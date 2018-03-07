@@ -1,13 +1,13 @@
 from typing import Any, Dict
 from core.Interpreter import Interpreter
-from core.DataGroupSchema import DataGroupSchema
+from core.GroupSchema import GroupSchema
 from core.Field import Field
 
 
-class DataGroup:
-    def __init__(self, schema: DataGroupSchema) -> None:
-        self.schema = schema
-        self.fields: Dict[str, Field] = {name: Field(field_schema) for name, field_schema in schema.fields}
+class Group:
+    def __init__(self, schema: GroupSchema) -> None:
+        self._schema = schema
+        self._fields: Dict[str, Field] = {name: Field(field_schema) for name, field_schema in schema.fields}
 
     def initialize(self, field_values: Dict[str, Any]) -> None:
         for name, value in field_values:
@@ -17,13 +17,19 @@ class DataGroup:
         return {name: field.changes() for name, field in self.fields}
 
     def evaluate(self, interpreter: Interpreter) -> None:
-        if not self.schema.filter or interpreter.evaluate(self.schema.filter):
+        if not self._schema.filter or interpreter.evaluate(self._schema.filter):
             for _, field in self.fields:
                 field.evaluate(interpreter)
 
+    def __getattr__(self, item):
+        if item in self._fields:
+            return self._fields[item].value
+
+        self.__getattribute__(item)
+
     @property
     def name(self):
-        return self.schema.name
+        return self._schema.name
 
     @property
     def fields(self):

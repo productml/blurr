@@ -1,8 +1,9 @@
 from core.FieldSchema import FieldSchema
 
 
-class DataGroupSchema:
+class GroupSchema:
     def __init__(self, schema: dict) -> None:
+        self.schema = schema
         self.name = schema['Name']
         self.type = schema['Type']
         self.filter = schema['Filter']
