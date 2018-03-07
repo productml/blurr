@@ -66,8 +66,8 @@ class FieldTypes(Enum):
         return FIELD_TYPE_VALIDATORS[self.name](value)
 
     @property
-    def default(self):
+    def default(self) -> Any:
         return FIELD_TYPE_DEFAULTS[self.name]
 
-    def diff(self, old, new):
+    def diff(self, old: Any, new: Any) -> Any:
         return FIELD_TYPE_DIFF[self.name](old, new)

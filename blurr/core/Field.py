@@ -20,13 +20,15 @@ class Field:
                     self._value)
 
     def evaluate(self, interpreter: Interpreter) -> None:
-        if not self.schema.type.type_of(self.value):
+        new_value = None
+        if not self.schema.filter or interpreter.evaluate(self.schema.filter):
+            new_value = interpreter.evaluate(self.schema.value)
+
+        if not self.schema.type.type_of(new_value):
             # TODO Give more meaningful error name
             raise ValueError('Type mismatch')
 
-        # TODO Determine the context of evaluations, and if context needs to be passed in
-        if not self.schema.filter or interpreter.evaluate(self.schema.filter):
-            self._value = interpreter.evaluate(self.schema.value)
+        self._value = new_value
 
     @property
     def name(self):
