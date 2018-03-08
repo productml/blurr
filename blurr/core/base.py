@@ -1,6 +1,14 @@
 from abc import ABC, abstractmethod
-from core.BaseSchema import BaseSchema
-from core.Interpreter import Interpreter
+from core.interpreter import Interpreter
+
+
+class BaseSchema(ABC):
+    def __init__(self, schema: dict):
+        self.schema = schema
+        self.name = schema['Name']
+        self.type = schema['Type']
+        self.filter = schema.get('Filter', '')
+        self.filter_expr = compile(self.filter, '<string>', 'eval')
 
 
 class BaseItem(ABC):

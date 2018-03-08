@@ -2,7 +2,7 @@ from typing import Any, Dict
 from core.interpreter import Interpreter
 from core.group import Group
 from core.session_group import SessionGroup, SessionGroupSchema
-from core.BaseItem import BaseItem
+from core.base import BaseItem
 from core.BaseSchema import BaseSchema
 
 GROUP_MAP = {

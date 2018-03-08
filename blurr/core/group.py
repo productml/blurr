@@ -1,7 +1,7 @@
 from typing import Any, Dict
 from core.interpreter import Interpreter
 from core.field import Field, FieldSchema
-from core.BaseItem import BaseItem
+from core.base import BaseItem
 from core.BaseSchema import BaseSchema
 
 
