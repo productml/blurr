@@ -2,6 +2,8 @@ from typing import Any, Dict
 from core.interpreter import Interpreter
 from core.group import Group
 from core.session_group import SessionGroup, SessionGroupSchema
+from core.BaseItem import BaseItem
+from core.BaseSchema import BaseSchema
 
 GROUP_MAP = {
     'ProductML:DTC:DataGroup:SessionAggregate': SessionGroup
@@ -12,13 +14,10 @@ GROUP_TYPE_MAP = {
 }
 
 
-class TransformerSchema:
+class TransformerSchema(BaseSchema):
     def __init__(self, schema: dict) -> None:
-        self.schema = schema
-        self.type = schema['Type']
+        super().__init__(schema)
         self.type = schema['Version']
-        self.filter = schema['Filter']
-        self.name = schema['Name']
         self.description = schema['Description']
         self.identity = schema['Identity']
         self.time = schema['Time']
@@ -32,9 +31,9 @@ class TransformerSchema:
 
 
 
-class Transformer:
+class Transformer(BaseItem):
     def __init__(self, schema: TransformerSchema, identity) -> None:
-        self._schema = schema
+        super().__init__(schema)
         self._identity = identity
         self._groups: Dict[str, Group] = {name: self.load_group(group_schema) for name, group_schema in schema.groups}
 
@@ -43,7 +42,7 @@ class Transformer:
         return GROUP_MAP[schema.type](schema)
 
     def evaluate(self, interpreter: Interpreter) -> None:
-        if not self._schema.filter or interpreter.evaluate(self._schema.filter):
+        if self.should_evaluate(interpreter):
             for _, group in self.groups:
                 group.evaluate(interpreter)
 
