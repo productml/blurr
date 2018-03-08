@@ -1,5 +1,5 @@
 from typing import Any, Dict
-from blurr.core.interpreter import Interpreter
+from blurr.core.context import Context
 from blurr.core.field import Field, FieldSchema
 from blurr.core.base import BaseItem, BaseSchema
 
@@ -11,24 +11,25 @@ class GroupSchema(BaseSchema):
 
 
 class Group(BaseItem):
-    def __init__(self, schema: GroupSchema) -> None:
-        super().__init__(schema)
+    def __init__(self, schema: GroupSchema, global_context: Context) -> None:
+        super().__init__(schema, global_context)
         self._fields: Dict[str, Field] = {
-            name: Field(field_schema)
-            for name, field_schema in schema.fields
+            name: Field(field_schema, self._global_context, self._local_context)
+            for name, field_schema in schema.fields.items()
         }
+        self._local_context.merge_context(self._fields)
 
     def initialize(self, field_values: Dict[str, Any]) -> None:
         for name, value in field_values:
-            self.fields[name].initialize(value)
+            self._fields[name].initialize(value)
 
     def changes(self) -> Any:
         return {name: field.changes() for name, field in self.fields}
 
-    def evaluate(self, interpreter: Interpreter) -> None:
-        if self.should_evaluate(interpreter):
-            for _, field in self.fields:
-                field.evaluate(interpreter)
+    def evaluate(self) -> None:
+        if self.should_evaluate():
+            for _, field in self._fields.items():
+                field.evaluate()
 
     def __getattr__(self, item):
         if item in self._fields:
@@ -42,4 +43,14 @@ class Group(BaseItem):
 
     @property
     def fields(self):
-        return self.fields
+        return self._fields
+
+
+import random
+
+class Tito:
+    @property
+    def name(self):
+        return random.Random().random()
+
+a = Tito()
