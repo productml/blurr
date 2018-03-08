@@ -1,6 +1,7 @@
 from typing import Dict, Any
-from pytest import fixture, raises
+from pytest import fixture, raises, mark
 from blurr.core.base import BaseSchema
+from blurr.core.errors import InvalidSchemaException
 import yaml
 
 TEST_SCHEMA = '''
@@ -10,43 +11,53 @@ Filter: True == True
 '''
 
 
-class TestSchema(BaseSchema):
-    def __init__(self, schema: dict):
-        super().__init__(schema)
-
-
-@fixture(scope='module')
-def field_definitions() -> Dict[str, Any]:
+@fixture
+def test_schema_definition():
     return yaml.load(TEST_SCHEMA)
 
 
-@fixture(scope='module')
-def field_schema(field_definitions: Dict[str, Any]) -> TestSchema:
-    return TestSchema(field_definitions)
+@mark.skip(reason='Abstract base class implementation for testing')
+class TestSchema(BaseSchema):
+    """
+    This class is to test abstract behavior, and thus, adds no functionality
+    """
+
+    def __init__(self, definition: Dict[str, Any]):
+        super().__init__(definition)
+
+    def validate(self, spec: Dict[str, Any]):
+        pass
+
+    def load(self, spec: Dict[str, Any]):
+        pass
 
 
-def test_base_schema_complete(field_schema: TestSchema,
-                              field_definitions: Dict[str, Any]) -> None:
-    assert field_schema.name == field_definitions['Name']
-    assert field_schema.type == field_definitions['Type']
-    assert field_schema.filter == field_definitions['Filter']
-    assert eval(field_schema.filter_expr)
+def test_base_schema_valid(test_schema_definition: Dict[str, Any]) -> None:
+    test_schema = TestSchema(test_schema_definition)
+    assert test_schema.name == test_schema_definition[BaseSchema.FIELD_NAME]
+    assert test_schema.type == test_schema_definition[BaseSchema.FIELD_TYPE]
+    assert test_schema.filter == test_schema_definition[BaseSchema.FIELD_FILTER]
+    assert eval(test_schema.filter_expr)
 
 
 def test_base_schema_empty() -> None:
-    with raises(KeyError, Message='Name is required for an item'):
+    with raises(InvalidSchemaException, Message='Required attribute missing.'):
         TestSchema({})
 
 
-def test_base_schema_type_missing() -> None:
-    with raises(KeyError, Message='Type is required for an item'):
-        TestSchema({'Name': 'Test'})
+def test_base_schema_name_missing(test_schema_definition: Dict[str, Any]) -> None:
+    del test_schema_definition[BaseSchema.FIELD_NAME]
+    with raises(InvalidSchemaException, Message='Required attribute missing.'):
+        TestSchema(test_schema_definition)
 
 
-def test_base_schema_invalid_filter() -> None:
+def test_base_schema_type_missing(test_schema_definition: Dict[str, Any]) -> None:
+    del test_schema_definition[BaseSchema.FIELD_TYPE]
+    with raises(InvalidSchemaException, Message='Required attribute missing.'):
+        TestSchema(test_schema_definition)
+
+
+def test_base_schema_invalid_filter(test_schema_definition: Dict[str, Any]) -> None:
+    test_schema_definition[BaseSchema.FIELD_FILTER] = '(#&*@#$#'
     with raises(SyntaxError):
-        TestSchema({
-            'Name': 'TestName',
-            'Type': 'TestType',
-            'Filter': '(#&*@#$#'
-        })
+        TestSchema(test_schema_definition)
