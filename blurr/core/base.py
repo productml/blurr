@@ -7,8 +7,8 @@ class BaseSchema(ABC):
         self.schema = schema
         self.name = schema['Name']
         self.type = schema['Type']
-        self.filter = schema.get('Filter', '')
-        self.filter_expr = compile(self.filter, '<string>', 'eval')
+        self.filter = schema.get('Filter', None)
+        self.filter_expr = None if self.filter is None else compile(self.filter, '<string>', 'eval')
 
 
 class BaseItem(ABC):
