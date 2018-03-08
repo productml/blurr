@@ -1,15 +1,16 @@
 from typing import Any
 from enum import Enum, auto
 from datetime import datetime
+from core.BaseSchema import BaseSchema
 
 
-class FieldSchema:
+class FieldSchema(BaseSchema):
     def __init__(self, schema: dict) -> None:
-        self.name = schema['Name']
+        super().__init__(schema)
         self.type = FieldTypes.load(schema['Type'])
-        self.filter = schema['Filter']
         self.value = schema['Value']
-        self.atomic = schema['Atomic']
+        self.value_expr = compile(self.value, '<string>', 'eval')
+        self.atomic = schema.get('Atomic', False)
 
 
 FIELD_TYPE_VALIDATORS = {

@@ -2,11 +2,12 @@ from typing import Any, Dict
 from core.Interpreter import Interpreter
 from core.GroupSchema import GroupSchema
 from core.Field import Field
+from core.BaseItem import BaseItem
 
 
-class Group:
+class Group(BaseItem):
     def __init__(self, schema: GroupSchema) -> None:
-        self._schema = schema
+        super().__init__(schema)
         self._fields: Dict[str, Field] = {name: Field(field_schema) for name, field_schema in schema.fields}
 
     def initialize(self, field_values: Dict[str, Any]) -> None:
@@ -17,7 +18,7 @@ class Group:
         return {name: field.changes() for name, field in self.fields}
 
     def evaluate(self, interpreter: Interpreter) -> None:
-        if not self._schema.filter or interpreter.evaluate(self._schema.filter):
+        if self.should_evaluate(interpreter):
             for _, field in self.fields:
                 field.evaluate(interpreter)
 

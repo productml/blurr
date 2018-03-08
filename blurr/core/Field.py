@@ -1,11 +1,12 @@
 from typing import Any
 from core.Interpreter import Interpreter
 from core.FieldSchema import FieldSchema
+from core.BaseItem import  BaseItem
 
 
-class Field:
+class Field(BaseItem):
     def __init__(self, schema: FieldSchema) -> None:
-        self.schema = schema
+        super().__init__(schema)
         self._initial_value = None
         self._value = None
 
@@ -21,8 +22,8 @@ class Field:
 
     def evaluate(self, interpreter: Interpreter) -> None:
         new_value = None
-        if not self.schema.filter or interpreter.evaluate(self.schema.filter):
-            new_value = interpreter.evaluate(self.schema.value)
+        if self.should_evaluate(interpreter):
+            new_value = interpreter.evaluate(self.schema.value_expr)
 
         if not self.schema.type.type_of(new_value):
             # TODO Give more meaningful error name

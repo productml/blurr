@@ -1,4 +1,4 @@
-from core.GroupSchema import GroupSchema
+from core.BaseSchema import BaseSchema
 from core.SessionGroupSchema import SessionGroupSchema
 
 GROUP_TYPE_MAP = {
@@ -6,13 +6,10 @@ GROUP_TYPE_MAP = {
 }
 
 
-class TransformerSchema:
+class TransformerSchema(BaseSchema):
     def __init__(self, schema: dict) -> None:
-        self.schema = schema
-        self.type = schema['Type']
-        self.type = schema['Version']
-        self.filter = schema['Filter']
-        self.name = schema['Name']
+        super().__init__(schema)
+        self.version = schema['Version']
         self.description = schema['Description']
         self.identity = schema['Identity']
         self.time = schema['Time']
