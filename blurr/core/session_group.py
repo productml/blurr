@@ -1,5 +1,5 @@
-from core.interpreter import Interpreter
-from core.group import Group, GroupSchema
+from blurr.core.interpreter import Interpreter
+from blurr.core.group import Group, GroupSchema
 
 
 class SessionGroupSchema(GroupSchema):

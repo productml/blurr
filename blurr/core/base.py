@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from core.interpreter import Interpreter
+from blurr.core.interpreter import Interpreter
 
 
 class BaseFieldNames:
@@ -15,15 +15,18 @@ class BaseSchema(ABC):
         self.name = schema[BaseFieldNames.NAME]
         self.type = schema[BaseFieldNames.TYPE]
         self.filter = schema.get(BaseFieldNames.FILTER, None)
-        self.filter_expr = None if self.filter is None else compile(self.filter, '<string>', 'eval')
+        self.filter_expr = None if self.filter is None else compile(
+            self.filter, '<string>', 'eval')
 
     @staticmethod
     def validate(schema):
         if BaseFieldNames.NAME not in schema:
-            raise KeyError('{} is required for an item'.format(BaseFieldNames.NAME))
+            raise KeyError('{} is required for an item'.format(
+                BaseFieldNames.NAME))
 
         if BaseFieldNames.TYPE not in schema:
-            raise KeyError('{} is required for an item'.format(BaseFieldNames.NAME))
+            raise KeyError('{} is required for an item'.format(
+                BaseFieldNames.NAME))
 
 
 class BaseItem(ABC):
@@ -31,7 +34,8 @@ class BaseItem(ABC):
         self._schema = schema
 
     def should_evaluate(self, interpreter: Interpreter) -> None:
-        return not self._schema.filter_expr or interpreter.evaluate(self._schema.filter_expr)
+        return not self._schema.filter_expr or interpreter.evaluate(
+            self._schema.filter_expr)
 
     @abstractmethod
     def evaluate(self, interpreter: Interpreter) -> None:

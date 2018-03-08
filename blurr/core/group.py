@@ -1,8 +1,7 @@
 from typing import Any, Dict
-from core.interpreter import Interpreter
-from core.field import Field, FieldSchema
-from core.base import BaseItem
-from core.BaseSchema import BaseSchema
+from blurr.core.interpreter import Interpreter
+from blurr.core.field import Field, FieldSchema
+from blurr.core.base import BaseItem, BaseSchema
 
 
 class GroupSchema(BaseSchema):
@@ -14,7 +13,10 @@ class GroupSchema(BaseSchema):
 class Group(BaseItem):
     def __init__(self, schema: GroupSchema) -> None:
         super().__init__(schema)
-        self._fields: Dict[str, Field] = {name: Field(field_schema) for name, field_schema in schema.fields}
+        self._fields: Dict[str, Field] = {
+            name: Field(field_schema)
+            for name, field_schema in schema.fields
+        }
 
     def initialize(self, field_values: Dict[str, Any]) -> None:
         for name, value in field_values:

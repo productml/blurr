@@ -1,13 +1,10 @@
 from typing import Any, Dict
-from core.interpreter import Interpreter
-from core.group import Group
-from core.session_group import SessionGroup, SessionGroupSchema
-from core.base import BaseItem
-from core.BaseSchema import BaseSchema
+from blurr.core.interpreter import Interpreter
+from blurr.core.group import Group
+from blurr.core.session_group import SessionGroup, SessionGroupSchema
+from blurr.core.base import BaseItem, BaseSchema
 
-GROUP_MAP = {
-    'ProductML:DTC:DataGroup:SessionAggregate': SessionGroup
-}
+GROUP_MAP = {'ProductML:DTC:DataGroup:SessionAggregate': SessionGroup}
 
 GROUP_TYPE_MAP = {
     'ProductML:DTC:DataGroup:SessionAggregate': SessionGroupSchema
@@ -22,7 +19,10 @@ class TransformerSchema(BaseSchema):
         self.identity = schema['Identity']
         self.time = schema['Time']
         # TODO Write factory for loading the correct group schema form different types
-        self.groups = {s['Name']: self.load_group_schema(s) for s in schema['Groups']}
+        self.groups = {
+            s['Name']: self.load_group_schema(s)
+            for s in schema['Groups']
+        }
 
     def load_group_schema(self, schema):
         # TODO Move the type name to type reference out to an external configuration
@@ -30,12 +30,14 @@ class TransformerSchema(BaseSchema):
         return GROUP_TYPE_MAP[schema['Type']](schema)
 
 
-
 class Transformer(BaseItem):
     def __init__(self, schema: TransformerSchema, identity) -> None:
         super().__init__(schema)
         self._identity = identity
-        self._groups: Dict[str, Group] = {name: self.load_group(group_schema) for name, group_schema in schema.groups}
+        self._groups: Dict[str, Group] = {
+            name: self.load_group(group_schema)
+            for name, group_schema in schema.groups
+        }
 
     def load_group(self, schema):
         # TODO Move the type name to type reference out to an external configuration

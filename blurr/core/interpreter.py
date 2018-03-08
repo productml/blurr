@@ -1,5 +1,3 @@
-
-
 class Interpreter:
     def __init__(self, global_context, local_context):
         self._global_context = global_context

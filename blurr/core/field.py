@@ -1,9 +1,9 @@
-from core.interpreter import Interpreter
+from blurr.core.interpreter import Interpreter
+from blurr.core.base import BaseSchema, BaseItem
 
 from typing import Any
 from enum import Enum, auto
 from datetime import datetime
-from core.base import BaseSchema, BaseItem
 
 
 class FieldSchema(BaseSchema):
@@ -88,9 +88,9 @@ class Field(BaseItem):
 
     def changes(self) -> Any:
         if self._value != self._initial_value:
-                self._schema.type.diff(
-                    self._initial_value if self._initial_value is not None else self._schema.type.default,
-                    self._value)
+            self._schema.type.diff(self._initial_value
+                                   if self._initial_value is not None else
+                                   self._schema.type.default, self._value)
 
     def evaluate(self, interpreter: Interpreter) -> None:
         new_value = None
