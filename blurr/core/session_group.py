@@ -1,6 +1,11 @@
-from core.Interpreter import Interpreter
-from core.SessionGroupSchema import SessionGroupSchema
-from core.Group import Group
+from core.interpreter import Interpreter
+from core.group import Group, GroupSchema
+
+
+class SessionGroupSchema(GroupSchema):
+    def __init__(self, schema: dict) -> None:
+        self.split = schema['Split']
+        super(SessionGroupSchema, self).__init__(schema)
 
 
 class StaleSessionError(Exception):
@@ -16,3 +21,7 @@ class SessionGroup(Group):
             raise StaleSessionError()
 
         super(SessionGroup, self).evaluate(interpreter)
+
+    def split(self):
+        pass
+        # TODO Flush the current session to store

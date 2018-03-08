@@ -1,7 +1,15 @@
 from typing import Any, Dict
-from core.Interpreter import Interpreter
-from core.GroupSchema import GroupSchema
-from core.Field import Field
+from core.interpreter import Interpreter
+from core.field import Field, FieldSchema
+
+
+class GroupSchema:
+    def __init__(self, schema: dict) -> None:
+        self.schema = schema
+        self.name = schema['Name']
+        self.type = schema['Type']
+        self.filter = schema['Filter']
+        self.fields = {s['Name']: FieldSchema(s) for s in schema['Fields']}
 
 
 class Group:
