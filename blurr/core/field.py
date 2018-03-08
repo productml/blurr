@@ -88,16 +88,16 @@ class Field(BaseItem):
 
     def changes(self) -> Any:
         if self._value != self._initial_value:
-                self.schema.type.diff(
-                    self._initial_value if self._initial_value is not None else self.schema.type.default,
+                self._schema.type.diff(
+                    self._initial_value if self._initial_value is not None else self._schema.type.default,
                     self._value)
 
     def evaluate(self, interpreter: Interpreter) -> None:
         new_value = None
         if self.should_evaluate(interpreter):
-            new_value = interpreter.evaluate(self.schema.value_expr)
+            new_value = interpreter.evaluate(self._schema.value_expr)
 
-        if not self.schema.type.type_of(new_value):
+        if not self._schema.type.type_of(new_value):
             # TODO Give more meaningful error name
             raise ValueError('Type mismatch')
 
@@ -105,8 +105,8 @@ class Field(BaseItem):
 
     @property
     def name(self):
-        return self.schema.name
+        return self._schema.name
 
     @property
     def value(self):
-        return self._value if self._value else self.schema.type.default
+        return self._value if self._value else self._schema.type.default

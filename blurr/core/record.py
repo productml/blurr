@@ -6,4 +6,4 @@ class Record:
         if isinstance(self._event_dict[item], dict):
             return Record(self._event_dict[item])
         else:
-            self._event_dict[item]
+            return self._event_dict[item]
