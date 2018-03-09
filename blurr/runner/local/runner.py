@@ -2,7 +2,7 @@ import yaml
 import json
 from blurr.core.transformer import TransformerSchema, Transformer
 from blurr.core.record import Record
-from blurr.core.context import Context
+from blurr.core.evaluation import Context
 from dateutil import parser
 
 
@@ -19,10 +19,12 @@ class LocalRunner:
     def _consume_record(self, record):
         source_context = Context({'source': record})
         identity = self._transformer_schema.get_identity(source_context)
-        user_transformer = self._user_transformer.get(identity, Transformer(self._transformer_schema,identity, self._exec_context))
+        if identity not in self._user_transformer:
+            self._user_transformer[identity] = Transformer(
+                self._transformer_schema, identity, self._exec_context)
+        user_transformer = self._user_transformer[identity]
         user_transformer.set_source_context(source_context)
         user_transformer.evaluate()
-        self._user_transformer[identity] = user_transformer
 
     def _execute_file(self, file):
         with open(file) as f:
