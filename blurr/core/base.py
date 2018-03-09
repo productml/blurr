@@ -1,9 +1,26 @@
 from abc import ABC, abstractmethod
-from blurr.core.context import Context
-import dis
-
 from typing import Dict, Any
+
+from blurr.core.context import Context
 from blurr.core.errors import InvalidSchemaException, ExpressionEvaluationException
+
+
+class EvaluationResult:
+    """
+    Returned as the result of an evaluation
+    """
+
+    def __init__(self, result: Any = None, skip_cause: str = None, error: Exception = None) -> None:
+        """
+        Initializes an evaluation result withe the result and result behavior
+        :param result: Result of the evaluation
+        :param skip_cause: Reason for not evaluating
+        :param error: Exception thrown during execution
+        """
+        self.result = result
+        self.success = not skip_cause and not error
+        self.skip_cause = skip_cause
+        self.error = error
 
 
 class Expression:
@@ -17,7 +34,7 @@ class Expression:
         self.code_string = 'None' if code_string.isspace() else code_string
         self.code_object = compile(self.code_string, '<string>', 'eval')
 
-    def evaluate(self, global_context: Dict[str, Any]=None, local_context: Dict[str, Any]=None) -> Any:
+    def evaluate(self, global_context: Context = Context(), local_context: Context = Context()) -> EvaluationResult:
         """
         Evaluates the expression with the context provided.  If the execution
         results in failure, an ExpressionEvaluationException encapsulating the
@@ -26,11 +43,10 @@ class Expression:
         :param local_context: Local Context dictionary to be passed for evaluation
         """
         try:
-            return eval(self.code_object,
-                        global_context if global_context else {},
-                        local_context if local_context else {})
+            return EvaluationResult(eval(self.code_object, global_context, local_context))
+
         except Exception as e:
-            raise ExpressionEvaluationException(e)
+            EvaluationResult(error=ExpressionEvaluationException(e))
 
 
 class BaseSchema(ABC):
@@ -42,7 +58,7 @@ class BaseSchema(ABC):
     # Field Name Definitions
     FIELD_NAME = 'Name'
     FIELD_TYPE = 'Type'
-    FIELD_FILTER = 'Filter'
+    FIELD_WHEN = 'When'
 
     def __init__(self, spec: Dict[str, Any]) -> None:
         """
@@ -51,8 +67,8 @@ class BaseSchema(ABC):
         """
         # Load the schema spec into the current object
 
-        self.validate_spec(spec)
-        self.load_spec(spec)
+        self.__validate_spec(spec)
+        self.__load_spec(spec)
 
     @abstractmethod
     def validate(self, spec: Dict[str, Any]) -> None:
@@ -68,19 +84,19 @@ class BaseSchema(ABC):
         """
         raise NotImplementedError('"load()" must be implemented for a schema.')
 
-    def load_spec(self, spec: Dict[str, Any]) -> None:
+    def __load_spec(self, spec: Dict[str, Any]) -> None:
         """
         Loads the base schema spec into the object
         """
         self.spec: Dict[str, Any] = spec
         self.name: str = spec[self.FIELD_NAME]
         self.type: str = spec[self.FIELD_TYPE]
-        self.filter: Expression = Expression(spec[self.FIELD_FILTER])
+        self.when: Expression = Expression(spec[self.FIELD_WHEN])
 
         # Invokes the loads of the subclass
         self.load(spec)
 
-    def validate_spec(self, spec: Dict[str, Any]) -> None:
+    def __validate_spec(self, spec: Dict[str, Any]) -> None:
         """
         Validates the schema spec.  Raises exceptions if errors are found.
         """
@@ -122,27 +138,46 @@ class BaseSchema(ABC):
 
 
 class BaseItem(ABC):
-    def __init__(self, schema: BaseSchema, global_context: Context=Context(), local_context: Context=Context()):
-        self._schema = schema
-        self._global_context = global_context
-        self._local_context = local_context
+    """
+    Base class for for all items
+    """
 
-    def evaluate_expr(self, expr):
-        try:
-            return eval(expr, self._global_context, self._local_context)
-        except Exception as e:
-            print(dis.dis(expr))
-            raise e
+    def __init__(self, schema: BaseSchema, global_context: Context = Context(), local_context: Context = Context()):
+        """
+        Initializes an item with the schema and execution context
+        :param schema: Schema of the item
+        :param global_context: Global context dictionary for evaluation
+        :param local_context: Local context dictionary for evaluation
+        """
+        self.schema = schema
+        self.global_context = global_context
+        self.local_context = local_context
 
-    def should_evaluate(self) -> None:
-        return self._schema.filter.evaluate(self._global_context, self._local_context)
+    def evaluate(self) -> EvaluationResult:
+        """
+        Evaluates the current item
+        :returns An evaluation result object containing the result, or reasons why
+        evaluation failed
+        """
+        when_result = self.schema.when.evaluate(self.global_context, self.local_context)
+        if when_result.success and when_result.result:
+            return self.evaluate_item()
+
+        return EvaluationResult(None,
+                                'When condition evaluated to False' if when_result.success else 'Error occurred')
 
     @abstractmethod
-    def evaluate(self) -> None:
-        return NotImplemented
+    def evaluate_item(self) -> EvaluationResult:
+        """
+        Implements specific behavior for evaluation
+        """
+        raise NotImplementedError('evaluate_item must be implemented')
 
 
 class BaseType(ABC):
+    """
+    Base for all field types supported
+    """
 
     @property
     @abstractmethod
@@ -152,7 +187,7 @@ class BaseType(ABC):
         """
         raise NotImplementedError('type_object is required')
 
-    def type_of(self, instance: Any) -> bool:
+    def is_type_of(self, instance: Any) -> bool:
         """
         Checks if instance is of the type
         :param instance: An object instance
@@ -175,7 +210,7 @@ class BaseType(ABC):
         :param new:
         :return:
         """
-        if not self.type_of(old) or not self.type_of(new):
+        if not self.is_type_of(old) or not self.is_type_of(new):
             raise TypeError('old and new are not objects of this type')
 
         return self.calculate_difference(old, new)

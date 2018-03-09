@@ -39,8 +39,8 @@ class SessionGroup(Group):
 
     def evaluate(self) -> None:
         if self.start_time is not None and self.end_time is not None:
-            if not self._schema.split or self.evaluate_expr(
-                    self._schema.split):
+            if not self.schema.split or self.evaluate_expr(
+                    self.schema.split):
                 raise StaleSessionError()
 
         super(SessionGroup, self).evaluate()

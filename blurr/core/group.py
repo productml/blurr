@@ -27,7 +27,7 @@ class GroupSchema(BaseSchema, ABC):
             self.raise_validation_error(spec, self.FIELD_FIELDS, 'Must contain at least 1 field.')
 
     def load(self, spec: Dict[str, Any]) -> None:
-        self.fields = {}
+        self.fields: Dict[str, FieldSchema] = {}
         for field_spec in spec[self.FIELD_FIELDS]:
             field_schema = FieldSchema(field_spec)
             self.fields[field_schema.name] = field_schema
@@ -36,11 +36,11 @@ class Group(BaseItem):
     def __init__(self, schema: GroupSchema, global_context: Context) -> None:
         super().__init__(schema, global_context)
         self._fields: Dict[str, Field] = {
-            name: Field(field_schema, self._global_context,
-                        self._local_context)
+            name: Field(field_schema, self.global_context,
+                        self.local_context)
             for name, field_schema in schema.fields.items()
         }
-        self._local_context.merge_context(self._fields)
+        self.local_context.merge_context(self._fields)
 
     def initialize(self, field_values: Dict[str, Any]) -> None:
         for name, value in field_values:
@@ -62,7 +62,7 @@ class Group(BaseItem):
 
     @property
     def name(self):
-        return self._schema.name
+        return self.schema.name
 
     @property
     def fields(self):
