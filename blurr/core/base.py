@@ -31,7 +31,8 @@ class BaseSchema(ABC):
         """
         Abstract method that ensures that the subclasses implement spec validation
         """
-        raise NotImplementedError('"validate()" must be implemented for a schema.')
+        raise NotImplementedError(
+            '"validate()" must be implemented for a schema.')
 
     @abstractmethod
     def load(self, spec: Dict[str, Any]) -> None:
@@ -47,7 +48,8 @@ class BaseSchema(ABC):
         self.spec: Dict[str, Any] = spec
         self.name: str = spec[self.FIELD_NAME]
         self.type: str = spec[self.FIELD_TYPE]
-        self.when: Expression = Expression(spec[self.FIELD_WHEN]) if self.FIELD_WHEN in spec else None
+        self.when: Expression = Expression(
+            spec[self.FIELD_WHEN]) if self.FIELD_WHEN in spec else None
 
         # Invokes the loads of the subclass
         self.load(spec)
@@ -62,7 +64,8 @@ class BaseSchema(ABC):
         # Invokes the validations of the subclasses
         self.validate(spec)
 
-    def validate_required_attribute(self, spec: Dict[str, Any], attribute: str):
+    def validate_required_attribute(self, spec: Dict[str, Any],
+                                    attribute: str):
         """
         Raises an error if a required attribute is not defined
         or contains an empty value
@@ -70,12 +73,15 @@ class BaseSchema(ABC):
         :param attribute: Attribute that is being validated
         """
         if attribute not in spec:
-            self.raise_validation_error(spec, attribute, 'Required attribute missing.')
+            self.raise_validation_error(spec, attribute,
+                                        'Required attribute missing.')
 
         if isinstance(spec[attribute], str) and spec[attribute].isspace():
-            self.raise_validation_error(spec, attribute, 'Invalid attribute value.')
+            self.raise_validation_error(spec, attribute,
+                                        'Invalid attribute value.')
 
-    def raise_validation_error(self, spec: Dict[str, Any], attribute: str, message: str):
+    def raise_validation_error(self, spec: Dict[str, Any], attribute: str,
+                               message: str):
         """
         Raises an InvalidSchemaException exception with an expressive message
         :param spec: Schema specification dictionary
@@ -98,7 +104,10 @@ class BaseItem(ABC):
     Base class for for all leaf items that do not contain sub-items
     """
 
-    def __init__(self, schema: BaseSchema, global_context: Context = Context(), local_context: Context = Context()):
+    def __init__(self,
+                 schema: BaseSchema,
+                 global_context: Context = Context(),
+                 local_context: Context = Context()):
         """
         Initializes an item with the schema and execution context
         :param schema: Schema of the item
@@ -148,11 +157,9 @@ class BaseItemCollection(BaseItem):
     @property
     def export(self):
         try:
-            return {
-                name: item.export for name, item in self.items.items()
-            }
+            return {name: item.export for name, item in self.items.items()}
         except Exception as e:
-            print('Error when exporting',  self.items)
+            print('Error when exporting', self.items)
             raise e
 
     @property

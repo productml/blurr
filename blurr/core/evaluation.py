@@ -39,7 +39,9 @@ class Expression:
         except Exception as e:
             raise InvalidExpressionException(e)
 
-    def evaluate(self, global_context: Context = Context(), local_context: Context = Context()) -> Any:
+    def evaluate(self,
+                 global_context: Context = Context(),
+                 local_context: Context = Context()) -> Any:
         """
         Evaluates the expression with the context provided.  If the execution
         results in failure, an ExpressionEvaluationException encapsulating the
