@@ -1,7 +1,8 @@
 from pytest import raises
 
 from blurr.core.base import Expression
-from blurr.core.errors import ExpressionEvaluationException
+from blurr.core.errors import ExpressionEvaluationException, InvalidExpressionException
+from blurr.core.evaluation import Context
 
 
 def test_expression_valid() -> None:
@@ -18,6 +19,18 @@ def test_expression_globals_locals() -> None:
     with raises(ExpressionEvaluationException, Message='is not defined'):
         expr.evaluate()
 
-    assert expr.evaluate(global_context={'a': 2, 'b': 3}) == 6
-    assert expr.evaluate(local_context={'a': 2, 'b': 3}) == 6
-    assert expr.evaluate({'a': 2}, {'b': 3}) == 6
+    assert expr.evaluate(global_context=Context({'a': 2, 'b': 3})) == 6
+    assert expr.evaluate(local_context=Context({'a': 2, 'b': 3})) == 6
+    assert expr.evaluate(Context({'a': 2}), Context({'b': 3})) == 6
+
+
+def test_invalid_expression() -> None:
+    code_string = '{9292#?&@&^'
+    with raises(InvalidExpressionException):
+        Expression(code_string)
+
+
+def test_execution_error() -> None:
+    code_string = '1/0'
+    with raises(ExpressionEvaluationException):
+        Expression(code_string).evaluate()

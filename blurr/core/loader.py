@@ -21,6 +21,8 @@ SCHEMA_MAP = {
 }
 
 
+# TODO Build dynamic type loader from a central configuration rather than reading a static dictionary
+
 class TypeLoader:
 
     @staticmethod

@@ -1,10 +1,9 @@
 from typing import Dict, Any
 
 import yaml
-from pytest import mark, fixture, raises
+from pytest import mark, fixture
 
 from blurr.core.base import BaseSchema, BaseItem
-from blurr.core.errors import ExpressionEvaluationException, InvalidExpressionException
 from blurr.core.evaluation import Context
 from tests.core.base_schema_tests import TestSchema
 
@@ -51,19 +50,3 @@ def test_base_item_filter_false(schema_spec: Dict[str, Any]) -> None:
     test_item = TestItem(schema)
 
     assert not test_item.needs_evaluation
-
-
-def test_base_item_filter_invalid_expression(schema_spec: Dict[str, Any]) -> None:
-    schema_spec[BaseSchema.FIELD_WHEN] = '{9292#?&@&^'
-
-    with raises(InvalidExpressionException):
-        TestSchema(schema_spec)
-
-
-def test_base_item_filter_execution_error(schema_spec: Dict[str, Any]) -> None:
-    schema_spec[BaseSchema.FIELD_WHEN] = '1/0'
-    schema = TestSchema(schema_spec)
-    test_item = TestItem(schema)
-
-    with raises(ExpressionEvaluationException):
-        a = test_item.needs_evaluation
