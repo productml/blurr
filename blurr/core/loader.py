@@ -1,5 +1,5 @@
 from typing import Any
-from blurr.core.session_group import SessionDataGroupSchema, SessionDataGroup
+from blurr.core.session_data_group import SessionDataGroupSchema, SessionDataGroup
 from blurr.core.errors import TypeNotFoundException
 from blurr.core.field_types import IntegerType, StringType, BooleanType, DateTimeType, FloatType, MapType, ListType, \
     SetType
