@@ -1,15 +1,15 @@
 from typing import Any
-from blurr.core.session_group import SessionGroupSchema, SessionGroup
+from blurr.core.session_group import SessionDataGroupSchema, SessionDataGroup
 from blurr.core.errors import TypeNotFoundException
 from blurr.core.field_types import IntegerType, StringType, BooleanType, DateTimeType, FloatType, MapType, ListType, \
     SetType
 
 ITEM_MAP = {
-    'ProductML:DTC:DataGroup:SessionAggregate': SessionGroup
+    'ProductML:DTC:DataGroup:SessionAggregate': SessionDataGroup
 }
 
 SCHEMA_MAP = {
-    'ProductML:DTC:DataGroup:SessionAggregate': SessionGroupSchema,
+    'ProductML:DTC:DataGroup:SessionAggregate': SessionDataGroupSchema,
     'string': StringType,
     'integer': IntegerType,
     'boolean': BooleanType,

@@ -1,5 +1,5 @@
 from typing import Any, Dict
-from blurr.core.group import Group
+from blurr.core.data_group import DataGroup
 from blurr.core.base import BaseItem, BaseSchema, Expression
 from blurr.core.context import Context
 from blurr.core.loader import TypeLoader
@@ -41,7 +41,7 @@ class Transformer(BaseItem):
         self.global_context.merge_context(exec_context)
         self._identity = identity
         self.global_context.add_context('identity', self._identity)
-        self._groups: Dict[str, Group] = {
+        self._groups: Dict[str, DataGroup] = {
             name: self.load_group(group_schema)
             for name, group_schema in schema.groups.items()
         }

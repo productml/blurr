@@ -1,12 +1,12 @@
 from blurr.core.evaluation import Context
-from blurr.core.group import Group, GroupSchema
+from blurr.core.data_group import DataGroup, DataGroupSchema
 
 
-class SessionGroupSchema(GroupSchema):
+class SessionDataGroupSchema(DataGroupSchema):
     def __init__(self, schema: dict) -> None:
         self.split = schema['Split']
         schema['Fields'][0:0] = self.get_predefined_fields(schema['Name'])
-        super(SessionGroupSchema, self).__init__(schema)
+        super(SessionDataGroupSchema, self).__init__(schema)
 
     @staticmethod
     def get_predefined_fields(name):
@@ -32,10 +32,10 @@ class StaleSessionError(Exception):
     pass
 
 
-class SessionGroup(Group):
-    def __init__(self, schema: SessionGroupSchema,
+class SessionDataGroup(DataGroup):
+    def __init__(self, schema: SessionDataGroupSchema,
                  global_context: Context) -> None:
-        super(SessionGroup, self).__init__(schema, global_context)
+        super(SessionDataGroup, self).__init__(schema, global_context)
 
     def evaluate(self) -> None:
         if self.start_time is not None and self.end_time is not None:
@@ -43,7 +43,7 @@ class SessionGroup(Group):
                     self.schema.split):
                 raise StaleSessionError()
 
-        super(SessionGroup, self).evaluate()
+        super(SessionDataGroup, self).evaluate()
 
     def split(self):
         pass

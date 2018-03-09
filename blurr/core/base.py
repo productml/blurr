@@ -112,6 +112,7 @@ class BaseItem(ABC):
     @property
     def needs_evaluation(self) -> bool:
         return bool(self.schema.when and self.schema.when.evaluate())
+
     @property
     def name(self):
         return self.schema.name
@@ -129,7 +130,7 @@ class BaseItem(ABC):
         raise NotImplementedError('export() must be implemented')
 
 
-class BaseItemGroup(BaseItem):
+class BaseItemCollection(BaseItem):
     """
     Base class for items that contain sub-items within them
     """

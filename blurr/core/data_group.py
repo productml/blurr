@@ -1,11 +1,12 @@
-from typing import Any, Dict
-from blurr.core.context import Context
-from blurr.core.field import Field, FieldSchema
-from blurr.core.base import BaseItem, BaseSchema
 from abc import ABC
+from typing import Any, Dict
+
+from blurr.core.base import BaseSchema, BaseItemCollection
+from blurr.core.evaluation import Context
+from blurr.core.field import Field, FieldSchema
 
 
-class GroupSchema(BaseSchema, ABC):
+class DataGroupSchema(BaseSchema, ABC):
     """
     Base for individual Group schema.  The Base implements 'Fields' which represents the list of
     'Field' schema objects.
@@ -32,8 +33,9 @@ class GroupSchema(BaseSchema, ABC):
             field_schema = FieldSchema(field_spec)
             self.fields[field_schema.name] = field_schema
 
-class Group(BaseItem):
-    def __init__(self, schema: GroupSchema, global_context: Context) -> None:
+
+class DataGroup(BaseItemCollection):
+    def __init__(self, schema: DataGroupSchema, global_context: Context) -> None:
         super().__init__(schema, global_context)
         self._fields: Dict[str, Field] = {
             name: Field(field_schema, self.global_context,
@@ -54,10 +56,6 @@ class Group(BaseItem):
             return self._fields[item].value
 
         self.__getattribute__(item)
-
-    @property
-    def name(self):
-        return self.schema.name
 
     @property
     def fields(self):
