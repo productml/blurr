@@ -111,7 +111,7 @@ class BaseItem(ABC):
 
     @property
     def needs_evaluation(self) -> bool:
-        return bool(self.schema.when and self.schema.when.evaluate())
+        return self.schema.when is None or self.schema.when.evaluate()
 
     @property
     def name(self):
@@ -147,11 +147,15 @@ class BaseItemCollection(BaseItem):
 
     @property
     def export(self):
-        return {
-            name: item.export() for name, item in self.items.items()
-        }
+        try:
+            return {
+                name: item.export for name, item in self.items.items()
+            }
+        except Exception as e:
+            print('Error when exporting',  self.items)
+            raise e
 
     @property
     @abstractmethod
-    def items(self):
+    def items(self) -> Dict[str, BaseItem]:
         raise NotImplementedError('Sub items must be present')

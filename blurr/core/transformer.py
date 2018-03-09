@@ -1,6 +1,6 @@
 from typing import Any, Dict
 from blurr.core.data_group import DataGroup
-from blurr.core.base import BaseItem, BaseSchema, Expression
+from blurr.core.base import BaseItemCollection, BaseItem, BaseSchema, Expression
 from blurr.core.evaluation import Context
 from blurr.core.loader import TypeLoader
 
@@ -10,7 +10,7 @@ class TransformerSchema(BaseSchema):
     FIELD_DESCRIPTION = 'Description'
     FIELD_IDENTITY = 'Identity'
     FIELD_TIME = 'Time'
-    FIELD_GROUPS = 'Groups'
+    FIELD_GROUPS = 'DataGroups'
 
     def __init__(self, spec: Dict[str, Any]) -> None:
         super().__init__(spec)
@@ -33,7 +33,7 @@ class TransformerSchema(BaseSchema):
         return self.identity.evaluate(source_context)
 
 
-class Transformer(BaseItem):
+class Transformer(BaseItemCollection):
     def __init__(self, schema: TransformerSchema, identity,
                  exec_context: Context) -> None:
         super().__init__(schema)
@@ -42,23 +42,18 @@ class Transformer(BaseItem):
         self._identity = identity
         self.global_context.add_context('identity', self._identity)
         self._groups: Dict[str, DataGroup] = {
-            name: self.load_group(group_schema)
+            name: TypeLoader.load_item(group_schema.type)(group_schema,
+                                                          self.global_context)
             for name, group_schema in schema.groups.items()
         }
         self.global_context.merge_context(self._groups)
 
-    def load_group(self, schema):
-        # TODO Move the type name to type reference out to an external configuration
-        return GROUP_MAP[schema.type](schema, self.global_context)
-
     def set_source_context(self, source_context: Context) -> None:
         self.global_context.merge_context(source_context)
-        self.global_context.add_context('time',
-                                        self.evaluate_expr(
-                                             self.schema.time_expr))
+        self.global_context.add_context('time', self.schema.time.evaluate(self.global_context))
 
     @property
-    def items(self) -> BaseItem:
+    def items(self) -> Dict[str, BaseItemCollection]:
         return self._groups
 
     def __getattr__(self, item):
@@ -66,10 +61,6 @@ class Transformer(BaseItem):
             return self._groups[item].value
 
         self.__getattribute__(item)
-
-    @property
-    def name(self):
-        return self.schema.name
 
     @property
     def groups(self):

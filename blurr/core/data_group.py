@@ -19,6 +19,7 @@ class DataGroupSchema(BaseSchema, ABC):
     def __init__(self, spec: Dict[str, Any]) -> None:
         super().__init__(spec)
 
+
     def validate(self, spec: Dict[str, Any]) -> None:
         self.validate_required_attribute(spec, self.FIELD_FIELDS)
 
@@ -29,17 +30,15 @@ class DataGroupSchema(BaseSchema, ABC):
             self.raise_validation_error(spec, self.FIELD_FIELDS, 'Must contain at least 1 field.')
 
     def load(self, spec: Dict[str, Any]) -> None:
-        self.fields: Dict[str, FieldSchema] = {}
-        for field_spec in spec[self.FIELD_FIELDS]:
-            field_schema = TypeLoader.load_schema(field_spec[self.FIELD_TYPE])(spec)
-            self.fields[field_schema.name] = field_schema
+        self.fields = {field_spec[self.FIELD_NAME]: TypeLoader.load_schema(field_spec[self.FIELD_TYPE])(field_spec)
+                       for field_spec in spec[self.FIELD_FIELDS]}
 
 
 class DataGroup(BaseItemCollection):
     def __init__(self, schema: DataGroupSchema, global_context: Context) -> None:
         super().__init__(schema, global_context)
         self._fields: Dict[str, Field] = {
-            name: TypeLoader.load_type(field_schema.type)(field_schema, self.global_context, self.local_context)
+            name: TypeLoader.load_item(field_schema.type)(field_schema, self.global_context, self.local_context)
             for name, field_schema in schema.fields.items()
         }
         self.local_context.merge_context(self._fields)

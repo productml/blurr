@@ -61,7 +61,7 @@ class Field(BaseItem):
     def __init__(self, schema: FieldSchema, global_context: Context,
                  local_context: Context) -> None:
         super().__init__(schema, global_context, local_context)
-        self.value = self.schema.type.default
+        self.value = self.schema.default
 
     def initialize(self, value) -> None:
         self.value = value
@@ -69,7 +69,7 @@ class Field(BaseItem):
     def evaluate(self) -> None:
         new_value = None
         if self.needs_evaluation:
-            new_value = self.value.evaluate()
+            new_value = self.schema.value.evaluate(self.global_context, self.local_context)
 
         if not self.schema.is_type_of(new_value):
             raise TypeError('Value expression for "{}" returned an incompatible type.', self.name)
