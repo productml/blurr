@@ -4,6 +4,17 @@ from typing import Dict, Any
 from blurr.core.errors import InvalidSchemaException
 
 
+class Expression:
+    """ Encapsulates a python code statement in string and in compilable expression"""
+
+    def __init__(self, code_string):
+        self.code_string = 'None' if code_string.isspace() else code_string
+        self.code_object = compile(self.code_string, '<string>', 'eval')
+
+    def evaluate(self, global_dictionary, local_dictionary):
+        eval(self.code_object, global_dictionary, local_dictionary)
+
+
 class BaseSchema(ABC):
     """
     The Base Schema encapsulates the common functionality of all schema
@@ -32,19 +43,6 @@ class BaseSchema(ABC):
         """
         raise NotImplementedError('"validate()" must be implemented for a schema.')
 
-    def validate_spec(self, spec: Dict[str, Any]) -> None:
-        """
-        Validates the schema spec.  Raises exceptions if errors are found.
-        """
-        if self.FIELD_NAME not in spec:
-            self.raise_validation_error(spec, self.FIELD_NAME, 'Required attribute missing.')
-
-        if self.FIELD_TYPE not in spec:
-            self.raise_validation_error(spec, self.FIELD_TYPE, 'Required attribute missing.')
-
-        # Invokes the validations of the subclasses
-        self.validate(spec)
-
     @abstractmethod
     def load(self, spec: Dict[str, Any]) -> None:
         """
@@ -59,12 +57,33 @@ class BaseSchema(ABC):
         self.spec: Dict[str, Any] = spec
         self.name: str = spec[self.FIELD_NAME]
         self.type: str = spec[self.FIELD_TYPE]
-        self.filter: str = spec.get(self.FIELD_FILTER, None)
-        self.filter_expr = None if self.filter is None else compile(
-            self.filter, '<string>', 'eval')
+        self.filter: Expression = Expression(spec[self.FIELD_FILTER])
 
         # Invokes the loads of the subclass
         self.load(spec)
+
+    def validate_spec(self, spec: Dict[str, Any]) -> None:
+        """
+        Validates the schema spec.  Raises exceptions if errors are found.
+        """
+        self.validate_required_attribute(spec, self.FIELD_NAME)
+        self.validate_required_attribute(spec, self.FIELD_TYPE)
+
+        # Invokes the validations of the subclasses
+        self.validate(spec)
+
+    def validate_required_attribute(self, spec: Dict[str, Any], attribute: str):
+        """
+        Raises an error if a required attribute is not defined
+        or contains an empty value
+        :param spec: Schema specifications
+        :param attribute: Attribute that is being validated
+        """
+        if attribute not in spec:
+            self.raise_validation_error(spec, attribute, 'Required attribute missing.')
+
+        if isinstance(spec[attribute], str) and spec[attribute].isspace():
+            self.raise_validation_error(spec, attribute, 'Invalid attribute value.')
 
     def raise_validation_error(self, spec: Dict[str, Any], attribute: str, message: str):
         error_message = ('\nError processing schema spec:'

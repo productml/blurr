@@ -1,18 +1,36 @@
 from blurr.core.interpreter import Interpreter
-from blurr.core.base import BaseSchema, BaseItem
+from blurr.core.base import BaseSchema, BaseItem, Expression
 
-from typing import Any
+from typing import Dict, Any
 from enum import Enum, auto
 from datetime import datetime
 
 
 class FieldSchema(BaseSchema):
+    """
+    Schema for an individual field definition. Here are the properties of the fields:
+        1. Field Schema must be defined inside a Group
+        2. Contain the attributes:
+            a. Name (inherited from base)
+            b. Type (inherited from base)
+            c. Value (required)
+            d. Filter (inherited from base)
+    """
+
+    # Field Name Definitions
+    FIELD_VALUE = 'Value'
+
     def __init__(self, schema: dict) -> None:
         super().__init__(schema)
-        self.type = FieldTypes.load(schema['Type'])
-        self.value = schema['Value']
-        self.value_expr = compile(self.value, '<string>', 'eval')
-        self.atomic = schema.get('Atomic', False)
+
+    def validate(self, spec: Dict[str, Any]) -> None:
+        self.validate_required_attribute(spec, self.FIELD_VALUE)
+
+    def load(self, spec: Dict[str, Any]) -> None:
+        self.type: FieldTypes = FieldTypes.load(spec[self.FIELD_TYPE])
+        self.value: Expression = Expression(spec[self.FIELD_VALUE])
+
+
 
 
 FIELD_TYPE_VALIDATORS = {
