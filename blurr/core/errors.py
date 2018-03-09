@@ -4,3 +4,6 @@ class InvalidSchemaException(Exception):
 
 class ExpressionEvaluationException(Exception):
     pass
+
+class TypeNotFoundException(Exception):
+    pass

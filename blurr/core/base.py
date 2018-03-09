@@ -140,3 +140,46 @@ class BaseItem(ABC):
     @abstractmethod
     def evaluate(self) -> None:
         return NotImplemented
+
+
+class BaseType(ABC):
+
+    @property
+    @abstractmethod
+    def type_object(self) -> Any:
+        """
+        Returns the type object the Type represents
+        """
+        raise NotImplementedError('type_object is required')
+
+    def type_of(self, instance: Any) -> bool:
+        """
+        Checks if instance is of the type
+        :param instance: An object instance
+        :return: True if the object is of this type, False otherwise
+        """
+        return isinstance(instance, self.type_object)
+
+    @property
+    @abstractmethod
+    def default(self) -> Any:
+        """
+        Returns the default value for this type
+        """
+        raise NotImplementedError('type_object is required')
+
+    def diff(self, old: Any, new: Any) -> Any:
+        """
+        Returns the difference between two objects of the type
+        :param old:
+        :param new:
+        :return:
+        """
+        if not self.type_of(old) or not self.type_of(new):
+            raise TypeError('old and new are not objects of this type')
+
+        return self.calculate_difference(old, new)
+
+    @abstractmethod
+    def calculate_difference(self, old: Any, new: Any) -> Any:
+        raise NotImplementedError('type_object is required')

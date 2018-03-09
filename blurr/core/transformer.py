@@ -1,38 +1,36 @@
 from typing import Any, Dict
 from blurr.core.group import Group
-from blurr.core.session_group import SessionGroup, SessionGroupSchema
-from blurr.core.base import BaseItem, BaseSchema
+from blurr.core.base import BaseItem, BaseSchema, Expression
 from blurr.core.context import Context
-
-GROUP_MAP = {'ProductML:DTC:DataGroup:SessionAggregate': SessionGroup}
-
-GROUP_TYPE_MAP = {
-    'ProductML:DTC:DataGroup:SessionAggregate': SessionGroupSchema
-}
+from blurr.core.loader import TypeLoader
 
 
 class TransformerSchema(BaseSchema):
-    def __init__(self, schema: dict) -> None:
-        super().__init__(schema)
-        self.type = schema['Version']
-        self.description = schema['Description']
-        self.identity = schema['Identity']
-        self.identity_expr = compile(self.identity, '<string>', 'eval')
-        self.time = schema['Time']
-        self.time_expr = compile(self.time, '<string>', 'eval')
-        # TODO Write factory for loading the correct group schema form different types
-        self.groups = {
-            s['Name']: self.load_group_schema(s)
-            for s in schema['DataGroups']
-        }
+    FIELD_VERSION = 'Version'
+    FIELD_DESCRIPTION = 'Description'
+    FIELD_IDENTITY = 'Identity'
+    FIELD_TIME = 'Time'
+    FIELD_GROUPS = 'Groups'
+
+    def __init__(self, spec: Dict[str, Any]) -> None:
+        super().__init__(spec)
+
+    def validate(self, spec: Dict[str, Any]) -> None:
+        self.validate_required_attribute(spec, self.FIELD_VERSION)
+        self.validate_required_attribute(spec, self.FIELD_DESCRIPTION)
+        self.validate_required_attribute(spec, self.FIELD_IDENTITY)
+        self.validate_required_attribute(spec, self.FIELD_TIME)
+
+    def load(self, spec: Dict[str, Any]) -> None:
+        self.version = spec[self.FIELD_VERSION]
+        self.description = spec[self.FIELD_DESCRIPTION]
+        self.identity = Expression(spec[self.FIELD_IDENTITY])
+        self.time = Expression(spec[self.FIELD_TIME])
+        self.groups = {group_spec[self.FIELD_NAME]: TypeLoader.load_type(group_spec[self.FIELD_TYPE])(group_spec)
+                       for group_spec in spec[self.FIELD_GROUPS]}
 
     def get_identity(self, source_context: Context):
-        return eval(self.identity_expr, source_context)
-
-    def load_group_schema(self, schema):
-        # TODO Move the type name to type reference out to an external configuration
-
-        return GROUP_TYPE_MAP[schema['Type']](schema)
+        return self.identity.evaluate(source_context)
 
 
 class Transformer(BaseItem):

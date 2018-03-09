@@ -1,14 +1,14 @@
 from blurr.core.context import Context
 from blurr.core.base import BaseSchema, BaseItem, Expression
-
+from blurr.core.loader import TypeLoader
 from typing import Dict, Any
 from enum import Enum, auto
 from datetime import datetime
-
+from abc import ABC
 
 class FieldSchema(BaseSchema):
     """
-    Schema for an individual field definition. Here are the properties of the fields:
+    An individual field schema.
         1. Field Schema must be defined inside a Group
         2. Contain the attributes:
             a. Name (inherited from base)
@@ -20,14 +20,14 @@ class FieldSchema(BaseSchema):
     # Field Name Definitions
     FIELD_VALUE = 'Value'
 
-    def __init__(self, schema: dict) -> None:
-        super().__init__(schema)
+    def __init__(self, spec: Dict[str, Any]) -> None:
+        super().__init__(spec)
 
     def validate(self, spec: Dict[str, Any]) -> None:
         self.validate_required_attribute(spec, self.FIELD_VALUE)
 
     def load(self, spec: Dict[str, Any]) -> None:
-        self.type: FieldTypes = FieldTypes.load(spec[self.FIELD_TYPE])
+        self.type: BaseType = TypeLoader.load_type(spec[self.FIELD_TYPE])
         self.value: Expression = Expression(spec[self.FIELD_VALUE])
 
 
@@ -129,3 +129,28 @@ class Field(BaseItem):
     @property
     def value(self):
         return self._value if self._value else self._schema.type.default
+
+
+
+class BaseType(ABC):
+
+    @property
+
+    def type(self):
+
+
+    @staticmethod
+    def load(name: str) -> 'FieldTypes':
+        # TODO Throw meaningful error if the field does not exist
+        return FieldTypes[name]
+
+    def type_of(self, value: Any) -> bool:
+        return FIELD_TYPE_VALIDATORS[self.name](value)
+
+    @property
+    def default(self) -> Any:
+        return FIELD_TYPE_DEFAULTS[self.name]
+
+    def diff(self, old: Any, new: Any) -> Any:
+        return FIELD_TYPE_DIFF[self.name](old, new)
+
