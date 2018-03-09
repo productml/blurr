@@ -9,11 +9,22 @@ from blurr.core.errors import InvalidSchemaException, ExpressionEvaluationExcept
 class Expression:
     """ Encapsulates a python code statement in string and in compilable expression"""
 
-    def __init__(self, code_string):
+    def __init__(self, code_string: str) -> None:
+        """
+        An expression must be initialized with a python statement
+        :param code_string: Python code statement
+        """
         self.code_string = 'None' if code_string.isspace() else code_string
         self.code_object = compile(self.code_string, '<string>', 'eval')
 
-    def evaluate(self, global_context=None, local_context=None):
+    def evaluate(self, global_context: Dict[str, Any]=None, local_context: Dict[str, Any]=None) -> Any:
+        """
+        Evaluates the expression with the context provided.  If the execution
+        results in failure, an ExpressionEvaluationException encapsulating the
+        underlying exception is raised.
+        :param global_context: Global context dictionary to be passed for evaluation
+        :param local_context: Local Context dictionary to be passed for evaluation
+        """
         try:
             return eval(self.code_object,
                         global_context if global_context else {},
@@ -93,6 +104,12 @@ class BaseSchema(ABC):
             self.raise_validation_error(spec, attribute, 'Invalid attribute value.')
 
     def raise_validation_error(self, spec: Dict[str, Any], attribute: str, message: str):
+        """
+        Raises an InvalidSchemaException exception with an expressive message
+        :param spec: Schema specification dictionary
+        :param attribute: Attribute with error
+        :param message: Description of error encountered
+        """
         error_message = ('\nError processing schema spec:'
                          '\n\tSpec: {name}'
                          '\n\tAttribute: {attribute}'

@@ -14,7 +14,8 @@ class Group(BaseItem):
     def __init__(self, schema: GroupSchema, global_context: Context) -> None:
         super().__init__(schema, global_context)
         self._fields: Dict[str, Field] = {
-            name: Field(field_schema, self._global_context, self._local_context)
+            name: Field(field_schema, self._global_context,
+                        self._local_context)
             for name, field_schema in schema.fields.items()
         }
         self._local_context.merge_context(self._fields)
@@ -48,9 +49,11 @@ class Group(BaseItem):
 
 import random
 
+
 class Tito:
     @property
     def name(self):
         return random.Random().random()
+
 
 a = Tito()
