@@ -46,7 +46,6 @@ class BaseSchema(ABC):
         """
         self.spec: Dict[str, Any] = spec
         self.name: str = spec[self.FIELD_NAME]
-        self.type: str = spec[self.FIELD_TYPE]
         self.when: Expression = Expression(spec[self.FIELD_WHEN]) if self.FIELD_WHEN in spec else None
 
         # Invokes the loads of the subclass

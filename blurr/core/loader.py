@@ -1,7 +1,5 @@
 from typing import Any
 
-from blurr.core.errors import TypeNotFoundException
-
 ITEM_MAP = {
     'ProductML:DTC:DataGroup:SessionAggregate': 'blurr.core.session_data_group.SessionDataGroup'
 }
@@ -24,14 +22,19 @@ SCHEMA_MAP = {
 class TypeLoader:
 
     @staticmethod
-    def load_type(type_name: str, schema=True) -> Any:
-        if (schema and type_name not in SCHEMA_MAP) or (
-                not schema and type_name not in ITEM_MAP):
-            raise TypeNotFoundException('Type "{}" not found in type directory.', type_name)
-        return TypeLoader.import_by_full_name(SCHEMA_MAP[type_name] if schema else ITEM_MAP[type_name])
+    def load_schema(type_name: str) -> Any:
+        return TypeLoader._load_type(type_name, SCHEMA_MAP)
 
     @staticmethod
-    def import_by_full_name(name):
+    def load_item(type_name: str) -> Any:
+        return TypeLoader._load_type(type_name, ITEM_MAP)
+
+    @staticmethod
+    def _load_type(type_name: str, map: dict) -> Any:
+        return TypeLoader._import_by_full_name(map[type_name])
+
+    @staticmethod
+    def _import_by_full_name(name):
         components = name.split('.')
         mod = __import__(components[0])
         for comp in components[1:]:

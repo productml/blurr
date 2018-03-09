@@ -26,20 +26,21 @@ class FieldSchema(BaseSchema):
         self.validate_required_attribute(spec, self.FIELD_VALUE)
 
     def load(self, spec: Dict[str, Any]) -> None:
-        self.type: BaseType = TypeLoader.load_type(spec[self.FIELD_TYPE])
         self.value: Expression = Expression(spec[self.FIELD_VALUE])
+        self.type: BaseType = TypeLoader.load_type(spec[self.FIELD_TYPE])
 
 
 class Field(BaseItem):
+    """
+    An individual field object responsible for retaining the field value
+    """
     def __init__(self, schema: FieldSchema, global_context: Context,
                  local_context: Context) -> None:
         super().__init__(schema, global_context, local_context)
-        self._initial_value = None
-        self._value = None
+        self.value = self.schema.type.default
 
     def initialize(self, value) -> None:
-        self._initial_value = value
-        self._value = value
+        self.value = value
 
     def evaluate(self) -> None:
         new_value = None
@@ -47,14 +48,9 @@ class Field(BaseItem):
             new_value = self.value.evaluate()
 
         if not self.schema.type.is_type_of(new_value):
-            # TODO Give more meaningful error name
-            raise ValueError('Type mismatch')
+            raise TypeError('Value expression for "{}" returned an incompatible type.', self.name)
 
-        self._value = new_value
-
-    @property
-    def value(self):
-        return self._value if self._value else self.schema.type.default
+        self.value = new_value
 
     @property
     def export(self):
