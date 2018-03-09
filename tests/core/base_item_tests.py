@@ -23,12 +23,14 @@ class TestItem(BaseItem):
     This class is to test abstract behavior, and thus, adds no functionality
     """
 
+    @property
+    def items(self):
+        pass
+
     def __init__(self, schema: BaseSchema, global_context: Context = Context(),
                  local_context: Context = Context()) -> None:
         super().__init__(schema, global_context, local_context)
 
-    def evaluate_item(self) -> EvaluationResult:
-        return EvaluationResult(True)
 
 
 def test_base_item_valid(test_schema_spec: Dict[str, Any]) -> None:

@@ -1,52 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Any
 
-from blurr.core.context import Context
-from blurr.core.errors import InvalidSchemaException, ExpressionEvaluationException
-
-
-class EvaluationResult:
-    """
-    Returned as the result of an evaluation
-    """
-
-    def __init__(self, result: Any = None, skip_cause: str = None, error: Exception = None) -> None:
-        """
-        Initializes an evaluation result withe the result and result behavior
-        :param result: Result of the evaluation
-        :param skip_cause: Reason for not evaluating
-        :param error: Exception thrown during execution
-        """
-        self.result = result
-        self.success = not skip_cause and not error
-        self.skip_cause = skip_cause
-        self.error = error
-
-
-class Expression:
-    """ Encapsulates a python code statement in string and in compilable expression"""
-
-    def __init__(self, code_string: str) -> None:
-        """
-        An expression must be initialized with a python statement
-        :param code_string: Python code statement
-        """
-        self.code_string = 'None' if code_string.isspace() else code_string
-        self.code_object = compile(self.code_string, '<string>', 'eval')
-
-    def evaluate(self, global_context: Context = Context(), local_context: Context = Context()) -> EvaluationResult:
-        """
-        Evaluates the expression with the context provided.  If the execution
-        results in failure, an ExpressionEvaluationException encapsulating the
-        underlying exception is raised.
-        :param global_context: Global context dictionary to be passed for evaluation
-        :param local_context: Local Context dictionary to be passed for evaluation
-        """
-        try:
-            return EvaluationResult(eval(self.code_object, global_context, local_context))
-
-        except Exception as e:
-            EvaluationResult(error=ExpressionEvaluationException(e))
+from blurr.core.evaluation import Context, Expression
+from blurr.core.errors import InvalidSchemaException
 
 
 class BaseSchema(ABC):
@@ -91,7 +47,7 @@ class BaseSchema(ABC):
         self.spec: Dict[str, Any] = spec
         self.name: str = spec[self.FIELD_NAME]
         self.type: str = spec[self.FIELD_TYPE]
-        self.when: Expression = Expression(spec[self.FIELD_WHEN])
+        self.when: Expression = Expression(spec[self.FIELD_WHEN]) if self.FIELD_WHEN in spec else None
 
         # Invokes the loads of the subclass
         self.load(spec)
@@ -153,25 +109,34 @@ class BaseItem(ABC):
         self.global_context = global_context
         self.local_context = local_context
 
-    def evaluate(self) -> EvaluationResult:
+    @property
+    def should_evaluate(self) -> bool:
+        if self.schema.when:
+            result = self.schema.when.evaluate(self.global_context, self.local_context)
+            return result.success and result.result
+
+        return False
+
+    def evaluate(self) -> None:
         """
         Evaluates the current item
         :returns An evaluation result object containing the result, or reasons why
         evaluation failed
         """
-        when_result = self.schema.when.evaluate(self.global_context, self.local_context)
-        if when_result.success and when_result.result:
-            return self.evaluate_item()
+        if self.should_evaluate:
+            for _, item in self.items.items():
+                item.evaluate()
 
-        return EvaluationResult(None,
-                                'When condition evaluated to False' if when_result.success else 'Error occurred')
+    @property
+    def export(self):
+        return {
+            name: item.export() for name, item in self.items.items()
+        }
 
+    @property
     @abstractmethod
-    def evaluate_item(self) -> EvaluationResult:
-        """
-        Implements specific behavior for evaluation
-        """
-        raise NotImplementedError('evaluate_item must be implemented')
+    def items(self):
+        raise NotImplementedError('Sub items must be present')
 
 
 class BaseType(ABC):
@@ -201,20 +166,4 @@ class BaseType(ABC):
         """
         Returns the default value for this type
         """
-        raise NotImplementedError('type_object is required')
-
-    def diff(self, old: Any, new: Any) -> Any:
-        """
-        Returns the difference between two objects of the type
-        :param old:
-        :param new:
-        :return:
-        """
-        if not self.is_type_of(old) or not self.is_type_of(new):
-            raise TypeError('old and new are not objects of this type')
-
-        return self.calculate_difference(old, new)
-
-    @abstractmethod
-    def calculate_difference(self, old: Any, new: Any) -> Any:
         raise NotImplementedError('type_object is required')

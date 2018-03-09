@@ -1,4 +1,4 @@
-from blurr.core.context import Context
+from blurr.core.evaluation import Context
 from blurr.core.group import Group, GroupSchema
 
 

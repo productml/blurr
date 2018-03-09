@@ -1,9 +1,7 @@
-from datetime import datetime
-from enum import Enum, auto
 from typing import Dict, Any
 
-from blurr.core.base import BaseSchema, BaseItem, Expression, BaseType
-from blurr.core.context import Context
+from blurr.core.base import BaseSchema, BaseItem, BaseType
+from blurr.core.evaluation import Context, Expression
 from blurr.core.loader import TypeLoader
 
 
@@ -43,16 +41,10 @@ class Field(BaseItem):
         self._initial_value = value
         self._value = value
 
-    def changes(self) -> Any:
-        if self._value != self._initial_value:
-            self.schema.type.diff(self._initial_value
-                                   if self._initial_value is not None else
-                                   self.schema.type.default, self._value)
-
     def evaluate(self) -> None:
         new_value = None
-        if self.should_evaluate():
-            new_value = self.evaluate_expr(self.schema.value_expr)
+        if self.should_evaluate:
+            new_value = self.value.evaluate()
 
         if not self.schema.type.is_type_of(new_value):
             # TODO Give more meaningful error name
@@ -67,3 +59,11 @@ class Field(BaseItem):
     @property
     def value(self):
         return self._value if self._value else self.schema.type.default
+
+    @property
+    def items(self):
+        return {self.name, self}
+
+    @property
+    def export(self):
+        return self.value
