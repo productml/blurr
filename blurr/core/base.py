@@ -31,17 +31,20 @@ class BaseSchema(ABC):
         """
         Abstract method that ensures that the subclasses implement spec validation
         """
-        raise NotImplementedError('"validate()" must be implemented for a schema.')
+        raise NotImplementedError(
+            '"validate()" must be implemented for a schema.')
 
     def validate_spec(self, spec: Dict[str, Any]) -> None:
         """
         Validates the schema spec.  Raises exceptions if errors are found.
         """
         if self.FIELD_NAME not in spec:
-            self.raise_validation_error(spec, self.FIELD_NAME, 'Required attribute missing.')
+            self.raise_validation_error(spec, self.FIELD_NAME,
+                                        'Required attribute missing.')
 
         if self.FIELD_TYPE not in spec:
-            self.raise_validation_error(spec, self.FIELD_TYPE, 'Required attribute missing.')
+            self.raise_validation_error(spec, self.FIELD_TYPE,
+                                        'Required attribute missing.')
 
         # Invokes the validations of the subclasses
         self.validate(spec)
@@ -66,7 +69,8 @@ class BaseSchema(ABC):
         # Invokes the loads of the subclass
         # self.load(spec)
 
-    def raise_validation_error(self, spec: Dict[str, Any], attribute: str, message: str):
+    def raise_validation_error(self, spec: Dict[str, Any], attribute: str,
+                               message: str):
         error_message = ('\nError processing schema spec:'
                          '\n\tSpec: {name}'
                          '\n\tAttribute: {attribute}'
@@ -79,7 +83,10 @@ class BaseSchema(ABC):
 
 
 class BaseItem(ABC):
-    def __init__(self, schema: BaseSchema, global_context: Context=Context(), local_context: Context=Context()):
+    def __init__(self,
+                 schema: BaseSchema,
+                 global_context: Context = Context(),
+                 local_context: Context = Context()):
         self._schema = schema
         self._global_context = global_context
         self._local_context = local_context
@@ -92,7 +99,8 @@ class BaseItem(ABC):
             raise e
 
     def should_evaluate(self) -> None:
-        return not self._schema.filter_expr or self.evaluate_expr(self._schema.filter_expr)
+        return not self._schema.filter_expr or self.evaluate_expr(
+            self._schema.filter_expr)
 
     @abstractmethod
     def evaluate(self) -> None:

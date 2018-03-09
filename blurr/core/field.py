@@ -77,7 +77,8 @@ class FieldTypes(Enum):
 
 
 class Field(BaseItem):
-    def __init__(self, schema: FieldSchema, global_context: Context, local_context: Context) -> None:
+    def __init__(self, schema: FieldSchema, global_context: Context,
+                 local_context: Context) -> None:
         super().__init__(schema, global_context, local_context)
         self._initial_value = None
         self._value = None

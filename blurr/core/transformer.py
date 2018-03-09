@@ -29,7 +29,6 @@ class TransformerSchema(BaseSchema):
     def get_identity(self, source_context: Context):
         return eval(self.identity_expr, source_context)
 
-
     def load_group_schema(self, schema):
         # TODO Move the type name to type reference out to an external configuration
 
@@ -37,7 +36,8 @@ class TransformerSchema(BaseSchema):
 
 
 class Transformer(BaseItem):
-    def __init__(self, schema: TransformerSchema, identity, exec_context: Context) -> None:
+    def __init__(self, schema: TransformerSchema, identity,
+                 exec_context: Context) -> None:
         super().__init__(schema)
         self._global_context.add_context(self.name, self)
         self._global_context.merge_context(exec_context)
@@ -55,7 +55,9 @@ class Transformer(BaseItem):
 
     def set_source_context(self, source_context: Context) -> None:
         self._global_context.merge_context(source_context)
-        self._global_context.add_context('time', self.evaluate_expr(self._schema.time_expr))
+        self._global_context.add_context('time',
+                                         self.evaluate_expr(
+                                             self._schema.time_expr))
 
     def evaluate(self) -> None:
         if self.should_evaluate():

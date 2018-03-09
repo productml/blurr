@@ -22,6 +22,7 @@ class LocalRunner:
         user_transformer = self._user_transformer.get(identity, Transformer(self._transformer_schema,identity, self._exec_context))
         user_transformer.set_source_context(source_context)
         user_transformer.evaluate()
+        self._user_transformer[identity] = user_transformer
 
     def _execute_file(self, file):
         with open(file) as f:
@@ -31,10 +32,6 @@ class LocalRunner:
     def execute(self):
         for file in self._raw_files:
             self._execute_file(file)
-
-
-local_runner = LocalRunner(['raw.json'], '', 'sample.yml')
-local_runner.execute()
 
 
 def main():
