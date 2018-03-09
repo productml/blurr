@@ -4,6 +4,7 @@ from typing import Any, Dict
 from blurr.core.base import BaseSchema, BaseItemCollection
 from blurr.core.evaluation import Context
 from blurr.core.field import Field, FieldSchema
+from blurr.core.loader import TypeLoader
 
 
 class DataGroupSchema(BaseSchema, ABC):
@@ -30,7 +31,7 @@ class DataGroupSchema(BaseSchema, ABC):
     def load(self, spec: Dict[str, Any]) -> None:
         self.fields: Dict[str, FieldSchema] = {}
         for field_spec in spec[self.FIELD_FIELDS]:
-            field_schema = FieldSchema(field_spec)
+            field_schema = TypeLoader.load_schema(field_spec[self.FIELD_TYPE])(spec)
             self.fields[field_schema.name] = field_schema
 
 
@@ -38,8 +39,7 @@ class DataGroup(BaseItemCollection):
     def __init__(self, schema: DataGroupSchema, global_context: Context) -> None:
         super().__init__(schema, global_context)
         self._fields: Dict[str, Field] = {
-            name: Field(field_schema, self.global_context,
-                        self.local_context)
+            name: TypeLoader.load_type(field_schema.type)(field_schema, self.global_context, self.local_context)
             for name, field_schema in schema.fields.items()
         }
         self.local_context.merge_context(self._fields)

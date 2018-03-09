@@ -26,7 +26,7 @@ class TransformerSchema(BaseSchema):
         self.description = spec[self.FIELD_DESCRIPTION]
         self.identity = Expression(spec[self.FIELD_IDENTITY])
         self.time = Expression(spec[self.FIELD_TIME])
-        self.groups = {group_spec[self.FIELD_NAME]: TypeLoader.load_type(group_spec[self.FIELD_TYPE])(group_spec)
+        self.groups = {group_spec[self.FIELD_NAME]: TypeLoader.load_schema(group_spec[self.FIELD_TYPE])(group_spec)
                        for group_spec in spec[self.FIELD_GROUPS]}
 
     def get_identity(self, source_context: Context):
