@@ -56,9 +56,3 @@ def test_base_schema_type_missing(test_schema_spec: Dict[str, Any]) -> None:
     del test_schema_spec[BaseSchema.FIELD_TYPE]
     with raises(InvalidSchemaException, Message='Required attribute missing.'):
         TestSchema(test_schema_spec)
-
-
-def test_base_schema_invalid_filter(test_schema_spec: Dict[str, Any]) -> None:
-    test_schema_spec[BaseSchema.FIELD_WHEN] = '(#&*@#$#'
-    with raises(SyntaxError):
-        TestSchema(test_schema_spec)
