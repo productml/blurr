@@ -1,7 +1,7 @@
 from typing import Any, Dict
 from blurr.core.data_group import DataGroup
 from blurr.core.base import BaseItem, BaseSchema, Expression
-from blurr.core.context import Context
+from blurr.core.evaluation import Context
 from blurr.core.loader import TypeLoader
 
 
