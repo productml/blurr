@@ -111,12 +111,7 @@ class BaseItem(ABC):
 
     @property
     def needs_evaluation(self) -> bool:
-        if self.schema.when:
-            result = self.schema.when.evaluate(self.global_context, self.local_context)
-            return result.success and bool(result.result)
-
-        return False
-
+        return bool(self.schema.when and self.schema.when.evaluate())
     @property
     def name(self):
         return self.schema.name

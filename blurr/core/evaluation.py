@@ -1,5 +1,6 @@
 from typing import Any
-from blurr.core.errors import ExpressionEvaluationException
+
+from blurr.core.errors import ExpressionEvaluationException, InvalidExpressionException
 
 
 class Context(dict):
@@ -13,24 +14,6 @@ class Context(dict):
         self.update(context)
 
 
-class EvaluationResult:
-    """
-    Returned as the result of an evaluation
-    """
-
-    def __init__(self, result: Any = None, skip_cause: str = None, error: Exception = None) -> None:
-        """
-        Initializes an evaluation result withe the result and result behavior
-        :param result: Result of the evaluation
-        :param skip_cause: Reason for not evaluating
-        :param error: Exception thrown during execution
-        """
-        self.result = result
-        self.success = not skip_cause and not error
-        self.skip_cause = skip_cause
-        self.error = error
-
-
 class Expression:
     """ Encapsulates a python code statement in string and in compilable expression"""
 
@@ -41,9 +24,13 @@ class Expression:
         """
         # TODO Add validation to see that there are no direct setting using the '=' character
         self.code_string = 'None' if code_string.isspace() else code_string
-        self.code_object = compile(self.code_string, '<string>', 'eval')
 
-    def evaluate(self, global_context: Context = Context(), local_context: Context = Context()) -> EvaluationResult:
+        try:
+            self.code_object = compile(self.code_string, '<string>', 'eval')
+        except Exception as e:
+            raise InvalidExpressionException(e)
+
+    def evaluate(self, global_context: Context = Context(), local_context: Context = Context()) -> Any:
         """
         Evaluates the expression with the context provided.  If the execution
         results in failure, an ExpressionEvaluationException encapsulating the
@@ -52,7 +39,7 @@ class Expression:
         :param local_context: Local Context dictionary to be passed for evaluation
         """
         try:
-            return EvaluationResult(eval(self.code_object, global_context, local_context))
+            return eval(self.code_object, global_context, local_context)
 
         except Exception as e:
-            return EvaluationResult(error=ExpressionEvaluationException(e))
+            raise ExpressionEvaluationException(e)

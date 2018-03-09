@@ -1,15 +1,16 @@
 from typing import Dict, Any
 
-from pytest import mark, fixture
+import yaml
+from pytest import mark, fixture, raises
 
 from blurr.core.base import BaseSchema, BaseItem
+from blurr.core.errors import ExpressionEvaluationException, InvalidExpressionException
 from blurr.core.evaluation import Context
 from tests.core.base_schema_tests import TestSchema
-import yaml
 
 
 @fixture
-def test_schema_spec() -> Dict[str, Any]:
+def schema_spec() -> Dict[str, Any]:
     return yaml.load('''
 Name: TestField
 Type: integer
@@ -34,8 +35,8 @@ class TestItem(BaseItem):
         pass
 
 
-def test_base_item_valid(test_schema_spec: Dict[str, Any]) -> None:
-    schema = TestSchema(test_schema_spec)
+def test_base_item_valid(schema_spec: Dict[str, Any]) -> None:
+    schema = TestSchema(schema_spec)
     test_item = TestItem(schema)
     assert test_item.schema == schema
     assert test_item.global_context == Context()
@@ -44,17 +45,25 @@ def test_base_item_valid(test_schema_spec: Dict[str, Any]) -> None:
     assert test_item.needs_evaluation
 
 
-def test_base_item_filter_false(test_schema_spec: Dict[str, Any]) -> None:
-    test_schema_spec[BaseSchema.FIELD_WHEN] = 'False'
-    schema = TestSchema(test_schema_spec)
+def test_base_item_filter_false(schema_spec: Dict[str, Any]) -> None:
+    schema_spec[BaseSchema.FIELD_WHEN] = 'False'
+    schema = TestSchema(schema_spec)
     test_item = TestItem(schema)
 
     assert not test_item.needs_evaluation
 
 
-def test_base_item_filter_invalid(test_schema_spec: Dict[str, Any]) -> None:
-    test_schema_spec[BaseSchema.FIELD_WHEN] = '{9292#?&@&^'
-    schema = TestSchema(test_schema_spec)
+def test_base_item_filter_invalid_expression(schema_spec: Dict[str, Any]) -> None:
+    schema_spec[BaseSchema.FIELD_WHEN] = '{9292#?&@&^'
+
+    with raises(InvalidExpressionException):
+        TestSchema(schema_spec)
+
+
+def test_base_item_filter_execution_error(schema_spec: Dict[str, Any]) -> None:
+    schema_spec[BaseSchema.FIELD_WHEN] = '1/0'
+    schema = TestSchema(schema_spec)
     test_item = TestItem(schema)
 
-    assert not test_item.needs_evaluation
+    with raises(ExpressionEvaluationException):
+        a = test_item.needs_evaluation
