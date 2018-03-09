@@ -2,7 +2,7 @@ import yaml
 import json
 from blurr.core.transformer import TransformerSchema, Transformer
 from blurr.core.record import Record
-from blurr.core.context import Context
+from blurr.core.evaluation import Context
 from dateutil import parser
 
 
