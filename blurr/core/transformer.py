@@ -59,10 +59,9 @@ class Transformer(BaseItem):
                                          self.evaluate_expr(
                                              self._schema.time_expr))
 
-    def evaluate(self) -> None:
-        if self.should_evaluate():
-            for _, group in self.groups.items():
-                group.evaluate()
+    @property
+    def sub_items(self) -> BaseItem:
+        return self._groups
 
     def __getattr__(self, item):
         if item in self._groups:
@@ -77,3 +76,4 @@ class Transformer(BaseItem):
     @property
     def groups(self):
         return self._groups
+

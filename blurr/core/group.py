@@ -27,11 +27,6 @@ class Group(BaseItem):
     def changes(self) -> Any:
         return {name: field.changes() for name, field in self.fields}
 
-    def evaluate(self) -> None:
-        if self.should_evaluate():
-            for _, field in self._fields.items():
-                field.evaluate()
-
     def __getattr__(self, item):
         if item in self._fields:
             return self._fields[item].value
@@ -46,14 +41,6 @@ class Group(BaseItem):
     def fields(self):
         return self._fields
 
-
-import random
-
-
-class Tito:
     @property
-    def name(self):
-        return random.Random().random()
-
-
-a = Tito()
+    def sub_items(self):
+        return self._fields

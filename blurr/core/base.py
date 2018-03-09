@@ -102,6 +102,20 @@ class BaseItem(ABC):
         return not self._schema.filter_expr or self.evaluate_expr(
             self._schema.filter_expr)
 
-    @abstractmethod
     def evaluate(self) -> None:
+        if self.should_evaluate():
+            for _, item in self.sub_items.items():
+                item.evaluate()
+
+    def build_json(self):
+        return {
+            name: item.build_json() for name, item in self.sub_items.items()
+        }
+
+    @property
+    @abstractmethod
+    def sub_items(self):
         return NotImplemented
+
+
+

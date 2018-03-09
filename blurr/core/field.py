@@ -111,3 +111,10 @@ class Field(BaseItem):
     @property
     def value(self):
         return self._value if self._value else self._schema.type.default
+
+    @property
+    def sub_items(self):
+        return {self.name, self}
+
+    def build_json(self):
+        return self.value
