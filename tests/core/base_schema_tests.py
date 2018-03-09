@@ -1,6 +1,7 @@
 from typing import Dict, Any
 from pytest import fixture, raises, mark
-from blurr.core.base import BaseSchema, Expression
+from blurr.core.base import BaseSchema
+from blurr.core.evaluation import Expression
 from blurr.core.errors import InvalidSchemaException
 import yaml
 

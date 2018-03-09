@@ -39,6 +39,7 @@ class Expression:
         An expression must be initialized with a python statement
         :param code_string: Python code statement
         """
+        # TODO Add validation to see that there are no direct setting using the '=' character
         self.code_string = 'None' if code_string.isspace() else code_string
         self.code_object = compile(self.code_string, '<string>', 'eval')
 
@@ -54,4 +55,4 @@ class Expression:
             return EvaluationResult(eval(self.code_object, global_context, local_context))
 
         except Exception as e:
-            EvaluationResult(error=ExpressionEvaluationException(e))
+            return EvaluationResult(error=ExpressionEvaluationException(e))

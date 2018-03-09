@@ -95,7 +95,7 @@ class BaseSchema(ABC):
 
 class BaseItem(ABC):
     """
-    Base class for for all items
+    Base class for for all leaf items that do not contain sub-items
     """
 
     def __init__(self, schema: BaseSchema, global_context: Context = Context(), local_context: Context = Context()):
@@ -110,12 +110,34 @@ class BaseItem(ABC):
         self.local_context = local_context
 
     @property
-    def should_evaluate(self) -> bool:
+    def needs_evaluation(self) -> bool:
         if self.schema.when:
             result = self.schema.when.evaluate(self.global_context, self.local_context)
-            return result.success and result.result
+            return result.success and bool(result.result)
 
         return False
+
+    @property
+    def name(self):
+        return self.schema.name
+
+    @abstractmethod
+    def evaluate(self) -> None:
+        """
+        Evaluates the current item
+        """
+        raise NotImplementedError('evaluate() must be implemented')
+
+    @property
+    @abstractmethod
+    def export(self):
+        raise NotImplementedError('export() must be implemented')
+
+
+class BaseItemGroup(BaseItem):
+    """
+    Base class for items that contain sub-items within them
+    """
 
     def evaluate(self) -> None:
         """
@@ -123,7 +145,7 @@ class BaseItem(ABC):
         :returns An evaluation result object containing the result, or reasons why
         evaluation failed
         """
-        if self.should_evaluate:
+        if self.needs_evaluation:
             for _, item in self.items.items():
                 item.evaluate()
 

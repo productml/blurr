@@ -43,7 +43,7 @@ class Field(BaseItem):
 
     def evaluate(self) -> None:
         new_value = None
-        if self.should_evaluate:
+        if self.needs_evaluation:
             new_value = self.value.evaluate()
 
         if not self.schema.type.is_type_of(new_value):
@@ -53,16 +53,8 @@ class Field(BaseItem):
         self._value = new_value
 
     @property
-    def name(self):
-        return self.schema.name
-
-    @property
     def value(self):
         return self._value if self._value else self.schema.type.default
-
-    @property
-    def items(self):
-        return {self.name, self}
 
     @property
     def export(self):
