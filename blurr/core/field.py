@@ -1,4 +1,4 @@
-from blurr.core.interpreter import Interpreter
+from blurr.core.context import Context
 from blurr.core.base import BaseSchema, BaseItem, Expression
 
 from typing import Dict, Any
@@ -95,8 +95,8 @@ class FieldTypes(Enum):
 
 
 class Field(BaseItem):
-    def __init__(self, schema: FieldSchema) -> None:
-        super().__init__(schema)
+    def __init__(self, schema: FieldSchema, global_context: Context, local_context: Context) -> None:
+        super().__init__(schema, global_context, local_context)
         self._initial_value = None
         self._value = None
 
@@ -110,10 +110,10 @@ class Field(BaseItem):
                                    if self._initial_value is not None else
                                    self._schema.type.default, self._value)
 
-    def evaluate(self, interpreter: Interpreter) -> None:
+    def evaluate(self) -> None:
         new_value = None
-        if self.should_evaluate(interpreter):
-            new_value = interpreter.evaluate(self._schema.value_expr)
+        if self.should_evaluate():
+            new_value = self.evaluate_expr(self._schema.value_expr)
 
         if not self._schema.type.type_of(new_value):
             # TODO Give more meaningful error name

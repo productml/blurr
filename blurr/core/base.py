@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
-from blurr.core.interpreter import Interpreter
+from blurr.core.context import Context
+import dis
+
 from typing import Dict, Any
 from blurr.core.errors import InvalidSchemaException
 
@@ -98,13 +100,21 @@ class BaseSchema(ABC):
 
 
 class BaseItem(ABC):
-    def __init__(self, schema: BaseSchema):
+    def __init__(self, schema: BaseSchema, global_context: Context=Context(), local_context: Context=Context()):
         self._schema = schema
+        self._global_context = global_context
+        self._local_context = local_context
 
-    def should_evaluate(self, interpreter: Interpreter) -> None:
-        return not self._schema.filter_expr or interpreter.evaluate(
-            self._schema.filter_expr)
+    def evaluate_expr(self, expr):
+        try:
+            return eval(expr, self._global_context, self._local_context)
+        except Exception as e:
+            print(dis.dis(expr))
+            raise e
+
+    def should_evaluate(self) -> None:
+        return not self._schema.filter_expr or self.evaluate_expr(self._schema.filter_expr)
 
     @abstractmethod
-    def evaluate(self, interpreter: Interpreter) -> None:
+    def evaluate(self) -> None:
         return NotImplemented
