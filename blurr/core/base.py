@@ -3,7 +3,7 @@ from blurr.core.context import Context
 import dis
 
 from typing import Dict, Any
-from blurr.core.errors import InvalidSchemaException
+from blurr.core.errors import InvalidSchemaException, ExpressionEvaluationException
 
 
 class Expression:
@@ -13,8 +13,13 @@ class Expression:
         self.code_string = 'None' if code_string.isspace() else code_string
         self.code_object = compile(self.code_string, '<string>', 'eval')
 
-    def evaluate(self, global_dictionary, local_dictionary):
-        eval(self.code_object, global_dictionary, local_dictionary)
+    def evaluate(self, global_context=None, local_context=None):
+        try:
+            return eval(self.code_object,
+                        global_context if global_context else {},
+                        local_context if local_context else {})
+        except Exception as e:
+            raise ExpressionEvaluationException(e)
 
 
 class BaseSchema(ABC):
@@ -113,7 +118,7 @@ class BaseItem(ABC):
             raise e
 
     def should_evaluate(self) -> None:
-        return not self._schema.filter_expr or self.evaluate_expr(self._schema.filter_expr)
+        return self._schema.filter.evaluate(self._global_context, self._local_context)
 
     @abstractmethod
     def evaluate(self) -> None:
