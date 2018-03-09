@@ -155,33 +155,3 @@ class BaseItemCollection(BaseItem):
     @abstractmethod
     def items(self):
         raise NotImplementedError('Sub items must be present')
-
-
-class BaseType(ABC):
-    """
-    Base for all field types supported
-    """
-
-    @property
-    @abstractmethod
-    def type_object(self) -> Any:
-        """
-        Returns the type object the Type represents
-        """
-        raise NotImplementedError('type_object is required')
-
-    def is_type_of(self, instance: Any) -> bool:
-        """
-        Checks if instance is of the type
-        :param instance: An object instance
-        :return: True if the object is of this type, False otherwise
-        """
-        return isinstance(instance, self.type_object)
-
-    @property
-    @abstractmethod
-    def default(self) -> Any:
-        """
-        Returns the default value for this type
-        """
-        raise NotImplementedError('type_object is required')
