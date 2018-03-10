@@ -65,13 +65,6 @@ class Field(BaseItem):
         # When the field is created, the value is set to the field type default
         self.value = self.schema.default
 
-    def initialize(self, value) -> None:
-        """
-        Initialization is invoked when a previous field state is restored by the parent group
-        :param value: Initial value of the field
-        """
-        self.value = value
-
     def evaluate(self) -> None:
         """
         Overrides the base evaluation to set the value to the evaluation result of the value
@@ -91,5 +84,14 @@ class Field(BaseItem):
         self.value = new_value
 
     @property
-    def snapshot(self):
+    def snapshot(self) -> Any:
+        """
+        Snapshots the current value of the field
+        """
         return self.value
+
+    def restore(self, snapshot) -> None:
+        """
+        Restores the value of a field from a snapshot
+        """
+        self.value = snapshot

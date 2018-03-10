@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Type
 
-from blurr.core.errors import InvalidSchemaException
+from blurr.core.errors import InvalidSchemaException, SnapshotException
 from blurr.core.evaluation import Context, Expression
 from blurr.core.loader import TypeLoader
 
@@ -179,7 +179,7 @@ class BaseItem(ABC):
         return self.schema.when is None or self.schema.when.evaluate()
 
     @property
-    def name(self):
+    def name(self) -> str:
         """
         Returns the name of the base item
         """
@@ -200,6 +200,13 @@ class BaseItem(ABC):
         :return: Name, Value map of the current tree
         """
         raise NotImplementedError('snapshot() must be implemented')
+
+    @abstractmethod
+    def restore(self, snapshot) -> None:
+        """
+        Restores the state of an item from a snapshot
+        """
+        raise NotImplementedError('restore() must be implemented')
 
 
 class BaseItemCollection(BaseItem):
@@ -238,12 +245,27 @@ class BaseItemCollection(BaseItem):
                 item.evaluate()
 
     @property
-    def snapshot(self):
+    def snapshot(self) -> Dict[str, Any]:
         """
         Implements snapshot for collections by recursively invoking snapshot of all child items
         """
         try:
+
             return {name: item.snapshot for name, item in self.items.items()}
+
         except Exception as e:
             print('Error while creating snapshot for {}', self.name)
-            raise e
+            raise SnapshotException(e)
+
+    def restore(self, snapshot: Dict[str, Any]) -> None:
+        """
+        Restores the state of a collection from a snapshot
+        """
+        try:
+
+            for name, snap in snapshot:
+                self.items[name].restore(snap)
+
+        except Exception as e:
+            print('Error while restoring snapshot: {}', self.snapshot)
+            raise SnapshotException(e)

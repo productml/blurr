@@ -12,3 +12,7 @@ class ExpressionEvaluationException(Exception):
 
 class TypeNotFoundException(Exception):
     pass
+
+
+class SnapshotException(Exception):
+    pass
