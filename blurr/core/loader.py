@@ -26,11 +26,10 @@ SCHEMA_MAP = {
     'set': 'blurr.core.field_schema.SetFieldSchema'
 }
 
-
 # TODO Build dynamic type loader from a central configuration rather than reading a static dictionary
 
-class TypeLoader:
 
+class TypeLoader:
     @staticmethod
     def load_schema(type_name: str) -> BaseSchema:
         return TypeLoader.load_type(type_name, SCHEMA_MAP)

@@ -5,7 +5,6 @@ from blurr.core.field import FieldSchema
 
 
 class IntegerFieldSchema(FieldSchema):
-
     @property
     def type_object(self) -> Any:
         return int
@@ -16,7 +15,6 @@ class IntegerFieldSchema(FieldSchema):
 
 
 class FloatFieldSchema(FieldSchema):
-
     @property
     def type_object(self) -> Any:
         return float
@@ -27,7 +25,6 @@ class FloatFieldSchema(FieldSchema):
 
 
 class StringFieldSchema(FieldSchema):
-
     @property
     def type_object(self) -> Any:
         return str
@@ -38,7 +35,6 @@ class StringFieldSchema(FieldSchema):
 
 
 class BooleanFieldSchema(FieldSchema):
-
     @property
     def type_object(self) -> Any:
         return bool
@@ -49,7 +45,6 @@ class BooleanFieldSchema(FieldSchema):
 
 
 class DateTimeFieldSchema(FieldSchema):
-
     @property
     def type_object(self) -> Any:
         return datetime
@@ -60,7 +55,6 @@ class DateTimeFieldSchema(FieldSchema):
 
 
 class MapFieldSchema(FieldSchema):
-
     @property
     def type_object(self) -> Any:
         return dict
@@ -71,7 +65,6 @@ class MapFieldSchema(FieldSchema):
 
 
 class ListFieldSchema(FieldSchema):
-
     @property
     def type_object(self) -> Any:
         return list
@@ -82,7 +75,6 @@ class ListFieldSchema(FieldSchema):
 
 
 class SetFieldSchema(FieldSchema):
-
     @property
     def type_object(self) -> Any:
         return set

@@ -26,8 +26,11 @@ class TransformerSchema(BaseSchema):
         self.description = spec[self.FIELD_DESCRIPTION]
         self.identity = Expression(spec[self.FIELD_IDENTITY])
         self.time = Expression(spec[self.FIELD_TIME])
-        self.groups = {group_spec[self.FIELD_NAME]: TypeLoader.load_schema(group_spec[self.FIELD_TYPE])(group_spec)
-                       for group_spec in spec[self.FIELD_GROUPS]}
+        self.groups = {
+            group_spec[self.FIELD_NAME]: TypeLoader.load_schema(
+                group_spec[self.FIELD_TYPE])(group_spec)
+            for group_spec in spec[self.FIELD_GROUPS]
+        }
 
     def get_identity(self, source_context: Context):
         return self.identity.evaluate(source_context)
@@ -50,7 +53,9 @@ class Transformer(BaseItemCollection):
 
     def set_source_context(self, source_context: Context) -> None:
         self.global_context.merge_context(source_context)
-        self.global_context.add_context('time', self.schema.time.evaluate(self.global_context))
+        self.global_context.add_context('time',
+                                        self.schema.time.evaluate(
+                                            self.global_context))
 
     @property
     def items(self) -> Dict[str, BaseItemCollection]:
@@ -65,4 +70,3 @@ class Transformer(BaseItemCollection):
     @property
     def groups(self):
         return self._groups
-

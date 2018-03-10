@@ -69,10 +69,13 @@ class Field(BaseItem):
     def evaluate(self) -> None:
         new_value = None
         if self.needs_evaluation:
-            new_value = self.schema.value.evaluate(self.global_context, self.local_context)
+            new_value = self.schema.value.evaluate(self.global_context,
+                                                   self.local_context)
 
         if not self.schema.is_type_of(new_value):
-            raise TypeError('Value expression for "{}" returned an incompatible type.', self.name)
+            raise TypeError(
+                'Value expression for "{}" returned an incompatible type.',
+                self.name)
 
         self.value = new_value
 

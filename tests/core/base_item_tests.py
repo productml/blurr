@@ -26,7 +26,9 @@ class TestItem(BaseItem):
     def export(self):
         pass
 
-    def __init__(self, schema: BaseSchema, global_context: Context = Context(),
+    def __init__(self,
+                 schema: BaseSchema,
+                 global_context: Context = Context(),
                  local_context: Context = Context()) -> None:
         super().__init__(schema, global_context, local_context)
 

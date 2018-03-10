@@ -10,7 +10,7 @@ class LocalRunner:
     def __init__(self, local_json_files, output_file, stream_dtc_file):
         self._raw_files = local_json_files
         self._output_file = output_file
-        self._stream_dtc =  yaml.safe_load(open(stream_dtc_file))
+        self._stream_dtc = yaml.safe_load(open(stream_dtc_file))
         self._transformer_schema = TransformerSchema(self._stream_dtc)
         self._user_transformer = {}
         self._exec_context = Context()
