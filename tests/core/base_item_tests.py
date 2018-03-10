@@ -50,3 +50,11 @@ def test_base_item_filter_false(schema_spec: Dict[str, Any]) -> None:
     test_item = TestItem(schema)
 
     assert not test_item.needs_evaluation
+
+
+def test_base_item_filter_missing(schema_spec: Dict[str, Any]) -> None:
+    del schema_spec[BaseSchema.FIELD_WHEN]
+    schema = TestSchema(schema_spec)
+    test_item = TestItem(schema)
+
+    assert test_item.needs_evaluation
