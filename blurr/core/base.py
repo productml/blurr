@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Any
 
-from blurr.core.evaluation import Context, Expression
 from blurr.core.errors import InvalidSchemaException
+from blurr.core.evaluation import Context, Expression
+from blurr.core.loader import TypeLoader
 
 
 class BaseSchema(ABC):
@@ -99,6 +100,55 @@ class BaseSchema(ABC):
         raise InvalidSchemaException(error_message)
 
 
+class BaseSchemaCollection(BaseSchema, ABC):
+    """
+    Base class for schema that contain nested schema
+    """
+
+    def __init__(self, spec: Dict[str, Any], nested_schema_attribute) -> None:
+        """
+        Initializes the schema for schema that contain a nested schema
+        :param spec:
+        :param nested_schema_attribute:
+        """
+        # Must declare all new fields prior to the initialization so that validation can find the new fields
+        self.nested_schema_attribute = nested_schema_attribute
+
+        super().__init__(spec)
+
+    def validate(self, spec: Dict[str, Any]):
+        """
+        Overrides the Base Schema validation specifications to include validation for nested schema
+        """
+
+        # Validate that the nested schema attribute is present
+        self.validate_required_attribute(spec, self.nested_schema_attribute)
+
+        # Ensure that the nested schema attribute is a list
+        if not isinstance(spec[self.nested_schema_attribute], list):
+            self.raise_validation_error(spec, self.nested_schema_attribute,
+                                        'Schema definition must specify a list of {}.'.format(
+                                            self.nested_schema_attribute))
+
+        # Ensure that the nested schema attribute contains a list of one or more items
+        if len(spec[self.nested_schema_attribute]) == 0:
+            self.raise_validation_error(spec, self.nested_schema_attribute,
+                                        'Schema definition must have at least one item under {}.'.format(
+                                            self.nested_schema_attribute))
+
+    def load(self, spec: Dict[str, Any]) -> None:
+        """
+        Overrides base load to include loads for nested items
+        """
+
+        # Load nested schema items
+        self.nested_schema = {
+            schema_spec[self.ATTRIBUTE_NAME]: TypeLoader.load_schema(
+                schema_spec[self.ATTRIBUTE_TYPE])(schema_spec)
+            for schema_spec in spec[self.nested_schema_attribute]
+        }
+
+
 class BaseItem(ABC):
     """
     Base class for for all leaf items that do not contain sub-items
@@ -178,4 +228,4 @@ class BaseItemCollection(BaseItem):
     @property
     @abstractmethod
     def items(self) -> Dict[str, BaseItem]:
-        raise NotImplementedError('Sub items must be present')
+        raise NotImplementedError('items() must return the items contained within')

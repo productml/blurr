@@ -1,6 +1,5 @@
 import importlib
-from typing import Any, Dict
-from blurr.core.base import BaseSchema, BaseItem
+from typing import Any
 
 ITEM_MAP = {
     'ProductML:DTC:DataGroup:SessionAggregate': 'blurr.core.session_data_group.SessionDataGroup',
@@ -26,21 +25,22 @@ SCHEMA_MAP = {
     'set': 'blurr.core.field_schema.SetFieldSchema'
 }
 
+
 # TODO Build dynamic type loader from a central configuration rather than reading a static dictionary
 
 
 class TypeLoader:
     @staticmethod
-    def load_schema(type_name: str) -> BaseSchema:
+    def load_schema(type_name: str):
         return TypeLoader.load_type(type_name, SCHEMA_MAP)
 
     @staticmethod
-    def load_item(type_name: str) -> BaseItem:
+    def load_item(type_name: str):
         return TypeLoader.load_type(type_name, ITEM_MAP)
 
     @staticmethod
-    def load_type(type_name: str, map: dict) -> Any:
-        return TypeLoader.import_class_by_full_name(map[type_name])
+    def load_type(type_name: str, type_map: dict) -> Any:
+        return TypeLoader.import_class_by_full_name(type_map[type_name])
 
     @staticmethod
     def import_class_by_full_name(name):

@@ -1,41 +1,22 @@
 from abc import ABC
 from typing import Any, Dict
 
-from blurr.core.base import BaseSchema, BaseItemCollection
+from blurr.core.base import BaseSchemaCollection, BaseItemCollection
 from blurr.core.evaluation import Context
 from blurr.core.field import Field, FieldSchema
 from blurr.core.loader import TypeLoader
 
 
-class DataGroupSchema(BaseSchema, ABC):
+class DataGroupSchema(BaseSchemaCollection, ABC):
     """
-    Base for individual Group schema.  The Base implements 'Fields' which represents the list of
-    'Field' schema objects.
+    Base for Group schema
     """
 
     # Field Name Definitions
     ATTRIBUTE_FIELDS = 'Fields'
 
     def __init__(self, spec: Dict[str, Any]) -> None:
-        super().__init__(spec)
-
-    def validate(self, spec: Dict[str, Any]) -> None:
-        self.validate_required_attribute(spec, self.ATTRIBUTE_FIELDS)
-
-        if not isinstance(spec[self.ATTRIBUTE_FIELDS], list):
-            self.raise_validation_error(spec, self.ATTRIBUTE_FIELDS,
-                                        'Must be a list of fields.')
-
-        if len(spec[self.ATTRIBUTE_FIELDS]) == 0:
-            self.raise_validation_error(spec, self.ATTRIBUTE_FIELDS,
-                                        'Must contain at least 1 field.')
-
-    def load(self, spec: Dict[str, Any]) -> None:
-        self.fields = {
-            field_spec[self.ATTRIBUTE_NAME]: TypeLoader.load_schema(
-                field_spec[self.ATTRIBUTE_TYPE])(field_spec)
-            for field_spec in spec[self.ATTRIBUTE_FIELDS]
-        }
+        super().__init__(spec, self.ATTRIBUTE_FIELDS)
 
 
 class DataGroup(BaseItemCollection):
@@ -45,7 +26,7 @@ class DataGroup(BaseItemCollection):
         self._fields: Dict[str, Field] = {
             name: TypeLoader.load_item(field_schema.type)(
                 field_schema, self.global_context, self.local_context)
-            for name, field_schema in schema.fields.items()
+            for name, field_schema in schema.nested_schema.items()
         }
         self.local_context.merge_context(self._fields)
 
