@@ -35,8 +35,8 @@ class TestSchema(BaseSchema):
 
 def test_base_schema_valid(test_schema_spec: Dict[str, Any]) -> None:
     test_schema = TestSchema(test_schema_spec)
-    assert test_schema.name == test_schema_spec[BaseSchema.FIELD_NAME]
-    assert test_schema.type == test_schema_spec[BaseSchema.FIELD_TYPE]
+    assert test_schema.name == test_schema_spec[BaseSchema.ATTRIBUTE_NAME]
+    assert test_schema.type == test_schema_spec[BaseSchema.ATTRIBUTE_TYPE]
     assert isinstance(test_schema.when, Expression)
     assert test_schema.when.evaluate()
 
@@ -47,12 +47,12 @@ def test_base_schema_empty() -> None:
 
 
 def test_base_schema_name_missing(test_schema_spec: Dict[str, Any]) -> None:
-    del test_schema_spec[BaseSchema.FIELD_NAME]
+    del test_schema_spec[BaseSchema.ATTRIBUTE_NAME]
     with raises(InvalidSchemaException, Message='Required attribute missing.'):
         TestSchema(test_schema_spec)
 
 
 def test_base_schema_type_missing(test_schema_spec: Dict[str, Any]) -> None:
-    del test_schema_spec[BaseSchema.FIELD_TYPE]
+    del test_schema_spec[BaseSchema.ATTRIBUTE_TYPE]
     with raises(InvalidSchemaException, Message='Required attribute missing.'):
         TestSchema(test_schema_spec)

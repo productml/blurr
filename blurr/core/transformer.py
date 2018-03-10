@@ -6,30 +6,30 @@ from blurr.core.loader import TypeLoader
 
 
 class TransformerSchema(BaseSchema):
-    FIELD_VERSION = 'Version'
-    FIELD_DESCRIPTION = 'Description'
-    FIELD_IDENTITY = 'Identity'
-    FIELD_TIME = 'Time'
-    FIELD_GROUPS = 'DataGroups'
+    ATTRIBUTE_VERSION = 'Version'
+    ATTRIBUTE_DESCRIPTION = 'Description'
+    ATTRIBUTE_IDENTITY = 'Identity'
+    ATTRIBUTE_TIME = 'Time'
+    ATTRIBUTE_GROUPS = 'DataGroups'
 
     def __init__(self, spec: Dict[str, Any]) -> None:
         super().__init__(spec)
 
     def validate(self, spec: Dict[str, Any]) -> None:
-        self.validate_required_attribute(spec, self.FIELD_VERSION)
-        self.validate_required_attribute(spec, self.FIELD_DESCRIPTION)
-        self.validate_required_attribute(spec, self.FIELD_IDENTITY)
-        self.validate_required_attribute(spec, self.FIELD_TIME)
+        self.validate_required_attribute(spec, self.ATTRIBUTE_VERSION)
+        self.validate_required_attribute(spec, self.ATTRIBUTE_DESCRIPTION)
+        self.validate_required_attribute(spec, self.ATTRIBUTE_IDENTITY)
+        self.validate_required_attribute(spec, self.ATTRIBUTE_TIME)
 
     def load(self, spec: Dict[str, Any]) -> None:
-        self.version = spec[self.FIELD_VERSION]
-        self.description = spec[self.FIELD_DESCRIPTION]
-        self.identity = Expression(spec[self.FIELD_IDENTITY])
-        self.time = Expression(spec[self.FIELD_TIME])
+        self.version = spec[self.ATTRIBUTE_VERSION]
+        self.description = spec[self.ATTRIBUTE_DESCRIPTION]
+        self.identity = Expression(spec[self.ATTRIBUTE_IDENTITY])
+        self.time = Expression(spec[self.ATTRIBUTE_TIME])
         self.groups = {
-            group_spec[self.FIELD_NAME]: TypeLoader.load_schema(
-                group_spec[self.FIELD_TYPE])(group_spec)
-            for group_spec in spec[self.FIELD_GROUPS]
+            group_spec[self.ATTRIBUTE_NAME]: TypeLoader.load_schema(
+                group_spec[self.ATTRIBUTE_TYPE])(group_spec)
+            for group_spec in spec[self.ATTRIBUTE_GROUPS]
         }
 
     def get_identity(self, source_context: Context):

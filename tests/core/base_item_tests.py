@@ -47,7 +47,7 @@ def test_base_item_valid(schema_spec: Dict[str, Any]) -> None:
 
 
 def test_base_item_filter_false(schema_spec: Dict[str, Any]) -> None:
-    schema_spec[BaseSchema.FIELD_WHEN] = 'False'
+    schema_spec[BaseSchema.ATTRIBUTE_WHEN] = 'False'
     schema = TestSchema(schema_spec)
     test_item = TestItem(schema)
 
@@ -55,7 +55,7 @@ def test_base_item_filter_false(schema_spec: Dict[str, Any]) -> None:
 
 
 def test_base_item_filter_missing(schema_spec: Dict[str, Any]) -> None:
-    del schema_spec[BaseSchema.FIELD_WHEN]
+    del schema_spec[BaseSchema.ATTRIBUTE_WHEN]
     schema = TestSchema(schema_spec)
     test_item = TestItem(schema)
 

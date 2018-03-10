@@ -14,27 +14,27 @@ class DataGroupSchema(BaseSchema, ABC):
     """
 
     # Field Name Definitions
-    FIELD_FIELDS = 'Fields'
+    ATTRIBUTE_FIELDS = 'Fields'
 
     def __init__(self, spec: Dict[str, Any]) -> None:
         super().__init__(spec)
 
     def validate(self, spec: Dict[str, Any]) -> None:
-        self.validate_required_attribute(spec, self.FIELD_FIELDS)
+        self.validate_required_attribute(spec, self.ATTRIBUTE_FIELDS)
 
-        if not isinstance(spec[self.FIELD_FIELDS], list):
-            self.raise_validation_error(spec, self.FIELD_FIELDS,
+        if not isinstance(spec[self.ATTRIBUTE_FIELDS], list):
+            self.raise_validation_error(spec, self.ATTRIBUTE_FIELDS,
                                         'Must be a list of fields.')
 
-        if len(spec[self.FIELD_FIELDS]) == 0:
-            self.raise_validation_error(spec, self.FIELD_FIELDS,
+        if len(spec[self.ATTRIBUTE_FIELDS]) == 0:
+            self.raise_validation_error(spec, self.ATTRIBUTE_FIELDS,
                                         'Must contain at least 1 field.')
 
     def load(self, spec: Dict[str, Any]) -> None:
         self.fields = {
-            field_spec[self.FIELD_NAME]: TypeLoader.load_schema(
-                field_spec[self.FIELD_TYPE])(field_spec)
-            for field_spec in spec[self.FIELD_FIELDS]
+            field_spec[self.ATTRIBUTE_NAME]: TypeLoader.load_schema(
+                field_spec[self.ATTRIBUTE_TYPE])(field_spec)
+            for field_spec in spec[self.ATTRIBUTE_FIELDS]
         }
 
 

@@ -12,9 +12,9 @@ class BaseSchema(ABC):
     """
 
     # Field Name Definitions
-    FIELD_NAME = 'Name'
-    FIELD_TYPE = 'Type'
-    FIELD_WHEN = 'When'
+    ATTRIBUTE_NAME = 'Name'
+    ATTRIBUTE_TYPE = 'Type'
+    ATTRIBUTE_WHEN = 'When'
 
     def __init__(self, spec: Dict[str, Any]) -> None:
         """
@@ -46,10 +46,10 @@ class BaseSchema(ABC):
         Loads the base schema spec into the object
         """
         self.spec: Dict[str, Any] = spec
-        self.name: str = spec[self.FIELD_NAME]
-        self.type: str = spec[self.FIELD_TYPE]
+        self.name: str = spec[self.ATTRIBUTE_NAME]
+        self.type: str = spec[self.ATTRIBUTE_TYPE]
         self.when: Expression = Expression(
-            spec[self.FIELD_WHEN]) if self.FIELD_WHEN in spec else None
+            spec[self.ATTRIBUTE_WHEN]) if self.ATTRIBUTE_WHEN in spec else None
 
         # Invokes the loads of the subclass
         self.load(spec)
@@ -58,8 +58,8 @@ class BaseSchema(ABC):
         """
         Validates the schema spec.  Raises exceptions if errors are found.
         """
-        self.validate_required_attribute(spec, self.FIELD_NAME)
-        self.validate_required_attribute(spec, self.FIELD_TYPE)
+        self.validate_required_attribute(spec, self.ATTRIBUTE_NAME)
+        self.validate_required_attribute(spec, self.ATTRIBUTE_TYPE)
 
         # Invokes the validations of the subclasses
         self.validate(spec)
@@ -93,7 +93,7 @@ class BaseSchema(ABC):
                          '\n\tAttribute: {attribute}'
                          '\n\tError Message: {message}') \
             .format(
-            name=spec.get(self.FIELD_NAME, str(spec)),
+            name=spec.get(self.ATTRIBUTE_NAME, str(spec)),
             attribute=attribute,
             message=message)
         raise InvalidSchemaException(error_message)
