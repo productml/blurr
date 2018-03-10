@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Any
+from typing import Dict, Any, Type
 
 from blurr.core.errors import InvalidSchemaException
 from blurr.core.evaluation import Context, Expression
@@ -207,6 +207,20 @@ class BaseItemCollection(BaseItem):
     Base class for items that contain sub-items within them
     """
 
+    def __init__(self,
+                 schema: BaseSchemaCollection,
+                 global_context: Context = Context(),
+                 local_context: Context = Context()):
+
+        super().__init__(schema, global_context, local_context)
+
+        # Load the nested items into the item
+        self.items: Dict[str, Type[BaseItem]] = {
+            name: TypeLoader.load_item(item_schema.type)(
+                item_schema, self.global_context, self.local_context)
+            for name, item_schema in schema.nested_schema.items()
+        }
+
     def evaluate(self) -> None:
         """
         Evaluates the current item
@@ -224,8 +238,3 @@ class BaseItemCollection(BaseItem):
         except Exception as e:
             print('Error while creating snapshot for {}', self.name)
             raise e
-
-    @property
-    @abstractmethod
-    def items(self) -> Dict[str, BaseItem]:
-        raise NotImplementedError('items() must return the items contained within')

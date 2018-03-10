@@ -34,8 +34,8 @@ class StaleSessionError(Exception):
 
 class SessionDataGroup(DataGroup):
     def __init__(self, schema: SessionDataGroupSchema,
-                 global_context: Context) -> None:
-        super(SessionDataGroup, self).__init__(schema, global_context)
+                 global_context: Context = Context(), local_context: Context = Context()) -> None:
+        super(SessionDataGroup, self).__init__(schema, global_context, local_context)
 
     def evaluate(self) -> None:
         if self.start_time is not None and self.end_time is not None:

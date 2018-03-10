@@ -1,8 +1,7 @@
 from typing import Any, Dict
-from blurr.core.data_group import DataGroup
-from blurr.core.base import BaseItemCollection, BaseItem, BaseSchemaCollection, Expression
+
+from blurr.core.base import BaseItemCollection, BaseSchemaCollection, Expression
 from blurr.core.evaluation import Context
-from blurr.core.loader import TypeLoader
 
 
 class TransformerSchema(BaseSchemaCollection):
@@ -47,29 +46,17 @@ class Transformer(BaseItemCollection):
         self.global_context.merge_context(exec_context)
         self._identity = identity
         self.global_context.add_context('identity', self._identity)
-        self._groups: Dict[str, DataGroup] = {
-            name: TypeLoader.load_item(group_schema.type)(group_schema,
-                                                          self.global_context)
-            for name, group_schema in schema.nested_schema.items()
-        }
-        self.global_context.merge_context(self._groups)
+        self.global_context.merge_context(self.items)
 
     def set_source_context(self, source_context: Context) -> None:
         self.global_context.merge_context(source_context)
         self.global_context.add_context('time',
                                         self.schema.time.evaluate(
                                             self.global_context))
-
-    @property
-    def items(self) -> Dict[str, BaseItemCollection]:
-        return self._groups
-
+"""
     def __getattr__(self, item):
-        if item in self._groups:
-            return self._groups[item].value
+        if item in self.items:
+            return self.items[item].value
 
         self.__getattribute__(item)
-
-    @property
-    def groups(self):
-        return self._groups
+"""
