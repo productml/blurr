@@ -211,6 +211,12 @@ class BaseItemCollection(BaseItem):
                  schema: BaseSchemaCollection,
                  global_context: Context = Context(),
                  local_context: Context = Context()):
+        """
+        Loads nested items to the 'items' collection
+        :param schema: Schema that conforms to the item
+        :param global_context: Global context dictionary
+        :param local_context: Local context dictionary
+        """
 
         super().__init__(schema, global_context, local_context)
 
@@ -233,6 +239,9 @@ class BaseItemCollection(BaseItem):
 
     @property
     def snapshot(self):
+        """
+        Implements snapshot for collections by recursively invoking snapshot of all child items
+        """
         try:
             return {name: item.snapshot for name, item in self.items.items()}
         except Exception as e:
