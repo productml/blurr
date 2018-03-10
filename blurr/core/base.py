@@ -120,10 +120,19 @@ class BaseItem(ABC):
 
     @property
     def needs_evaluation(self) -> bool:
+        """
+        Returns True when:
+            1. Where clause is not specified
+            2. Where WHERE clause is specified and it evaluates to True
+        Returns false if a where clause is specified and it evaluates to False
+        """
         return self.schema.when is None or self.schema.when.evaluate()
 
     @property
     def name(self):
+        """
+        Returns the name of the base item
+        """
         return self.schema.name
 
     @abstractmethod
@@ -135,8 +144,12 @@ class BaseItem(ABC):
 
     @property
     @abstractmethod
-    def export(self):
-        raise NotImplementedError('export() must be implemented')
+    def snapshot(self):
+        """
+        Gets a dictionary representation of the current state items in the current hierarchy
+        :return: Name, Value map of the current tree
+        """
+        raise NotImplementedError('snapshot() must be implemented')
 
 
 class BaseItemCollection(BaseItem):
@@ -155,11 +168,11 @@ class BaseItemCollection(BaseItem):
                 item.evaluate()
 
     @property
-    def export(self):
+    def snapshot(self):
         try:
-            return {name: item.export for name, item in self.items.items()}
+            return {name: item.snapshot for name, item in self.items.items()}
         except Exception as e:
-            print('Error when exporting', self.items)
+            print('Error while creating snapshot for {}', self.name)
             raise e
 
     @property

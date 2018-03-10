@@ -23,7 +23,7 @@ class TestItem(BaseItem):
     This class is to test abstract behavior, and thus, adds no functionality
     """
 
-    def export(self):
+    def snapshot(self):
         pass
 
     def __init__(self,

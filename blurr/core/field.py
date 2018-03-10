@@ -91,5 +91,5 @@ class Field(BaseItem):
         self.value = new_value
 
     @property
-    def export(self):
+    def snapshot(self):
         return self.value
