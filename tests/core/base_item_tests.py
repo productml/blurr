@@ -4,7 +4,7 @@ import yaml
 from pytest import mark, fixture
 
 from blurr.core.base import BaseSchema, BaseItem
-from blurr.core.evaluation import EvaluationContext
+from blurr.core.evaluation import Context
 from tests.core.base_schema_tests import TestSchema
 
 
@@ -28,8 +28,8 @@ class TestItem(BaseItem):
 
     def __init__(self,
                  schema: BaseSchema,
-                 global_context: EvaluationContext = EvaluationContext(),
-                 local_context: EvaluationContext = EvaluationContext()) -> None:
+                 global_context: Context = Context(),
+                 local_context: Context = Context()) -> None:
         super().__init__(schema, global_context, local_context)
 
     def evaluate(self):
@@ -40,8 +40,8 @@ def test_base_item_valid(schema_spec: Dict[str, Any]) -> None:
     schema = TestSchema(schema_spec)
     test_item = TestItem(schema)
     assert test_item.schema == schema
-    assert test_item.global_context == EvaluationContext()
-    assert test_item.local_context == EvaluationContext()
+    assert test_item.global_context == Context()
+    assert test_item.local_context == Context()
 
     assert test_item.needs_evaluation
 

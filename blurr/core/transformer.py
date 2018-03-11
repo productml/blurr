@@ -1,7 +1,7 @@
 from typing import Any, Dict
 
 from blurr.core.base import BaseItemCollection, BaseSchemaCollection, Expression
-from blurr.core.evaluation import EvaluationContext
+from blurr.core.evaluation import Context
 
 
 class TransformerSchema(BaseSchemaCollection):
@@ -34,14 +34,14 @@ class TransformerSchema(BaseSchemaCollection):
         self.identity = Expression(spec[self.ATTRIBUTE_IDENTITY])
         self.time = Expression(spec[self.ATTRIBUTE_TIME])
 
-    def get_identity(self, source_context: EvaluationContext):
+    def get_identity(self, source_context: Context):
         return self.identity.evaluate(source_context)
 
 
 class Transformer(BaseItemCollection):
     def __init__(self, schema: TransformerSchema, identity,
-                 global_context: EvaluationContext,
-                 local_context: EvaluationContext) -> None:
+                 global_context: Context,
+                 local_context: Context) -> None:
         super().__init__(schema, global_context, local_context)
         self.global_context.add(self.name, self)
         self.global_context.merge(global_context)
@@ -49,7 +49,7 @@ class Transformer(BaseItemCollection):
         self.global_context.add('identity', self._identity)
         self.global_context.merge(self.nested_items)
 
-    def set_source_context(self, source_context: EvaluationContext) -> None:
+    def set_source_context(self, source_context: Context) -> None:
         self.global_context.merge(source_context)
         self.global_context.add('time',
                                 self.schema.time.evaluate(

@@ -1,7 +1,7 @@
 from typing import Dict, Any
 
 from blurr.core.base import BaseSchema, BaseItem
-from blurr.core.evaluation import EvaluationContext, Expression
+from blurr.core.evaluation import Context, Expression
 from abc import ABC, abstractmethod
 
 
@@ -58,8 +58,8 @@ class Field(BaseItem):
     An individual field object responsible for retaining the field value
     """
 
-    def __init__(self, schema: FieldSchema, global_context: EvaluationContext,
-                 local_context: EvaluationContext) -> None:
+    def __init__(self, schema: FieldSchema, global_context: Context,
+                 local_context: Context) -> None:
         super().__init__(schema, global_context, local_context)
 
         # When the field is created, the value is set to the field type default

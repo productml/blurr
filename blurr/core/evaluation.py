@@ -3,7 +3,7 @@ from typing import Any, Dict
 from blurr.core.errors import ExpressionEvaluationException, InvalidExpressionException
 
 
-class EvaluationContext(dict):
+class Context(dict):
     """
     Evaluation context provides a dictionary of declared context objects
     """
@@ -24,7 +24,7 @@ class EvaluationContext(dict):
         """
         self[name] = value
 
-    def merge(self, context: 'EvaluationContext') -> None:
+    def merge(self, context: 'Context') -> None:
         """
         Updates the context object with the items in another context
         object.  Fields of the same name are overwritten
@@ -51,8 +51,8 @@ class Expression:
             raise InvalidExpressionException(e)
 
     def evaluate(self,
-                 global_context: EvaluationContext = EvaluationContext(),
-                 local_context: EvaluationContext = EvaluationContext()) -> Any:
+                 global_context: Context = Context(),
+                 local_context: Context = Context()) -> Any:
         """
         Evaluates the expression with the context provided.  If the execution
         results in failure, an ExpressionEvaluationException encapsulating the

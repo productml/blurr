@@ -2,7 +2,7 @@ from abc import ABC
 from typing import Any, Dict
 
 from blurr.core.base import BaseSchemaCollection, BaseItemCollection
-from blurr.core.evaluation import EvaluationContext
+from blurr.core.evaluation import Context
 
 
 class DataGroupSchema(BaseSchemaCollection, ABC):
@@ -23,8 +23,8 @@ class DataGroupSchema(BaseSchemaCollection, ABC):
 
 class DataGroup(BaseItemCollection):
     def __init__(self, schema: DataGroupSchema,
-                 global_context: EvaluationContext = EvaluationContext(),
-                 local_context: EvaluationContext = EvaluationContext()) -> None:
+                 global_context: Context = Context(),
+                 local_context: Context = Context()) -> None:
         """
         Initializes the data group with the inherited context and adds
         its own nested items into the local context for execution
