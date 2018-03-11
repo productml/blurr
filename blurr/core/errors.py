@@ -16,3 +16,7 @@ class TypeNotFoundException(Exception):
 
 class SnapshotException(Exception):
     pass
+
+
+class StaleSessionException(Exception):
+    pass

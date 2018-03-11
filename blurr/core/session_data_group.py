@@ -2,6 +2,7 @@ from typing import Dict, Any, List
 
 from blurr.core.evaluation import Context, Expression
 from blurr.core.data_group import DataGroup, DataGroupSchema
+from blurr.core.errors import StaleSessionException
 
 
 class SessionDataGroupSchema(DataGroupSchema):
@@ -35,7 +36,7 @@ class SessionDataGroupSchema(DataGroupSchema):
         super().load(spec)
 
         # Load type specific attributes
-        self.split = Expression(spec[self.ATTRIBUTE_SPLIT])
+        self.split: Expression = Expression(spec[self.ATTRIBUTE_SPLIT]) if self.ATTRIBUTE_SPLIT in spec else None
 
     @staticmethod
     def build_predefined_fields_spec(name_in_context: str) -> List[Dict[str, Any]]:
@@ -62,21 +63,25 @@ class SessionDataGroupSchema(DataGroupSchema):
         ]
 
 
-class StaleSessionError(Exception):
-    pass
-
-
 class SessionDataGroup(DataGroup):
-    def __init__(self, schema: SessionDataGroupSchema,
-                 global_context: Context = Context(), local_context: Context = Context()) -> None:
+    """
+    Manages the aggregates for session based roll-ups of streaming data
+    """
+
+    def __init__(self, schema: SessionDataGroupSchema, global_context: Context, local_context: Context) -> None:
         super(SessionDataGroup, self).__init__(schema, global_context, local_context)
 
     def evaluate(self) -> None:
+        """
+        Overrides the default execution behavior to handle session splits
+        """
+        # Check if current session is stale for the event being processed
         if self.start_time is not None and self.end_time is not None:
-            if not self.schema.split or self.evaluate_expr(self.schema.split):
-                raise StaleSessionError()
+            if not self.schema.split or self.schema.split.evaluate():
+                raise StaleSessionException()
 
-        super(SessionDataGroup, self).evaluate()
+        # Evaluate the rest
+        super().evaluate()
 
     def split(self):
         pass
