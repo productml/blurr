@@ -77,12 +77,8 @@ class SessionDataGroup(DataGroup):
         """
         # Check if current session is stale for the event being processed
         if self.start_time is not None and self.end_time is not None:
-            if not self.schema.split or self.schema.split.evaluate():
+            if not self.schema.split or self.schema.split.evaluate(self.global_context, self.local_context):
                 raise StaleSessionError()
 
         # Evaluate the rest
         super().evaluate()
-
-    def split(self):
-        pass
-        # TODO Flush the current session to store

@@ -176,7 +176,7 @@ class BaseItem(ABC):
             2. Where WHERE clause is specified and it evaluates to True
         Returns false if a where clause is specified and it evaluates to False
         """
-        return self.schema.when is None or self.schema.when.evaluate()
+        return self.schema.when is None or self.schema.when.evaluate(self.global_context, self.local_context)
 
     @property
     def name(self) -> str:
