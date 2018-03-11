@@ -1,6 +1,6 @@
 from typing import Any, Dict
 
-from blurr.core.errors import ExpressionEvaluationException, InvalidExpressionException
+from blurr.core.errors import ExpressionEvaluationError, InvalidExpressionError
 
 
 class Context(dict):
@@ -48,7 +48,7 @@ class Expression:
         try:
             self.code_object = compile(self.code_string, '<string>', 'eval')
         except Exception as e:
-            raise InvalidExpressionException(e)
+            raise InvalidExpressionError(e)
 
     def evaluate(self,
                  global_context: Context = Context(),
@@ -64,4 +64,4 @@ class Expression:
             return eval(self.code_object, global_context, local_context)
 
         except Exception as e:
-            raise ExpressionEvaluationException(e)
+            raise ExpressionEvaluationError(e)

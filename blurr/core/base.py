@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Type
 
-from blurr.core.errors import InvalidSchemaException, SnapshotException
+from blurr.core.errors import InvalidSchemaError, SnapshotError
 from blurr.core.evaluation import Context, Expression
 from blurr.core.loader import TypeLoader
 
@@ -97,7 +97,7 @@ class BaseSchema(ABC):
             name=spec.get(self.ATTRIBUTE_NAME, str(spec)),
             attribute=attribute,
             message=message)
-        raise InvalidSchemaException(error_message)
+        raise InvalidSchemaError(error_message)
 
 
 class BaseSchemaCollection(BaseSchema, ABC):
@@ -255,7 +255,7 @@ class BaseItemCollection(BaseItem):
 
         except Exception as e:
             print('Error while creating snapshot for {}', self.name)
-            raise SnapshotException(e)
+            raise SnapshotError(e)
 
     def restore(self, snapshot: Dict[str, Any]) -> None:
         """
@@ -268,4 +268,4 @@ class BaseItemCollection(BaseItem):
 
         except Exception as e:
             print('Error while restoring snapshot: {}', self.snapshot)
-            raise SnapshotException(e)
+            raise SnapshotError(e)

@@ -2,7 +2,7 @@ from typing import Dict, Any, List
 
 from blurr.core.evaluation import Context, Expression
 from blurr.core.data_group import DataGroup, DataGroupSchema
-from blurr.core.errors import StaleSessionException
+from blurr.core.errors import StaleSessionError
 
 
 class SessionDataGroupSchema(DataGroupSchema):
@@ -78,7 +78,7 @@ class SessionDataGroup(DataGroup):
         # Check if current session is stale for the event being processed
         if self.start_time is not None and self.end_time is not None:
             if not self.schema.split or self.schema.split.evaluate():
-                raise StaleSessionException()
+                raise StaleSessionError()
 
         # Evaluate the rest
         super().evaluate()
