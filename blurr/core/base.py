@@ -273,7 +273,7 @@ class BaseItemCollection(BaseItem):
     def __getattr__(self, item: str) -> Any:
         """
         Makes the value of the nested items available as properties
-        of the data group object.  This is used for retrieving field values
+        of the collection object.  This is used for retrieving field values
         for dynamic execution.
         :param item: Field requested
         """

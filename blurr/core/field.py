@@ -53,7 +53,7 @@ class FieldSchema(BaseSchema, ABC):
         raise NotImplementedError('type_object is required')
 
 
-class Field(BaseItem):
+class Field(BaseItem, ABC):
     """
     An individual field object responsible for retaining the field value
     """

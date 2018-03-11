@@ -1,7 +1,7 @@
 from typing import Any
 from datetime import datetime
 
-from blurr.core.field import FieldSchema
+from blurr.core.field import FieldSchema, Field
 
 
 class IntegerFieldSchema(FieldSchema):
@@ -82,3 +82,10 @@ class SetFieldSchema(FieldSchema):
     @property
     def default(self) -> Any:
         return set()
+
+
+class SimpleField(Field):
+    """
+    Represents a simple field that can be of any native feild type
+    """
+    pass
