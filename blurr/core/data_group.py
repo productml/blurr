@@ -11,14 +11,14 @@ class DataGroupSchema(BaseSchemaCollection, ABC):
     """
 
     # Field Name Definitions
-    ATTRIBUTE_FIELD = 'Fields'
+    ATTRIBUTE_FIELDS = 'Fields'
 
     def __init__(self, spec: Dict[str, Any]) -> None:
         """
         Initializing the nested field schema that all data groups contain
-        :param spec:
+        :param spec: Schema specifications for the field
         """
-        super().__init__(spec, self.ATTRIBUTE_FIELD)
+        super().__init__(spec, self.ATTRIBUTE_FIELDS)
 
 
 class DataGroup(BaseItemCollection):
