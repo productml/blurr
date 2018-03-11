@@ -19,8 +19,8 @@ jobs:
           name: init .pypirc
           command: |
             echo -e "[pypi]" >> ~/.pypirc
-            echo -e "username = productml" >> ~/.pypirc
-            echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
+            echo -e "username = $PYPI_USER" >> ~/.pypirc
+            echo -e "password = $PYPI_PASS" >> ~/.pypirc
       - run:
           name: deploy pypi
           command: |
