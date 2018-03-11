@@ -7,7 +7,8 @@ from blurr.core.evaluation import Context
 
 class DataGroupSchema(BaseSchemaCollection, ABC):
     """
-    Base for DataGroup schema
+    Group Schema must inherit from this base.  Data Group schema provides the
+    abstraction for managing the 'Fields' in the group.
     """
 
     # Field Name Definitions
@@ -22,6 +23,10 @@ class DataGroupSchema(BaseSchemaCollection, ABC):
 
 
 class DataGroup(BaseItemCollection):
+    """
+    All Data Groups inherit from this base.  Provides an abstraction for 'value' of the encapsulated
+    to be called as properties of the data group itself.
+    """
     def __init__(self, schema: DataGroupSchema,
                  global_context: Context = Context(),
                  local_context: Context = Context()) -> None:
@@ -37,14 +42,4 @@ class DataGroup(BaseItemCollection):
 
         self.local_context.merge(self.nested_items)
 
-    def __getattr__(self, item: str) -> Any:
-        """
-        Makes the value of the nested items available as properties
-        of the data group object.  This is used for retrieving field values
-        for dynamic execution.
-        :param item: Field requested
-        """
-        if item in self.nested_items:
-            return self.nested_items[item].snapshot
 
-        self.__getattribute__(item)

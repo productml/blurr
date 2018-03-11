@@ -1,14 +1,18 @@
 from typing import Any, Dict
+from abc import ABC
 
-from blurr.core.base import BaseItemCollection, BaseSchemaCollection, Expression
+from blurr.core.base import BaseItemCollection, BaseSchemaCollection
 from blurr.core.evaluation import Context
 
 
-class TransformerSchema(BaseSchemaCollection):
+class TransformerSchema(BaseSchemaCollection, ABC):
+    """
+    All Transformer Schema inherit from this base.  Adds support for handling
+    the required attributes of a schema.
+    """
+
     ATTRIBUTE_VERSION = 'Version'
     ATTRIBUTE_DESCRIPTION = 'Description'
-    ATTRIBUTE_IDENTITY = 'Identity'
-    ATTRIBUTE_TIME = 'Time'
     ATTRIBUTE_DATA_GROUPS = 'DataGroups'
 
     def __init__(self, spec: Dict[str, Any]) -> None:
@@ -21,8 +25,6 @@ class TransformerSchema(BaseSchemaCollection):
         # Validate schema specific attributes
         self.validate_required_attribute(spec, self.ATTRIBUTE_VERSION)
         self.validate_required_attribute(spec, self.ATTRIBUTE_DESCRIPTION)
-        self.validate_required_attribute(spec, self.ATTRIBUTE_IDENTITY)
-        self.validate_required_attribute(spec, self.ATTRIBUTE_TIME)
 
     def load(self, spec: Dict[str, Any]) -> None:
         # Ensure that the base loader is invoked
@@ -31,33 +33,16 @@ class TransformerSchema(BaseSchemaCollection):
         # Load the schema specific attributes
         self.version = spec[self.ATTRIBUTE_VERSION]
         self.description = spec[self.ATTRIBUTE_DESCRIPTION]
-        self.identity = Expression(spec[self.ATTRIBUTE_IDENTITY])
-        self.time = Expression(spec[self.ATTRIBUTE_TIME])
-
-    def get_identity(self, source_context: Context):
-        return self.identity.evaluate(source_context)
 
 
-class Transformer(BaseItemCollection):
-    def __init__(self, schema: TransformerSchema, identity,
-                 global_context: Context,
-                 local_context: Context) -> None:
+class Transformer(BaseItemCollection, ABC):
+    """
+    All transformers inherit from this base.  Adds the current transformer
+    to the context
+    """
+
+    def __init__(self, schema: TransformerSchema, global_context: Context, local_context: Context) -> None:
         super().__init__(schema, global_context, local_context)
         self.global_context.add(self.name, self)
         self.global_context.merge(global_context)
-        self._identity = identity
-        self.global_context.add('identity', self._identity)
         self.global_context.merge(self.nested_items)
-
-    def set_source_context(self, source_context: Context) -> None:
-        self.global_context.merge(source_context)
-        self.global_context.add('time',
-                                self.schema.time.evaluate(
-                                            self.global_context))
-"""
-    def __getattr__(self, item):
-        if item in self.items:
-            return self.items[item].value
-
-        self.__getattribute__(item)
-"""

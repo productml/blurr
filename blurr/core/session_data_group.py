@@ -13,7 +13,7 @@ class SessionDataGroupSchema(DataGroupSchema):
     ATTRIBUTE_SPLIT = 'Split'
 
     def __init__(self, spec: Dict[str, Any]) -> None:
-        super(SessionDataGroupSchema, self).__init__(spec)
+        super().__init__(spec)
 
     def validate(self, spec: Dict[str, Any]):
         """

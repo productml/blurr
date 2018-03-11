@@ -269,3 +269,15 @@ class BaseItemCollection(BaseItem):
         except Exception as e:
             print('Error while restoring snapshot: {}', self.snapshot)
             raise SnapshotError(e)
+
+    def __getattr__(self, item: str) -> Any:
+        """
+        Makes the value of the nested items available as properties
+        of the data group object.  This is used for retrieving field values
+        for dynamic execution.
+        :param item: Field requested
+        """
+        if item in self.nested_items:
+            return self.nested_items[item].snapshot
+
+        self.__getattribute__(item)
