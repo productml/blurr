@@ -35,7 +35,7 @@ class DataGroup(BaseItemCollection):
         """
         super().__init__(schema, global_context, local_context)
 
-        self.local_context.merge_context(self.items)
+        self.local_context.merge_context(self.nested_items)
 
     def __getattr__(self, item: str) -> Any:
         """
@@ -44,7 +44,7 @@ class DataGroup(BaseItemCollection):
         for dynamic execution.
         :param item: Field requested
         """
-        if item in self.items:
-            return self.items[item].snapshot
+        if item in self.nested_items:
+            return self.nested_items[item].snapshot
 
         self.__getattribute__(item)

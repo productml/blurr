@@ -46,7 +46,7 @@ class BaseSchema(ABC):
         """
         Loads the base schema spec into the object
         """
-        self.spec: Dict[str, Any] = spec
+        self.__spec: Dict[str, Any] = spec
         self.name: str = spec[self.ATTRIBUTE_NAME]
         self.type: str = spec[self.ATTRIBUTE_TYPE]
         self.when: Expression = Expression(
@@ -112,7 +112,7 @@ class BaseSchemaCollection(BaseSchema, ABC):
         :param nested_schema_attribute:
         """
         # Must declare all new fields prior to the initialization so that validation can find the new fields
-        self.nested_schema_attribute = nested_schema_attribute
+        self._nested_item_attribute = nested_schema_attribute
 
         super().__init__(spec)
 
@@ -122,19 +122,19 @@ class BaseSchemaCollection(BaseSchema, ABC):
         """
 
         # Validate that the nested schema attribute is present
-        self.validate_required_attribute(spec, self.nested_schema_attribute)
+        self.validate_required_attribute(spec, self._nested_item_attribute)
 
         # Ensure that the nested schema attribute is a list
-        if not isinstance(spec[self.nested_schema_attribute], list):
-            self.raise_validation_error(spec, self.nested_schema_attribute,
+        if not isinstance(spec[self._nested_item_attribute], list):
+            self.raise_validation_error(spec, self._nested_item_attribute,
                                         'Schema definition must specify a list of {}.'.format(
-                                            self.nested_schema_attribute))
+                                            self._nested_item_attribute))
 
         # Ensure that the nested schema attribute contains a list of one or more items
-        if len(spec[self.nested_schema_attribute]) == 0:
-            self.raise_validation_error(spec, self.nested_schema_attribute,
+        if len(spec[self._nested_item_attribute]) == 0:
+            self.raise_validation_error(spec, self._nested_item_attribute,
                                         'Schema definition must have at least one item under {}.'.format(
-                                            self.nested_schema_attribute))
+                                            self._nested_item_attribute))
 
     def load(self, spec: Dict[str, Any]) -> None:
         """
@@ -142,10 +142,10 @@ class BaseSchemaCollection(BaseSchema, ABC):
         """
 
         # Load nested schema items
-        self.nested_schema = {
+        self.nested_schema: Dict[str, Type[BaseSchema]] = {
             schema_spec[self.ATTRIBUTE_NAME]: TypeLoader.load_schema(
                 schema_spec[self.ATTRIBUTE_TYPE])(schema_spec)
-            for schema_spec in spec[self.nested_schema_attribute]
+            for schema_spec in spec[self._nested_item_attribute]
         }
 
 
@@ -228,7 +228,7 @@ class BaseItemCollection(BaseItem):
         super().__init__(schema, global_context, local_context)
 
         # Load the nested items into the item
-        self.items: Dict[str, Type[BaseItem]] = {
+        self.nested_items: Dict[str, Type[BaseItem]] = {
             name: TypeLoader.load_item(item_schema.type)(
                 item_schema, self.global_context, self.local_context)
             for name, item_schema in schema.nested_schema.items()
@@ -241,7 +241,7 @@ class BaseItemCollection(BaseItem):
         evaluation failed
         """
         if self.needs_evaluation:
-            for _, item in self.items.items():
+            for _, item in self.nested_items.items():
                 item.evaluate()
 
     @property
@@ -251,7 +251,7 @@ class BaseItemCollection(BaseItem):
         """
         try:
 
-            return {name: item.snapshot for name, item in self.items.items()}
+            return {name: item.snapshot for name, item in self.nested_items.items()}
 
         except Exception as e:
             print('Error while creating snapshot for {}', self.name)
@@ -264,8 +264,9 @@ class BaseItemCollection(BaseItem):
         try:
 
             for name, snap in snapshot:
-                self.items[name].restore(snap)
+                self.nested_items[name].restore(snap)
 
         except Exception as e:
             print('Error while restoring snapshot: {}', self.snapshot)
             raise SnapshotException(e)
+

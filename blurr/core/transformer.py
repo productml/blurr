@@ -46,7 +46,7 @@ class Transformer(BaseItemCollection):
         self.global_context.merge_context(exec_context)
         self._identity = identity
         self.global_context.add_context('identity', self._identity)
-        self.global_context.merge_context(self.items)
+        self.global_context.merge_context(self.nested_items)
 
     def set_source_context(self, source_context: Context) -> None:
         self.global_context.merge_context(source_context)
