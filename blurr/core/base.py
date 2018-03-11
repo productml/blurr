@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Dict, Any, Type
 
 from blurr.core.errors import InvalidSchemaException, SnapshotException
-from blurr.core.evaluation import Context, Expression
+from blurr.core.evaluation import EvaluationContext, Expression
 from blurr.core.loader import TypeLoader
 
 
@@ -156,8 +156,8 @@ class BaseItem(ABC):
 
     def __init__(self,
                  schema: BaseSchema,
-                 global_context: Context = Context(),
-                 local_context: Context = Context()):
+                 global_context: EvaluationContext,
+                 local_context: EvaluationContext):
         """
         Initializes an item with the schema and execution context
         :param schema: Schema of the item
@@ -216,8 +216,8 @@ class BaseItemCollection(BaseItem):
 
     def __init__(self,
                  schema: BaseSchemaCollection,
-                 global_context: Context = Context(),
-                 local_context: Context = Context()):
+                 global_context: EvaluationContext,
+                 local_context: EvaluationContext) -> None:
         """
         Loads nested items to the 'items' collection
         :param schema: Schema that conforms to the item
@@ -269,4 +269,3 @@ class BaseItemCollection(BaseItem):
         except Exception as e:
             print('Error while restoring snapshot: {}', self.snapshot)
             raise SnapshotException(e)
-

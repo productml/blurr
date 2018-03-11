@@ -1,4 +1,4 @@
-from blurr.core.evaluation import Context
+from blurr.core.evaluation import EvaluationContext
 from blurr.core.data_group import DataGroup, DataGroupSchema
 
 
@@ -34,7 +34,7 @@ class StaleSessionError(Exception):
 
 class SessionDataGroup(DataGroup):
     def __init__(self, schema: SessionDataGroupSchema,
-                 global_context: Context = Context(), local_context: Context = Context()) -> None:
+                 global_context: EvaluationContext = EvaluationContext(), local_context: EvaluationContext = EvaluationContext()) -> None:
         super(SessionDataGroup, self).__init__(schema, global_context, local_context)
 
     def evaluate(self) -> None:

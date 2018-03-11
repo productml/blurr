@@ -2,7 +2,7 @@ import yaml
 import json
 from blurr.core.transformer import TransformerSchema, Transformer
 from blurr.core.record import Record
-from blurr.core.evaluation import Context
+from blurr.core.evaluation import EvaluationContext
 from dateutil import parser
 
 
@@ -13,15 +13,15 @@ class LocalRunner:
         self._stream_dtc = yaml.safe_load(open(stream_dtc_file))
         self._transformer_schema = TransformerSchema(self._stream_dtc)
         self._user_transformer = {}
-        self._exec_context = Context()
-        self._exec_context.add_context('parser', parser)
+        self._exec_context = EvaluationContext()
+        self._exec_context.add('parser', parser)
 
     def _consume_record(self, record):
-        source_context = Context({'source': record})
+        source_context = EvaluationContext({'source': record})
         identity = self._transformer_schema.get_identity(source_context)
         if identity not in self._user_transformer:
             self._user_transformer[identity] = Transformer(
-                self._transformer_schema, identity, self._exec_context)
+                self._transformer_schema, identity, self._exec_context, EvaluationContext())
         user_transformer = self._user_transformer[identity]
         user_transformer.set_source_context(source_context)
         user_transformer.evaluate()

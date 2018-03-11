@@ -2,7 +2,7 @@ from pytest import raises
 
 from blurr.core.base import Expression
 from blurr.core.errors import ExpressionEvaluationException, InvalidExpressionException
-from blurr.core.evaluation import Context
+from blurr.core.evaluation import EvaluationContext
 
 
 def test_expression_valid() -> None:
@@ -19,9 +19,9 @@ def test_expression_globals_locals() -> None:
     with raises(ExpressionEvaluationException, Message='is not defined'):
         expr.evaluate()
 
-    assert expr.evaluate(global_context=Context({'a': 2, 'b': 3})) == 6
-    assert expr.evaluate(local_context=Context({'a': 2, 'b': 3})) == 6
-    assert expr.evaluate(Context({'a': 2}), Context({'b': 3})) == 6
+    assert expr.evaluate(global_context=EvaluationContext({'a': 2, 'b': 3})) == 6
+    assert expr.evaluate(local_context=EvaluationContext({'a': 2, 'b': 3})) == 6
+    assert expr.evaluate(EvaluationContext({'a': 2}), EvaluationContext({'b': 3})) == 6
 
 
 def test_invalid_expression() -> None:
