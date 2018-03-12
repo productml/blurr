@@ -4,6 +4,8 @@ from abc import ABC
 from blurr.core.base import BaseItemCollection, BaseSchemaCollection
 from blurr.core.evaluation import Context
 
+from blurr.core.store import Store
+
 
 class TransformerSchema(BaseSchemaCollection, ABC):
     """
@@ -41,8 +43,11 @@ class Transformer(BaseItemCollection, ABC):
     to the context
     """
 
-    def __init__(self, schema: TransformerSchema, global_context: Context, local_context: Context) -> None:
+    def __init__(self, store: Store, schema: TransformerSchema, identity: str,
+                 global_context: Context, local_context: Context) -> None:
         super().__init__(schema, global_context, local_context)
+        self.store = store
+        self.identity = identity
         self.global_context.add(self.name, self)
         self.global_context.merge(global_context)
         self.global_context.merge(self.nested_items)

@@ -8,13 +8,13 @@ class Store(ABC):
         # and one that keeps the saved states.  The initial and final dictionaries
         # are compared to see what needs to be flushed in the final final stage
 
-        self._cache: Dict[str, Any] = dict()
+        self._dict_store: Dict[str, Any] = dict()
 
     def _cache_get(self, identity: str, group: str) -> Any:
-        return self._cache.get(identity, {}).get(group, None)
+        return self._dict_store.get(identity, {}).get(group, None)
 
     def _cache_save(self, identity: str, group: str, value: Any) -> None:
-        self._cache.setdefault(identity, {})[group] = value
+        self._dict_store.setdefault(identity, {})[group] = value
 
     def prefetch(self, records):
         pass

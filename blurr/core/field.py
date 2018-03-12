@@ -72,7 +72,8 @@ class Field(BaseItem, ABC):
         """
         new_value = None
         if self.needs_evaluation:
-            new_value = self.schema.value.evaluate(self.global_context, self.local_context)
+            new_value = self.schema.value.evaluate(self.global_context,
+                                                   self.local_context)
 
         # Only set the value if it conforms to the field type
         if not self.schema.is_type_of(new_value):
