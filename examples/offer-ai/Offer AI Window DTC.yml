@@ -26,12 +26,12 @@ Anchor:
 ##
 #Window aggregations are stored in S3 (a Store)
 #Defines the Store properties
-## 
+##
 
 Store:
    - Type: ProductML:DTC:Storage:S3
      Name: s3
-     Bucket: productml-test
+     Bucket: offer-ai-example
      Prefix: /dtc-test/window/
 
 
@@ -67,4 +67,3 @@ DataGroups:
      - Name: purchases_prev_week_amount
        Type: float
        Value: prev_week.purchase_amount
-
