@@ -23,7 +23,7 @@ class TestItem(BaseItem):
     This class is to test abstract behavior, and thus, adds no functionality
     """
 
-    def export(self):
+    def snapshot(self):
         pass
 
     def __init__(self,
@@ -47,8 +47,16 @@ def test_base_item_valid(schema_spec: Dict[str, Any]) -> None:
 
 
 def test_base_item_filter_false(schema_spec: Dict[str, Any]) -> None:
-    schema_spec[BaseSchema.FIELD_WHEN] = 'False'
+    schema_spec[BaseSchema.ATTRIBUTE_WHEN] = 'False'
     schema = TestSchema(schema_spec)
     test_item = TestItem(schema)
 
     assert not test_item.needs_evaluation
+
+
+def test_base_item_filter_missing(schema_spec: Dict[str, Any]) -> None:
+    del schema_spec[BaseSchema.ATTRIBUTE_WHEN]
+    schema = TestSchema(schema_spec)
+    test_item = TestItem(schema)
+
+    assert test_item.needs_evaluation

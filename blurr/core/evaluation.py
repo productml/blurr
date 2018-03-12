@@ -1,6 +1,6 @@
 from typing import Any, Dict
 
-from blurr.core.errors import ExpressionEvaluationException, InvalidExpressionException
+from blurr.core.errors import ExpressionEvaluationError, InvalidExpressionError
 
 
 class Context(dict):
@@ -16,10 +16,21 @@ class Context(dict):
         if initial_value:
             super().__init__(initial_value)
 
-    def add_context(self, name, value):
+    def add(self, name, value):
+        """
+        Adds a context item by name
+        :param name: Name of the item in the context for evaluation
+        :param value: Object that the name refers to in the context
+        """
         self[name] = value
 
-    def merge_context(self, context):
+    def merge(self, context: 'Context') -> None:
+        """
+        Updates the context object with the items in another context
+        object.  Fields of the same name are overwritten
+        :param context: Another context object to superimpose on current
+        :return:
+        """
         self.update(context)
 
 
@@ -37,7 +48,7 @@ class Expression:
         try:
             self.code_object = compile(self.code_string, '<string>', 'eval')
         except Exception as e:
-            raise InvalidExpressionException(e)
+            raise InvalidExpressionError(e)
 
     def evaluate(self,
                  global_context: Context = Context(),
@@ -53,4 +64,4 @@ class Expression:
             return eval(self.code_object, global_context, local_context)
 
         except Exception as e:
-            raise ExpressionEvaluationException(e)
+            raise ExpressionEvaluationError(e)

@@ -1,72 +1,48 @@
 from typing import Any, Dict
-from blurr.core.data_group import DataGroup
-from blurr.core.base import BaseItemCollection, BaseItem, BaseSchema, Expression
+from abc import ABC
+
+from blurr.core.base import BaseItemCollection, BaseSchemaCollection
 from blurr.core.evaluation import Context
-from blurr.core.loader import TypeLoader
 
 
-class TransformerSchema(BaseSchema):
-    FIELD_VERSION = 'Version'
-    FIELD_DESCRIPTION = 'Description'
-    FIELD_IDENTITY = 'Identity'
-    FIELD_TIME = 'Time'
-    FIELD_GROUPS = 'DataGroups'
+class TransformerSchema(BaseSchemaCollection, ABC):
+    """
+    All Transformer Schema inherit from this base.  Adds support for handling
+    the required attributes of a schema.
+    """
+
+    ATTRIBUTE_VERSION = 'Version'
+    ATTRIBUTE_DESCRIPTION = 'Description'
+    ATTRIBUTE_DATA_GROUPS = 'DataGroups'
 
     def __init__(self, spec: Dict[str, Any]) -> None:
-        super().__init__(spec)
+        super().__init__(spec, self.ATTRIBUTE_DATA_GROUPS)
 
     def validate(self, spec: Dict[str, Any]) -> None:
-        self.validate_required_attribute(spec, self.FIELD_VERSION)
-        self.validate_required_attribute(spec, self.FIELD_DESCRIPTION)
-        self.validate_required_attribute(spec, self.FIELD_IDENTITY)
-        self.validate_required_attribute(spec, self.FIELD_TIME)
+        # Ensure that the base validator is invoked
+        super().validate(spec)
+
+        # Validate schema specific attributes
+        self.validate_required_attribute(spec, self.ATTRIBUTE_VERSION)
+        self.validate_required_attribute(spec, self.ATTRIBUTE_DESCRIPTION)
 
     def load(self, spec: Dict[str, Any]) -> None:
-        self.version = spec[self.FIELD_VERSION]
-        self.description = spec[self.FIELD_DESCRIPTION]
-        self.identity = Expression(spec[self.FIELD_IDENTITY])
-        self.time = Expression(spec[self.FIELD_TIME])
-        self.groups = {
-            group_spec[self.FIELD_NAME]: TypeLoader.load_schema(
-                group_spec[self.FIELD_TYPE])(group_spec)
-            for group_spec in spec[self.FIELD_GROUPS]
-        }
+        # Ensure that the base loader is invoked
+        super().load(spec)
 
-    def get_identity(self, source_context: Context):
-        return self.identity.evaluate(source_context)
+        # Load the schema specific attributes
+        self.version = spec[self.ATTRIBUTE_VERSION]
+        self.description = spec[self.ATTRIBUTE_DESCRIPTION]
 
 
-class Transformer(BaseItemCollection):
-    def __init__(self, schema: TransformerSchema, identity,
-                 exec_context: Context) -> None:
-        super().__init__(schema)
-        self.global_context.add_context(self.name, self)
-        self.global_context.merge_context(exec_context)
-        self._identity = identity
-        self.global_context.add_context('identity', self._identity)
-        self._groups: Dict[str, DataGroup] = {
-            name: TypeLoader.load_item(group_schema.type)(group_schema,
-                                                          self.global_context)
-            for name, group_schema in schema.groups.items()
-        }
-        self.global_context.merge_context(self._groups)
+class Transformer(BaseItemCollection, ABC):
+    """
+    All transformers inherit from this base.  Adds the current transformer
+    to the context
+    """
 
-    def set_source_context(self, source_context: Context) -> None:
-        self.global_context.merge_context(source_context)
-        self.global_context.add_context('time',
-                                        self.schema.time.evaluate(
-                                            self.global_context))
-
-    @property
-    def items(self) -> Dict[str, BaseItemCollection]:
-        return self._groups
-
-    def __getattr__(self, item):
-        if item in self._groups:
-            return self._groups[item].value
-
-        self.__getattribute__(item)
-
-    @property
-    def groups(self):
-        return self._groups
+    def __init__(self, schema: TransformerSchema, global_context: Context, local_context: Context) -> None:
+        super().__init__(schema, global_context, local_context)
+        self.global_context.add(self.name, self)
+        self.global_context.merge(global_context)
+        self.global_context.merge(self.nested_items)

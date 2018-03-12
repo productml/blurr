@@ -1,6 +1,6 @@
 import yaml
 import json
-from blurr.core.transformer import TransformerSchema, Transformer
+from blurr.core.streaming_transformer import StreamingTransformerSchema, StreamingTransformer
 from blurr.core.record import Record
 from blurr.core.evaluation import Context
 from dateutil import parser
@@ -11,17 +11,17 @@ class LocalRunner:
         self._raw_files = local_json_files
         self._output_file = output_file
         self._stream_dtc = yaml.safe_load(open(stream_dtc_file))
-        self._transformer_schema = TransformerSchema(self._stream_dtc)
+        self._transformer_schema = StreamingTransformerSchema(self._stream_dtc)
         self._user_transformer = {}
         self._exec_context = Context()
-        self._exec_context.add_context('parser', parser)
+        self._exec_context.add('parser', parser)
 
     def _consume_record(self, record):
         source_context = Context({'source': record})
         identity = self._transformer_schema.get_identity(source_context)
         if identity not in self._user_transformer:
-            self._user_transformer[identity] = Transformer(
-                self._transformer_schema, identity, self._exec_context)
+            self._user_transformer[identity] = StreamingTransformer(
+                self._transformer_schema, identity, self._exec_context, Context())
         user_transformer = self._user_transformer[identity]
         user_transformer.set_source_context(source_context)
         user_transformer.evaluate()

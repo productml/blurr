@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Any
+from typing import Dict, Any, Type
 
+from blurr.core.errors import InvalidSchemaError, SnapshotError
 from blurr.core.evaluation import Context, Expression
-from blurr.core.errors import InvalidSchemaException
+from blurr.core.loader import TypeLoader
 
 
 class BaseSchema(ABC):
@@ -12,9 +13,9 @@ class BaseSchema(ABC):
     """
 
     # Field Name Definitions
-    FIELD_NAME = 'Name'
-    FIELD_TYPE = 'Type'
-    FIELD_WHEN = 'When'
+    ATTRIBUTE_NAME = 'Name'
+    ATTRIBUTE_TYPE = 'Type'
+    ATTRIBUTE_WHEN = 'When'
 
     def __init__(self, spec: Dict[str, Any]) -> None:
         """
@@ -45,11 +46,11 @@ class BaseSchema(ABC):
         """
         Loads the base schema spec into the object
         """
-        self.spec: Dict[str, Any] = spec
-        self.name: str = spec[self.FIELD_NAME]
-        self.type: str = spec[self.FIELD_TYPE]
+        self.__spec: Dict[str, Any] = spec
+        self.name: str = spec[self.ATTRIBUTE_NAME]
+        self.type: str = spec[self.ATTRIBUTE_TYPE]
         self.when: Expression = Expression(
-            spec[self.FIELD_WHEN]) if self.FIELD_WHEN in spec else None
+            spec[self.ATTRIBUTE_WHEN]) if self.ATTRIBUTE_WHEN in spec else None
 
         # Invokes the loads of the subclass
         self.load(spec)
@@ -58,8 +59,8 @@ class BaseSchema(ABC):
         """
         Validates the schema spec.  Raises exceptions if errors are found.
         """
-        self.validate_required_attribute(spec, self.FIELD_NAME)
-        self.validate_required_attribute(spec, self.FIELD_TYPE)
+        self.validate_required_attribute(spec, self.ATTRIBUTE_NAME)
+        self.validate_required_attribute(spec, self.ATTRIBUTE_TYPE)
 
         # Invokes the validations of the subclasses
         self.validate(spec)
@@ -93,10 +94,59 @@ class BaseSchema(ABC):
                          '\n\tAttribute: {attribute}'
                          '\n\tError Message: {message}') \
             .format(
-            name=spec.get(self.FIELD_NAME, str(spec)),
+            name=spec.get(self.ATTRIBUTE_NAME, str(spec)),
             attribute=attribute,
             message=message)
-        raise InvalidSchemaException(error_message)
+        raise InvalidSchemaError(error_message)
+
+
+class BaseSchemaCollection(BaseSchema, ABC):
+    """
+    Base class for schema that contain nested schema
+    """
+
+    def __init__(self, spec: Dict[str, Any], nested_schema_attribute) -> None:
+        """
+        Initializes the schema for schema that contain a nested schema
+        :param spec:
+        :param nested_schema_attribute:
+        """
+        # Must declare all new fields prior to the initialization so that validation can find the new fields
+        self._nested_item_attribute = nested_schema_attribute
+
+        super().__init__(spec)
+
+    def validate(self, spec: Dict[str, Any]):
+        """
+        Overrides the Base Schema validation specifications to include validation for nested schema
+        """
+
+        # Validate that the nested schema attribute is present
+        self.validate_required_attribute(spec, self._nested_item_attribute)
+
+        # Ensure that the nested schema attribute is a list
+        if not isinstance(spec[self._nested_item_attribute], list):
+            self.raise_validation_error(spec, self._nested_item_attribute,
+                                        'Schema definition must specify a list of {}.'.format(
+                                            self._nested_item_attribute))
+
+        # Ensure that the nested schema attribute contains a list of one or more items
+        if len(spec[self._nested_item_attribute]) == 0:
+            self.raise_validation_error(spec, self._nested_item_attribute,
+                                        'Schema definition must have at least one item under {}.'.format(
+                                            self._nested_item_attribute))
+
+    def load(self, spec: Dict[str, Any]) -> None:
+        """
+        Overrides base load to include loads for nested items
+        """
+
+        # Load nested schema items
+        self.nested_schema: Dict[str, Type[BaseSchema]] = {
+            schema_spec[self.ATTRIBUTE_NAME]: TypeLoader.load_schema(
+                schema_spec[self.ATTRIBUTE_TYPE])(schema_spec)
+            for schema_spec in spec[self._nested_item_attribute]
+        }
 
 
 class BaseItem(ABC):
@@ -106,8 +156,8 @@ class BaseItem(ABC):
 
     def __init__(self,
                  schema: BaseSchema,
-                 global_context: Context = Context(),
-                 local_context: Context = Context()):
+                 global_context: Context,
+                 local_context: Context):
         """
         Initializes an item with the schema and execution context
         :param schema: Schema of the item
@@ -120,10 +170,19 @@ class BaseItem(ABC):
 
     @property
     def needs_evaluation(self) -> bool:
-        return self.schema.when is None or self.schema.when.evaluate()
+        """
+        Returns True when:
+            1. Where clause is not specified
+            2. Where WHERE clause is specified and it evaluates to True
+        Returns false if a where clause is specified and it evaluates to False
+        """
+        return self.schema.when is None or self.schema.when.evaluate(self.global_context, self.local_context)
 
     @property
-    def name(self):
+    def name(self) -> str:
+        """
+        Returns the name of the base item
+        """
         return self.schema.name
 
     @abstractmethod
@@ -135,14 +194,45 @@ class BaseItem(ABC):
 
     @property
     @abstractmethod
-    def export(self):
-        raise NotImplementedError('export() must be implemented')
+    def snapshot(self):
+        """
+        Gets a dictionary representation of the current state items in the current hierarchy
+        :return: Name, Value map of the current tree
+        """
+        raise NotImplementedError('snapshot() must be implemented')
+
+    @abstractmethod
+    def restore(self, snapshot) -> None:
+        """
+        Restores the state of an item from a snapshot
+        """
+        raise NotImplementedError('restore() must be implemented')
 
 
 class BaseItemCollection(BaseItem):
     """
     Base class for items that contain sub-items within them
     """
+
+    def __init__(self,
+                 schema: BaseSchemaCollection,
+                 global_context: Context,
+                 local_context: Context) -> None:
+        """
+        Loads nested items to the 'items' collection
+        :param schema: Schema that conforms to the item
+        :param global_context: Global context dictionary
+        :param local_context: Local context dictionary
+        """
+
+        super().__init__(schema, global_context, local_context)
+
+        # Load the nested items into the item
+        self.nested_items: Dict[str, Type[BaseItem]] = {
+            name: TypeLoader.load_item(item_schema.type)(
+                item_schema, self.global_context, self.local_context)
+            for name, item_schema in schema.nested_schema.items()
+        }
 
     def evaluate(self) -> None:
         """
@@ -151,18 +241,43 @@ class BaseItemCollection(BaseItem):
         evaluation failed
         """
         if self.needs_evaluation:
-            for _, item in self.items.items():
+            for _, item in self.nested_items.items():
                 item.evaluate()
 
     @property
-    def export(self):
+    def snapshot(self) -> Dict[str, Any]:
+        """
+        Implements snapshot for collections by recursively invoking snapshot of all child items
+        """
         try:
-            return {name: item.export for name, item in self.items.items()}
-        except Exception as e:
-            print('Error when exporting', self.items)
-            raise e
 
-    @property
-    @abstractmethod
-    def items(self) -> Dict[str, BaseItem]:
-        raise NotImplementedError('Sub items must be present')
+            return {name: item.snapshot for name, item in self.nested_items.items()}
+
+        except Exception as e:
+            print('Error while creating snapshot for {}', self.name)
+            raise SnapshotError(e)
+
+    def restore(self, snapshot: Dict[str, Any]) -> None:
+        """
+        Restores the state of a collection from a snapshot
+        """
+        try:
+
+            for name, snap in snapshot:
+                self.nested_items[name].restore(snap)
+
+        except Exception as e:
+            print('Error while restoring snapshot: {}', self.snapshot)
+            raise SnapshotError(e)
+
+    def __getattr__(self, item: str) -> Any:
+        """
+        Makes the value of the nested items available as properties
+        of the collection object.  This is used for retrieving field values
+        for dynamic execution.
+        :param item: Field requested
+        """
+        if item in self.nested_items:
+            return self.nested_items[item].snapshot
+
+        self.__getattribute__(item)
