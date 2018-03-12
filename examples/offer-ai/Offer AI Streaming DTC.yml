@@ -10,7 +10,7 @@ Description: Level 1 transformation from streaming Raw Data
 Name: offer_ai_v1
 
 #The field in the raw data around which data is aggregated. This is usually a unique user id
-Identity: source.customer_identifier
+Identity: source.user_id
 Time: parse_time(source.event_time, 'YYYY/mm/dd HH:MM:SS')
 
 #A boolean expression that filters out raw data to be processed
@@ -23,7 +23,7 @@ Filter: source.package_version = '1.0'
 
 Store:
    - Type: ProductML:DTC:Storage:DynamoDB
-     Name: dynamo
+     Name: offer_ai_dynamo
      #Days to retain data
      Retention: 180
      Table: ProductML_Test_Win_Ratios
@@ -90,6 +90,11 @@ DataGroups:
        
      - Name: offer_type
        Value:  source.offer_type
+       Filter: source.event_id == 'offer_shown'
+       
+     - Name: offer_purchased
+       Value:  source.offer_purchased
+       Tyoe: boolean
        Filter: source.event_id == 'offer_shown'
      
      - Name: offer_price
