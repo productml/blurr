@@ -126,15 +126,17 @@ class BaseSchemaCollection(BaseSchema, ABC):
 
         # Ensure that the nested schema attribute is a list
         if not isinstance(spec[self._nested_item_attribute], list):
-            self.raise_validation_error(spec, self._nested_item_attribute,
-                                        'Schema definition must specify a list of {}.'.format(
-                                            self._nested_item_attribute))
+            self.raise_validation_error(
+                spec, self._nested_item_attribute,
+                'Schema definition must specify a list of {}.'.format(
+                    self._nested_item_attribute))
 
         # Ensure that the nested schema attribute contains a list of one or more items
         if len(spec[self._nested_item_attribute]) == 0:
-            self.raise_validation_error(spec, self._nested_item_attribute,
-                                        'Schema definition must have at least one item under {}.'.format(
-                                            self._nested_item_attribute))
+            self.raise_validation_error(
+                spec, self._nested_item_attribute,
+                'Schema definition must have at least one item under {}.'.
+                format(self._nested_item_attribute))
 
     def load(self, spec: Dict[str, Any]) -> None:
         """
@@ -154,9 +156,7 @@ class BaseItem(ABC):
     Base class for for all leaf items that do not contain sub-items
     """
 
-    def __init__(self,
-                 schema: BaseSchema,
-                 global_context: Context,
+    def __init__(self, schema: BaseSchema, global_context: Context,
                  local_context: Context):
         """
         Initializes an item with the schema and execution context
@@ -176,7 +176,8 @@ class BaseItem(ABC):
             2. Where WHERE clause is specified and it evaluates to True
         Returns false if a where clause is specified and it evaluates to False
         """
-        return self.schema.when is None or self.schema.when.evaluate(self.global_context, self.local_context)
+        return self.schema.when is None or self.schema.when.evaluate(
+            self.global_context, self.local_context)
 
     @property
     def name(self) -> str:
@@ -214,9 +215,7 @@ class BaseItemCollection(BaseItem):
     Base class for items that contain sub-items within them
     """
 
-    def __init__(self,
-                 schema: BaseSchemaCollection,
-                 global_context: Context,
+    def __init__(self, schema: BaseSchemaCollection, global_context: Context,
                  local_context: Context) -> None:
         """
         Loads nested items to the 'items' collection
@@ -251,7 +250,10 @@ class BaseItemCollection(BaseItem):
         """
         try:
 
-            return {name: item.snapshot for name, item in self.nested_items.items()}
+            return {
+                name: item.snapshot
+                for name, item in self.nested_items.items()
+            }
 
         except Exception as e:
             print('Error while creating snapshot for {}', self.name)

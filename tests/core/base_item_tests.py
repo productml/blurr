@@ -32,7 +32,10 @@ class TestItem(BaseItem):
                  local_context: Context = Context()) -> None:
         super().__init__(schema, global_context, local_context)
 
-    def evaluate(self):
+    def evaluate(self)-> None:
+        pass
+
+    def restore(self, snapshot) -> None:
         pass
 
 

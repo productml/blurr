@@ -27,7 +27,9 @@ class DataGroup(BaseItemCollection):
     All Data Groups inherit from this base.  Provides an abstraction for 'value' of the encapsulated
     to be called as properties of the data group itself.
     """
-    def __init__(self, schema: DataGroupSchema,
+
+    def __init__(self,
+                 schema: DataGroupSchema,
                  global_context: Context = Context(),
                  local_context: Context = Context()) -> None:
         """
@@ -41,5 +43,3 @@ class DataGroup(BaseItemCollection):
         super().__init__(schema, global_context, local_context)
 
         self.local_context.merge(self.nested_items)
-
-
