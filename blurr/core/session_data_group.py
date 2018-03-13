@@ -1,6 +1,6 @@
 from typing import Dict, Any, List
 
-from blurr.core.evaluation import Context, Expression
+from blurr.core.evaluation import Context, Expression, EvaluationContext
 from blurr.core.data_group import DataGroup, DataGroupSchema
 from blurr.core.errors import StaleSessionError
 
@@ -73,28 +73,20 @@ class SessionDataGroup(DataGroup):
     Manages the aggregates for session based roll-ups of streaming data
     """
 
-    def __init__(self, schema: SessionDataGroupSchema, global_context: Context,
-                 local_context: Context) -> None:
-        super(SessionDataGroup, self).__init__(schema, global_context,
-                                               local_context)
+    def __init__(self, schema: SessionDataGroupSchema,
+                 evaluation_context: EvaluationContext) -> None:
+        super(SessionDataGroup, self).__init__(schema, evaluation_context)
 
     def evaluate(self) -> None:
         """
         Overrides the default execution behavior to handle session splits
         """
+
+        # Check if current session is stale for the event being processed
+        if self.start_time is not None and self.end_time is not None:
+            if not self.schema.split or self.schema.split.evaluate(
+                    self.global_context, self.local_context):
+                raise StaleSessionError()
+
         # Evaluate the rest
         super().evaluate()
-
-    def split(self) -> bool:
-        # Check if current session is stale for the event being processed
-        if self.schema.split is None:
-            return False
-        if self.start_time is None or self.end_time is None:
-            return False
-        if self.schema.split.evaluate(self.global_context, self.local_context):
-            return True
-
-        return False
-
-    def reset(self):
-        self.__init__(self.schema, self.global_context, self.local_context)

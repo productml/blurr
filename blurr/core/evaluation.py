@@ -1,5 +1,5 @@
 from typing import Any, Dict
-
+from copy import copy
 from blurr.core.errors import ExpressionEvaluationError, InvalidExpressionError
 
 
@@ -34,6 +34,42 @@ class Context(dict):
         self.update(context)
 
 
+class EvaluationContext:
+    def __init__(self,
+                 global_context: Context = Context(),
+                 local_context: Context = Context()) -> None:
+        """
+        Initializes an evaluation context with global and local context dictionaries.  The unset parameters default
+        to an empty context dictionary.
+        :param global_context: Global context dictionary
+        :param local_context: Local context dictionary.
+        """
+        self.global_context = global_context
+        self.local_context = local_context
+
+    @property
+    def fork(self) -> 'EvaluationContext':
+        """
+        Creates a copy of the current evaluation config with the same global context, but a shallow copy of the
+        local context
+        :return:
+        """
+        return EvaluationContext(self.global_context, copy(self.local_context))
+
+    def local_include(self, context: Context) -> None:
+        """
+        Includes the supplied context into the local context
+        :param context: Context to include into local context
+        """
+        self.local_context.merge(context)
+
+    def global_add(self, key: str, value: Any) -> Any:
+        """
+        Adds a key and value to the global dictionary
+        """
+        self.global_context[key] = value
+
+
 class Expression:
     """ Encapsulates a python code statement in string and in compilable expression"""
 
@@ -50,18 +86,16 @@ class Expression:
         except Exception as e:
             raise InvalidExpressionError(e)
 
-    def evaluate(self,
-                 global_context: Context = Context(),
-                 local_context: Context = Context()) -> Any:
+    def evaluate(self, evaluation_context: EvaluationContext) -> Any:
         """
         Evaluates the expression with the context provided.  If the execution
         results in failure, an ExpressionEvaluationException encapsulating the
         underlying exception is raised.
-        :param global_context: Global context dictionary to be passed for evaluation
-        :param local_context: Local Context dictionary to be passed for evaluation
+        :param evaluation_context: Global and local context dictionary to be passed for evaluation
         """
         try:
-            return eval(self.code_object, global_context, local_context)
+            return eval(self.code_object, evaluation_context.global_context,
+                        evaluation_context.local_context)
 
         except Exception as e:
             raise ExpressionEvaluationError(e)
