@@ -3,6 +3,8 @@ from typing import Any, Dict
 from blurr.core.base import Expression
 from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.transformer import Transformer, TransformerSchema
+from blurr.core.store import Store
+from blurr.core.session_data_group import SessionDataGroup
 
 
 class StreamingTransformerSchema(TransformerSchema):
@@ -52,7 +54,7 @@ class StreamingTransformer(Transformer):
             return
 
         for _, item in self.nested_items.items():
-            if isinstance(item, SessionDataGroup) and item.split():
+            if isinstance(item, SessionDataGroup) and item.split_now:
                 self.store.save(self.identity, item.name)
                 item.reset()
 

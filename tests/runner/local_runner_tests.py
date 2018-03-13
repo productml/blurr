@@ -6,7 +6,7 @@ def test_local_runner():
     local_runner.execute()
 
     assert local_runner._user_transformer['userA'].snapshot['session'][
-        'events'] == 2
+        'events'] == 3
     assert local_runner._user_transformer['userB'].snapshot['session'][
         'events'] == 1
     assert local_runner._user_transformer['userC'].snapshot['session'][
