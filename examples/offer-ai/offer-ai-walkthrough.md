@@ -16,7 +16,7 @@ Blurr has first class support for serverless data processing, which means near z
 
 Imagine that we have a game. We want to be able to show personalized offers to the user via an in-app purchase.
 
-![Objective](images/objective.png?raw=true)
+![Objective](images/objective.png)
 
 To do that, we need the features that were used in training the model readily available to query when the users shows up. If we used `games_played_last_session` as one of the features, when the user starts a new session, we need the `games_played_last_session` data to query the model to get the prediction. Ideally, ASAP.
 
