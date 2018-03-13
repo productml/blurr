@@ -137,11 +137,11 @@ user_id | country | facebook_connected | purchases_prev_week_amount | games_play
 
 Data is prepared in a two step process.
 
-[2Steps](/images/2steps.png)
+![2Steps](images/2steps.png)
 
 First, we process raw data and aggregate into sessions. Processing instructions are defined in a Data Transform Configuration (DTC). Event Data + DTC creates DataGroups, which can be used as session aggregates.
 
-[Data Transformer](/images/data-transformer.png)
+![Data Transformer](images/data-transformer.png)
 
 Separate data transform configs (DTCs) are used for each step - Streaming DTC for stream processing (Step 1) and Window DTC for rollups (Step 2).
 
@@ -371,4 +371,4 @@ The [official Sagemaker documentation](https://docs.aws.amazon.com/sagemaker/lat
 
 Once this is in production, the end-to-end flow looks like this.
 
-[production](/images/production.png)
+![production](images/production.png)
