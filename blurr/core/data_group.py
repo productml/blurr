@@ -28,7 +28,8 @@ class DataGroup(BaseItemCollection):
     to be called as properties of the data group itself.
     """
 
-    def __init__(self, schema: DataGroupSchema, evaluation_context: EvaluationContext) -> None:
+    def __init__(self, schema: DataGroupSchema,
+                 evaluation_context: EvaluationContext) -> None:
         """
         Initializes the data group with the inherited context and adds
         its own nested items into the local context for execution

@@ -41,7 +41,8 @@ class Transformer(BaseItemCollection, ABC):
     to the context
     """
 
-    def __init__(self, schema: TransformerSchema,  evaluation_context: EvaluationContext) -> None:
+    def __init__(self, schema: TransformerSchema,
+                 evaluation_context: EvaluationContext) -> None:
         super().__init__(schema, evaluation_context)
         self.evaluation_context.global_add(self.name, self)
         self.evaluation_context.global_context.merge(self.nested_items)

@@ -30,16 +30,19 @@ class SessionDataGroupSchema(DataGroupSchema):
         Overrides base load to include loads for nested items
         """
         # Alter the spec to introduce the session start and end time implicitly handled fields
-        spec[self.ATTRIBUTE_FIELDS][0:0] = self.build_predefined_fields_spec(spec[self.ATTRIBUTE_NAME])
+        spec[self.ATTRIBUTE_FIELDS][0:0] = self.build_predefined_fields_spec(
+            spec[self.ATTRIBUTE_NAME])
 
         # Loading the base attributes first
         super().load(spec)
 
         # Load type specific attributes
-        self.split: Expression = Expression(spec[self.ATTRIBUTE_SPLIT]) if self.ATTRIBUTE_SPLIT in spec else None
+        self.split: Expression = Expression(spec[
+            self.ATTRIBUTE_SPLIT]) if self.ATTRIBUTE_SPLIT in spec else None
 
     @staticmethod
-    def build_predefined_fields_spec(name_in_context: str) -> List[Dict[str, Any]]:
+    def build_predefined_fields_spec(
+            name_in_context: str) -> List[Dict[str, Any]]:
         """
         Constructs the spec for predefined fields that are to be included in the master spec prior to schema load
         :param name_in_context: Name of the current object in the context
@@ -49,16 +52,18 @@ class SessionDataGroupSchema(DataGroupSchema):
             {
                 'Name': 'start_time',
                 'Type': 'datetime',
-                'Value': ('time if {data_group}.start_time is None else time '
-                          'if time < {data_group}.start_time else {data_group}.start_time').format(
-                    data_group=name_in_context)
+                'Value': (
+                    'time if {data_group}.start_time is None else time '
+                    'if time < {data_group}.start_time else {data_group}.start_time'
+                ).format(data_group=name_in_context)
             },
             {
                 'Name': 'end_time',
                 'Type': 'datetime',
-                'Value': ('time if {data_group}.end_time is None else time '
-                          'if time > {data_group}.end_time else {data_group}.end_time').format(
-                    data_group=name_in_context)
+                'Value': (
+                    'time if {data_group}.end_time is None else time '
+                    'if time > {data_group}.end_time else {data_group}.end_time'
+                ).format(data_group=name_in_context)
             },
         ]
 
@@ -68,7 +73,8 @@ class SessionDataGroup(DataGroup):
     Manages the aggregates for session based roll-ups of streaming data
     """
 
-    def __init__(self, schema: SessionDataGroupSchema, evaluation_context: EvaluationContext) -> None:
+    def __init__(self, schema: SessionDataGroupSchema,
+                 evaluation_context: EvaluationContext) -> None:
         super(SessionDataGroup, self).__init__(schema, evaluation_context)
 
     def evaluate(self) -> None:
@@ -77,7 +83,8 @@ class SessionDataGroup(DataGroup):
         """
         # Check if current session is stale for the event being processed
         if self.start_time is not None and self.end_time is not None:
-            if not self.schema.split or self.schema.split.evaluate(self.global_context, self.local_context):
+            if not self.schema.split or self.schema.split.evaluate(
+                    self.global_context, self.local_context):
                 raise StaleSessionError()
 
         # Evaluate the rest

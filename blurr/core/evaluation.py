@@ -35,7 +35,9 @@ class Context(dict):
 
 
 class EvaluationContext:
-    def __init__(self, global_context: Context = Context(), local_context: Context = Context()) -> None:
+    def __init__(self,
+                 global_context: Context = Context(),
+                 local_context: Context = Context()) -> None:
         """
         Initializes an evaluation context with global and local context dictionaries.  The unset parameters default
         to an empty context dictionary.
@@ -67,6 +69,7 @@ class EvaluationContext:
         """
         self.global_context[key] = value
 
+
 class Expression:
     """ Encapsulates a python code statement in string and in compilable expression"""
 
@@ -91,7 +94,8 @@ class Expression:
         :param evaluation_context: Global and local context dictionary to be passed for evaluation
         """
         try:
-            return eval(self.code_object, evaluation_context.global_context, evaluation_context.local_context)
+            return eval(self.code_object, evaluation_context.global_context,
+                        evaluation_context.local_context)
 
         except Exception as e:
             raise ExpressionEvaluationError(e)

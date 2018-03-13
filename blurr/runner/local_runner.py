@@ -21,7 +21,9 @@ class LocalRunner:
         identity = self._transformer_schema.get_identity(source_context)
         if identity not in self._user_transformer:
             self._user_transformer[identity] = StreamingTransformer(
-                self._transformer_schema, identity, EvaluationContext(self._exec_context, source_context.global_context))
+                self._transformer_schema, identity,
+                EvaluationContext(self._exec_context,
+                                  source_context.global_context))
         user_transformer = self._user_transformer[identity]
         user_transformer.set_source_context(source_context)
         user_transformer.evaluate()
