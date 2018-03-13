@@ -2,13 +2,21 @@
 
 ## What is Blurr?
 
-TODO: Add first paragraph
+Blurr is a data pipeline authoring environment for real-time predictive models. Work directly with raw data to construct a production ML pipeline in minutes. We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer.
+
+When working with data, it is important to iterate fast and the best way to do that is by working directly with the raw data. Doing a full end to end data engineering + ML dev + production ready model can take a few months.
+
+With Blurr we want to give product teams the ability to iterate quickly when doing ML dev and take things to production using a self-service model.
+
+Blurr takes out the complexity in data transformation by providing a high-level expressive YAML based schema language called Data Transform Schema (DTS). The DTS defines custom data transformations and aggregations from a data source (S3), to transform the data (in lambdas) and output to a data store (DynamoDB). The data in the store can be used for any application dependent on real-time transformations like analytics or predictions.
+
+Blurr has first class support for serverless data processing, which means near zero standard cost and infinite scale - which will reduce cost of operations for fluctuating workloads.  Isolating the transformation template from the underlying technology also allows for transparent portability of ETL processes from premise to cloud, or across clouds, and to the device endpoint where real-time rollup may happen.
 
 ## Offer AI objective
 
 Imagine that we have a game. We want to be able to show personalized offers to the user via an in-app purchase.
 
-(/images/objective.png)
+[Objective](/images/objective.png)
 
 To do that, we need the features that were used in training the model readily available to query when the users shows up. If we used `games_played_last_session` as one of the features, when the user starts a new session, we need the `games_played_last_session` data to query the model to get the prediction. Ideally, ASAP.
 
@@ -129,11 +137,11 @@ user_id | country | facebook_connected | purchases_prev_week_amount | games_play
 
 Data is prepared in a two step process.
 
-(/images/2steps.png)
+[2Steps](/images/2steps.png)
 
 First, we process raw data and aggregate into sessions. Processing instructions are defined in a Data Transform Configuration (DTC). Event Data + DTC creates DataGroups, which can be used as session aggregates.
 
-(/images/data-transformer.png)
+[Data Transformer](/images/data-transformer.png)
 
 Separate data transform configs (DTCs) are used for each step - Streaming DTC for stream processing (Step 1) and Window DTC for rollups (Step 2).
 
@@ -339,7 +347,7 @@ DataGroups:
 After a Window DTC is run, we have data in S3 that looks like this.
 
 user_id | purchases_prev_week_amount | games_played_last_session | win_ratio_last_session
----- | ----- | ---- | -----
+------- | -------------------------- | ------------------------- | ----------------------
 
 902844 | 1.99 | 6 | 0.50
 768264 | 0 | 10 | 0.75
@@ -361,6 +369,6 @@ The [official Sagemaker documentation](https://docs.aws.amazon.com/sagemaker/lat
 
 # Use in production
 
-Once this is in production, the end-to-end flow looks like this. 
+Once this is in production, the end-to-end flow looks like this.
 
-(/images/production.png)
+[production](/images/production.png)
