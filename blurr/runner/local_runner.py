@@ -3,6 +3,7 @@ import json
 from blurr.core.streaming_transformer import StreamingTransformerSchema, StreamingTransformer
 from blurr.core.record import Record
 from blurr.core.evaluation import Context, EvaluationContext
+from blurr.store.local_store import LocalStore
 from dateutil import parser
 
 
@@ -22,7 +23,8 @@ class LocalRunner:
         identity = self._transformer_schema.get_identity(source_context)
         if identity not in self._user_transformer:
             self._user_transformer[identity] = StreamingTransformer(
-                self._transformer_schema, identity, source_context)
+                LocalStore(), self._transformer_schema, identity, source_context)
+
         user_transformer = self._user_transformer[identity]
         user_transformer.evaluate()
 

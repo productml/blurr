@@ -81,6 +81,7 @@ class SessionDataGroup(DataGroup):
         """
         Overrides the default execution behavior to handle session splits
         """
+
         # Check if current session is stale for the event being processed
         if self.start_time is not None and self.end_time is not None:
             if not self.schema.split or self.schema.split.evaluate(
