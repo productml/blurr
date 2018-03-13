@@ -1,0 +1,47 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: productml/build-image:fb9ba7674b2590ff5abbd45516b9a27e9dfc5f6d
+    steps:
+      - checkout
+      - run:
+          name: build
+          command: |
+            cd blurr
+            sh build.sh
+  deploy:
+    docker:
+      - image: productml/build-image:fb9ba7674b2590ff5abbd45516b9a27e9dfc5f6d
+    steps:
+      - checkout
+      - run:
+          name: init .pypirc
+          command: |
+            echo -e "[pypi]" >> ~/.pypirc
+            echo -e "username = $PYPI_USER" >> ~/.pypirc
+            echo -e "password = $PYPI_PASS" >> ~/.pypirc
+      - run:
+          name: deploy pypi
+          command: |
+            cd blurr
+            pipenv run python setup.py sdist
+            pipenv run python setup.py bdist_wheel
+            pipenv run twine upload dist/*
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /.*/
+      - deploy:
+          context: pypi
+          requires:
+            - build
+          filters:
+            tags:
+              only: /[0-9]+(\.[0-9]+)*/
+            branches:
+              ignore: /.*/
