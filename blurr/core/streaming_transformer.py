@@ -32,21 +32,14 @@ class StreamingTransformerSchema(TransformerSchema):
         self.identity = Expression(spec[self.ATTRIBUTE_IDENTITY])
         self.time = Expression(spec[self.ATTRIBUTE_TIME])
 
-    def get_identity(self, source_context: EvaluationContext) -> str:
-        return self.identity.evaluate(source_context)
+    def get_identity(self, context: Context) -> str:
+        return self.identity.evaluate(EvaluationContext(context))
 
 
 class StreamingTransformer(Transformer):
     def __init__(self, schema: TransformerSchema, identity,
-                 evaluation_context: EvaluationContext) -> None:
-        super().__init__(schema, evaluation_context)
+                 context: Context) -> None:
+        super().__init__(schema, context)
         self._identity = identity
         self.evaluation_context.global_add('identity', self._identity)
-
-    def set_source_context(self, source_context: EvaluationContext) -> None:
-        self.evaluation_context.global_context.merge(
-            source_context.global_context)
-        self.evaluation_context.local_include(source_context.local_context)
-        self.evaluation_context.global_add('time',
-                                           self.schema.time.evaluate(
-                                               self.evaluation_context))
+        self.evaluation_context.global_add('time', self.schema.time.evaluate(self.evaluation_context))

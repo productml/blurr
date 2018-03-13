@@ -17,15 +17,13 @@ class LocalRunner:
         self._exec_context.add('parser', parser)
 
     def _consume_record(self, record):
-        source_context = EvaluationContext(Context({'source': record}))
+        source_context = Context({'source': record})
+        source_context.merge(self._exec_context)
         identity = self._transformer_schema.get_identity(source_context)
         if identity not in self._user_transformer:
             self._user_transformer[identity] = StreamingTransformer(
-                self._transformer_schema, identity,
-                EvaluationContext(self._exec_context,
-                                  source_context.global_context))
+                self._transformer_schema, identity, source_context)
         user_transformer = self._user_transformer[identity]
-        user_transformer.set_source_context(source_context)
         user_transformer.evaluate()
 
     def _execute_file(self, file):
