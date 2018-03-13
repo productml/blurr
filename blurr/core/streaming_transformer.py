@@ -1,7 +1,7 @@
 from typing import Any, Dict
 
 from blurr.core.base import Expression
-from blurr.core.evaluation import Context
+from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.transformer import Transformer, TransformerSchema
 
 
@@ -32,20 +32,17 @@ class StreamingTransformerSchema(TransformerSchema):
         self.identity = Expression(spec[self.ATTRIBUTE_IDENTITY])
         self.time = Expression(spec[self.ATTRIBUTE_TIME])
 
-    def get_identity(self, source_context: Context):
+    def get_identity(self, source_context: EvaluationContext) -> str:
         return self.identity.evaluate(source_context)
 
 
 class StreamingTransformer(Transformer):
-    def __init__(self, schema: TransformerSchema, identity,
-                 global_context: Context,
-                 local_context: Context) -> None:
-        super().__init__(schema, global_context, local_context)
+    def __init__(self, schema: TransformerSchema, identity, evaluation_context: EvaluationContext) -> None:
+        super().__init__(schema, evaluation_context)
         self._identity = identity
-        self.global_context.add('identity', self._identity)
+        self.evaluation_context.global_add('identity', self._identity)
 
-    def set_source_context(self, source_context: Context) -> None:
-        self.global_context.merge(source_context)
-        self.global_context.add('time',
-                                self.schema.time.evaluate(
-                                    self.global_context))
+    def set_source_context(self, source_context: EvaluationContext) -> None:
+        self.evaluation_context.global_context.merge(source_context.global_context)
+        self.evaluation_context.local_include(source_context.local_context)
+        self.evaluation_context.global_add('time', self.schema.time.evaluate(self.evaluation_context))

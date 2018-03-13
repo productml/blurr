@@ -2,7 +2,7 @@ from typing import Any, Dict
 from abc import ABC
 
 from blurr.core.base import BaseItemCollection, BaseSchemaCollection
-from blurr.core.evaluation import Context
+from blurr.core.evaluation import Context, EvaluationContext
 
 
 class TransformerSchema(BaseSchemaCollection, ABC):
@@ -41,8 +41,7 @@ class Transformer(BaseItemCollection, ABC):
     to the context
     """
 
-    def __init__(self, schema: TransformerSchema, global_context: Context, local_context: Context) -> None:
-        super().__init__(schema, global_context, local_context)
-        self.global_context.add(self.name, self)
-        self.global_context.merge(global_context)
-        self.global_context.merge(self.nested_items)
+    def __init__(self, schema: TransformerSchema,  evaluation_context: EvaluationContext) -> None:
+        super().__init__(schema, evaluation_context)
+        self.evaluation_context.global_add(self.name, self)
+        self.evaluation_context.global_context.merge(self.nested_items)

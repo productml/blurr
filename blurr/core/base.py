@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Dict, Any, Type
 
 from blurr.core.errors import InvalidSchemaError, SnapshotError
-from blurr.core.evaluation import Context, Expression
+from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.loader import TypeLoader
 
 
@@ -156,17 +156,14 @@ class BaseItem(ABC):
 
     def __init__(self,
                  schema: BaseSchema,
-                 global_context: Context,
-                 local_context: Context):
+                 evaluation_context: EvaluationContext) -> None:
         """
         Initializes an item with the schema and execution context
         :param schema: Schema of the item
-        :param global_context: Global context dictionary for evaluation
-        :param local_context: Local context dictionary for evaluation
+        :param evaluation_context: Context dictionary for evaluation
         """
         self.schema = schema
-        self.global_context = global_context
-        self.local_context = local_context
+        self.evaluation_context = evaluation_context
 
     @property
     def needs_evaluation(self) -> bool:
@@ -176,7 +173,7 @@ class BaseItem(ABC):
             2. Where WHERE clause is specified and it evaluates to True
         Returns false if a where clause is specified and it evaluates to False
         """
-        return self.schema.when is None or self.schema.when.evaluate(self.global_context, self.local_context)
+        return self.schema.when is None or self.schema.when.evaluate(self.evaluation_context)
 
     @property
     def name(self) -> str:
@@ -216,21 +213,19 @@ class BaseItemCollection(BaseItem):
 
     def __init__(self,
                  schema: BaseSchemaCollection,
-                 global_context: Context,
-                 local_context: Context) -> None:
+                 evaluation_context: EvaluationContext) -> None:
         """
         Loads nested items to the 'items' collection
         :param schema: Schema that conforms to the item
-        :param global_context: Global context dictionary
-        :param local_context: Local context dictionary
+        :param evaluation_context: Context dictionary for evaluation
         """
 
-        super().__init__(schema, global_context, local_context)
+        super().__init__(schema, evaluation_context)
 
         # Load the nested items into the item
         self.nested_items: Dict[str, Type[BaseItem]] = {
             name: TypeLoader.load_item(item_schema.type)(
-                item_schema, self.global_context, self.local_context)
+                item_schema, evaluation_context.fork)
             for name, item_schema in schema.nested_schema.items()
         }
 
