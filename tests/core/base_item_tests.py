@@ -32,7 +32,7 @@ class TestItem(BaseItem):
                  ) -> None:
         super().__init__(schema, evaluation_context)
 
-    def evaluate(self)-> None:
+    def evaluate(self) -> None:
         pass
 
     def restore(self, snapshot) -> None:

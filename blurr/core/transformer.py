@@ -34,7 +34,7 @@ class TransformerSchema(BaseSchemaCollection, ABC):
         # Load the schema specific attributes
         self.version = spec[self.ATTRIBUTE_VERSION]
         self.description = spec[self.ATTRIBUTE_DESCRIPTION]
-        
+
 
 class Transformer(BaseItemCollection, ABC):
     """

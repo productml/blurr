@@ -1,8 +1,12 @@
 from typing import Any, Dict
 
 from blurr.core.base import Expression
+from blurr.core.errors import StreamingSourceNotFoundError
 from blurr.core.evaluation import Context, EvaluationContext
+from blurr.core.record import Record
 from blurr.core.transformer import Transformer, TransformerSchema
+from blurr.core.store import Store
+from blurr.core.session_data_group import SessionDataGroup
 
 
 class StreamingTransformerSchema(TransformerSchema):
@@ -37,10 +41,23 @@ class StreamingTransformerSchema(TransformerSchema):
 
 
 class StreamingTransformer(Transformer):
-    def __init__(self, store: Store, schema: TransformerSchema, identity: str, context: Context) -> None:
+    def __init__(self, store: Store, schema: TransformerSchema, identity: str,
+                 context: Context) -> None:
         super().__init__(store, schema, identity, context)
         self.evaluation_context.global_add('identity', self.identity)
-        self.evaluation_context.global_add('time', self.schema.time.evaluate(self.evaluation_context))        
+
+    def evaluate_record(self, record: Record):
+        # Add source record and time to the global context
+        self.evaluation_context.global_add('source', record)
+        self.evaluation_context.global_add('time',
+                                           self.schema.time.evaluate(
+                                               self.evaluation_context))
+
+        self.evaluate()
+
+        # Cleanup source and time form the context
+        del self.evaluation_context.global_context['source']
+        del self.evaluation_context.global_context['time']
 
     def evaluate(self) -> None:
         """
@@ -48,13 +65,16 @@ class StreamingTransformer(Transformer):
         :returns An evaluation result object containing the result, or reasons why
         evaluation failed
         """
+
+        if 'source' not in self.evaluation_context.global_context:
+            raise StreamingSourceNotFoundError()
+
         if not self.needs_evaluation:
             return
 
         for _, item in self.nested_items.items():
-            if isinstance(item, SessionDataGroup) and item.split():
+            if isinstance(item, SessionDataGroup) and item.split_now:
                 self.store.save(self.identity, item.name)
                 item.reset()
 
         super().evaluate()
-

@@ -38,3 +38,10 @@ class StaleSessionError(Exception):
     Indicates that the event being processed cannot be added to the session rollup that is loaded
     """
     pass
+
+
+class StreamingSourceNotFoundError(Exception):
+    """
+    Raised when the raw data for streaming is unavailable in the execution context
+    """
+    pass

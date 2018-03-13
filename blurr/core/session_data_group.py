@@ -1,8 +1,7 @@
 from typing import Dict, Any, List
 
-from blurr.core.evaluation import Context, Expression, EvaluationContext
+from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.data_group import DataGroup, DataGroupSchema
-from blurr.core.errors import StaleSessionError
 
 
 class SessionDataGroupSchema(DataGroupSchema):
@@ -77,16 +76,19 @@ class SessionDataGroup(DataGroup):
                  evaluation_context: EvaluationContext) -> None:
         super(SessionDataGroup, self).__init__(schema, evaluation_context)
 
-    def evaluate(self) -> None:
-        """
-        Overrides the default execution behavior to handle session splits
-        """
-
+    @property
+    def split_now(self) -> bool:
         # Check if current session is stale for the event being processed
-        if self.start_time is not None and self.end_time is not None:
-            if not self.schema.split or self.schema.split.evaluate(
-                    self.global_context, self.local_context):
-                raise StaleSessionError()
+        if self.schema.split is None:
+            return False
 
-        # Evaluate the rest
-        super().evaluate()
+        if self.start_time is None or self.end_time is None:
+            return False
+
+        if self.schema.split.evaluate(self.evaluation_context):
+            return True
+
+        return False
+
+    def reset(self):
+        self.__init__(self.schema, self.evaluation_context)
