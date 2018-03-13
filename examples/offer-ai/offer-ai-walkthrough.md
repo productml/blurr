@@ -2,7 +2,7 @@
 
 ## What is Blurr?
 
-Blurr is a data pipeline authoring environment for real-time predictive models. Work directly with raw data to construct a production ML pipeline in minutes. We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer.
+Blurr is a data pipeline authoring environment for real-time predictive models. Work directly with raw data to construct a production ML pipeline in minutes. We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer. The distinction is blurred (cough). Just like development and operations merged over time into DevOps.
 
 When working with data, it is important to iterate fast and the best way to do that is by working directly with the raw data. Doing a full end to end data engineering + ML dev + production ready model can take a few months.
 
@@ -16,7 +16,7 @@ Blurr has first class support for serverless data processing, which means near z
 
 Imagine that we have a game. We want to be able to show personalized offers to the user via an in-app purchase.
 
-[Objective](/images/objective.png)
+[Objective](/images/objective.png?raw=true)
 
 To do that, we need the features that were used in training the model readily available to query when the users shows up. If we used `games_played_last_session` as one of the features, when the user starts a new session, we need the `games_played_last_session` data to query the model to get the prediction. Ideally, ASAP.
 
