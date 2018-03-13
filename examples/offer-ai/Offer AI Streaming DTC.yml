@@ -28,7 +28,7 @@ Store:
      Retention: 180
      Table: ProductML_Test_Win_Ratios
 
-DataGroups:       
+DataGroups:
 
 ##
 #IdentityAggregate is meant for user profile information that is rarely updated. This is processed first
@@ -43,21 +43,21 @@ DataGroups:
    Fields:
      - Name: user_id
        Value: source.customer_identifier
-       
+
    Fields:
      - Name: country
        Value: source.country
-       
+
     Fields:
      - Name: fb_connected
        Value: source.fb
-       
+
 
 
 ##
 #Session aggregates definition
-##      
-       
+##
+
  - Type: ProductML:DTC:DataGroup:SessionAggregate
    Name: game_stats
    #We defined this store earlier
@@ -67,39 +67,37 @@ DataGroups:
 
    Fields:
      - Name: games_played
-       #String is the default type and is used if type is not defined 
+       #String is the default type and is used if type is not defined
        Type: integer
        #Any valid Python expression can be used
        Value: games_played + 1
        Filter: source.event_id == 'game_start'
-    
+
      - Name: games_won
        Type: integer
        Value: games_won + 1
-       Filter: source.event_id == 'game_end' and source.won == '1' 
-    
+       Filter: source.event_id == 'game_end' and source.won == '1'
+
      - Name: win_ratio
        Type: float
        Value: game_stats.games_played/game_stats.games_won
        Filter: source.event_id == 'game_end'
-       
+
      - Name: purchase_amount
        Type: float
        Value:  purchase_amount + source.txn_amount
        Filter: source.event_id == 'purchase'
-       
+
      - Name: offer_type
        Value:  source.offer_type
        Filter: source.event_id == 'offer_shown'
-       
+
      - Name: offer_purchased
        Value:  source.offer_purchased
        Tyoe: boolean
        Filter: source.event_id == 'offer_shown'
-     
+
      - Name: offer_price
        Type: float
        Value:  source.offer_price
-       Filter: source.event_id == 'offer_price'
-       
-      
+       Filter: source.event_id == 'offer_shown'
