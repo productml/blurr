@@ -2,19 +2,17 @@
 
 ## What is Blurr?
 
-Blurr is a data pipeline authoring environment for real-time predictive models. Work directly with raw data to construct a production ML pipeline in minutes. We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer. The distinction is blurred (cough). Just like development and operations merged over time into DevOps.
+Blurr is a data pipeline authoring environment for real-time predictive models. Work directly with raw data to construct a production ML pipeline in minutes. We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer. The distinction is increasingly blurry *cough*. Just like development and operations merged over time into DevOps.
 
-When working with data, it is important to iterate fast and the best way to do that is by working directly with the raw data. Doing a full end to end data engineering + ML dev + production ready model can take a few months.
+When working with data, it is important to iterate fast and the best way to do that is by working directly with the raw data. With Blurr we want to give product teams the ability to iterate quickly when doing ML dev and take things to production using a self-service model.
 
-With Blurr we want to give product teams the ability to iterate quickly when doing ML dev and take things to production using a self-service model.
+Blurr provides a high-level expressive YAML-based schema language called Data Transform Schema (DTS). The DTS defines custom data transformations and aggregations from a data source (S3), to transform the data (in lambdas) and output to a data store (DynamoDB). The data in the store can be used for any application dependent on real-time transformations like analytics or predictions.
 
-Blurr takes out the complexity in data transformation by providing a high-level expressive YAML based schema language called Data Transform Schema (DTS). The DTS defines custom data transformations and aggregations from a data source (S3), to transform the data (in lambdas) and output to a data store (DynamoDB). The data in the store can be used for any application dependent on real-time transformations like analytics or predictions.
-
-Blurr has first class support for serverless data processing, which means near zero standard cost and infinite scale - which will reduce cost of operations for fluctuating workloads.  Isolating the transformation template from the underlying technology also allows for transparent portability of ETL processes from premise to cloud, or across clouds, and to the device endpoint where real-time rollup may happen.
+Blurr has first class support for serverless data processing, which means near zero standard cost and infinite scale - and zero maintenance headache.
 
 ## Offer AI objective
 
-Imagine that we have a game. We want to be able to show personalized offers to the user via an in-app purchase.
+Say we have a game. We want to be able to show personalized offers to the user via an in-app purchase.
 
 ![Objective](images/objective.png)
 
@@ -348,7 +346,6 @@ After a Window DTC is run, we have data in S3 that looks like this.
 
 user_id | purchases_prev_week_amount | games_played_last_session | win_ratio_last_session
 ------- | -------------------------- | ------------------------- | ----------------------
-
 902844 | 1.99 | 6 | 0.50
 768264 | 0 | 10 | 0.75
 482640| 9.99 | 5 | 0.60
