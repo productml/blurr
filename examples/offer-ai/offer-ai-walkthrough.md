@@ -20,7 +20,7 @@ To do that, we need the features that were used in training the model readily av
 
 In this example, we'll work directly with raw data from events in the game to prepare the features needed to run such a model in production.  
 
-This is a model that continuously learns based on the feedback received as the user interacts with the product and makes a purchase (or not).
+This is a model that continuously learns based on the feedback received as the user interacts with the product and makes a purchase (or not). The model optimizes for a long term function - say, total revenue over 7 days.
 
 To train the model, we need a dataset where we can observe how users behave when presented with different offers and prices. We’re assuming that we don’t have that, and we're not training on historical data. We want a contextual bandit approach to continuously personalize the ‘winning treatment’ for each user. More on contextual bandits. [here](http://pavel.surmenok.com/2017/08/26/contextual-bandits-and-reinforcement-learning/)
 
@@ -258,13 +258,27 @@ DataGroups:
 
 When the Streaming DTC is run, the data is added in DynamoDB.
 
-TODO: Add screenshot of DynamoDB
+![dynamo](images/dynamodb.png)
 
 Each ‘row’ is a session, because we defined the split in the DTC as `source.session_id != session_id`. If we had used `source.event_date != event_date`, the raw data would be aggregated by day. Any `boolean` expression can be used to define a split.
 
-The second step is to prepare rollups on top of the session aggregates and is especially useful for making time window-based aggregations to prepare training and prediction query data for a machine learning model.
+The second step is to perform window operations on the session aggregates. They are useful for making time window-based aggregations to prepare training and prediction query data for a machine learning model.
 
-TODO: Add bridge to explain windowing concepts
+## Anchors and Windows
+
+Windowing concepts in Blurr are similar to the concepts in [Apache Spark/Flink](https://softwaremill.com/windowing-in-big-data-streams-spark-flink-kafka-akka/).
+
+The machine learning model is trying to predict a decision at a specific point in time. In our case, it is the offer to show the user. After the Streaming DTC has aggregated the raw data into 'blocks' - sessions in our case, a typical user's data is broken up like this.
+
+![blocks](images/blocks.png)
+
+When training a model, the data needs to be organized around the decision point.  We want to know the value of the features at the point an offer is shown. So if the offer is shown during session 4, the features need to be relative to session 4. And the optimization function (total revenue over next 7 days) needs to be relative to session 4 as well.
+
+![features](images/features.png)
+
+The decision point is the Anchor. A window defines segments of data relative to the anchor. In our case, we need the features and our optimization function relative to when an offer is shown.
+
+Let's write the Window DTC that defines this.
 
 ## Window DTC
 
@@ -358,14 +372,16 @@ Once the data is in S3 and DynamoDB, we can set up any training pipeline we want
 
 AWS Sagemaker is an option here to train the model and host it for predictions. We’ve also put together a guide to building your own AMI to run Tensorflow.
 
-TODO: Add link to article
+TODO: Write article and add link @vigbk
 
 Sagemaker starts off with creating a hosted Jupyter notebook instance which is used for working with data and training models.
 
-The [official Sagemaker documentation](https://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works-training.html) has several great examples. We’ve included a notebook that describes how to build a model to predict video game sales from reviews (TODO: Add link). With Sagemaker, we can train with the data we’ve processed in S3 and deploy a model to be used as a prediction API.
+The [official Sagemaker documentation](https://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works-training.html) has several great examples. We’ve included a notebook that describes how to build a model to [predict video game sales from reviews] (AWS-Sagemaker-example-video-game-sales-xgboost.md). With Sagemaker, we can train with the data we’ve processed in S3 and deploy a model to be used as a prediction API.
 
 # Use in production
 
 Once this is in production, the end-to-end flow looks like this.
 
 ![production](images/production.png)
+
+Tune, experiment and play around with data to improve the model. Remember to smell the roses on your journey to Higher Revenue Land!
