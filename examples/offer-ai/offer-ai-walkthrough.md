@@ -28,16 +28,18 @@ TODO: Broader article comparing A/B tests vs. contextual bandit
 
 For the purposes of this example, let's say we want these features:
 
-* country
-* facebook_connected
-* purchases_prev_week_amount
-* games_played_last_session
-* win_ratio_last_session
+```
+country
+facebook_connected
+purchases_prev_week_amount
+games_played_last_session
+win_ratio_last_session
+```
 
-The model then predicts
+The model then predicts `offer_type` and `offer_price`, optimizing for `next_7_days_revenue`
 
-* offer_type
-* offer_price
+TODO: add next_7_days_revenue snippet to window DTC
+
 
 # Raw Data
 
