@@ -175,6 +175,8 @@ Let's write the Window DTC that defines this.
 
 [Window DTC](offer-ai-window-dtc.yml)
 
+The Window DTC is run periodically (we're thinking daily) to generate training data. How and where this is defined is TBD.
+
 After a Window DTC is run, we have data in S3 for each anchor point.
 
 user_id | purchases_prev_week_amount | games_played_last_session | win_ratio_last_session | next_7_days_revenue

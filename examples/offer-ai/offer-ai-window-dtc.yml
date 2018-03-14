@@ -3,7 +3,7 @@
 ####
 
 # Type of DTC. Streaming or Window
-# The Window DTC applies windows operations on top of sessionized data
+# The Window DTC periodically applies windows operations on top of sessionized data
 
 Type: ProductML:DTC:Window
 Version: '2018-03-01'
@@ -25,10 +25,10 @@ Anchor:
  Max: 1
 
 ##
-# Max defines the maximum number of output rows to be generated. If the number of sessions that satisfy the anchor condition
-# is more than the max value specified, then, a ‘max’ number of satisfying sessions are picked randomly
-# By setting max = 1, we're making sure that we are only seeing 1 test_offer per session in the data and filtering out the rest
-# If we wanted to record multiple offers, set max to a higher number
+# Max defines the maximum number of output rows to be generated every time the Window DTC is run
+# We expect the Window DTC is run periodically (perhaps daily) to generate training data
+# By setting max = 1, we're making sure that we are only selecting one session for each user
+# in each period the Window DTC is run. This is to avoid over-sampling more active users 
 ##
 
 ##
