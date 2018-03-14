@@ -18,7 +18,7 @@ pipenv run yapf -i -r . --style='{allow_split_before_dict_value : false}'
 
 echo "running tests..."
 export PYTHONPATH=`pwd`:$PYTHONPATH
-pipenv run pytest tests/*/*
+pipenv run pytest
 
 
 echo "Done."
