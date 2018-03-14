@@ -1,7 +1,7 @@
 from typing import Dict, Any
 from pytest import fixture, raises, mark
 from blurr.core.base import BaseSchema
-from blurr.core.evaluation import Expression
+from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.errors import InvalidSchemaError
 import yaml
 
@@ -38,7 +38,7 @@ def test_base_schema_valid(test_schema_spec: Dict[str, Any]) -> None:
     assert test_schema.name == test_schema_spec[BaseSchema.ATTRIBUTE_NAME]
     assert test_schema.type == test_schema_spec[BaseSchema.ATTRIBUTE_TYPE]
     assert isinstance(test_schema.when, Expression)
-    assert test_schema.when.evaluate()
+    assert test_schema.when.evaluate(EvaluationContext())
 
 
 def test_base_schema_empty() -> None:

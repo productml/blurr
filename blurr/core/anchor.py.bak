@@ -1,0 +1,33 @@
+from typing import Dict, Any
+
+from blurr.core.base import BaseItem, BaseSchema
+from blurr.core.evaluation import EvaluationContext
+
+
+class AnchorSchema(BaseSchema):
+
+
+    def __init__(self, spec: Dict[str, Any]) -> None:
+        super().__init__(spec)
+
+    def load(self, spec: Dict[str, Any]) -> None:
+        pass
+
+    def validate(self, spec: Dict[str, Any]) -> None:
+        pass
+
+
+class Anchor(BaseItem):
+    def restore(self, snapshot) -> None:
+        pass
+
+    @property
+    def snapshot(self):
+        pass
+
+    def evaluate(self) -> None:
+        pass
+
+    def __init__(self, schema: AnchorSchema,
+                 evaluation_context: EvaluationContext) -> None:
+        super().__init__(schema, evaluation_context)
