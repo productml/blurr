@@ -40,7 +40,7 @@ The model predicts `next_7_days_revenue`. The `offer_type` and `offer_price` are
 
 # Raw Data
 
-Blurr assumes that there is raw data from the game  landing
+Blurr assumes that there is raw data from the game landing
 in an S3 bucket. Depending on your internal setup, this could be as simple as pointing your current raw data ingestion end-point (such as Firehose) to an S3 bucket.
 
 We also assume that the raw data arrives in a JSON format.

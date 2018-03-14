@@ -1,27 +1,27 @@
 ####
-#Header block that defines the properties of this DTC
+# Header block that defines the properties of this DTC
 ####
 
-#Type of DTC. Streaming or Window
-#The Streaming DTC processes the raw data and converts it into sessions
+# Type of DTC. Streaming or Window
+# The Streaming DTC processes the raw data and converts it into sessions
 
 Type: ProductML:DTC:Streaming
 Version: '2018-03-07'
 Description: Level 1 transformation from streaming Raw Data
 Name: offer_ai_v1
 
-#The field in the raw data around which data is aggregated. This is usually a unique user id
+# The field in the raw data around which data is aggregated. This is usually a unique user id
 
 Identity: source.user_id
 Time: parse_time(source.event_time, 'YYYY/mm/dd HH:MM:SS')
 
-#A boolean expression that Whens out raw data to be processed
+# A boolean expression that Whens out raw data to be processed
 
 When: source.package_version = '1.0'
 
 ##
-#The raw data is converted to sessions and stored in persistent storage such as DynamoDB (a Store)
-#Store properties. Only DynamoDB is supported currently
+# The raw data is converted to sessions and stored in persistent storage such as DynamoDB (a Store)
+# Store properties. Only DynamoDB is supported currently
 ##
 
 Store:
@@ -33,8 +33,8 @@ Store:
 DataGroups:
 
 ##
-#IdentityAggregate is meant for user profile information that is rarely updated. This is processed first
-#These are things like country, install source and whether user is logged in to Facebook
+# IdentityAggregate is meant for user profile information that is rarely updated. This is processed first
+# These are things like country, install source and whether user is logged in to Facebook
 ##
 
  - Type: ProductML:DTC:DataGroup:IdentityAggregate
@@ -57,32 +57,32 @@ DataGroups:
 
 
 ##
-#Session aggregates definition
+# Session aggregates definition
 ##
 
  - Type: ProductML:DTC:DataGroup:SessionAggregate
    Name: game_stats
 
-#We defined this store earlier
+# We defined this store earlier
 
    Store: offer_ai_dynamo
 
-#Split defines when a new session is created when the boolean expression is TRUE
+# Split defines when a new session is created when the boolean expression is TRUE
 
    Split: source.session_id != session_id
 
    Fields:
      - Name: games_played
 
-#String is the default type and is used if type is not defined
+# String is the default type and is used if type is not defined
 
        Type: integer
        Value: game_stats.games_played + 1
        When: source.event_id == 'game_start'
 
 ##
-#Any valid Python expression can be used for Value and When fields
-#The underlying interpreter for DTCs is Python v3.6
+# Any valid Python expression can be used for Value and When fields
+# The underlying interpreter for DTCs is Python v3.6
 ##
 
      - Name: games_won
