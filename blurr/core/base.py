@@ -17,19 +17,11 @@ class DTCType(Validator):
     # all valid types would go here, I just made this up
     VALUES = list(SCHEMA_MAP.keys()) + ['ProductML:DTC:Streaming']
 
-    __name__ = "DTC Type"
-
     def _is_valid(self, value):
         return value in self.VALUES
 
-    def __str__(self):
-        return "DTC Valid Type"
-
-    def __repr__(self):
-        return self.__str__()
-
     def get_name(self):
-        return self.__str__()
+        return "DTC Valid Type"
 
 
 class BaseSchema(ABC):
