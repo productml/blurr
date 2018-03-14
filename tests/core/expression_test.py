@@ -9,7 +9,7 @@ def test_expression_valid() -> None:
     code_string = '1+1'
     expr = Expression(code_string)
     assert expr.code_string == code_string
-    assert expr.evaluate(None, None) == 2
+    assert expr.evaluate(EvaluationContext()) == 2
 
 
 def test_expression_globals_locals() -> None:
@@ -17,7 +17,7 @@ def test_expression_globals_locals() -> None:
     expr = Expression(code_string)
 
     with raises(ExpressionEvaluationError, Message='is not defined'):
-        expr.evaluate()
+        expr.evaluate(EvaluationContext())
 
     assert expr.evaluate(EvaluationContext(Context({'a': 2, 'b': 3}))) == 6
     assert expr.evaluate(
@@ -42,4 +42,4 @@ def test_invalid_expression() -> None:
 def test_execution_error() -> None:
     code_string = '1/0'
     with raises(ExpressionEvaluationError):
-        Expression(code_string).evaluate()
+        Expression(code_string).evaluate(EvaluationContext())
