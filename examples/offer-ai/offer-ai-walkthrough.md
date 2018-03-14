@@ -8,7 +8,7 @@ When working with data, it is important to iterate fast and the best way to do t
 
 Blurr provides a high-level expressive YAML-based language called the Data Transform Configuration (DTC). The DTC defines custom data transformations and aggregations from a data source (S3), to transform the data (in lambdas) and output to a data store (DynamoDB). The data in the store can be used for any application dependent on real-time transformations like analytics or predictions.
 
-Blurr has first class support for serverless data processing, which means near zero standard cost and infinite scale - and zero maintenance headache.
+Blurr has first class support for serverless data processing which means near zero standing costs, great for spiky usage, infinite scale and zero maintenance headache.
 
 ## Offer AI objective
 
