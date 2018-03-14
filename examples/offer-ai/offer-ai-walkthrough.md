@@ -2,7 +2,7 @@
 
 ## What is Blurr?
 
-Blurr is a data pipeline authoring environment for real-time predictive models. Work directly with raw data to construct a production ML pipeline in minutes. We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer. The distinction is increasingly blurry *cough*. Just like development and operations merged over time into DevOps.
+Blurr is a data pipeline authoring environment for real-time predictive models. Work directly with raw data to construct a production ML pipeline in minutes. We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer. The distinction is increasingly *cough* blurry. Just like development and operations merged over time into DevOps.
 
 When working with data, it is important to iterate fast and the best way to do that is by working directly with the raw data. With Blurr we want to give product teams the ability to iterate quickly when doing ML dev and take things to production using a self-service model.
 
@@ -22,7 +22,7 @@ In this example, we'll work directly with raw data from events in the game to pr
 
 This is a model that continuously learns based on the feedback received as the user interacts with the product and makes a purchase (or not). The model optimizes for a long term function - say, total revenue over 7 days.
 
-To train the model, we need a dataset where we can observe how users behave when presented with different offers and prices. We want a contextual bandit approach to continuously personalize the ‘winning treatment’ for each user. More on contextual bandits. [here](http://pavel.surmenok.com/2017/08/26/contextual-bandits-and-reinforcement-learning/)
+To train the model, we need a dataset where we can observe how users behave when presented with different offers and prices. We want a contextual bandit approach to continuously personalize the ‘winning treatment’ for each user. More on contextual bandits  [here](http://pavel.surmenok.com/2017/08/26/contextual-bandits-and-reinforcement-learning/)
 
 TODO: Broader article comparing A/B tests vs. contextual bandit
 
@@ -40,8 +40,8 @@ The model predicts `next_7_days_revenue`. The `offer_type` and `offer_price` are
 
 # Raw Data
 
-Blurr assumes that there is raw data from the game that is landing
-in an S3 bucket. Depending on our internal setup, this could be as simple as point your current raw data ingestion end-point (such as Firehose) to the S3 bucket.
+Blurr assumes that there is raw data from the game  landing
+in an S3 bucket. Depending on your internal setup, this could be as simple as pointing your current raw data ingestion end-point (such as Firehose) to an S3 bucket.
 
 We also assume that the raw data arrives in a JSON format.
 
@@ -49,7 +49,7 @@ Here’s an example JSON file with raw data from a game. Even though we are usin
 
 ## Peeking at raw data
 
-We assume that when a users plays a game, the following events are sent as raw data.
+We assume that when a user open the app and plays a game, the following events are sent as raw data.
 
 ```
 [
