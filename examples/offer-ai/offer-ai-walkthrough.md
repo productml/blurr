@@ -129,6 +129,7 @@ When an offer is shown, the following events are triggered. We assume that the o
 We want the end result to look like this - these are the features in the model.
 
 user_id | country | facebook_connected | purchases_prev_week_amount | games_played_last_session | win_ratio_last_session
+------- | ------- | ------------------ | -------------------------- | ------------------------- | ----------------------
 
 # Writing data transforms
 
