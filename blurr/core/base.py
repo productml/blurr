@@ -1,9 +1,27 @@
-from abc import ABC, abstractmethod
 from typing import Dict, Any, Type
+
+import yaml
+from abc import ABC, abstractmethod
+from yamale.schema import Schema, Data
+from yamale.validators import Validator, DefaultValidators
 
 from blurr.core.errors import InvalidSchemaError, SnapshotError
 from blurr.core.evaluation import Expression, EvaluationContext
-from blurr.core.loader import TypeLoader
+from blurr.core.loader import TypeLoader, SCHEMA_MAP
+
+
+# This would be in a more central place along with other validation code
+class DTCType(Validator):
+    TAG = 'dtc_type'
+
+    # all valid types would go here, I just made this up
+    VALUES = list(SCHEMA_MAP.keys()) + ['ProductML:DTC:Streaming']
+
+    def _is_valid(self, value):
+        return value in self.VALUES
+
+    def get_name(self):
+        return "DTC Valid Type"
 
 
 class BaseSchema(ABC):
@@ -17,12 +35,24 @@ class BaseSchema(ABC):
     ATTRIBUTE_TYPE = 'Type'
     ATTRIBUTE_WHEN = 'When'
 
+    SCHEMA = '''
+        Name: str(min=1)
+        Type: dtc_type()
+        When: str(min=1, required=False)
+    '''
+
     def __init__(self, spec: Dict[str, Any]) -> None:
         """
         A schema object must be initialized with a schema spec
         :param spec: Dictionary representation of the YAML schema spec
         """
-        # Load the schema spec into the current object
+        validators = DefaultValidators.copy()
+        validators['dtc_type'] = DTCType
+
+        self.schema = Schema(
+            yaml.load(self.SCHEMA),
+            name=self.__class__.__name__,
+            validators=validators)
 
         self.__validate_spec(spec)
         self.__load_spec(spec)
@@ -59,45 +89,10 @@ class BaseSchema(ABC):
         """
         Validates the schema spec.  Raises exceptions if errors are found.
         """
-        self.validate_required_attribute(spec, self.ATTRIBUTE_NAME)
-        self.validate_required_attribute(spec, self.ATTRIBUTE_TYPE)
-
-        # Invokes the validations of the subclasses
-        self.validate(spec)
-
-    def validate_required_attribute(self, spec: Dict[str, Any],
-                                    attribute: str):
-        """
-        Raises an error if a required attribute is not defined
-        or contains an empty value
-        :param spec: Schema specifications
-        :param attribute: Attribute that is being validated
-        """
-        if attribute not in spec:
-            self.raise_validation_error(spec, attribute,
-                                        'Required attribute missing.')
-
-        if isinstance(spec[attribute], str) and spec[attribute].isspace():
-            self.raise_validation_error(spec, attribute,
-                                        'Invalid attribute value.')
-
-    def raise_validation_error(self, spec: Dict[str, Any], attribute: str,
-                               message: str):
-        """
-        Raises an InvalidSchemaException exception with an expressive message
-        :param spec: Schema specification dictionary
-        :param attribute: Attribute with error
-        :param message: Description of error encountered
-        """
-        error_message = ('\nError processing schema spec:'
-                         '\n\tSpec: {name}'
-                         '\n\tAttribute: {attribute}'
-                         '\n\tError Message: {message}') \
-            .format(
-            name=spec.get(self.ATTRIBUTE_NAME, str(spec)),
-            attribute=attribute,
-            message=message)
-        raise InvalidSchemaError(error_message)
+        try:
+            self.schema.validate(Data(spec, name="spec"))
+        except ValueError as e:
+            raise InvalidSchemaError(str(e))
 
 
 class BaseSchemaCollection(BaseSchema, ABC):
