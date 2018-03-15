@@ -5,7 +5,7 @@ from pytest import mark, fixture
 
 from blurr.core.base import BaseSchema, BaseItem
 from blurr.core.evaluation import Context, EvaluationContext
-from tests.core.base_schema_tests import TestSchema
+from tests.core.base_schema_test import TestSchema
 
 
 @fixture
@@ -43,8 +43,8 @@ def test_base_item_valid(schema_spec: Dict[str, Any]) -> None:
     schema = TestSchema(schema_spec)
     test_item = TestItem(schema)
     assert test_item.schema == schema
-    assert test_item.global_context == Context()
-    assert test_item.local_context == Context()
+    assert len(test_item.evaluation_context.global_context) == 0
+    assert len(test_item.evaluation_context.local_context) == 0
 
     assert test_item.needs_evaluation
 
