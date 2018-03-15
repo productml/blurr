@@ -3,10 +3,12 @@
 [![CircleCI](https://circleci.com/gh/productml/blurr/tree/master.svg?style=svg)](https://circleci.com/gh/productml/blurr/tree/master)
 
 ```
-We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer. The distinction is increasingly blurry (*cough*). Like development and operations merged into DevOps over time.
+We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer.
+The distinction is increasingly blurry (*cough*).
+Like development and operations merged into DevOps over time.
 ```
 
-Work directly with raw data to construct a production ML pipeline. In minutes. Without writing code.
+Work directly with raw data to construct a production ML pipeline, in minutes - without writing code.
 
 Blurr enables data scientists and engineers to build and deploy real-time predictive models by:
 
