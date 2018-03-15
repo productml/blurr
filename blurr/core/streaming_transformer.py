@@ -41,9 +41,9 @@ class StreamingTransformerSchema(TransformerSchema):
 
 
 class StreamingTransformer(Transformer):
-    def __init__(self, store: Store, schema: TransformerSchema, identity: str,
+    def __init__(self, schema: TransformerSchema, identity: str,
                  context: Context) -> None:
-        super().__init__(store, schema, identity, context)
+        super().__init__(schema, identity, context)
         self.evaluation_context.global_add('identity', self.identity)
 
     def evaluate_record(self, record: Record):
@@ -74,7 +74,7 @@ class StreamingTransformer(Transformer):
 
         for _, item in self.nested_items.items():
             if isinstance(item, SessionDataGroup) and item.split_now:
-                self.store.save(self.identity, item.name)
+#                self.store.save(self.identity, item.name)
                 item.reset()
 
         super().evaluate()
