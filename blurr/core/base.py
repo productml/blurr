@@ -1,27 +1,10 @@
 from typing import Dict, Any, Type
 
-import yaml
 from abc import ABC, abstractmethod
-from yamale.schema import Schema, Data
-from yamale.validators import Validator, DefaultValidators
 
-from blurr.core.errors import InvalidSchemaError, SnapshotError
+from blurr.core.errors import SnapshotError
 from blurr.core.evaluation import Expression, EvaluationContext
-from blurr.core.loader import TypeLoader, SCHEMA_MAP
-
-
-# This would be in a more central place along with other validation code
-class DTCType(Validator):
-    TAG = 'dtc_type'
-
-    # all valid types would go here, I just made this up
-    VALUES = list(SCHEMA_MAP.keys()) + ['ProductML:DTC:Streaming']
-
-    def _is_valid(self, value):
-        return value in self.VALUES
-
-    def get_name(self):
-        return "DTC Valid Type"
+from blurr.core.loader import TypeLoader
 
 
 class BaseSchema(ABC):
@@ -35,26 +18,11 @@ class BaseSchema(ABC):
     ATTRIBUTE_TYPE = 'Type'
     ATTRIBUTE_WHEN = 'When'
 
-    SCHEMA = '''
-        Name: str(min=1)
-        Type: dtc_type()
-        When: str(min=1, required=False)
-    '''
-
     def __init__(self, spec: Dict[str, Any]) -> None:
         """
         A schema object must be initialized with a schema spec
         :param spec: Dictionary representation of the YAML schema spec
-        """
-        validators = DefaultValidators.copy()
-        validators['dtc_type'] = DTCType
-
-        self.schema = Schema(
-            yaml.load(self.SCHEMA),
-            name=self.__class__.__name__,
-            validators=validators)
-
-        self.__validate_spec(spec)
+       sh """
         self.__load_spec(spec)
 
     @abstractmethod
@@ -84,15 +52,6 @@ class BaseSchema(ABC):
 
         # Invokes the loads of the subclass
         self.load(spec)
-
-    def __validate_spec(self, spec: Dict[str, Any]) -> None:
-        """
-        Validates the schema spec.  Raises exceptions if errors are found.
-        """
-        try:
-            self.schema.validate(Data(spec, name="spec"))
-        except ValueError as e:
-            raise InvalidSchemaError(str(e))
 
 
 class BaseSchemaCollection(BaseSchema, ABC):
