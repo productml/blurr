@@ -9,13 +9,13 @@ Time: parser.parse(source.event_time)
 
 Stores:
    - Type: ProductML:DTC:Store:MemoryStore
-     Name: ether
+     Name: memory
 
 DataGroups:
 
  - Type: ProductML:DTC:DataGroup:SessionAggregate
    Name: session
-   Store: dynamo
+   Store: memory
    Split: (time - session.end_time).seconds > 1800
 
    Fields:
