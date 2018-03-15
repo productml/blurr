@@ -2,9 +2,14 @@
 
 [![CircleCI](https://circleci.com/gh/productml/blurr/tree/master.svg?style=svg)](https://circleci.com/gh/productml/blurr/tree/master)
 
-Blurr is a data pipeline authoring environment for real-time predictive models. Work directly with raw data to construct a production ML pipeline in minutes. We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer. The distinction is increasingly blurry (*cough*). Just like development and operations merged over time into DevOps.
+Work directly with raw data to construct a production ML pipeline. In minutes. Without writing code. We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer. The distinction is increasingly blurry (*cough*). Like development and operations merged into DevOps over time.
 
-When working with data, it is important to iterate fast and the best way to do that is by working directly with the raw data. With Blurr we want to give product teams the ability to iterate quickly when doing ML dev and take things to production using a self-service model.
+Blurr enables data scientists and engineers to build and deploy real-time predictive models by:
+
+1. Providing a data pipeline that transforms raw data into features for model training and prediction
+2. Defining a high level authoring language that executes data transforms without writing code
+
+For production ML, experimentation and iteration speed is important. Working directly with raw data provides the most flexibility. Blurr allows product teams to iterate quickly during ML dev and provides a self-service way to take experiments to production.
 
 Blurr provides a high-level expressive YAML-based language called the Data Transform Configuration (DTC). The DTC defines custom data transformations and aggregations from a data source (S3), to transform the data (in lambdas) and output to a data store (DynamoDB). The data in the store can be used for any application dependent on real-time transformations like analytics or predictions.
 
@@ -27,3 +32,13 @@ More to come!
 Blurr is currently in closed development. We're targeting a first release in early April, 2018. Email blurr@productml.com to get notified when it is out! Even better, star or watch this GitHub project!
 
 We intend to license Blurr as an open source project. We will update the license + contribution guidelines with the first release.
+
+# Data Science 'Joel Test'
+
+Inspired by the (old school) [Joel Test](https://www.joelonsoftware.com/2000/08/09/the-joel-test-12-steps-to-better-code/) to rate software teams, here's our version for data science teams. What's your score? We'd love to know!
+
+1. Data pipelines are versioned and reproducible
+2. Pipelines (re)build in one step
+3. Deploying to production needs minimal engineering help
+4. Successful ML is a long game. You play it like it is
+5. Kaizen. Experimentation and iterations are a way of life
