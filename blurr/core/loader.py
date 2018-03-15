@@ -25,6 +25,10 @@ SCHEMA_MAP = {
     'set': 'blurr.core.simple_field.SetFieldSchema'
 }
 
+STORE_MAP = {
+    'ProductML:DTC:Store:MemoryStore': 'blurr.store.memory_store.MemoryStore'
+}
+
 # TODO Build dynamic type loader from a central configuration rather than reading a static dictionary
 
 
@@ -36,6 +40,10 @@ class TypeLoader:
     @staticmethod
     def load_item(type_name: str):
         return TypeLoader.load_type(type_name, ITEM_MAP)
+
+    @staticmethod
+    def load_store(type_name: str):
+        return TypeLoader.load_type(type_name, STORE_MAP)
 
     @staticmethod
     def load_type(type_name: str, type_map: dict) -> Any:
