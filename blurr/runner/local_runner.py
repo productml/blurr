@@ -1,10 +1,13 @@
-import yaml
 import json
-from blurr.core.streaming_transformer import StreamingTransformerSchema, StreamingTransformer
-from blurr.core.record import Record
-from blurr.core.evaluation import Context, EvaluationContext
-from blurr.store.local_store import LocalStore
+
+import yaml
 from dateutil import parser
+
+from blurr.core.evaluation import Context
+from blurr.core.record import Record
+from blurr.core.streaming_transformer import StreamingTransformerSchema, StreamingTransformer
+from blurr.core.syntax.schema_validator import validate
+from blurr.store.local_store import LocalStore
 
 
 class LocalRunner:
@@ -16,6 +19,11 @@ class LocalRunner:
         self._user_transformer = {}
         self._exec_context = Context()
         self._exec_context.add('parser', parser)
+
+        self._validate_dtc_syntax()
+
+    def _validate_dtc_syntax(self):
+        validate(self._stream_dtc)
 
     def _consume_record(self, record):
         source_context = Context({'source': record})
