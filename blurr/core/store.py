@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Any, Dict, List
+from time import time
 
 
 class Key:
@@ -8,47 +9,48 @@ class Key:
     A record in the store is identified by a key
     """
 
-    @staticmethod
-    def parse(key_string: str) -> 'Key':
-        parts = key_string.split('-')
-        return Key(parts[0], parts[1], None if len(parts) < 3 else datetime.strptime(parts[2], '%s'))
-
     def __init__(self, identity: str, group: str, timestamp: datetime = None) -> None:
         """
-        A key is a composite of identity and group
-        :param identity: Identifies the entity
-        :param group: Identifies the data group
+        Initializes a new key for storing data
+        :param identity: Primary identity of the record being stored
+        :param group: Secondary identity of the record
+        :param timestamp: Optional timestamp that can be used for time range queries
         """
+        if identity.isspace() or group.isspace():
+            raise ValueError('`identity` and `value` must be present.')
+
         self.identity = identity
         self.group = group
         self.timestamp = timestamp
 
+    @staticmethod
+    def parse(key_string: str) -> 'Key':
+        """ Parses a flat key string and returns a key """
+        parts = key_string.split('-')
+        return Key(parts[0], parts[1], datetime.fromtimestamp(int(parts[2])) if len(parts) > 2 else None)
+
     def __str__(self):
+        """ Returns the string representation of the key"""
         if self.timestamp:
-            return '-'.join([self.identity, self.group, datetime.strftime(self.timestamp, '%s')])
+            return '-'.join([self.identity, self.group, str(int(time()))])
 
         return '-'.join([self.identity, self.group])
 
     def __eq__(self, other: 'Key') -> bool:
-        if isinstance(self, other.__class__):
-            return self.__dict__ == other.__dict__
-
-        return False
+        return (self.identity, self.group, self.timestamp) == (other.identity, other.group, other.timestamp)
 
     def __lt__(self, other: 'Key') -> bool:
-        if isinstance(self, other.__class__):
-            return self.identity == other.identity and self.group == other.group and self.timestamp < other.timestamp
-
-        return False
+        return (self.identity, self.group) == (other.identity, other.group) and self.timestamp < other.timestamp
 
     def __gt__(self, other: 'Key') -> bool:
-        if isinstance(self, other.__class__):
-            return self.identity == other.identity and self.group == other.group and self.timestamp > other.timestamp
+        return (self.identity, self.group) == (other.identity, other.group) and self.timestamp > other.timestamp
 
-        return False
+    def __hash__(self):
+        return hash((self.identity, self.group, self.timestamp))
 
 
 class Store(ABC):
+    """ Base Store that allows for data to be persisted during / after transformation """
     def __init__(self, spec: Dict[str, Any]) -> None:
         """
         Initializes the store based on the specifications
@@ -82,7 +84,7 @@ class Store(ABC):
 
         return item
 
-    def get_range(self, start: Key, end: Key, count: int) -> Dict[Key, Any]:
+    def get_range(self, start: Key, end: Key = None, count: int = 0) -> Dict[Key, Any]:
         result = self._store_get_range(start, end, count)
         for key, item in result.items():
             if key in self._cache:
@@ -95,7 +97,7 @@ class Store(ABC):
         return result
 
     @abstractmethod
-    def _store_get_range(self, start: Key, end: Key, count: int) -> Dict[Key, Any]:
+    def _store_get_range(self, start: Key, end: Key = None, count: int = 0) -> Dict[Key, Any]:
         pass
 
     @abstractmethod
@@ -124,7 +126,7 @@ class Store(ABC):
         Saves an item to store
         """
         # Save to cache
-        self._cache_save(key, item)
+        self._cache[key] = item
 
         # Save to the underlying store
         self._store_save(key, item)
