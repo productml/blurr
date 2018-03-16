@@ -6,14 +6,18 @@ name = "pypi"
 
 
 [packages]
+
 pyyaml = "*"
 python-dateutil = "*"
+docopt = "*"
+
 
 [dev-packages]
 
 pytest = "*"
 mypy = "*"
 yapf = "*"
+pipenv = "*"
 
 
 [requires]
