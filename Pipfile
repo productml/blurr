@@ -6,8 +6,11 @@ name = "pypi"
 
 
 [packages]
+
 pyyaml = "*"
 python-dateutil = "*"
+yamale = "*"
+
 
 [dev-packages]
 
