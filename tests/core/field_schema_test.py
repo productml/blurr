@@ -32,24 +32,6 @@ class MockFieldSchema(FieldSchema):
         return int(0)
 
 
-def test_field_schema_missing_required_parameter():
-    missing_field_spec = yaml.load('''
-Name: events
-Type: integer
-''')
-    with pytest.raises(
-            InvalidSchemaError, match="Required attribute missing."):
-        MockFieldSchema(missing_field_spec)
-
-
-def test_field_schema_valid_schema(field_schema_spec):
-    valid_field_schema = MockFieldSchema(field_schema_spec)
-
-    assert valid_field_schema.name == "max_attempts"
-    assert valid_field_schema.type == "integer"
-    assert valid_field_schema.value.evaluate(EvaluationContext()) == 5
-
-
 def test_field_schema_type_object(field_schema_spec):
     valid_field_schema = MockFieldSchema(field_schema_spec)
 
