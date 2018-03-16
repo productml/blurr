@@ -8,10 +8,10 @@ Identity: source.user_id
 Time: parser.parse(source.event_time)
 
 Store:
-   - Type: ProductML:DTC:Storage:DynamoDB
-     Name: dynamo
-     Retention: 180
-     Table: ProductML_Test_Sessions
+  Type: ProductML:DTC:Storage:DynamoDB
+  Name: dynamo
+  Retention: 180
+  Table: ProductML_Test_Sessions
 
 DataGroups:
 

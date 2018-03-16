@@ -1,20 +1,21 @@
 import yaml
 
 from blurr.core.errors import InvalidSchemaError
-from blurr.util.eprint import eprint
+from blurr.core.syntax.schema_validator import validate
 
 
-def validate_command(dtc_file):
-    print("validating " + dtc_file + " DTC")
+def validate_command(dtc_file, out):
     try:
-        yaml.safe_load(open(dtc_file))
-        # TODO : validate once ready
-        print("document is valid")
+        dtc_dict = yaml.safe_load(open(dtc_file))
+        validate(dtc_dict)
+        out.print("document is valid")
+        return 0
     except yaml.YAMLError:
-        eprint("document is not a valid yaml document")
+        out.eprint("invalid yaml")
+        return 1
     except InvalidSchemaError as err:
-        eprint(str(err.value))
+        out.eprint(str(err))
+        return 1
     except:
-        eprint("there was an error parsing the document")
-
-
+        out.eprint("there was an error parsing the document")
+        return 1

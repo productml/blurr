@@ -1,10 +1,6 @@
 from blurr.cli.validate import validate_command
 
 
-def cli(arguments):
+def cli(arguments, out):
     if arguments["validate"]:
-        validate_command(arguments["<DTC>"])
-
-
-if __name__ == '__main__':
-    print("jello!")
+        return validate_command(arguments["<DTC>"], out)

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "188d4a833fda0cfc88da7d35ed282ed268381cde459657d85da81e1ca0d4621b"
+            "sha256": "e830a8c760099f05ee4a0a46acef8624b216f79816cd44e578d4fda082dc980d"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -67,6 +67,12 @@
                 "sha256:70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9"
             ],
             "version": "==1.11.0"
+        },
+        "yamale": {
+            "hashes": [
+                "sha256:18f921a8272b85b1d74df19e18f8656254c4561ef8abee323bbdbf411f79ec0b"
+            ],
+            "version": "==1.7.0"
         }
     },
     "develop": {
@@ -123,6 +129,18 @@
                 "sha256:70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9"
             ],
             "version": "==1.11.0"
+        },
+        "snapshottest": {
+            "hashes": [
+                "sha256:215c28eb397fd171a25a0e7d8b7b82d39619bf38d0e44de97c38842e8495b40c"
+            ],
+            "version": "==0.5.0"
+        },
+        "termcolor": {
+            "hashes": [
+                "sha256:1d6d69ce66211143803fbc56652b41d73b4a400a2891d7bf7a1cdf4c02de613b"
+            ],
+            "version": "==1.1.0"
         },
         "typed-ast": {
             "hashes": [

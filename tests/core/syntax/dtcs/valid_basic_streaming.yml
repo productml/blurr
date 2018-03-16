@@ -1,0 +1,23 @@
+Type: ProductML:DTC:Streaming
+Version: '2018-03-01'
+Description: Example
+Name: example_name
+Identity: source.user_id
+When: source.package_version = '1.0'
+Store:
+   Type: ProductML:DTC:Storage:DynamoDB
+   Name: offer_ai_dynamo
+   RetentionDays: 180
+   ReadWriteUnits: 5
+   Table: ProductML_Test_Win_Ratios
+DataGroups:
+ - Type: ProductML:DTC:DataGroup:IdentityAggregate
+   Name: user
+   Store: offer_ai_dynamo
+   Fields:
+     - Name: user_id
+       Value: source.customer_identifier
+       Atomic: true
+     - Name: country
+       Value: source.country
+       When: last_session = None
