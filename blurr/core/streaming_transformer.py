@@ -5,7 +5,7 @@ from blurr.core.errors import StreamingSourceNotFoundError
 from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.record import Record
 from blurr.core.transformer import Transformer, TransformerSchema
-from blurr.core.store import Store
+from blurr.core.store import Store, Key
 from blurr.core.session_data_group import SessionDataGroup
 
 
@@ -72,9 +72,11 @@ class StreamingTransformer(Transformer):
         if not self.needs_evaluation:
             return
 
-        for _, item in self.nested_items.items():
+        for key, item in self.nested_items.items():
             if isinstance(item, SessionDataGroup) and item.split_now:
-#                self.store.save(self.identity, item.name)
-                item.reset()
+                # If a split is imminent, save the current session snapshot with the timestamp
+                self.store.save(Key(self.identity, item.name, item.start_time), item.snapshot)
+                # Create a new Session data group for this key for further processing
+                self.nested_items[key] = SessionDataGroup(item.schema, item.evaluation_context)
 
         super().evaluate()

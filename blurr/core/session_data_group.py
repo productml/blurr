@@ -78,7 +78,10 @@ class SessionDataGroup(DataGroup):
 
     @property
     def split_now(self) -> bool:
-        # Check if current session is stale for the event being processed
+        """
+        Check if current session is stale for the event being processed
+        :return: True if the session needs to be split, false otherwise
+        """
         if self.schema.split is None:
             return False
 
@@ -90,5 +93,3 @@ class SessionDataGroup(DataGroup):
 
         return False
 
-    def reset(self):
-        self.__init__(self.schema, self.evaluation_context)

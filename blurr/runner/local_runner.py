@@ -37,6 +37,11 @@ class LocalRunner:
         for file in self._raw_files:
             self._execute_file(file)
 
+        # Ensure that the final values are saved
+        for item in self._user_transformer.values():
+            item.finalize()
+
+
 
 def main():
     pass
