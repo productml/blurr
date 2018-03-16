@@ -63,7 +63,7 @@ def test_set_get_date() -> None:
     assert store.get(Key('user1', 'session', now)) == 'test'
 
 
-def test_get_range(state: Dict[str, Any]) -> None:
+def test_get_range_start_end(state: Dict[str, Any]) -> None:
     """
     Tests that the range get does not include the sessions that lie on the boundary
     """
@@ -75,3 +75,23 @@ def test_get_range(state: Dict[str, Any]) -> None:
     assert list(sessions)[0].timestamp == datetime(2018, 3, 7, 22, 35, 35, 0, timezone.utc)
 
 
+def test_get_range_start_count(state: Dict[str, Any]) -> None:
+    """
+    Tests that the range get does not include the sessions that lie on the boundary
+    """
+    store = MemoryStore(state)
+    start = Key('user1', 'session', datetime(2018, 3, 7, 22, 35, 31, 0, timezone.utc))
+    sessions = store.get_range(start, None, 2)
+    assert len(sessions) == 2
+    assert list(sessions)[0].timestamp == datetime(2018, 3, 7, 22, 35, 35, 0, timezone.utc)
+
+
+def test_get_range_end_count(state: Dict[str, Any]) -> None:
+    """
+    Tests that the range get does not include the sessions that lie on the boundary
+    """
+    store = MemoryStore(state)
+    end = Key('user1', 'session', datetime(2018, 3, 7, 22, 38, 31, 0, timezone.utc))
+    sessions = store.get_range(end, None, -2)
+    assert len(sessions) == 2
+    assert list(sessions)[0].timestamp == datetime(2018, 3, 7, 22, 35, 35, 0, timezone.utc)

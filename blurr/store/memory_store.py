@@ -18,9 +18,9 @@ class MemoryStore(Store):
         if not count:
             return {key: item for key, item in self._cache.items() if start < key < end}
         else:
-            filter_condition = (lambda k, v: k > start) if count > 0 else (lambda k, v: k < start)
+            filter_condition = (lambda i: i[0] > start) if count > 0 else (lambda i: i[0] < start)
 
-            items = sorted(filter(filter_condition, self._cache.items()))
+            items = sorted(filter(filter_condition, list(self._cache.items())))
 
             if abs(count) > len(items):
                 count = (count / abs(count)) * len(items)

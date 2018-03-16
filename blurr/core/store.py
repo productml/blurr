@@ -86,6 +86,9 @@ class Store(ABC):
         return item
 
     def get_range(self, start: Key, end: Key = None, count: int = 0) -> Dict[Key, Any]:
+        if end and count:
+            raise ValueError('Only one of `end` or `count` can be set')
+
         result = self._store_get_range(start, end, count)
         for key, item in result.items():
             if key in self._cache:
