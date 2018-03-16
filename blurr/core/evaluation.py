@@ -44,8 +44,10 @@ class EvaluationContext:
         :param global_context: Global context dictionary
         :param local_context: Local context dictionary.
         """
-        self.global_context = global_context if global_context is not None else Context()
-        self.local_context = local_context if local_context is not None else Context()
+        self.global_context = Context(
+        ) if global_context is None else global_context
+        self.local_context = Context(
+        ) if local_context is None else local_context
 
     @property
     def fork(self) -> 'EvaluationContext':
@@ -78,6 +80,10 @@ class Expression:
         An expression must be initialized with a python statement
         :param code_string: Python code statement
         """
+
+        # For non string single value expressions. Ex: 5, False.
+        code_string = str(code_string)
+
         # TODO Add validation to see that there are no direct setting using the '=' character
         self.code_string = 'None' if code_string.isspace() else code_string
 
