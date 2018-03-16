@@ -31,6 +31,12 @@ class Store(ABC):
     def _store_get(self, identity, group):
         pass
 
+    def get_window_by_time(self, identity, group_id, start_time, end_time):
+        pass
+
+    def get_window_by_count(self, identity, group_id, start_time, count):
+        pass
+
     def get_last(self, identity, group_id_prefix, count):
         pass
 

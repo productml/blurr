@@ -7,17 +7,10 @@ Name: Sessions
 Identity: source.user_id
 Time: parser.parse(source.event_time)
 
-Store:
-   - Type: ProductML:DTC:Storage:DynamoDB
-     Name: dynamo
-     Retention: 180
-     Table: ProductML_Test_Sessions
-
 DataGroups:
 
  - Type: ProductML:DTC:DataGroup:SessionAggregate
    Name: session
-   Store: dynamo
    Split: (time - session.end_time).seconds > 1800
 
    Fields:

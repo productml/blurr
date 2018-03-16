@@ -45,6 +45,7 @@ class Transformer(BaseItemCollection, ABC):
     def __init__(self, store: Store, schema: TransformerSchema, identity: str,
                  context: Context) -> None:
         super().__init__(schema, EvaluationContext(global_context=context))
-        self.evaluation_context.global_context.merge(self.nested_items)
         self.store = store
         self.identity = identity
+        self.evaluation_context.global_add('identity', self.identity)
+        self.evaluation_context.global_context.merge(self.nested_items)

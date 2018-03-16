@@ -226,8 +226,8 @@ class BaseItemCollection(BaseItem):
         # Load the nested items into the item
         self.nested_items: Dict[str, Type[BaseItem]] = {
             name: TypeLoader.load_item(item_schema.type)(
-                item_schema, evaluation_context.fork)
-            for name, item_schema in schema.nested_schema.items()
+                item_schema, self.evaluation_context)
+            for name, item_schema in self.schema.nested_schema.items()
         }
 
     def evaluate(self) -> None:
@@ -262,7 +262,7 @@ class BaseItemCollection(BaseItem):
         """
         try:
 
-            for name, snap in snapshot:
+            for name, snap in snapshot.items():
                 self.nested_items[name].restore(snap)
 
         except Exception as e:
@@ -279,4 +279,4 @@ class BaseItemCollection(BaseItem):
         if item in self.nested_items:
             return self.nested_items[item].snapshot
 
-        self.__getattribute__(item)
+        return self.__getattribute__(item)

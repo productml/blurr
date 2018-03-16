@@ -45,3 +45,7 @@ class StreamingSourceNotFoundError(Exception):
     Raised when the raw data for streaming is unavailable in the execution context
     """
     pass
+
+
+class AnchorSessionNotDefinedError(Exception):
+    pass

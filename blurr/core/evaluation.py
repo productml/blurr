@@ -36,16 +36,16 @@ class Context(dict):
 
 class EvaluationContext:
     def __init__(self,
-                 global_context: Context = Context(),
-                 local_context: Context = Context()) -> None:
+                 global_context: Context = None,
+                 local_context: Context = None) -> None:
         """
         Initializes an evaluation context with global and local context dictionaries.  The unset parameters default
         to an empty context dictionary.
         :param global_context: Global context dictionary
         :param local_context: Local context dictionary.
         """
-        self.global_context = global_context
-        self.local_context = local_context
+        self.global_context = global_context if global_context is not None else Context()
+        self.local_context = local_context if local_context is not None else Context()
 
     @property
     def fork(self) -> 'EvaluationContext':
