@@ -72,11 +72,11 @@ class StreamingTransformer(Transformer):
         if not self.needs_evaluation:
             return
 
-        for key, item in self.nested_items.items():
+        for item in self.nested_items.values():
             if isinstance(item, SessionDataGroup) and item.split_now:
                 # If a split is imminent, save the current session snapshot with the timestamp
                 self.store.save(Key(self.identity, item.name, item.start_time), item.snapshot)
                 # Create a new Session data group for this key for further processing
-                self.nested_items[key] = SessionDataGroup(item.schema, item.evaluation_context)
+                item.reset()
 
         super().evaluate()

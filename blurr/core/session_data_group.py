@@ -93,3 +93,7 @@ class SessionDataGroup(DataGroup):
 
         return False
 
+    def reset(self):
+        self.__init__(self.schema, self.evaluation_context)
+
+
