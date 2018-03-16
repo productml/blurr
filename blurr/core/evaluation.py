@@ -78,6 +78,10 @@ class Expression:
         An expression must be initialized with a python statement
         :param code_string: Python code statement
         """
+
+        # For non string single value expressions. Ex: 5, False.
+        code_string = str(code_string)
+
         # TODO Add validation to see that there are no direct setting using the '=' character
         self.code_string = 'None' if code_string.isspace() else code_string
 

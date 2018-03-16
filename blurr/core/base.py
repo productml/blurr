@@ -1,7 +1,8 @@
-from abc import ABC, abstractmethod
 from typing import Dict, Any, Type
 
-from blurr.core.errors import InvalidSchemaError, SnapshotError
+from abc import ABC, abstractmethod
+
+from blurr.core.errors import SnapshotError
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.loader import TypeLoader
 
@@ -21,10 +22,7 @@ class BaseSchema(ABC):
         """
         A schema object must be initialized with a schema spec
         :param spec: Dictionary representation of the YAML schema spec
-        """
-        # Load the schema spec into the current object
-
-        self.__validate_spec(spec)
+       sh """
         self.__load_spec(spec)
 
     @abstractmethod
@@ -54,50 +52,6 @@ class BaseSchema(ABC):
 
         # Invokes the loads of the subclass
         self.load(spec)
-
-    def __validate_spec(self, spec: Dict[str, Any]) -> None:
-        """
-        Validates the schema spec.  Raises exceptions if errors are found.
-        """
-        self.validate_required_attribute(spec, self.ATTRIBUTE_NAME)
-        self.validate_required_attribute(spec, self.ATTRIBUTE_TYPE)
-
-        # Invokes the validations of the subclasses
-        self.validate(spec)
-
-    def validate_required_attribute(self, spec: Dict[str, Any],
-                                    attribute: str):
-        """
-        Raises an error if a required attribute is not defined
-        or contains an empty value
-        :param spec: Schema specifications
-        :param attribute: Attribute that is being validated
-        """
-        if attribute not in spec:
-            self.raise_validation_error(spec, attribute,
-                                        'Required attribute missing.')
-
-        if isinstance(spec[attribute], str) and spec[attribute].isspace():
-            self.raise_validation_error(spec, attribute,
-                                        'Invalid attribute value.')
-
-    def raise_validation_error(self, spec: Dict[str, Any], attribute: str,
-                               message: str):
-        """
-        Raises an InvalidSchemaException exception with an expressive message
-        :param spec: Schema specification dictionary
-        :param attribute: Attribute with error
-        :param message: Description of error encountered
-        """
-        error_message = ('\nError processing schema spec:'
-                         '\n\tSpec: {name}'
-                         '\n\tAttribute: {attribute}'
-                         '\n\tError Message: {message}') \
-            .format(
-            name=spec.get(self.ATTRIBUTE_NAME, str(spec)),
-            attribute=attribute,
-            message=message)
-        raise InvalidSchemaError(error_message)
 
 
 class BaseSchemaCollection(BaseSchema, ABC):

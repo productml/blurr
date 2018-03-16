@@ -7,9 +7,11 @@ Name: Sessions
 Identity: source.user_id
 Time: parser.parse(source.event_time)
 
-Stores:
-   - Type: ProductML:DTC:Store:MemoryStore
-     Name: memory
+Store:
+  Type: ProductML:DTC:Storage:DynamoDB
+  Name: dynamo
+  Retention: 180
+  Table: ProductML_Test_Sessions
 
 DataGroups:
 

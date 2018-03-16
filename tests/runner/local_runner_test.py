@@ -3,7 +3,8 @@ from blurr.runner.local_runner import LocalRunner
 from datetime import datetime, timezone
 
 def test_local_runner():
-    local_runner = LocalRunner(['tests/runner/data/raw.json'], '', 'tests/runner/data/sample.yml')
+    local_runner = LocalRunner(['tests/runner/data/raw.json'], '',
+                               'tests/runner/data/sample.yml')
     local_runner.execute()
 
     assert local_runner._user_transformer['userA'].snapshot['session'][
