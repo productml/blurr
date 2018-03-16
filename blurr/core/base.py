@@ -22,7 +22,7 @@ class BaseSchema(ABC):
         """
         A schema object must be initialized with a schema spec
         :param spec: Dictionary representation of the YAML schema spec
-       sh """
+        """
         self.__load_spec(spec)
 
     @abstractmethod
