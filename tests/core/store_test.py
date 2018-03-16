@@ -2,30 +2,30 @@ from typing import Dict, Any
 from blurr.store.memory_store import MemoryStore
 from blurr.core.store import Key
 from pytest import fixture
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 @fixture()
 def state() -> Dict[str, Any]:
     return {
-        'user1-state': {
+        'user1/state': {
             'variable_1': 1,
             'variable_a': 'a',
             'variable_true': True
         },
-        'user1-session-1521146000': {
+        'user1/session/2018-03-07T22:35:31+00:00': {
             'events': 1
         },
-        'user1-session-1521147000': {
+        'user1/session/2018-03-07T22:35:35+00:00': {
             'events': 2
         },
-        'user1-session-1521148000': {
+        'user1/session/2018-03-07T22:36:31+00:00': {
             'events': 3
         },
-        'user1-session-1521149000': {
+        'user1/session/2018-03-07T22:38:31+00:00': {
             'events': 4
         },
-        'user1-session-1521149662': {
+        'user1/session/2018-03-07T22:40:31+00:00': {
             'events': 5
         }
     }
@@ -34,10 +34,10 @@ def state() -> Dict[str, Any]:
 def test_get(state: Dict[str, Any]) -> None:
     store = MemoryStore(state)
     key = Key('user1', 'state')
-    assert store.get(key) == state['user1-state']
+    assert store.get(key) == state['user1/state']
 
-    key = Key('user1', 'session', datetime(2018, 3, 15, 13, 33, 20))
-    assert store.get(key) == state['user1-session-1521146000']
+    key = Key('user1', 'session', datetime(2018, 3, 7, 22, 35, 31, 0, timezone.utc))
+    assert store.get(key) == state['user1/session/2018-03-07T22:35:31+00:00']
 
 
 def test_set_simple() -> None:
@@ -68,10 +68,10 @@ def test_get_range(state: Dict[str, Any]) -> None:
     Tests that the range get does not include the sessions that lie on the boundary
     """
     store = MemoryStore(state)
-    start = Key('user1', 'session', datetime(2018, 3, 15, 13, 33, 20))
-    end = Key('user1', 'session', datetime(2018, 3, 15, 14, 23, 20))
+    start = Key('user1', 'session', datetime(2018, 3, 7, 22, 35, 31, 0, timezone.utc))
+    end = Key('user1', 'session', datetime(2018, 3, 7, 22, 38, 31, 0, timezone.utc))
     sessions = store.get_range(start, end)
     assert len(sessions) == 2
-    assert list(sessions)[0].timestamp == datetime(2018, 3, 15, 13, 50)
+    assert list(sessions)[0].timestamp == datetime(2018, 3, 7, 22, 35, 35, 0, timezone.utc)
 
 

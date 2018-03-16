@@ -1,12 +1,14 @@
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
 from typing import Any, Dict, List
+from dateutil import parser
 
 
 class Key:
     """
     A record in the store is identified by a key
     """
+    PARTITION = '/'
 
     def __init__(self, identity: str, group: str, timestamp: datetime = None) -> None:
         """
@@ -20,28 +22,20 @@ class Key:
 
         self.identity = identity
         self.group = group
-        self.timestamp = timestamp
-
-    @staticmethod
-    def datetime_to_utc_timestamp(datetime_obj: datetime) -> int:
-        return int(datetime_obj.astimezone(timezone.utc).timestamp())
-
-    @staticmethod
-    def timestamp_to_utc_datetime(timestamp: int) -> datetime:
-        return datetime.utcfromtimestamp(timestamp)
+        self.timestamp = timestamp if not timestamp or timestamp.tzinfo else timestamp.replace(tzinfo=timezone.utc)
 
     @staticmethod
     def parse(key_string: str) -> 'Key':
         """ Parses a flat key string and returns a key """
-        parts = key_string.split('-')
-        return Key(parts[0], parts[1], Key.timestamp_to_utc_datetime(int(parts[2])) if len(parts) > 2 else None)
+        parts = key_string.split(Key.PARTITION)
+        return Key(parts[0], parts[1], parser.parse(parts[2]) if len(parts) > 2 else None)
 
     def __str__(self):
         """ Returns the string representation of the key"""
         if self.timestamp:
-            return '-'.join([self.identity, self.group, str(Key.datetime_to_utc_timestamp(self.timestamp))])
+            return Key.PARTITION.join([self.identity, self.group, self.timestamp.isoformat()])
 
-        return '-'.join([self.identity, self.group])
+        return Key.PARTITION.join([self.identity, self.group])
 
     def __eq__(self, other: 'Key') -> bool:
         return (self.identity, self.group, self.timestamp) == (other.identity, other.group, other.timestamp)
