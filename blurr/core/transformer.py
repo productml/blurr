@@ -4,6 +4,7 @@ from abc import ABC
 from blurr.core.base import BaseItemCollection, BaseSchemaCollection
 from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.store import Store, Key
+from blurr.core.variable_data_group import VariableDataGroup
 
 
 class TransformerSchema(BaseSchemaCollection, ABC):
@@ -51,4 +52,5 @@ class Transformer(BaseItemCollection, ABC):
 
     def finalize(self):
         for item in self.nested_items.values():
-            self.store.save(Key(self.identity, item.name), item.snapshot)
+            if not isinstance(item, VariableDataGroup):
+                self.store.save(Key(self.identity, item.name), item.snapshot)

@@ -79,6 +79,9 @@ class Field(BaseItem, ABC):
         if self.needs_evaluation:
             new_value = self.schema.value.evaluate(self.evaluation_context)
 
+        if new_value is None:
+            return
+
         # Only set the value if it conforms to the field type
         if not self.schema.is_type_of(new_value):
             raise TypeError(

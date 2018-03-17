@@ -15,12 +15,44 @@ Store:
 
 DataGroups:
 
+ - Type: ProductML:DTC:DataGroup:VariableAggregate
+   Name: vars
+
+   Fields:
+     - Name: continent
+       Type: string
+
+       Value: "'North America' if source.country == 'US' else 'World'"
+
+       When: bool(source.country)
+
+ - Type: ProductML:DTC:DataGroup:IdentityAggregate
+   Name: state
+
+   Fields:
+     - Name: country
+       Type: string
+       Value: source.country
+
+     - Name: continent
+       Type: string
+       Value: vars.continent
+       When: bool(vars.continent)
+
  - Type: ProductML:DTC:DataGroup:SessionAggregate
    Name: session
-   Store: memory
    Split: (time - session.end_time).seconds > 1800
 
    Fields:
      - Name: events
        Type: integer
        Value: session.events + 1
+
+     - Name: country
+       Type: string
+       Value: source.country
+
+     - Name: continent
+       Type: string
+       Value: vars.continent
+       When: bool(vars.continent)
