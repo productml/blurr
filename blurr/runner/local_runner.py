@@ -12,7 +12,6 @@ from blurr.core.streaming_transformer import StreamingTransformerSchema, Streami
 from blurr.core.syntax.schema_validator import validate
 
 
-
 class LocalRunner:
     def __init__(self, local_json_files, output_file, stream_dtc_file):
         self._raw_files = local_json_files
@@ -51,7 +50,6 @@ class LocalRunner:
         # Ensure that the final values are saved
         for item in self._user_transformer.values():
             item.finalize()
-
 
 
 def main():
