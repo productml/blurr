@@ -2,7 +2,6 @@ from blurr.core.store import Key
 from blurr.runner.local_runner import LocalRunner
 from datetime import datetime, timezone
 
-
 def test_local_runner():
     local_runner = LocalRunner(['tests/runner/data/raw.json'], '',
                                'tests/runner/data/sample.yml')

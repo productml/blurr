@@ -18,7 +18,7 @@ class Key:
         :param group: Secondary identity of the record
         :param timestamp: Optional timestamp that can be used for time range queries
         """
-        if identity.isspace() or group.isspace():
+        if not identity or not group or identity.isspace() or group.isspace():
             raise ValueError('`identity` and `value` must be present.')
 
         self.identity = identity
