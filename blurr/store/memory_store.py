@@ -14,11 +14,16 @@ class MemoryStore(Store):
             key = Key.parse(k)
             self._cache[key] = v
 
-    def _store_get_range(self, start: Key, end: Key = None, count: int = 0) -> Dict[Key, Any]:
+    def _store_get_range(self, start: Key, end: Key = None,
+                         count: int = 0) -> Dict[Key, Any]:
         if not count:
-            return {key: item for key, item in self._cache.items() if start < key < end}
+            return {
+                key: item
+                for key, item in self._cache.items() if start < key < end
+            }
         else:
-            filter_condition = (lambda i: i[0] > start) if count > 0 else (lambda i: i[0] < start)
+            filter_condition = (lambda i: i[0] > start) if count > 0 else (
+                lambda i: i[0] < start)
 
             items = sorted(filter(filter_condition, list(self._cache.items())))
 

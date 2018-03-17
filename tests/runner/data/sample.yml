@@ -17,7 +17,6 @@ DataGroups:
 
  - Type: ProductML:DTC:DataGroup:SessionAggregate
    Name: session
-   Store: memory
    Split: (time - session.end_time).seconds > 1800
 
    Fields:

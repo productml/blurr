@@ -10,41 +10,50 @@ class Key:
     """
     PARTITION = '/'
 
-    def __init__(self, identity: str, group: str, timestamp: datetime = None) -> None:
+    def __init__(self, identity: str, group: str,
+                 timestamp: datetime = None) -> None:
         """
         Initializes a new key for storing data
         :param identity: Primary identity of the record being stored
         :param group: Secondary identity of the record
         :param timestamp: Optional timestamp that can be used for time range queries
         """
-        if identity.isspace() or group.isspace():
+        if not identity or not group or identity.isspace() or group.isspace():
             raise ValueError('`identity` and `value` must be present.')
 
         self.identity = identity
         self.group = group
-        self.timestamp = timestamp if not timestamp or timestamp.tzinfo else timestamp.replace(tzinfo=timezone.utc)
+        self.timestamp = timestamp if not timestamp or timestamp.tzinfo else timestamp.replace(
+            tzinfo=timezone.utc)
 
     @staticmethod
     def parse(key_string: str) -> 'Key':
         """ Parses a flat key string and returns a key """
         parts = key_string.split(Key.PARTITION)
-        return Key(parts[0], parts[1], parser.parse(parts[2]) if len(parts) > 2 else None)
+        return Key(parts[0], parts[1],
+                   parser.parse(parts[2]) if len(parts) > 2 else None)
 
     def __str__(self):
         """ Returns the string representation of the key"""
         if self.timestamp:
-            return Key.PARTITION.join([self.identity, self.group, self.timestamp.isoformat()])
+            return Key.PARTITION.join(
+                [self.identity, self.group,
+                 self.timestamp.isoformat()])
 
         return Key.PARTITION.join([self.identity, self.group])
 
     def __eq__(self, other: 'Key') -> bool:
-        return (self.identity, self.group, self.timestamp) == (other.identity, other.group, other.timestamp)
+        return (self.identity, self.group,
+                self.timestamp) == (other.identity, other.group,
+                                    other.timestamp)
 
     def __lt__(self, other: 'Key') -> bool:
-        return (self.identity, self.group) == (other.identity, other.group) and self.timestamp < other.timestamp
+        return (self.identity, self.group) == (
+            other.identity, other.group) and self.timestamp < other.timestamp
 
     def __gt__(self, other: 'Key') -> bool:
-        return (self.identity, self.group) == (other.identity, other.group) and self.timestamp > other.timestamp
+        return (self.identity, self.group) == (
+            other.identity, other.group) and self.timestamp > other.timestamp
 
     def __hash__(self):
         return hash((self.identity, self.group, self.timestamp))
@@ -52,6 +61,7 @@ class Key:
 
 class Store(ABC):
     """ Base Store that allows for data to be persisted during / after transformation """
+
     def __init__(self, spec: Dict[str, Any]) -> None:
         """
         Initializes the store based on the specifications
@@ -85,7 +95,8 @@ class Store(ABC):
 
         return item
 
-    def get_range(self, start: Key, end: Key = None, count: int = 0) -> Dict[Key, Any]:
+    def get_range(self, start: Key, end: Key = None,
+                  count: int = 0) -> Dict[Key, Any]:
         if end and count:
             raise ValueError('Only one of `end` or `count` can be set')
 
@@ -101,7 +112,8 @@ class Store(ABC):
         return result
 
     @abstractmethod
-    def _store_get_range(self, start: Key, end: Key = None, count: int = 0) -> Dict[Key, Any]:
+    def _store_get_range(self, start: Key, end: Key = None,
+                         count: int = 0) -> Dict[Key, Any]:
         pass
 
     @abstractmethod
