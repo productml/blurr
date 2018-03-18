@@ -5,9 +5,11 @@ from dateutil import parser
 
 from blurr.core.evaluation import Context
 from blurr.core.record import Record
+from blurr.core.evaluation import Context
+from blurr.store.memory_store import MemoryStore
+from dateutil import parser
 from blurr.core.streaming_transformer import StreamingTransformerSchema, StreamingTransformer
 from blurr.core.syntax.schema_validator import validate
-from blurr.store.local_store import LocalStore
 
 
 class LocalRunner:
@@ -31,7 +33,7 @@ class LocalRunner:
         identity = self._transformer_schema.get_identity(source_context)
         if identity not in self._user_transformer:
             self._user_transformer[identity] = StreamingTransformer(
-                LocalStore(), self._transformer_schema, identity,
+                MemoryStore(), self._transformer_schema, identity,
                 source_context)
 
         self._user_transformer[identity].evaluate_record(record)
@@ -44,6 +46,10 @@ class LocalRunner:
     def execute(self):
         for file in self._raw_files:
             self._execute_file(file)
+
+        # Ensure that the final values are saved
+        for item in self._user_transformer.values():
+            item.finalize()
 
 
 def main():
