@@ -4,6 +4,9 @@ from blurr.core.store import Store, Key
 
 
 class MemoryStore(Store):
+    """
+    In-memory store implementation
+    """
     def __init__(self, spec: Dict[str, Any]) -> None:
         super().__init__(spec)
 
