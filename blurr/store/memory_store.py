@@ -7,8 +7,12 @@ class MemoryStore(Store):
     """
     In-memory store implementation
     """
+
     def __init__(self, spec: Dict[str, Any] = None) -> None:
-        super().__init__(spec if spec else {'Name': 'memory', 'Type': 'memory_store'})
+        super().__init__(spec if spec else {
+            'Name': 'memory',
+            'Type': 'memory_store'
+        })
 
         self._cache: Dict[Key, Any] = dict()
 

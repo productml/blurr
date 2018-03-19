@@ -9,26 +9,42 @@ from blurr.store.memory_store import MemoryStore
 @fixture
 def memory_store() -> MemoryStore:
     store = MemoryStore()
-    store.save(Key('user1', 'state'), {
-        'variable_1': 1,
-        'variable_a': 'a',
-        'variable_true': True
-    })
+    store.save(
+        Key('user1', 'state'), {
+            'variable_1': 1,
+            'variable_a': 'a',
+            'variable_true': True
+        })
 
-    store.save(Key('user1', 'session', datetime(2018, 3, 7, 22, 35, 31, 0, timezone.utc)),
-               {'events': 1}),
+    store.save(
+        Key('user1', 'session',
+            datetime(2018, 3, 7, 22, 35, 31, 0, timezone.utc)), {
+                'events': 1
+            }),
 
-    store.save(Key('user1', 'session', datetime(2018, 3, 7, 22, 35, 35, 0, timezone.utc)),
-               {'events': 2}),
+    store.save(
+        Key('user1', 'session',
+            datetime(2018, 3, 7, 22, 35, 35, 0, timezone.utc)), {
+                'events': 2
+            }),
 
-    store.save(Key('user1', 'session', datetime(2018, 3, 7, 22, 36, 31, 0, timezone.utc)),
-               {'events': 3}),
+    store.save(
+        Key('user1', 'session',
+            datetime(2018, 3, 7, 22, 36, 31, 0, timezone.utc)), {
+                'events': 3
+            }),
 
-    store.save(Key('user1', 'session', datetime(2018, 3, 7, 22, 38, 31, 0, timezone.utc)),
-               {'events': 4}),
+    store.save(
+        Key('user1', 'session',
+            datetime(2018, 3, 7, 22, 38, 31, 0, timezone.utc)), {
+                'events': 4
+            }),
 
-    store.save(Key('user1', 'session', datetime(2018, 3, 7, 22, 40, 31, 0, timezone.utc)),
-               {'events': 5}),
+    store.save(
+        Key('user1', 'session',
+            datetime(2018, 3, 7, 22, 40, 31, 0, timezone.utc)), {
+                'events': 5
+            }),
 
     return store
 

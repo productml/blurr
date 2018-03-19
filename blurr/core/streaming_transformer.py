@@ -33,7 +33,8 @@ class StreamingTransformerSchema(TransformerSchema):
 
 
 class StreamingTransformer(Transformer):
-    def __init__(self, schema: TransformerSchema, identity: str, context: Context) -> None:
+    def __init__(self, schema: TransformerSchema, identity: str,
+                 context: Context) -> None:
         super().__init__(schema, identity, context)
         self.evaluation_context.global_add('identity', self.identity)
 

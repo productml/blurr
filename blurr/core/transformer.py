@@ -48,7 +48,8 @@ class Transformer(BaseItemCollection, ABC):
     to the context
     """
 
-    def __init__(self, schema: TransformerSchema, identity: str, context: Context) -> None:
+    def __init__(self, schema: TransformerSchema, identity: str,
+                 context: Context) -> None:
         super().__init__(schema, EvaluationContext(global_context=context))
         # Load the nested items into the item
         self._data_groups: Dict[str, Type[BaseItem]] = {

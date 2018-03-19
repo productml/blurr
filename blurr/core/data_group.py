@@ -68,4 +68,5 @@ class DataGroup(BaseItemCollection):
         :param timestamp: Optional timestamp to include in the Key construction
         """
         if self.schema.store:
-            self.schema.store.save(Key(self.identity, self.name, timestamp), self.snapshot)
+            self.schema.store.save(
+                Key(self.identity, self.name, timestamp), self.snapshot)

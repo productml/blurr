@@ -24,7 +24,7 @@ class SessionDataGroupSchema(DataGroupSchema):
 
         # Load type specific attributes
         self.split: Expression = Expression(spec[
-                                                self.ATTRIBUTE_SPLIT]) if self.ATTRIBUTE_SPLIT in spec else None
+            self.ATTRIBUTE_SPLIT]) if self.ATTRIBUTE_SPLIT in spec else None
 
     @staticmethod
     def build_predefined_fields_spec(
