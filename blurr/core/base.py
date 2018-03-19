@@ -90,7 +90,7 @@ class BaseSchemaCollection(BaseSchema, ABC):
             self.raise_validation_error(
                 spec, self._nested_item_attribute,
                 'Schema definition must have at least one item under {}.'.
-                format(self._nested_item_attribute))
+                    format(self._nested_item_attribute))
 
     def load(self, spec: Dict[str, Any]) -> None:
         """
@@ -234,3 +234,10 @@ class BaseItemCollection(BaseItem):
             return self.nested_items[item].snapshot
 
         self.__getattribute__(item)
+
+    @abstractmethod
+    def finalize(self) -> None:
+        """
+        Performs the final rites of an item before it decommissioned
+        """
+        raise NotImplementedError('finalize() must be implemented')

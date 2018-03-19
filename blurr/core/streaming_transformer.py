@@ -20,14 +20,6 @@ class StreamingTransformerSchema(TransformerSchema):
     def __init__(self, spec: Dict[str, Any]) -> None:
         super().__init__(spec)
 
-    def validate(self, spec: Dict[str, Any]) -> None:
-        # Ensure that the base validator is invoked
-        super().validate(spec)
-
-        # Validate schema specific attributes
-        self.validate_required_attribute(spec, self.ATTRIBUTE_IDENTITY)
-        self.validate_required_attribute(spec, self.ATTRIBUTE_TIME)
-
     def load(self, spec: Dict[str, Any]) -> None:
         # Ensure that the base loader is invoked
         super().load(spec)
@@ -41,9 +33,8 @@ class StreamingTransformerSchema(TransformerSchema):
 
 
 class StreamingTransformer(Transformer):
-    def __init__(self, store: Store, schema: TransformerSchema, identity: str,
-                 context: Context) -> None:
-        super().__init__(store, schema, identity, context)
+    def __init__(self, schema: TransformerSchema, identity: str, context: Context) -> None:
+        super().__init__(schema, identity, context)
         self.evaluation_context.global_add('identity', self.identity)
 
     def evaluate_record(self, record: Record):
@@ -58,27 +49,3 @@ class StreamingTransformer(Transformer):
         # Cleanup source and time form the context
         del self.evaluation_context.global_context['source']
         del self.evaluation_context.global_context['time']
-
-    def evaluate(self) -> None:
-        """
-        Evaluates the current item
-        :returns An evaluation result object containing the result, or reasons why
-        evaluation failed
-        """
-
-        if 'source' not in self.evaluation_context.global_context:
-            raise StreamingSourceNotFoundError()
-
-        if not self.needs_evaluation:
-            return
-
-        for item in self.nested_items.values():
-            if isinstance(item, SessionDataGroup) and item.split_now:
-                # If a split is imminent, save the current session snapshot with the timestamp
-                self.store.save(
-                    Key(self.identity, item.name, item.start_time),
-                    item.snapshot)
-                # Create a new Session data group for this key for further processing
-                item.reset()
-
-        super().evaluate()

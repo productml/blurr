@@ -4,6 +4,7 @@ from blurr.core.store import Store, Key
 
 
 class MemoryStore(Store):
+    """
     def __init__(self, state: Dict[str, Any] = None) -> None:
         super().__init__({'Name': 'memory', 'Type': 'MemoryStore'})
         if state:
@@ -13,7 +14,7 @@ class MemoryStore(Store):
         for k, v in state.items():
             key = Key.parse(k)
             self._cache[key] = v
-
+    """
     def _store_get_range(self, start: Key, end: Key = None,
                          count: int = 0) -> Dict[Key, Any]:
         if not count:
