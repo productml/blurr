@@ -14,10 +14,6 @@ class WindowSchema(BaseSchema):
     ATTRIBUTE_SOURCE = 'Source'
 
     def load(self) -> None:
-        # Inject 'source' window name if not present
-        if self.ATTRIBUTE_NAME not in self._spec:
-            self._spec[self.ATTRIBUTE_NAME] = 'source'
-
         self.value = self._spec[self.ATTRIBUTE_VALUE]
         self.source = self.schema_loader.get_schema_object(
             self._spec[self.ATTRIBUTE_SOURCE])
