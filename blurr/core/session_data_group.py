@@ -59,23 +59,6 @@ class SessionDataGroup(DataGroup):
     Manages the aggregates for session based roll-ups of streaming data
     """
 
-    @property
-    def split_now(self) -> bool:
-        """
-        Check if current session is stale for the event being processed
-        :return: True if the session needs to be split, false otherwise
-        """
-        if self.schema.split is None:
-            return False
-
-        if self.start_time is None or self.end_time is None:
-            return False
-
-        if self.schema.split.evaluate(self.evaluation_context):
-            return True
-
-        return False
-
     def evaluate(self) -> None:
         """
         Evaluates the current item
