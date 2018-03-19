@@ -9,16 +9,10 @@ class AnchorSchema(BaseSchema):
     ATTRIBUTE_CONDITION = 'Condition'
     ATTRIBUTE_MAX = 'Max'
 
-    def __init__(self, spec: Dict[str, Any]) -> None:
-        # Inject name and type as expected by BaseSchema
-        spec[self.ATTRIBUTE_NAME] = 'anchor'
-        spec[self.ATTRIBUTE_TYPE] = 'anchor'
-        super().__init__(spec)
-
-    def load(self, spec: Dict[str, Any]) -> None:
-        self.condition = Expression(spec[self.ATTRIBUTE_CONDITION])
-        self.max = spec[
-            self.ATTRIBUTE_MAX] if self.ATTRIBUTE_MAX in spec else None
+    def load(self) -> None:
+        self.condition = Expression(self._spec[self.ATTRIBUTE_CONDITION])
+        self.max = self._spec[
+            self.ATTRIBUTE_MAX] if self.ATTRIBUTE_MAX in self._spec else None
 
     def validate(self, spec: Dict[str, Any]) -> None:
         self.validate_required_attribute(spec, self.ATTRIBUTE_CONDITION)

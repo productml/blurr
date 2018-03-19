@@ -5,9 +5,12 @@ from dateutil import parser
 
 from blurr.core.evaluation import Context
 from blurr.core.record import Record
+from blurr.core.evaluation import Context
+from blurr.core.schema_loader import SchemaLoader
+from blurr.store.memory_store import MemoryStore
+from dateutil import parser
 from blurr.core.streaming_transformer import StreamingTransformerSchema, StreamingTransformer
 from blurr.core.syntax.schema_validator import validate
-from blurr.store.local_store import LocalStore
 
 
 class LocalRunner:
@@ -15,7 +18,10 @@ class LocalRunner:
         self._raw_files = local_json_files
         self._output_file = output_file
         self._stream_dtc = yaml.safe_load(open(stream_dtc_file))
-        self._transformer_schema = StreamingTransformerSchema(self._stream_dtc)
+        self._schema_loader = SchemaLoader()
+        self._transformer_schema = StreamingTransformerSchema(
+            self._schema_loader.add_schema(self._stream_dtc),
+            self._schema_loader)
         self._user_transformer = {}
         self._exec_context = Context()
         self._exec_context.add('parser', parser)
@@ -31,7 +37,7 @@ class LocalRunner:
         identity = self._transformer_schema.get_identity(source_context)
         if identity not in self._user_transformer:
             self._user_transformer[identity] = StreamingTransformer(
-                LocalStore(), self._transformer_schema, identity,
+                MemoryStore(), self._transformer_schema, identity,
                 source_context)
 
         self._user_transformer[identity].evaluate_record(record)
@@ -44,6 +50,10 @@ class LocalRunner:
     def execute(self):
         for file in self._raw_files:
             self._execute_file(file)
+
+        # Ensure that the final values are saved
+        for item in self._user_transformer.values():
+            item.finalize()
 
 
 def main():

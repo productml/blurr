@@ -104,4 +104,5 @@ class Expression:
                         evaluation_context.local_context)
 
         except Exception as e:
+            print('Expression:', self.code_string)
             raise ExpressionEvaluationError(e)

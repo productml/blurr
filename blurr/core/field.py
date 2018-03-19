@@ -19,14 +19,11 @@ class FieldSchema(BaseSchema, ABC):
     # Field Name Definitions
     ATTRIBUTE_VALUE = 'Value'
 
-    def __init__(self, spec: Dict[str, Any]) -> None:
-        super().__init__(spec)
-
     def validate(self, spec: Dict[str, Any]) -> None:
         self.validate_required_attribute(spec, self.ATTRIBUTE_VALUE)
 
-    def load(self, spec: Dict[str, Any]) -> None:
-        self.value: Expression = Expression(spec[self.ATTRIBUTE_VALUE])
+    def load(self) -> None:
+        self.value: Expression = Expression(self._spec[self.ATTRIBUTE_VALUE])
 
     @property
     @abstractmethod

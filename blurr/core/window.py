@@ -1,24 +1,26 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, Any, List
 
-from blurr.core.base import BaseSchema
+from blurr.core.base import BaseSchema, BaseItem
+from blurr.core.evaluation import EvaluationContext
+from blurr.core.loader import TypeLoader
+from blurr.core.schema_loader import SchemaLoader
 from blurr.core.session_data_group import SessionDataGroup
-from blurr.core.store import Store
+from blurr.core.store import Store, Key
 
 
 class WindowSchema(BaseSchema):
     ATTRIBUTE_VALUE = 'Value'
     ATTRIBUTE_SOURCE = 'Source'
 
-    def __init__(self, spec: Dict[str, Any]) -> None:
+    def load(self) -> None:
         # Inject 'source' window name if not present
-        if self.ATTRIBUTE_NAME not in spec:
-            spec[self.ATTRIBUTE_NAME] = 'source'
-        super().__init__(spec)
+        if self.ATTRIBUTE_NAME not in self._spec:
+            self._spec[self.ATTRIBUTE_NAME] = 'source'
 
-    def load(self, spec: Dict[str, Any]) -> None:
-        self.value = spec[self.ATTRIBUTE_VALUE]
-        self.source = spec[self.ATTRIBUTE_SOURCE]
+        self.value = self._spec[self.ATTRIBUTE_VALUE]
+        self.source = self.schema_loader.get_schema_object(
+            self._spec[self.ATTRIBUTE_SOURCE])
 
     def validate(self, spec: Dict[str, Any]) -> None:
         self.validate_required_attribute(spec, self.ATTRIBUTE_VALUE)
@@ -33,15 +35,28 @@ class Window:
     def prepare(self, store: Store, identity: str,
                 start_time: datetime) -> None:
         if self.schema.type == 'day' or self.schema.type == 'hour':
-            self.view = store.get_window_by_time(identity, self.schema.source,
-                                                 start_time,
-                                                 self.get_end_time(start_time))
+            self.view = self._load_sessions(
+                store.get_range(
+                    Key(identity, self.schema.source.name, start_time),
+                    Key(identity, self.schema.source.name,
+                        self.get_end_time(start_time))))
         else:
-            self.view = store.get_window_by_count(
-                identity, self.schema.source, start_time, self.schema.value)
+            self.view = self._load_sessions(
+                store.get_range(
+                    Key(identity, self.schema.source.name, start_time), None,
+                    self.schema.value))
 
     def get_end_time(self, start_time: datetime) -> datetime:
-        pass
+        if self.schema.type == 'day':
+            return start_time + timedelta(days=self.schema.value)
+        elif self.schema.type == 'hour':
+            return start_time + timedelta(hours=self.schema.value)
+
+    def _load_sessions(self, sessions: List[Any]) -> List[BaseItem]:
+        return [
+            SessionDataGroup(self.schema.source, EvaluationContext()).restore(
+                session[1]) for session in sessions
+        ]
 
     def __getattr__(self, item: str) -> List[Any]:
         return [getattr(session, item) for session in self.view]

@@ -17,7 +17,7 @@ DataGroups:
     Window:
       Type: count
       Value: -1
-      Source: Sessions.sessions
+      Source: Sessions.session
 
     Fields:
      - Name: events
@@ -29,7 +29,7 @@ DataGroups:
     Window:
       Type: day
       Value: -1
-      Source: Sessions.sessions
+      Source: Sessions.session
 
     Fields:
      - Name: total_events

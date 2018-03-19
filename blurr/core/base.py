@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from blurr.core.errors import SnapshotError
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.loader import TypeLoader
+from blurr.core.schema_loader import SchemaLoader
 
 
 class BaseSchema(ABC):
@@ -18,12 +19,15 @@ class BaseSchema(ABC):
     ATTRIBUTE_TYPE = 'Type'
     ATTRIBUTE_WHEN = 'When'
 
-    def __init__(self, spec: Dict[str, Any]) -> None:
+    def __init__(self, fully_qualified_name: str,
+                 schema_loader: SchemaLoader) -> None:
         """
         A schema object must be initialized with a schema spec
         :param spec: Dictionary representation of the YAML schema spec
         """
-        self.__load_spec(spec)
+        self.schema_loader = schema_loader
+        self.fully_qualified_name = fully_qualified_name
+        self.__load_spec()
 
     @abstractmethod
     def validate(self, spec: Dict[str, Any]) -> None:
@@ -34,24 +38,26 @@ class BaseSchema(ABC):
             '"validate()" must be implemented for a schema.')
 
     @abstractmethod
-    def load(self, spec: Dict[str, Any]) -> None:
+    def load(self) -> None:
         """
         Abstract method placeholder for subclasses to load the spec into the schema
         """
         raise NotImplementedError('"load()" must be implemented for a schema.')
 
-    def __load_spec(self, spec: Dict[str, Any]) -> None:
+    def __load_spec(self) -> None:
         """
         Loads the base schema spec into the object
         """
-        self.__spec: Dict[str, Any] = spec
-        self.name: str = spec[self.ATTRIBUTE_NAME]
-        self.type: str = spec[self.ATTRIBUTE_TYPE]
+        self._spec: Dict[str, Any] = self.schema_loader.get_schema_spec(
+            self.fully_qualified_name)
+        self.name: str = self._spec[self.ATTRIBUTE_NAME]
+        self.type: str = self._spec[self.ATTRIBUTE_TYPE]
         self.when: Expression = Expression(
-            spec[self.ATTRIBUTE_WHEN]) if self.ATTRIBUTE_WHEN in spec else None
+            self._spec[self.ATTRIBUTE_WHEN]
+        ) if self.ATTRIBUTE_WHEN in self._spec else None
 
         # Invokes the loads of the subclass
-        self.load(spec)
+        self.load()
 
 
 class BaseSchemaCollection(BaseSchema, ABC):
@@ -59,7 +65,8 @@ class BaseSchemaCollection(BaseSchema, ABC):
     Base class for schema that contain nested schema
     """
 
-    def __init__(self, spec: Dict[str, Any], nested_schema_attribute) -> None:
+    def __init__(self, name: str, schema_loader: SchemaLoader,
+                 nested_schema_attribute: str) -> None:
         """
         Initializes the schema for schema that contain a nested schema
         :param spec:
@@ -68,7 +75,7 @@ class BaseSchemaCollection(BaseSchema, ABC):
         # Must declare all new fields prior to the initialization so that validation can find the new fields
         self._nested_item_attribute = nested_schema_attribute
 
-        super().__init__(spec)
+        super().__init__(name, schema_loader)
 
     def validate(self, spec: Dict[str, Any]):
         """
@@ -92,16 +99,18 @@ class BaseSchemaCollection(BaseSchema, ABC):
                 'Schema definition must have at least one item under {}.'.
                 format(self._nested_item_attribute))
 
-    def load(self, spec: Dict[str, Any]) -> None:
+    def load(self) -> None:
         """
         Overrides base load to include loads for nested items
         """
 
         # Load nested schema items
         self.nested_schema: Dict[str, Type[BaseSchema]] = {
-            schema_spec[self.ATTRIBUTE_NAME]: TypeLoader.load_schema(
-                schema_spec[self.ATTRIBUTE_TYPE])(schema_spec)
-            for schema_spec in spec[self._nested_item_attribute]
+            schema_spec[self.ATTRIBUTE_NAME]:
+            self.schema_loader.get_schema_object(
+                self.fully_qualified_name + '.' +
+                schema_spec[self.ATTRIBUTE_NAME])
+            for schema_spec in self._spec[self._nested_item_attribute]
         }
 
 
@@ -155,7 +164,7 @@ class BaseItem(ABC):
         raise NotImplementedError('snapshot() must be implemented')
 
     @abstractmethod
-    def restore(self, snapshot) -> None:
+    def restore(self, snapshot) -> 'BaseItem':
         """
         Restores the state of an item from a snapshot
         """
@@ -210,7 +219,7 @@ class BaseItemCollection(BaseItem):
             print('Error while creating snapshot for {}', self.name)
             raise SnapshotError(e)
 
-    def restore(self, snapshot: Dict[str, Any]) -> None:
+    def restore(self, snapshot: Dict[str, Any]) -> BaseItem:
         """
         Restores the state of a collection from a snapshot
         """
@@ -218,6 +227,7 @@ class BaseItemCollection(BaseItem):
 
             for name, snap in snapshot.items():
                 self.nested_items[name].restore(snap)
+            return self
 
         except Exception as e:
             print('Error while restoring snapshot: {}', self.snapshot)

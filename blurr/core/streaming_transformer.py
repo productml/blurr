@@ -4,8 +4,9 @@ from blurr.core.base import Expression
 from blurr.core.errors import StreamingSourceNotFoundError
 from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.record import Record
+from blurr.core.schema_loader import SchemaLoader
 from blurr.core.transformer import Transformer, TransformerSchema
-from blurr.core.store import Store
+from blurr.core.store import Store, Key
 from blurr.core.session_data_group import SessionDataGroup
 
 
@@ -17,8 +18,8 @@ class StreamingTransformerSchema(TransformerSchema):
     ATTRIBUTE_IDENTITY = 'Identity'
     ATTRIBUTE_TIME = 'Time'
 
-    def __init__(self, spec: Dict[str, Any]) -> None:
-        super().__init__(spec)
+    def __init__(self, name: str, schema_loader: SchemaLoader) -> None:
+        super().__init__(name, schema_loader)
 
     def validate(self, spec: Dict[str, Any]) -> None:
         # Ensure that the base validator is invoked
@@ -28,13 +29,13 @@ class StreamingTransformerSchema(TransformerSchema):
         self.validate_required_attribute(spec, self.ATTRIBUTE_IDENTITY)
         self.validate_required_attribute(spec, self.ATTRIBUTE_TIME)
 
-    def load(self, spec: Dict[str, Any]) -> None:
+    def load(self) -> None:
         # Ensure that the base loader is invoked
-        super().load(spec)
+        super().load()
 
         # Load the schema specific attributes
-        self.identity = Expression(spec[self.ATTRIBUTE_IDENTITY])
-        self.time = Expression(spec[self.ATTRIBUTE_TIME])
+        self.identity = Expression(self._spec[self.ATTRIBUTE_IDENTITY])
+        self.time = Expression(self._spec[self.ATTRIBUTE_TIME])
 
     def get_identity(self, context: Context) -> str:
         return self.identity.evaluate(EvaluationContext(context))
@@ -72,9 +73,13 @@ class StreamingTransformer(Transformer):
         if not self.needs_evaluation:
             return
 
-        for _, item in self.nested_items.items():
+        for item in self.nested_items.values():
             if isinstance(item, SessionDataGroup) and item.split_now:
-                self.store.save(self.identity, item.name)
+                # If a split is imminent, save the current session snapshot with the timestamp
+                self.store.save(
+                    Key(self.identity, item.name, item.start_time),
+                    item.snapshot)
+                # Create a new Session data group for this key for further processing
                 item.reset()
 
         super().evaluate()

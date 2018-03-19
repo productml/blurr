@@ -3,7 +3,8 @@ from abc import ABC
 
 from blurr.core.base import BaseItemCollection, BaseSchemaCollection
 from blurr.core.evaluation import Context, EvaluationContext
-from blurr.core.store import Store
+from blurr.core.schema_loader import SchemaLoader
+from blurr.core.store import Store, Key
 
 
 class TransformerSchema(BaseSchemaCollection, ABC):
@@ -16,8 +17,8 @@ class TransformerSchema(BaseSchemaCollection, ABC):
     ATTRIBUTE_DESCRIPTION = 'Description'
     ATTRIBUTE_DATA_GROUPS = 'DataGroups'
 
-    def __init__(self, spec: Dict[str, Any]) -> None:
-        super().__init__(spec, self.ATTRIBUTE_DATA_GROUPS)
+    def __init__(self, name: str, schema_loader: SchemaLoader) -> None:
+        super().__init__(name, schema_loader, self.ATTRIBUTE_DATA_GROUPS)
 
     def validate(self, spec: Dict[str, Any]) -> None:
         # Ensure that the base validator is invoked
@@ -27,13 +28,13 @@ class TransformerSchema(BaseSchemaCollection, ABC):
         self.validate_required_attribute(spec, self.ATTRIBUTE_VERSION)
         self.validate_required_attribute(spec, self.ATTRIBUTE_DESCRIPTION)
 
-    def load(self, spec: Dict[str, Any]) -> None:
+    def load(self) -> None:
         # Ensure that the base loader is invoked
-        super().load(spec)
+        super().load()
 
         # Load the schema specific attributes
-        self.version = spec[self.ATTRIBUTE_VERSION]
-        self.description = spec[self.ATTRIBUTE_DESCRIPTION]
+        self.version = self._spec[self.ATTRIBUTE_VERSION]
+        self.description = self._spec[self.ATTRIBUTE_DESCRIPTION]
 
 
 class Transformer(BaseItemCollection, ABC):
@@ -49,3 +50,7 @@ class Transformer(BaseItemCollection, ABC):
         self.identity = identity
         self.evaluation_context.global_add('identity', self.identity)
         self.evaluation_context.global_context.merge(self.nested_items)
+
+    def finalize(self):
+        for item in self.nested_items.values():
+            self.store.save(Key(self.identity, item.name), item.snapshot)

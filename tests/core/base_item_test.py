@@ -5,6 +5,7 @@ from pytest import mark, fixture
 
 from blurr.core.base import BaseSchema, BaseItem
 from blurr.core.evaluation import Context, EvaluationContext
+from blurr.core.schema_loader import SchemaLoader
 from tests.core.base_schema_test import TestSchema
 
 
@@ -26,12 +27,6 @@ class TestItem(BaseItem):
     def snapshot(self):
         pass
 
-    def __init__(self,
-                 schema: BaseSchema,
-                 evaluation_context: EvaluationContext = EvaluationContext()
-                 ) -> None:
-        super().__init__(schema, evaluation_context)
-
     def evaluate(self) -> None:
         pass
 
@@ -39,10 +34,17 @@ class TestItem(BaseItem):
         pass
 
 
+def get_test_item(schema_spec: Dict[str, Any]) -> TestItem:
+    schema_loader = SchemaLoader()
+    name = schema_loader.add_schema(schema_spec)
+    schema = TestSchema(name, schema_loader)
+    return TestItem(schema, EvaluationContext())
+
+
 def test_base_item_valid(schema_spec: Dict[str, Any]) -> None:
-    schema = TestSchema(schema_spec)
-    test_item = TestItem(schema)
-    assert test_item.schema == schema
+    test_item = get_test_item(schema_spec)
+    assert test_item.schema.name == 'TestField'
+    assert test_item.schema.type == 'integer'
     assert len(test_item.evaluation_context.global_context) == 0
     assert len(test_item.evaluation_context.local_context) == 0
 
@@ -51,15 +53,13 @@ def test_base_item_valid(schema_spec: Dict[str, Any]) -> None:
 
 def test_base_item_filter_false(schema_spec: Dict[str, Any]) -> None:
     schema_spec[BaseSchema.ATTRIBUTE_WHEN] = 'False'
-    schema = TestSchema(schema_spec)
-    test_item = TestItem(schema)
+    test_item = get_test_item(schema_spec)
 
     assert not test_item.needs_evaluation
 
 
 def test_base_item_filter_missing(schema_spec: Dict[str, Any]) -> None:
     del schema_spec[BaseSchema.ATTRIBUTE_WHEN]
-    schema = TestSchema(schema_spec)
-    test_item = TestItem(schema)
+    test_item = get_test_item(schema_spec)
 
     assert test_item.needs_evaluation
