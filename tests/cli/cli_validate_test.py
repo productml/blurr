@@ -1,7 +1,7 @@
 from pytest import fixture
 
 from blurr.cli.cli import cli
-from blurr.util.out import OutStub
+from tests.util.out_stub import OutStub
 
 
 def run_command(dtc, out):

@@ -7,6 +7,7 @@ Options:
   --version     Show version.
 """
 import sys
+
 from docopt import docopt
 
 from blurr.cli.cli import cli
