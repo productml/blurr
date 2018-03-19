@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import Any, Dict, Type
 
-from blurr.core.base import BaseItemCollection, BaseSchemaCollection
+from blurr.core.base import BaseItemCollection, BaseSchemaCollection, BaseItem
 from blurr.core.data_group import DataGroup
 from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.loader import TypeLoader
@@ -49,12 +49,9 @@ class Transformer(BaseItemCollection, ABC):
     """
 
     def __init__(self, schema: TransformerSchema, identity: str, context: Context) -> None:
-        # TODO Fix Initialization inheritence pattern
-        self.schema = schema
-        self.evaluation_context = EvaluationContext(global_context=context)
-
+        super().__init__(schema, EvaluationContext(global_context=context))
         # Load the nested items into the item
-        self.nested_items: Dict[str, Type[DataGroup]] = {
+        self._data_groups: Dict[str, Type[BaseItem]] = {
             name: TypeLoader.load_item(item_schema.type)(
                 item_schema, identity, self.evaluation_context.fork)
             for name, item_schema in schema.nested_schema.items()
@@ -62,6 +59,13 @@ class Transformer(BaseItemCollection, ABC):
 
         self.evaluation_context.global_context.merge(self.nested_items)
         self.identity = identity
+
+    @property
+    def nested_items(self) -> Dict[str, Type[BaseItem]]:
+        """
+        Dictionary of nested data groups
+        """
+        return self._data_groups
 
     def finalize(self) -> None:
         """

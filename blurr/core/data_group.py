@@ -1,8 +1,9 @@
 from abc import ABC
-from typing import Any, Dict
+from typing import Any, Dict, Type
 
-from blurr.core.base import BaseSchemaCollection, BaseItemCollection
-from blurr.core.evaluation import Context, EvaluationContext
+from blurr.core.base import BaseSchemaCollection, BaseItemCollection, BaseItem
+from blurr.core.evaluation import EvaluationContext
+from blurr.core.loader import TypeLoader
 from blurr.core.store import Key
 
 
@@ -41,6 +42,19 @@ class DataGroup(BaseItemCollection):
         """
         super().__init__(schema, evaluation_context)
         self.identity = identity
+
+        self._fields: Dict[str, Type[BaseItem]] = {
+            name: TypeLoader.load_item(item_schema.type)(
+                item_schema, self.evaluation_context.fork)
+            for name, item_schema in self.schema.nested_schema.items()
+        }
+
+    @property
+    def nested_items(self) -> Dict[str, Type[BaseItem]]:
+        """
+        Returns the dictionary of fields the DataGroup contains
+        """
+        return self._fields
 
     def finalize(self) -> None:
         """
