@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import datetime
 from typing import Dict, Any
 
@@ -22,7 +23,7 @@ class Anchor(BaseItem):
     def __init__(self, schema: AnchorSchema,
                  evaluation_context: EvaluationContext):
         super().__init__(schema, evaluation_context)
-        self.condition_met: Dict[datetime, int] = {}
+        self.condition_met: Dict[datetime, int] = defaultdict(int)
         self.anchor_session = None
 
     def evaluate_anchor(self, session) -> bool:
@@ -31,9 +32,7 @@ class Anchor(BaseItem):
             return False
 
         if self.evaluate():
-            self.condition_met[self.anchor_session.start_time.date(
-            )] = self.condition_met.get(self.anchor_session.start_time.date(),
-                                        0) + 1
+            self.condition_met[self.anchor_session.start_time.date()] += 1
             return True
 
         return False
