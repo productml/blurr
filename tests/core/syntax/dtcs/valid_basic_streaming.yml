@@ -4,8 +4,8 @@ Description: Example
 Name: example_name
 Identity: source.user_id
 When: source.package_version = '1.0'
-Store:
-   Type: ProductML:DTC:Storage:DynamoDB
+Stores:
+ - Type: ProductML:DTC:Store:MemoryStore
    Name: offer_ai_dynamo
    RetentionDays: 180
    ReadWriteUnits: 5
