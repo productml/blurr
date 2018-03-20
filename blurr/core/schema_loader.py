@@ -24,11 +24,10 @@ class SchemaLoader:
         :param fully_qualified_parent_name: Full qualified name of the parent.
         If None is passed then the schema is stored against the schema name.
         :return: The fully qualified name against which the spec is stored.
+        None is returned if the given spec is not a dictionary or the spec does not
+        contain a 'name' key.
         """
-        if not isinstance(spec, dict):
-            return None
-
-        if self.ATTRIBUTE_NAME not in spec:
+        if not isinstance(spec, dict) or self.ATTRIBUTE_NAME not in spec:
             return None
 
         name = spec[self.ATTRIBUTE_NAME]
