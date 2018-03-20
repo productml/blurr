@@ -1,4 +1,5 @@
 import ast
+from typing import Dict
 
 import re
 from yamale import yamale
@@ -48,7 +49,7 @@ class Identifier(Validator):
 class Expression(Validator):
     TAG = 'expression'
 
-    def _is_valid(self, value) -> bool:
+    def _is_valid(self, value: str) -> bool:
         return is_expression(value)
 
     def get_name(self) -> str:
@@ -68,21 +69,21 @@ WINDOW_SCHEMA = yamale.make_schema(
     'blurr/core/syntax/dtc_window_schema.yml', validators=VALIDATORS)
 
 
-def _validate_window(dtc_dict: dict, name: str) -> None:
+def _validate_window(dtc_dict: Dict, name: str) -> None:
     try:
         WINDOW_SCHEMA.validate(Data(dtc_dict, name))
     except ValueError as e:
         raise InvalidSchemaError(str(e))
 
 
-def _validate_streaming(dtc_dict: dict, name: str) -> None:
+def _validate_streaming(dtc_dict: Dict, name: str) -> None:
     try:
         STREAMING_SCHEMA.validate(Data(dtc_dict, name))
     except ValueError as e:
         raise InvalidSchemaError(str(e))
 
 
-def validate(dtc_dict: dict, name="dtc") -> None:
+def validate(dtc_dict: Dict, name="dtc") -> None:
     if dtc_dict['Type'] == 'ProductML:DTC:Window':
         _validate_window(dtc_dict, name)
     elif dtc_dict['Type'] == 'ProductML:DTC:Streaming':
