@@ -5,6 +5,7 @@ from blurr.core.base import BaseSchemaCollection, BaseItemCollection, BaseItem
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.loader import TypeLoader
 from blurr.core.store import Key
+from blurr.core.schema_loader import SchemaLoader
 
 
 class DataGroupSchema(BaseSchemaCollection, ABC):
@@ -17,13 +18,25 @@ class DataGroupSchema(BaseSchemaCollection, ABC):
     ATTRIBUTE_STORE = 'Store'
     ATTRIBUTE_FIELDS = 'Fields'
 
-    def __init__(self, spec: Dict[str, Any], stores: Dict[str, Any]) -> None:
+    def __init__(self, fully_qualified_name: str,
+                 schema_loader: SchemaLoader) -> None:
         """
         Initializing the nested field schema that all data groups contain
         :param spec: Schema specifications for the field
         """
-        super().__init__(spec, self.ATTRIBUTE_FIELDS)
-        self.store = stores.get(spec.get(self.ATTRIBUTE_STORE, None), None)
+        self.store = None
+        super().__init__(fully_qualified_name, schema_loader,
+                         self.ATTRIBUTE_FIELDS)
+
+    def load(self):
+        super().load()
+
+        if self.ATTRIBUTE_STORE in self._spec:
+            store_fq_name = self.schema_loader.get_fully_qualified_name(
+                self.schema_loader.get_transformer_name(
+                    self.fully_qualified_name),
+                self._spec[self.ATTRIBUTE_STORE])
+            self.store = self.schema_loader.get_schema_object(store_fq_name)
 
 
 class DataGroup(BaseItemCollection):
@@ -45,7 +58,7 @@ class DataGroup(BaseItemCollection):
 
         self._fields: Dict[str, Type[BaseItem]] = {
             name: TypeLoader.load_item(item_schema.type)(
-                item_schema, self.evaluation_context.fork)
+                item_schema, self.evaluation_context)
             for name, item_schema in self.schema.nested_schema.items()
         }
 

@@ -4,8 +4,8 @@ from datetime import datetime, timezone
 
 
 def test_local_runner():
-    local_runner = LocalRunner(['tests/runner/data/raw.json'], '',
-                               'tests/runner/data/sample.yml')
+    local_runner = LocalRunner(['tests/data/raw.json'], '',
+                               'tests/data/stream.yml')
     local_runner.execute()
 
     assert local_runner._user_transformer['userA'].snapshot['session'][

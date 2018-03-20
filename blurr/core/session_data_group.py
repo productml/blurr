@@ -11,20 +11,25 @@ class SessionDataGroupSchema(DataGroupSchema):
 
     ATTRIBUTE_SPLIT = 'Split'
 
-    def load(self, spec: Dict[str, Any]) -> None:
+    def load(self) -> None:
         """
         Overrides base load to include loads for nested items
         """
         # Alter the spec to introduce the session start and end time implicitly handled fields
-        spec[self.ATTRIBUTE_FIELDS][0:0] = self.build_predefined_fields_spec(
-            spec[self.ATTRIBUTE_NAME])
+        predefined_field = self.build_predefined_fields_spec(
+            self._spec[self.ATTRIBUTE_NAME])
+        self._spec[self.ATTRIBUTE_FIELDS][0:0] = predefined_field
+        for field_schema in predefined_field:
+            self.schema_loader.add_schema(field_schema,
+                                          self.fully_qualified_name)
 
         # Loading the base attributes first
-        super().load(spec)
+        super().load()
 
         # Load type specific attributes
-        self.split: Expression = Expression(spec[
-            self.ATTRIBUTE_SPLIT]) if self.ATTRIBUTE_SPLIT in spec else None
+        self.split: Expression = Expression(
+            self._spec[self.ATTRIBUTE_SPLIT]
+        ) if self.ATTRIBUTE_SPLIT in self._spec else None
 
     @staticmethod
     def build_predefined_fields_spec(

@@ -17,16 +17,13 @@ class StreamingTransformerSchema(TransformerSchema):
     ATTRIBUTE_IDENTITY = 'Identity'
     ATTRIBUTE_TIME = 'Time'
 
-    def __init__(self, spec: Dict[str, Any]) -> None:
-        super().__init__(spec)
-
-    def load(self, spec: Dict[str, Any]) -> None:
+    def load(self) -> None:
         # Ensure that the base loader is invoked
-        super().load(spec)
+        super().load()
 
         # Load the schema specific attributes
-        self.identity = Expression(spec[self.ATTRIBUTE_IDENTITY])
-        self.time = Expression(spec[self.ATTRIBUTE_TIME])
+        self.identity = Expression(self._spec[self.ATTRIBUTE_IDENTITY])
+        self.time = Expression(self._spec[self.ATTRIBUTE_TIME])
 
     def get_identity(self, context: Context) -> str:
         return self.identity.evaluate(EvaluationContext(context))
