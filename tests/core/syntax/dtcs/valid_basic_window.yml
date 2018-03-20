@@ -6,11 +6,11 @@ SourceDTC: offer_ai_v1
 Anchor:
   Condition:  offer_ai_v1.game_stats.offer_type != ''
   Max: 1
-Store:
-  Type: ProductML:DTC:Storage:S3
-  Name: s3
-  Bucket: productml-test
-  Prefix: /dtc-test/window/
+Stores:
+  - Type: ProductML:DTC:Storage:S3
+    Name: s3
+    Bucket: productml-test
+    Prefix: /dtc-test/window/
 DataGroups:
   - Type: ProductML:DTC:DataGroup:AnchorAggregate
     Name: last_session

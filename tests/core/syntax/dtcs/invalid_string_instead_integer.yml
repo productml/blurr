@@ -1,0 +1,18 @@
+Type: ProductML:DTC:Window
+Version: '2018-03-01'
+Description: Example
+SourceDTC: test
+Name: example_name
+When: source.package_version = '1.0'
+
+Anchor:
+  Condition: True==True
+  Max: one
+
+DataGroups:
+ - Type: ProductML:DTC:DataGroup:VariableAggregate
+   Name: user
+   Store: offer_ai_dynamo
+   Fields:
+     - Name: user_id
+       Value: source.customer_identifier

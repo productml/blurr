@@ -52,6 +52,14 @@ def test_invalid_wrong_version():
         validate(dtc_dict)
     assert "Version: '2088-03-01' not in ('2018-03-01',)" in str(err.value)
 
+
+def test_invalid_string_instead_of_integer():
+    with raises(InvalidSchemaError) as err:
+        dtc_dict = load_example('invalid_string_instead_integer.yml')
+        validate(dtc_dict)
+    assert "Anchor.Max: 'one' is not a int." in str(err.value)
+
+
 def test_invalid_non_existing_data_type():
     with raises(InvalidSchemaError) as err:
         dtc_dict = load_example('invalid_non_existing_data_type.yml')
