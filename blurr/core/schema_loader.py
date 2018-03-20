@@ -31,7 +31,8 @@ class SchemaLoader:
             return None
 
         name = spec[self.ATTRIBUTE_NAME]
-        fully_qualified_name = name if fully_qualified_parent_name is None else fully_qualified_parent_name + '.' + name
+        fully_qualified_name = name if fully_qualified_parent_name is None else self.get_fully_qualified_name(
+            fully_qualified_parent_name, name)
 
         self._spec[fully_qualified_name] = spec
         for key, val in spec.items():
@@ -42,7 +43,8 @@ class SchemaLoader:
 
         return spec[self.ATTRIBUTE_NAME]
 
-    def get_schema_object(self, fully_qualified_name: str):
+    # Using forward reference to avoid cyclic dependency.
+    def get_schema_object(self, fully_qualified_name: str) -> 'BaseSchema':
         """
         Used to generate a schema object from the given fully_qualified_name.
         :param fully_qualified_name: The fully qualified name of the object needed.
@@ -53,6 +55,31 @@ class SchemaLoader:
             raise InvalidSchemaError('Name not defined in schema')
         return TypeLoader.load_schema(spec[self.ATTRIBUTE_TYPE])(
             fully_qualified_name, self)
+
+    def get_nested_schema_object(self, fully_qualified_parent_name: str,
+                                 nested_item_name: str) -> 'BaseSchema':
+        """
+        Used to generate a schema object from the given fully_qualified_parent_name
+        and the nested_item_name.
+        :param fully_qualified_parent_name: The fully qualified name of the parent.
+        :param nested_item_name: The nested item name.
+        :return: An initialized schema object of the nested item.
+        """
+        return self.get_schema_object(
+            self.get_fully_qualified_name(fully_qualified_parent_name,
+                                          nested_item_name))
+
+    @staticmethod
+    def get_fully_qualified_name(fully_qualified_parent_name: str,
+                                 nested_item_name: str) -> str:
+        """
+        Returns the fully qualified name by combining the fully_qualified_parent_name
+        and nested_item_name.
+        :param fully_qualified_parent_name: The fully qualified name of the parent.
+        :param nested_item_name: The nested item name.
+        :return: The fully qualified name of the nested item.
+        """
+        return fully_qualified_parent_name + '.' + nested_item_name
 
     def get_schema_spec(self, fully_qualified_name: str) -> Dict[str, Any]:
         """

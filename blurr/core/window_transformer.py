@@ -72,7 +72,7 @@ class WindowTransformer(Transformer):
         if not self.needs_evaluation:
             return
 
-        for _, item in self.nested_items.items():
+        for item in self.nested_items.values():
             if isinstance(item, AnchorDataGroup):
                 item.prepare_window(self.store, self.identity,
                                     self.anchor.anchor_session.start_time)
