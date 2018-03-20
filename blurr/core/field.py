@@ -19,9 +19,6 @@ class FieldSchema(BaseSchema, ABC):
     # Field Name Definitions
     ATTRIBUTE_VALUE = 'Value'
 
-    def validate(self, spec: Dict[str, Any]) -> None:
-        self.validate_required_attribute(spec, self.ATTRIBUTE_VALUE)
-
     def load(self) -> None:
         self.value: Expression = Expression(self._spec[self.ATTRIBUTE_VALUE])
 
@@ -75,6 +72,9 @@ class Field(BaseItem, ABC):
         new_value = None
         if self.needs_evaluation:
             new_value = self.schema.value.evaluate(self.evaluation_context)
+
+        if new_value is None:
+            return
 
         # Only set the value if it conforms to the field type
         if not self.schema.is_type_of(new_value):

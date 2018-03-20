@@ -13,6 +13,7 @@ class SchemaLoader:
 
     def __init__(self):
         self._spec = {}
+        self._object_cache: Dict[str, 'BaseSchema'] = {}
 
     def add_schema(self,
                    spec: Dict[str, Any],
@@ -50,11 +51,14 @@ class SchemaLoader:
         :param fully_qualified_name: The fully qualified name of the object needed.
         :return: An initialized schema object
         """
-        spec = self.get_schema_spec(fully_qualified_name)
-        if self.ATTRIBUTE_TYPE not in spec:
-            raise InvalidSchemaError('Name not defined in schema')
-        return TypeLoader.load_schema(spec[self.ATTRIBUTE_TYPE])(
-            fully_qualified_name, self)
+        if fully_qualified_name not in self._object_cache:
+            spec = self.get_schema_spec(fully_qualified_name)
+            if self.ATTRIBUTE_TYPE not in spec:
+                raise InvalidSchemaError('Name not defined in schema')
+            self._object_cache[fully_qualified_name] = TypeLoader.load_schema(
+                spec[self.ATTRIBUTE_TYPE])(fully_qualified_name, self)
+
+        return self._object_cache[fully_qualified_name]
 
     def get_nested_schema_object(self, fully_qualified_parent_name: str,
                                  nested_item_name: str) -> 'BaseSchema':
@@ -89,3 +93,7 @@ class SchemaLoader:
         :return: Schema dictionary.
         """
         return self._spec[fully_qualified_name]
+
+    @staticmethod
+    def get_transformer_name(fully_qualified_name: str) -> str:
+        return fully_qualified_name.split('.', 1)[0]

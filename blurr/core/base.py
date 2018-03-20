@@ -30,14 +30,6 @@ class BaseSchema(ABC):
         self.__load_spec()
 
     @abstractmethod
-    def validate(self, spec: Dict[str, Any]) -> None:
-        """
-        Abstract method that ensures that the subclasses implement spec validation
-        """
-        raise NotImplementedError(
-            '"validate()" must be implemented for a schema.')
-
-    @abstractmethod
     def load(self) -> None:
         """
         Abstract method placeholder for subclasses to load the spec into the schema
@@ -76,28 +68,6 @@ class BaseSchemaCollection(BaseSchema, ABC):
         self._nested_item_attribute = nested_schema_attribute
 
         super().__init__(fully_qualified_name, schema_loader)
-
-    def validate(self, spec: Dict[str, Any]):
-        """
-        Overrides the Base Schema validation specifications to include validation for nested schema
-        """
-
-        # Validate that the nested schema attribute is present
-        self.validate_required_attribute(spec, self._nested_item_attribute)
-
-        # Ensure that the nested schema attribute is a list
-        if not isinstance(spec[self._nested_item_attribute], list):
-            self.raise_validation_error(
-                spec, self._nested_item_attribute,
-                'Schema definition must specify a list of {}.'.format(
-                    self._nested_item_attribute))
-
-        # Ensure that the nested schema attribute contains a list of one or more items
-        if len(spec[self._nested_item_attribute]) == 0:
-            self.raise_validation_error(
-                spec, self._nested_item_attribute,
-                'Schema definition must have at least one item under {}.'.
-                format(self._nested_item_attribute))
 
     def load(self) -> None:
         """
@@ -185,13 +155,6 @@ class BaseItemCollection(BaseItem):
 
         super().__init__(schema, evaluation_context)
 
-        # Load the nested items into the item
-        self.nested_items: Dict[str, Type[BaseItem]] = {
-            name: TypeLoader.load_item(item_schema.type)(
-                item_schema, self.evaluation_context)
-            for name, item_schema in self.schema.nested_schema.items()
-        }
-
     def evaluate(self) -> None:
         """
         Evaluates the current item
@@ -243,3 +206,18 @@ class BaseItemCollection(BaseItem):
             return self.nested_items[item].snapshot
 
         return self.__getattribute__(item)
+
+    @abstractmethod
+    def finalize(self) -> None:
+        """
+        Performs the final rites of an item before it decommissioned
+        """
+        raise NotImplementedError('finalize() must be implemented')
+
+    @property
+    @abstractmethod
+    def nested_items(self) -> Dict[str, Type[BaseItem]]:
+        """
+        Dictionary of the name and item in the collection
+        """
+        pass

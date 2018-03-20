@@ -47,14 +47,13 @@ class AnchorDataGroup(DataGroup):
     Manages the generation of AnchorAggregate as defined in the schema.
     """
 
-    def __init__(self, schema: AnchorDataGroupSchema,
+    def __init__(self, schema: AnchorDataGroupSchema, identity: str,
                  evaluation_context: EvaluationContext) -> None:
-        super().__init__(schema, evaluation_context)
+        super().__init__(schema, identity, evaluation_context)
         self.window = Window(self.schema.window_schema
                              ) if schema.window_schema is not None else None
 
-    def prepare_window(self, store: Store, identity: str,
-                       start_time: datetime) -> None:
+    def prepare_window(self, start_time: datetime) -> None:
         """
         Prepares window if any is specified.
         :param store: Store to be used to query for the source data.
@@ -64,7 +63,7 @@ class AnchorDataGroup(DataGroup):
         """
         # evaluate window first which sets the correct window in the store
         if self.window is not None:
-            self.window.prepare(store, identity, start_time)
+            self.window.prepare(self.identity, start_time)
 
     def evaluate(self) -> None:
         if self.window is not None:

@@ -3,6 +3,8 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Tuple
 from dateutil import parser
 
+from blurr.core.base import BaseSchema
+
 
 class Key:
     """
@@ -59,104 +61,38 @@ class Key:
         return hash((self.identity, self.group, self.timestamp))
 
 
-class Store(ABC):
+class Store(BaseSchema):
     """ Base Store that allows for data to be persisted during / after transformation """
 
-    def __init__(self, spec: Dict[str, Any]) -> None:
-        """
-        Initializes the store based on the specifications
-        """
-        self.name = spec['Name']
-        self.type = spec['Type']
-        self._cache: Dict[Key, Any] = dict()
-
-    def prefetch(self, keys: List[Key]) -> None:
-        """
-        Pre-fetches items from the store and loads the cache
-        :param keys: List of item keys
-        """
-        for key in keys:
-            item = self._store_get(key)
-            if item:
-                self._cache[key] = item
-
+    @abstractmethod
     def get(self, key: Key) -> Any:
         """
         Gets an item by key
         """
-        # Check the cache to see if item exists
-        item = self._cache.get(key, None)
+        raise NotImplementedError()
 
-        if not item:
-            # If not, load from store and put item in cache
-            item = self._store_get(key)
-            if item:
-                self._cache[key] = item
-
-        return item
-
+    @abstractmethod
     def get_range(self, start: Key, end: Key = None,
                   count: int = 0) -> List[Tuple[Key, Any]]:
-        if end and count:
-            raise ValueError('Only one of `end` or `count` can be set')
-
-        return self._store_get_range(start, end, count)
-
-    @abstractmethod
-    def _store_get_range(self, start: Key, end: Key = None,
-                         count: int = 0) -> List[Tuple[Key, Any]]:
-        pass
-
-    @abstractmethod
-    def _store_get(self, key: Key) -> Any:
-        """
-        Gets an item from the underlying store by the key
-        """
         raise NotImplementedError()
 
     @abstractmethod
-    def _store_save(self, key: Key, item: Any) -> None:
-        """
-        Saves an item by key to the underlying store
-        """
-        raise NotImplementedError()
-
-    @abstractmethod
-    def _store_delete(self, key: Key) -> None:
-        """
-        Deletes an item from the store by key
-        """
-        raise NotImplementedError()
-
     def save(self, key: Key, item: Any) -> None:
         """
         Saves an item to store
         """
-        # Save to cache
-        self._cache[key] = item
+        raise NotImplementedError()
 
-        # Save to the underlying store
-        self._store_save(key, item)
-
+    @abstractmethod
     def delete(self, key: Key) -> None:
         """
         Deletes an item from the store by key
         """
-        # Remove key from cache if it exists
-        self._cache.pop(key, None)
-        # Remove item from underlying store
-        self._store_delete(key)
-
-    @abstractmethod
-    def _finalize(self) -> None:
-        """
-        Flushes all dirty items from the cache to the store
-        """
         raise NotImplementedError()
 
-    def close(self) -> None:
+    @abstractmethod
+    def finalize(self) -> None:
         """
-        Closes the store by flushing all remaining data to persistence
+        Finalizes the store by flushing all remaining data to persistence
         """
-
-        self._finalize()
+        raise NotImplementedError()

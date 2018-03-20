@@ -2,7 +2,6 @@ from typing import Dict, Any, List
 
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.data_group import DataGroup, DataGroupSchema
-from blurr.core.schema_loader import SchemaLoader
 
 
 class SessionDataGroupSchema(DataGroupSchema):
@@ -11,16 +10,6 @@ class SessionDataGroupSchema(DataGroupSchema):
     """
 
     ATTRIBUTE_SPLIT = 'Split'
-
-    def validate(self, spec: Dict[str, Any]):
-        """
-        Overrides the Base Schema validation specifications to include validation for nested schema
-        """
-        # Validate base attributes first
-        super().validate(spec)
-
-        # Validate type specific attributes
-        self.validate_required_attribute(spec, self.ATTRIBUTE_SPLIT)
 
     def load(self) -> None:
         """
@@ -75,26 +64,21 @@ class SessionDataGroup(DataGroup):
     Manages the aggregates for session based roll-ups of streaming data
     """
 
-    def __init__(self, schema: SessionDataGroupSchema,
-                 evaluation_context: EvaluationContext) -> None:
-        super(SessionDataGroup, self).__init__(schema, evaluation_context)
-
-    @property
-    def split_now(self) -> bool:
+    def evaluate(self) -> None:
         """
-        Check if current session is stale for the event being processed
-        :return: True if the session needs to be split, false otherwise
+        Evaluates the current item
         """
-        if self.schema.split is None:
-            return False
 
-        if self.start_time is None or self.end_time is None:
-            return False
+        # If a split is imminent, save the current session snapshot with the timestamp
+        split_should_be_evaluated = not (self.schema.split is None
+                                         or self.start_time is None
+                                         or self.end_time is None)
 
-        if self.schema.split.evaluate(self.evaluation_context):
-            return True
+        if split_should_be_evaluated and self.schema.split.evaluate(
+                self.evaluation_context) is True:
+            # Save the current snapshot with the current timestamp
+            self.persist(self.start_time)
+            # Reset the state of the contents
+            self.__init__(self.schema, self.identity, self.evaluation_context)
 
-        return False
-
-    def reset(self):
-        self.__init__(self.schema, self.evaluation_context)
+        super().evaluate()

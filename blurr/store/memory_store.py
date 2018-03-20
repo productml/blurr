@@ -1,25 +1,32 @@
 from typing import Any, Dict, List, Tuple
 
+from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store import Store, Key
 
 
 class MemoryStore(Store):
-    def __init__(self, state: Dict[str, Any] = None) -> None:
-        super().__init__({'Name': 'memory', 'Type': 'MemoryStore'})
-        if state:
-            self.load(state)
+    """
+    In-memory store implementation
+    """
 
-    def load(self, state: Dict[str, Any]) -> Any:
-        for k, v in state.items():
-            key = Key.parse(k)
-            self._cache[key] = v
+    def __init__(self, fully_qualified_name: str,
+                 schema_loader: SchemaLoader) -> None:
+        super().__init__(fully_qualified_name, schema_loader)
+        self._cache: Dict[Key, Any] = dict()
 
-    def _store_get_range(self, start: Key, end: Key = None,
-                         count: int = 0) -> List[Tuple[Key, Any]]:
+    def load(self):
+        pass
+
+    def get(self, key: Key) -> Any:
+        return self._cache.get(key, None)
+
+    def get_range(self, start: Key, end: Key = None,
+                  count: int = 0) -> List[Tuple[Key, Any]]:
+        if end and count:
+            raise ValueError('Only one of `end` or `count` can be set')
+
         if end is not None and end < start:
-            temp = start
-            start = end
-            end = temp
+            start, end = end, start
 
         if not count:
             return [(key, item) for key, item in self._cache.items()
@@ -42,14 +49,11 @@ class MemoryStore(Store):
     def _sign(x: int) -> int:
         return (1, -1)[x < 0]
 
-    def _store_get(self, key: Key):
-        return None
+    def save(self, key: Key, item: Any) -> None:
+        self._cache[key] = item
 
-    def _store_save(self, key: Key, item: Any) -> None:
-        pass
+    def delete(self, key: Key) -> None:
+        self._cache.pop(key, None)
 
-    def _store_delete(self, key: Key) -> None:
-        pass
-
-    def _finalize(self) -> None:
+    def finalize(self) -> None:
         pass

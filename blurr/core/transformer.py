@@ -1,10 +1,12 @@
-from typing import Any, Dict
 from abc import ABC
+from typing import Any, Dict, Type
 
-from blurr.core.base import BaseItemCollection, BaseSchemaCollection
+from blurr.core.base import BaseItemCollection, BaseSchemaCollection, BaseItem
+from blurr.core.data_group import DataGroup
 from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store import Store, Key
+from blurr.core.loader import TypeLoader
 
 
 class TransformerSchema(BaseSchemaCollection, ABC):
@@ -15,20 +17,13 @@ class TransformerSchema(BaseSchemaCollection, ABC):
 
     ATTRIBUTE_VERSION = 'Version'
     ATTRIBUTE_DESCRIPTION = 'Description'
+    ATTRIBUTE_STORES = 'Stores'
     ATTRIBUTE_DATA_GROUPS = 'DataGroups'
 
     def __init__(self, fully_qualified_name: str,
                  schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader,
                          self.ATTRIBUTE_DATA_GROUPS)
-
-    def validate(self, spec: Dict[str, Any]) -> None:
-        # Ensure that the base validator is invoked
-        super().validate(spec)
-
-        # Validate schema specific attributes
-        self.validate_required_attribute(spec, self.ATTRIBUTE_VERSION)
-        self.validate_required_attribute(spec, self.ATTRIBUTE_DESCRIPTION)
 
     def load(self) -> None:
         # Ensure that the base loader is invoked
@@ -38,6 +33,24 @@ class TransformerSchema(BaseSchemaCollection, ABC):
         self.version = self._spec[self.ATTRIBUTE_VERSION]
         self.description = self._spec[self.ATTRIBUTE_DESCRIPTION]
 
+        if self.ATTRIBUTE_STORES in self._spec:
+            # Load list of stores from the schema
+            self.stores: Dict[str, Type[Store]] = {
+                schema_spec[self.ATTRIBUTE_NAME]:
+                self.schema_loader.get_nested_schema_object(
+                    self.fully_qualified_name,
+                    schema_spec[self.ATTRIBUTE_NAME])
+                for schema_spec in self._spec[self.ATTRIBUTE_STORES]
+            }
+
+        # Load nested schema items
+        self.nested_schema: Dict[str, Type[DataGroup]] = {
+            schema_spec[self.ATTRIBUTE_NAME]:
+            self.schema_loader.get_nested_schema_object(
+                self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
+            for schema_spec in self._spec[self._nested_item_attribute]
+        }
+
 
 class Transformer(BaseItemCollection, ABC):
     """
@@ -45,14 +58,29 @@ class Transformer(BaseItemCollection, ABC):
     to the context
     """
 
-    def __init__(self, store: Store, schema: TransformerSchema, identity: str,
+    def __init__(self, schema: TransformerSchema, identity: str,
                  context: Context) -> None:
         super().__init__(schema, EvaluationContext(global_context=context))
-        self.store = store
+        # Load the nested items into the item
+        self._data_groups: Dict[str, Type[BaseItem]] = {
+            name: TypeLoader.load_item(item_schema.type)(
+                item_schema, identity, self.evaluation_context)
+            for name, item_schema in schema.nested_schema.items()
+        }
         self.identity = identity
         self.evaluation_context.global_add('identity', self.identity)
         self.evaluation_context.global_context.merge(self.nested_items)
 
-    def finalize(self):
+    @property
+    def nested_items(self) -> Dict[str, Type[BaseItem]]:
+        """
+        Dictionary of nested data groups
+        """
+        return self._data_groups
+
+    def finalize(self) -> None:
+        """
+        Iteratively finalizes all data groups in its transformer
+        """
         for item in self.nested_items.values():
-            self.store.save(Key(self.identity, item.name), item.snapshot)
+            item.finalize()

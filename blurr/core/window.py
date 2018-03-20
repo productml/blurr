@@ -36,8 +36,7 @@ class Window:
         self.schema = schema
         self.view: List[SessionDataGroup] = []
 
-    def prepare(self, store: Store, identity: str,
-                start_time: datetime) -> None:
+    def prepare(self, identity: str, start_time: datetime) -> None:
         """
         Prepares the window view on the source data.
         :param store: Store to be used to query for the source data.
@@ -46,17 +45,18 @@ class Window:
         should be generated.
         :return: None
         """
+        store = self.schema.source.store
         if self.schema.type == 'day' or self.schema.type == 'hour':
             self.view = self._load_sessions(
                 store.get_range(
                     Key(identity, self.schema.source.name, start_time),
                     Key(identity, self.schema.source.name,
-                        self._get_end_time(start_time))))
+                        self._get_end_time(start_time))), identity)
         else:
             self.view = self._load_sessions(
                 store.get_range(
                     Key(identity, self.schema.source.name, start_time), None,
-                    self.schema.value))
+                    self.schema.value), identity)
 
     def _get_end_time(self, start_time: datetime) -> datetime:
         """
@@ -70,15 +70,15 @@ class Window:
         elif self.schema.type == 'hour':
             return start_time + timedelta(hours=self.schema.value)
 
-    def _load_sessions(self,
-                       sessions: List[Tuple[Key, Any]]) -> List[BaseItem]:
+    def _load_sessions(self, sessions: List[Tuple[Key, Any]],
+                       identity: str) -> List[BaseItem]:
         """
         Converts [(Key, Session)] to [SessionDataGroup]
         :param sessions: List of (Key, Session) sessions.
         :return: List of SessionDataGroup
         """
         return [
-            SessionDataGroup(self.schema.source,
+            SessionDataGroup(self.schema.source, identity,
                              EvaluationContext()).restore(session)
             for (_, session) in sessions
         ]

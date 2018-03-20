@@ -44,9 +44,9 @@ class WindowTransformer(Transformer):
     session data.
     """
 
-    def __init__(self, store: Store, schema: WindowTransformerSchema,
-                 identity: str, context: Context) -> None:
-        super().__init__(store, schema, identity, context)
+    def __init__(self, schema: WindowTransformerSchema, identity: str,
+                 context: Context) -> None:
+        super().__init__(schema, identity, context)
         self.anchor = Anchor(
             schema.anchor, EvaluationContext(global_context=context))
 
@@ -74,7 +74,6 @@ class WindowTransformer(Transformer):
 
         for item in self.nested_items.values():
             if isinstance(item, AnchorDataGroup):
-                item.prepare_window(self.store, self.identity,
-                                    self.anchor.anchor_session.start_time)
+                item.prepare_window(self.anchor.anchor_session.start_time)
 
         super().evaluate()
