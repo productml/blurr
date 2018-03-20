@@ -4,6 +4,7 @@ from typing import Dict, Any
 
 from blurr.core.base import BaseSchema, BaseItem
 from blurr.core.evaluation import Expression, EvaluationContext
+from blurr.core.schema_loader import SchemaLoader
 from blurr.core.session_data_group import SessionDataGroup
 
 
@@ -14,13 +15,13 @@ class AnchorSchema(BaseSchema):
     ATTRIBUTE_CONDITION = 'Condition'
     ATTRIBUTE_MAX = 'Max'
 
-    def load(self) -> None:
+    def __init__(self, fully_qualified_name: str,
+                 schema_loader: SchemaLoader) -> None:
+        super().__init__(fully_qualified_name, schema_loader)
+
         self.condition = Expression(self._spec[self.ATTRIBUTE_CONDITION])
         self.max = self._spec[
             self.ATTRIBUTE_MAX] if self.ATTRIBUTE_MAX in self._spec else None
-
-    def validate(self, spec: Dict[str, Any]) -> None:
-        self.validate_required_attribute(spec, self.ATTRIBUTE_CONDITION)
 
 
 class Anchor(BaseItem):

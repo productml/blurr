@@ -27,29 +27,19 @@ class BaseSchema(ABC):
         """
         self.schema_loader = schema_loader
         self.fully_qualified_name = fully_qualified_name
-        self.__load_spec()
-
-    @abstractmethod
-    def load(self) -> None:
-        """
-        Abstract method placeholder for subclasses to load the spec into the schema
-        """
-        raise NotImplementedError('"load()" must be implemented for a schema.')
-
-    def __load_spec(self) -> None:
-        """
-        Loads the base schema spec into the object
-        """
         self._spec: Dict[str, Any] = self.schema_loader.get_schema_spec(
             self.fully_qualified_name)
+
+        self.extend_schema()
+
         self.name: str = self._spec[self.ATTRIBUTE_NAME]
         self.type: str = self._spec[self.ATTRIBUTE_TYPE]
         self.when: Expression = Expression(
             self._spec[self.ATTRIBUTE_WHEN]
         ) if self.ATTRIBUTE_WHEN in self._spec else None
 
-        # Invokes the loads of the subclass
-        self.load()
+    def extend_schema(self):
+        pass
 
 
 class BaseSchemaCollection(BaseSchema, ABC):
@@ -64,16 +54,9 @@ class BaseSchemaCollection(BaseSchema, ABC):
         :param spec:
         :param nested_schema_attribute:
         """
-        # Must declare all new fields prior to the initialization so that validation can find the new fields
-        self._nested_item_attribute = nested_schema_attribute
-
         super().__init__(fully_qualified_name, schema_loader)
 
-    def load(self) -> None:
-        """
-        Overrides base load to include loads for nested items
-        """
-
+        self._nested_item_attribute = nested_schema_attribute
         # Load nested schema items
         self.nested_schema: Dict[str, Type[BaseSchema]] = {
             schema_spec[self.ATTRIBUTE_NAME]:

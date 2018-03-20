@@ -3,6 +3,7 @@ from typing import Dict, Any
 
 from blurr.core.data_group import DataGroup, DataGroupSchema
 from blurr.core.evaluation import EvaluationContext
+from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store import Store
 from blurr.core.window import Window
 
@@ -13,27 +14,16 @@ class AnchorDataGroupSchema(DataGroupSchema):
     """
     ATTRIBUTE_WINDOW = 'Window'
 
-    def validate(self, spec: Dict[str, Any]):
-        """
-        Overrides the Base Schema validation specifications to include validation for nested schema
-        """
-        # Validate base attributes first
-        super().validate(spec)
+    def __init__(self, fully_qualified_name: str,
+                 schema_loader: SchemaLoader) -> None:
+        super().__init__(fully_qualified_name, schema_loader)
 
-    def load(self) -> None:
-        """
-        Overrides base load to include loads for nested items
-        """
-        # Loading the base attributes first
-        super().load()
-
+        self.window_schema = None
         if self.ATTRIBUTE_WINDOW in self._spec:
             self.add_window_name()
             self.window_schema = self.schema_loader.get_schema_object(
                 self.fully_qualified_name + '.' +
                 self._spec[self.ATTRIBUTE_WINDOW][self.ATTRIBUTE_NAME])
-        else:
-            self.window_schema = None
 
     def add_window_name(self) -> None:
         if self.ATTRIBUTE_NAME not in self._spec[self.ATTRIBUTE_WINDOW]:

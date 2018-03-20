@@ -3,6 +3,7 @@ from typing import Dict, Any, List, Tuple
 
 from blurr.core.base import BaseSchema, BaseItem
 from blurr.core.evaluation import EvaluationContext
+from blurr.core.schema_loader import SchemaLoader
 from blurr.core.session_data_group import SessionDataGroup
 from blurr.core.store import Store, Key
 
@@ -15,14 +16,13 @@ class WindowSchema(BaseSchema):
     ATTRIBUTE_VALUE = 'Value'
     ATTRIBUTE_SOURCE = 'Source'
 
-    def load(self) -> None:
+    def __init__(self, fully_qualified_name: str,
+                 schema_loader: SchemaLoader) -> None:
+        super().__init__(fully_qualified_name, schema_loader)
+
         self.value = self._spec[self.ATTRIBUTE_VALUE]
         self.source = self.schema_loader.get_schema_object(
             self._spec[self.ATTRIBUTE_SOURCE])
-
-    def validate(self, spec: Dict[str, Any]) -> None:
-        self.validate_required_attribute(spec, self.ATTRIBUTE_VALUE)
-        self.validate_required_attribute(spec, self.ATTRIBUTE_SOURCE)
 
 
 class Window:
