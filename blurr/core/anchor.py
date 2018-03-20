@@ -4,6 +4,7 @@ from typing import Dict, Any
 
 from blurr.core.base import BaseSchema, BaseItem
 from blurr.core.evaluation import Expression, EvaluationContext
+from blurr.core.session_data_group import SessionDataGroup
 
 
 class AnchorSchema(BaseSchema):
@@ -29,7 +30,7 @@ class Anchor(BaseItem):
         self.condition_met: Dict[datetime, int] = defaultdict(int)
         self.anchor_session = None
 
-    def evaluate_anchor(self, session) -> bool:
+    def evaluate_anchor(self, session: SessionDataGroup) -> bool:
         self.anchor_session = session
         if self.max_condition_met(session):
             return False
@@ -43,14 +44,10 @@ class Anchor(BaseItem):
     def evaluate(self) -> bool:
         return self.schema.condition.evaluate(self.evaluation_context)
 
-    def max_condition_met(self, session) -> bool:
-        if self.condition_met.get(session.start_time.date(),
-                                  0) >= self.schema.max:
-            return True
+    def max_condition_met(self, session: SessionDataGroup) -> bool:
+        return self.condition_met[session.start_time.date()] >= self.schema.max
 
-        return False
-
-    def restore(self, snapshot) -> None:
+    def restore(self, snapshot: Dict[str, Any]) -> BaseItem:
         pass
 
     @property

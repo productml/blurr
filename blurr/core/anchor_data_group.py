@@ -1,7 +1,9 @@
+from datetime import datetime
 from typing import Dict, Any
 
 from blurr.core.data_group import DataGroup, DataGroupSchema
 from blurr.core.evaluation import EvaluationContext
+from blurr.core.store import Store
 from blurr.core.window import Window
 
 
@@ -51,7 +53,8 @@ class AnchorDataGroup(DataGroup):
         self.window = Window(self.schema.window_schema
                              ) if schema.window_schema is not None else None
 
-    def prepare_window(self, store, identity, start_time):
+    def prepare_window(self, store: Store, identity: str,
+                       start_time: datetime) -> None:
         """
         Prepares window if any is specified.
         :param store: Store to be used to query for the source data.
