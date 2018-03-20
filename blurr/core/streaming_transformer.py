@@ -18,9 +18,6 @@ class StreamingTransformerSchema(TransformerSchema):
     ATTRIBUTE_IDENTITY = 'Identity'
     ATTRIBUTE_TIME = 'Time'
 
-    def __init__(self, name: str, schema_loader: SchemaLoader) -> None:
-        super().__init__(name, schema_loader)
-
     def validate(self, spec: Dict[str, Any]) -> None:
         # Ensure that the base validator is invoked
         super().validate(spec)

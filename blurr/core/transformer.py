@@ -17,8 +17,10 @@ class TransformerSchema(BaseSchemaCollection, ABC):
     ATTRIBUTE_DESCRIPTION = 'Description'
     ATTRIBUTE_DATA_GROUPS = 'DataGroups'
 
-    def __init__(self, name: str, schema_loader: SchemaLoader) -> None:
-        super().__init__(name, schema_loader, self.ATTRIBUTE_DATA_GROUPS)
+    def __init__(self, fully_qualified_name: str,
+                 schema_loader: SchemaLoader) -> None:
+        super().__init__(fully_qualified_name, schema_loader,
+                         self.ATTRIBUTE_DATA_GROUPS)
 
     def validate(self, spec: Dict[str, Any]) -> None:
         # Ensure that the base validator is invoked

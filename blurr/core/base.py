@@ -65,7 +65,7 @@ class BaseSchemaCollection(BaseSchema, ABC):
     Base class for schema that contain nested schema
     """
 
-    def __init__(self, name: str, schema_loader: SchemaLoader,
+    def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader,
                  nested_schema_attribute: str) -> None:
         """
         Initializes the schema for schema that contain a nested schema
@@ -75,7 +75,7 @@ class BaseSchemaCollection(BaseSchema, ABC):
         # Must declare all new fields prior to the initialization so that validation can find the new fields
         self._nested_item_attribute = nested_schema_attribute
 
-        super().__init__(name, schema_loader)
+        super().__init__(fully_qualified_name, schema_loader)
 
     def validate(self, spec: Dict[str, Any]):
         """
