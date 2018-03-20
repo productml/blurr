@@ -5,7 +5,7 @@ Name: identifier()
 Identity: expression()
 Time: expression(required=False)
 When: expression(required=False)
-Stores: List(any(include('memory_store')))
+Stores: List(any(include('memory_store')), min=1)
 DataGroups: list(any(include('data_group_variable'), include('data_group_identity'), include('data_group_session')), min=1)
 
 ---
