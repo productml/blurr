@@ -3,6 +3,8 @@ from typing import Any
 
 ITEM_MAP = {
     'ProductML:DTC:DataGroup:SessionAggregate': 'blurr.core.session_data_group.SessionDataGroup',
+    'ProductML:DTC:DataGroup:IdentityAggregate': 'blurr.core.identity_data_group.IdentityDataGroup',
+    'ProductML:DTC:DataGroup:VariableAggregate': 'blurr.core.variable_data_group.VariableDataGroup',
     'string': 'blurr.core.simple_field.SimpleField',
     'integer': 'blurr.core.simple_field.SimpleField',
     'boolean': 'blurr.core.simple_field.SimpleField',
@@ -15,6 +17,8 @@ ITEM_MAP = {
 
 SCHEMA_MAP = {
     'ProductML:DTC:DataGroup:SessionAggregate': 'blurr.core.session_data_group.SessionDataGroupSchema',
+    'ProductML:DTC:DataGroup:IdentityAggregate': 'blurr.core.identity_data_group.IdentityDataGroupSchema',
+    'ProductML:DTC:DataGroup:VariableAggregate': 'blurr.core.variable_data_group.VariableDataGroupSchema',
     'string': 'blurr.core.simple_field.StringFieldSchema',
     'integer': 'blurr.core.simple_field.IntegerFieldSchema',
     'boolean': 'blurr.core.simple_field.BooleanFieldSchema',

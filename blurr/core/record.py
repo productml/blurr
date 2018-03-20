@@ -1,9 +1,8 @@
 class Record:
     def __init__(self, event_dict):
-        self._event_dict = event_dict
+        for k, v in event_dict.items():
+            self.__dict__[k] = v
 
-    def __getattr__(self, item):
-        if isinstance(self._event_dict[item], dict):
-            return Record(self._event_dict[item])
-        else:
-            return self._event_dict[item]
+    def __getattr__(self, name):
+        if not hasattr(super(), name):
+            return None
