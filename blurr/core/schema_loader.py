@@ -14,8 +14,17 @@ class SchemaLoader:
     def __init__(self):
         self._spec = {}
 
-    def add_schema(self, spec: Dict[str, Any],
+    def add_schema(self,
+                   spec: Dict[str, Any],
                    fully_qualified_parent_name: str = None) -> str:
+        """
+        Add a schema dictionary to the schema loader. The given schema is stored
+        against fully_qualified_parent_name + '.' + schema.name.
+        :param spec: Schema specification.
+        :param fully_qualified_parent_name: Full qualified name of the parent.
+        If None is passed then the schema is stored against the schema name.
+        :return: The fully qualified name against which the spec is stored.
+        """
         if not isinstance(spec, dict):
             return None
 
@@ -35,11 +44,22 @@ class SchemaLoader:
         return spec[self.ATTRIBUTE_NAME]
 
     def get_schema_object(self, fully_qualified_name: str):
+        """
+        Used to generate a schema object from the given fully_qualified_name.
+        :param fully_qualified_name: The fully qualified name of the object needed.
+        :return: An initialized schema object
+        """
         spec = self.get_schema_spec(fully_qualified_name)
         if self.ATTRIBUTE_TYPE not in spec:
             raise InvalidSchemaError('Name not defined in schema')
-        return TypeLoader.load_schema(spec[self.ATTRIBUTE_TYPE])(fully_qualified_name,
-                                                                 self)
+        return TypeLoader.load_schema(spec[self.ATTRIBUTE_TYPE])(
+            fully_qualified_name, self)
 
     def get_schema_spec(self, fully_qualified_name: str) -> Dict[str, Any]:
+        """
+        Used to retrieve the specifications of the schema from the given
+        fully_qualified_name of schema.
+        :param fully_qualified_name: The fully qualified name of the schema needed.
+        :return: Schema dictionary.
+        """
         return self._spec[fully_qualified_name]

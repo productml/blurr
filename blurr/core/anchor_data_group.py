@@ -44,6 +44,7 @@ class AnchorDataGroup(DataGroup):
     """
     Manages the generation of AnchorAggregate as defined in the schema.
     """
+
     def __init__(self, schema: AnchorDataGroupSchema,
                  evaluation_context: EvaluationContext) -> None:
         super().__init__(schema, evaluation_context)

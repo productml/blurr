@@ -45,6 +45,7 @@ class WindowTransformer(Transformer):
     The Window DTC transformer that performs window operations on pre-aggregated
     session data.
     """
+
     def __init__(self, store: Store, schema: WindowTransformerSchema,
                  identity: str, context: Context) -> None:
         super().__init__(store, schema, identity, context)

@@ -31,6 +31,7 @@ class Window:
     Does not inherit from BaseItem a window is use for setting up the evaluation
     context and does not directly participate in the evaluation path.
     """
+
     def __init__(self, schema: WindowSchema) -> None:
         self.schema = schema
         self.view: List[SessionDataGroup] = []
@@ -69,15 +70,17 @@ class Window:
         elif self.schema.type == 'hour':
             return start_time + timedelta(hours=self.schema.value)
 
-    def _load_sessions(self, sessions: List[Tuple[Key,Any]]) -> List[BaseItem]:
+    def _load_sessions(self,
+                       sessions: List[Tuple[Key, Any]]) -> List[BaseItem]:
         """
         Converts [(Key, Session)] to [SessionDataGroup]
         :param sessions: List of (Key, Session) sessions.
         :return: List of SessionDataGroup
         """
         return [
-            SessionDataGroup(self.schema.source, EvaluationContext()).restore(
-                session) for (_, session) in sessions
+            SessionDataGroup(self.schema.source,
+                             EvaluationContext()).restore(session)
+            for (_, session) in sessions
         ]
 
     def __getattr__(self, item: str) -> List[Any]:
