@@ -1,14 +1,14 @@
-from typing import Dict, Any, Type
+from typing import Dict, Any
 
-from blurr.core.base import BaseSchema
 from blurr.core.data_group import DataGroup, DataGroupSchema
 from blurr.core.evaluation import EvaluationContext
-from blurr.core.loader import TypeLoader
-from blurr.core.schema_loader import SchemaLoader
 from blurr.core.window import Window
 
 
 class AnchorDataGroupSchema(DataGroupSchema):
+    """
+    Schema for AnchorAggregate DataGroup.
+    """
     ATTRIBUTE_WINDOW = 'Window'
 
     def validate(self, spec: Dict[str, Any]):
@@ -41,6 +41,9 @@ class AnchorDataGroupSchema(DataGroupSchema):
 
 
 class AnchorDataGroup(DataGroup):
+    """
+    Manages the generation of AnchorAggregate as defined in the schema.
+    """
     def __init__(self, schema: AnchorDataGroupSchema,
                  evaluation_context: EvaluationContext) -> None:
         super().__init__(schema, evaluation_context)
@@ -48,6 +51,13 @@ class AnchorDataGroup(DataGroup):
                              ) if schema.window_schema is not None else None
 
     def prepare_window(self, store, identity, start_time):
+        """
+        Prepares window if any is specified.
+        :param store: Store to be used to query for the source data.
+        :param identity: Identity is used as a Key for store query.
+        :param start_time: The Anchor session start_time from where the window
+        should be generated.
+        """
         # evaluate window first which sets the correct window in the store
         if self.window is not None:
             self.window.prepare(store, identity, start_time)

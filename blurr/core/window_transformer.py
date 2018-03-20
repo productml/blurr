@@ -12,6 +12,11 @@ from blurr.core.transformer import Transformer, TransformerSchema
 
 
 class WindowTransformerSchema(TransformerSchema):
+    """
+    Represents the schema for processing aggregated data using windows.
+    Handles attributes specific to the window DTC schema
+    """
+
     ATTRIBUTE_ANCHOR = 'Anchor'
 
     def validate(self, spec: Dict[str, Any]) -> None:
@@ -36,6 +41,10 @@ class WindowTransformerSchema(TransformerSchema):
 
 
 class WindowTransformer(Transformer):
+    """
+    The Window DTC transformer that performs window operations on pre-aggregated
+    session data.
+    """
     def __init__(self, store: Store, schema: WindowTransformerSchema,
                  identity: str, context: Context) -> None:
         super().__init__(store, schema, identity, context)
@@ -43,6 +52,11 @@ class WindowTransformer(Transformer):
             schema.anchor, EvaluationContext(global_context=context))
 
     def evaluate_anchor(self, session: SessionDataGroup) -> bool:
+        """
+        Evaluates the anchor condition against the specified session.
+        :param session: Session to run the anchor condition against.
+        :return: True, if the anchor condition is met, otherwise, False.
+        """
         # Set up context so that anchor can process the session
         if self.anchor.evaluate_anchor(session):
             self.evaluation_context.global_add('anchor', session)

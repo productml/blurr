@@ -7,6 +7,9 @@ from blurr.core.evaluation import Expression, EvaluationContext
 
 
 class AnchorSchema(BaseSchema):
+    """
+    Represents the schema for the Anchor specified in a window DTC.
+    """
     ATTRIBUTE_CONDITION = 'Condition'
     ATTRIBUTE_MAX = 'Max'
 

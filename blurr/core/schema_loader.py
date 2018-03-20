@@ -5,6 +5,9 @@ from blurr.core.loader import TypeLoader
 
 
 class SchemaLoader:
+    """
+    Provides functionality to operate on the schema using fully qualified names.
+    """
     ATTRIBUTE_NAME = 'Name'
     ATTRIBUTE_TYPE = 'Type'
 
@@ -12,7 +15,7 @@ class SchemaLoader:
         self._spec = {}
 
     def add_schema(self, spec: Dict[str, Any],
-                   full_parent_name: str = None) -> str:
+                   fully_qualified_parent_name: str = None) -> str:
         if not isinstance(spec, dict):
             return None
 
@@ -20,32 +23,23 @@ class SchemaLoader:
             return None
 
         name = spec[self.ATTRIBUTE_NAME]
-        full_name = name if full_parent_name is None else full_parent_name + '.' + name
+        fully_qualified_name = name if fully_qualified_parent_name is None else fully_qualified_parent_name + '.' + name
 
-        self._spec[full_name] = spec
+        self._spec[fully_qualified_name] = spec
         for key, val in spec.items():
             if isinstance(val, list):
                 for item in val:
-                    self.add_schema(item, full_name)
-            self.add_schema(val, full_name)
+                    self.add_schema(item, fully_qualified_name)
+            self.add_schema(val, fully_qualified_name)
 
         return spec[self.ATTRIBUTE_NAME]
 
-    def get_schema_object(self, schema_path: str):
-        spec = self.get_schema_spec(schema_path)
+    def get_schema_object(self, fully_qualified_name: str):
+        spec = self.get_schema_spec(fully_qualified_name)
         if self.ATTRIBUTE_TYPE not in spec:
             raise InvalidSchemaError('Name not defined in schema')
-        return TypeLoader.load_schema(spec[self.ATTRIBUTE_TYPE])(schema_path,
+        return TypeLoader.load_schema(spec[self.ATTRIBUTE_TYPE])(fully_qualified_name,
                                                                  self)
 
-    def get_schema_spec(self, schema_path: str) -> Dict[str, Any]:
-        return self._spec[schema_path]
-
-    def _get_schema(self, schema_path: str,
-                    spec: Dict[str, Any]) -> Dict[str, Any]:
-        schema_path_splits = schema_path.split('.', 1)
-        if len(schema_path_splits) > 1:
-            return self._get_schema(schema_path_splits[1],
-                                    spec[schema_path_splits[0]])
-        else:
-            return spec[schema_path_splits[0]]
+    def get_schema_spec(self, fully_qualified_name: str) -> Dict[str, Any]:
+        return self._spec[fully_qualified_name]
