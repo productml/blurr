@@ -13,6 +13,7 @@ DataGroups: list(any(include('data_group_variable'), include('data_group_identit
 data_group_variable:
   Name: identifier()
   Type: enum('ProductML:DTC:DataGroup:VariableAggregate')
+  Store: identifier(required=False)
   When: expression(required=False)
   Fields: list(include('field'), min=1)
 
