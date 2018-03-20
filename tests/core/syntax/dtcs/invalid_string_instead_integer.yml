@@ -1,22 +1,16 @@
-Type: ProductML:DTC:Streaming
+Type: ProductML:DTC:Window
 Version: '2018-03-01'
 Description: Example
+SourceDTC: test
 Name: example_name
-Identity: source.user_id
 When: source.package_version = '1.0'
-Store:
-   Type: ProductML:DTC:Storage:DynamoDB
-   Name: offer_ai_dynamo
-   RetentionDays: 180
 
+Anchor:
+  Condition: True==True
+  Max: one
 
-   # SHOULD BE AN INTEGER
-   ReadWriteUnits: five
-
-
-   Table: ProductML_Test_Win_Ratios
 DataGroups:
- - Type: ProductML:DTC:DataGroup:IdentityAggregate
+ - Type: ProductML:DTC:DataGroup:VariableAggregate
    Name: user
    Store: offer_ai_dynamo
    Fields:

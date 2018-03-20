@@ -4,18 +4,26 @@ from blurr.core.store import Store, Key
 
 
 class MemoryStore(Store):
-    def __init__(self, state: Dict[str, Any] = None) -> None:
-        super().__init__({'Name': 'memory', 'Type': 'MemoryStore'})
-        if state:
-            self.load(state)
+    """
+    In-memory store implementation
+    """
 
-    def load(self, state: Dict[str, Any]) -> Any:
-        for k, v in state.items():
-            key = Key.parse(k)
-            self._cache[key] = v
+    def __init__(self, spec: Dict[str, Any] = None) -> None:
+        super().__init__(spec if spec else {
+            'Name': 'memory',
+            'Type': 'memory_store'
+        })
 
-    def _store_get_range(self, start: Key, end: Key = None,
-                         count: int = 0) -> Dict[Key, Any]:
+        self._cache: Dict[Key, Any] = dict()
+
+    def get(self, key: Key) -> Any:
+        return self._cache.get(key, None)
+
+    def get_range(self, start: Key, end: Key = None,
+                  count: int = 0) -> Dict[Key, Any]:
+        if end and count:
+            raise ValueError('Only one of `end` or `count` can be set')
+
         if not count:
             return {
                 key: item
@@ -35,14 +43,11 @@ class MemoryStore(Store):
             else:
                 return dict(items[:count])
 
-    def _store_get(self, key: Key):
-        return None
+    def save(self, key: Key, item: Any) -> None:
+        self._cache[key] = item
 
-    def _store_save(self, key: Key, item: Any) -> None:
-        pass
+    def delete(self, key: Key) -> None:
+        self._cache.pop(key, None)
 
-    def _store_delete(self, key: Key) -> None:
-        pass
-
-    def _finalize(self) -> None:
+    def finalize(self) -> None:
         pass

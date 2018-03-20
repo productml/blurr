@@ -33,8 +33,7 @@ class LocalRunner:
         identity = self._transformer_schema.get_identity(source_context)
         if identity not in self._user_transformer:
             self._user_transformer[identity] = StreamingTransformer(
-                MemoryStore(), self._transformer_schema, identity,
-                source_context)
+                self._transformer_schema, identity, source_context)
 
         self._user_transformer[identity].evaluate_record(record)
 

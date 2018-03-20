@@ -57,7 +57,7 @@ def test_invalid_string_instead_of_integer():
     with raises(InvalidSchemaError) as err:
         dtc_dict = load_example('invalid_string_instead_integer.yml')
         validate(dtc_dict)
-    assert "Store.ReadWriteUnits: 'five' is not a int." in str(err.value)
+    assert "Anchor.Max: 'one' is not a int." in str(err.value)
 
 
 def test_invalid_non_existing_data_type():
