@@ -65,9 +65,12 @@ class SessionDataGroup(DataGroup):
         """
 
         # If a split is imminent, save the current session snapshot with the timestamp
-        split_should_be_evaluated = not (self.schema.split is None or self.start_time is None or self.end_time is None)
+        split_should_be_evaluated = not (self.schema.split is None
+                                         or self.start_time is None
+                                         or self.end_time is None)
 
-        if split_should_be_evaluated and self.schema.split.evaluate(self.evaluation_context) is True:
+        if split_should_be_evaluated and self.schema.split.evaluate(
+                self.evaluation_context) is True:
             # Save the current snapshot with the current timestamp
             self.persist(self.start_time)
             # Reset the state of the contents
