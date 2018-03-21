@@ -6,13 +6,13 @@ from blurr.core.syntax.schema_validator import is_identifier, is_expression, val
 
 
 def test_valid_identifier():
-    assert is_identifier("valid_string_with_numbers_and_!@£$$%%^&*()")
+    assert is_identifier('valid_string_with_numbers_and_!@£$$%%^&*()')
 
 
 def test_invalid_identifiers():
-    assert not is_identifier("identifier with spaces")
-    assert not is_identifier("identifier_with\t_tabs")
-    assert not is_identifier("identifier_with\n_new_lines")
+    assert not is_identifier('identifier with spaces')
+    assert not is_identifier('identifier_with\t_tabs')
+    assert not is_identifier('identifier_with\n_new_lines')
 
 
 def test_valid_expression():
@@ -20,8 +20,8 @@ def test_valid_expression():
 
 
 def test_invalid_expression():
-    assert not is_expression("regular text")
-    assert not is_expression("is_invalid_python(1 /// 2)")
+    assert not is_expression('regular text')
+    assert not is_expression('is_invalid_python(1 /// 2)')
 
 
 def load_example(file):
@@ -32,7 +32,7 @@ def test_validation_errors_contain_dtc_name_and_schema_location():
     with raises(InvalidSchemaError) as err:
         dtc_dict = load_example('invalid_wrong_version.yml')
         validate(dtc_dict, 'dtc_name')
-    assert "Error validating data dtc_name with schema blurr/core/syntax/dtc_streaming_schema.yml" in str(
+    assert 'Error validating data dtc_name with schema blurr/core/syntax/dtc_streaming_schema.yml' in str(
         err.value)
 
 
@@ -78,4 +78,4 @@ def test_invalid_datagroup_has_no_fields():
     with raises(InvalidSchemaError) as err:
         dtc_dict = load_example('invalid_datagroup_has_no_fields.yml')
         validate(dtc_dict)
-    assert "DataGroups.0.Fields: Required field missing" in str(err.value)
+    assert 'DataGroups.0.Fields: Required field missing' in str(err.value)
