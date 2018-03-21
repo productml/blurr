@@ -24,13 +24,9 @@ class DataGroupSchema(BaseSchemaCollection, ABC):
         Initializing the nested field schema that all data groups contain
         :param spec: Schema specifications for the field
         """
-        self.store = None
         super().__init__(fully_qualified_name, schema_loader,
                          self.ATTRIBUTE_FIELDS)
-
-    def load(self):
-        super().load()
-
+        self.store = None
         if self.ATTRIBUTE_STORE in self._spec:
             store_fq_name = self.schema_loader.get_fully_qualified_name(
                 self.schema_loader.get_transformer_name(

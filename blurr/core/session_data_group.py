@@ -2,6 +2,7 @@ from typing import Dict, Any, List
 
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.data_group import DataGroup, DataGroupSchema
+from blurr.core.schema_loader import SchemaLoader
 
 
 class SessionDataGroupSchema(DataGroupSchema):
@@ -11,25 +12,24 @@ class SessionDataGroupSchema(DataGroupSchema):
 
     ATTRIBUTE_SPLIT = 'Split'
 
-    def load(self) -> None:
-        """
-        Overrides base load to include loads for nested items
-        """
-        # Alter the spec to introduce the session start and end time implicitly handled fields
+    def __init__(self, fully_qualified_name: str,
+                 schema_loader: SchemaLoader) -> None:
+        super().__init__(fully_qualified_name, schema_loader)
+
+        # Load type specific attributes
+        self.split: Expression = Expression(
+            self._spec[self.ATTRIBUTE_SPLIT]
+        ) if self.ATTRIBUTE_SPLIT in self._spec else None
+
+    def extend_schema(self):
+        # Alter the spec to introduce the session start and end time implicitly
+        # handled fields
         predefined_field = self.build_predefined_fields_spec(
             self._spec[self.ATTRIBUTE_NAME])
         self._spec[self.ATTRIBUTE_FIELDS][0:0] = predefined_field
         for field_schema in predefined_field:
             self.schema_loader.add_schema(field_schema,
                                           self.fully_qualified_name)
-
-        # Loading the base attributes first
-        super().load()
-
-        # Load type specific attributes
-        self.split: Expression = Expression(
-            self._spec[self.ATTRIBUTE_SPLIT]
-        ) if self.ATTRIBUTE_SPLIT in self._spec else None
 
     @staticmethod
     def build_predefined_fields_spec(

@@ -4,6 +4,7 @@ from blurr.core.anchor import Anchor
 from blurr.core.anchor_data_group import AnchorDataGroup
 from blurr.core.errors import AnchorSessionNotDefinedError
 from blurr.core.evaluation import Context, EvaluationContext
+from blurr.core.schema_loader import SchemaLoader
 from blurr.core.session_data_group import SessionDataGroup
 from blurr.core.store import Store
 from blurr.core.transformer import Transformer, TransformerSchema
@@ -17,16 +18,9 @@ class WindowTransformerSchema(TransformerSchema):
 
     ATTRIBUTE_ANCHOR = 'Anchor'
 
-    def validate(self, spec: Dict[str, Any]) -> None:
-        # Ensure that the base validator is invoked
-        super().validate(spec)
-
-        # Validate schema specific attributes
-        self.validate_required_attribute(spec, self.ATTRIBUTE_ANCHOR)
-
-    def load(self) -> None:
-        # Ensure that the base loader is invoked
-        super().load()
+    def __init__(self, fully_qualified_name: str,
+                 schema_loader: SchemaLoader) -> None:
+        super().__init__(fully_qualified_name, schema_loader)
 
         # Inject name and type as expected by BaseSchema
         self._spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_NAME] = 'anchor'

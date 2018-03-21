@@ -3,6 +3,7 @@ from typing import Dict, Any
 
 from blurr.core.base import BaseSchema, BaseItem
 from blurr.core.evaluation import Expression, EvaluationContext
+from blurr.core.schema_loader import SchemaLoader
 
 
 class FieldSchema(BaseSchema, ABC):
@@ -19,7 +20,9 @@ class FieldSchema(BaseSchema, ABC):
     # Field Name Definitions
     ATTRIBUTE_VALUE = 'Value'
 
-    def load(self) -> None:
+    def __init__(self, fully_qualified_name: str,
+                 schema_loader: SchemaLoader) -> None:
+        super().__init__(fully_qualified_name, schema_loader)
         self.value: Expression = Expression(self._spec[self.ATTRIBUTE_VALUE])
 
     @property

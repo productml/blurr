@@ -4,6 +4,7 @@ from blurr.core.base import Expression
 from blurr.core.errors import StreamingSourceNotFoundError
 from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.record import Record
+from blurr.core.schema_loader import SchemaLoader
 from blurr.core.transformer import Transformer, TransformerSchema
 from blurr.core.store import Store, Key
 from blurr.core.session_data_group import SessionDataGroup
@@ -17,11 +18,10 @@ class StreamingTransformerSchema(TransformerSchema):
     ATTRIBUTE_IDENTITY = 'Identity'
     ATTRIBUTE_TIME = 'Time'
 
-    def load(self) -> None:
-        # Ensure that the base loader is invoked
-        super().load()
+    def __init__(self, fully_qualified_name: str,
+                 schema_loader: SchemaLoader) -> None:
+        super().__init__(fully_qualified_name, schema_loader)
 
-        # Load the schema specific attributes
         self.identity = Expression(self._spec[self.ATTRIBUTE_IDENTITY])
         self.time = Expression(self._spec[self.ATTRIBUTE_TIME])
 

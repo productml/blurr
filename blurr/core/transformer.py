@@ -25,23 +25,17 @@ class TransformerSchema(BaseSchemaCollection, ABC):
         super().__init__(fully_qualified_name, schema_loader,
                          self.ATTRIBUTE_DATA_GROUPS)
 
-    def load(self) -> None:
-        # Ensure that the base loader is invoked
-        super().load()
-
         # Load the schema specific attributes
         self.version = self._spec[self.ATTRIBUTE_VERSION]
         self.description = self._spec[self.ATTRIBUTE_DESCRIPTION]
 
-        if self.ATTRIBUTE_STORES in self._spec:
-            # Load list of stores from the schema
-            self.stores: Dict[str, Type[Store]] = {
-                schema_spec[self.ATTRIBUTE_NAME]:
-                self.schema_loader.get_nested_schema_object(
-                    self.fully_qualified_name,
-                    schema_spec[self.ATTRIBUTE_NAME])
-                for schema_spec in self._spec[self.ATTRIBUTE_STORES]
-            }
+        # Load list of stores from the schema
+        self.stores: Dict[str, Type[Store]] = {
+            schema_spec[self.ATTRIBUTE_NAME]:
+            self.schema_loader.get_nested_schema_object(
+                self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
+            for schema_spec in self._spec.get(self.ATTRIBUTE_STORES, [])
+        }
 
         # Load nested schema items
         self.nested_schema: Dict[str, Type[DataGroup]] = {
