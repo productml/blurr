@@ -1,16 +1,33 @@
 from pytest import raises
-
 from blurr.core.base import Expression
 from blurr.core.errors import ExpressionEvaluationError, InvalidExpressionError
 from blurr.core.evaluation import Context, EvaluationContext
 
-
-def test_expression_valid() -> None:
-    code_string = '1+1'
+def test_expression_valid_single_value() -> None:
+    code_string = 1
     expr = Expression(code_string)
-    assert expr.code_string == code_string
-    assert expr.evaluate(EvaluationContext()) == 2
+    assert expr.code_string == str(code_string)
+    assert expr.evaluate(EvaluationContext()) == 1
+   
+    code_string = False
+    expr = Expression(code_string) 
+    assert expr.code_string == str(code_string)
+    assert expr.evaluate(EvaluationContext()) is False
 
+    code_string = '"Hello World"'
+    expr = Expression(code_string) 
+    assert expr.code_string == code_string
+    assert expr.evaluate(EvaluationContext()) == "Hello World"
+
+    code_string = '[1, 2, 3]'
+    expr = Expression(code_string) 
+    assert expr.code_string == code_string
+    assert expr.evaluate(EvaluationContext()) == [1, 2, 3]
+
+    code_string = '{"a":1, "b":2}'
+    expr = Expression(code_string) 
+    assert expr.code_string == code_string
+    assert expr.evaluate(EvaluationContext()) == {"a":1, "b":2}
 
 def test_expression_globals_locals() -> None:
     code_string = 'a + b + 1'
@@ -32,12 +49,24 @@ def test_expression_globals_locals() -> None:
             'b': 3
         }))) == 6
 
+def test_expression_conditional() -> None:
+    code_string = '1 if 2 > 1 else 3'
+    expr = Expression(code_string)
+    assert expr.evaluate(EvaluationContext()) == 1
+
+def test_expression_user_function() -> None:
+    code_string = '2 if test_function() else 3'
+    def test_function():
+        return 3 > 4
+    expr = Expression(code_string)
+    assert expr.evaluate(EvaluationContext(Context({
+            'test_function': test_function
+        }))) == 3
 
 def test_invalid_expression() -> None:
     code_string = '{9292#?&@&^'
     with raises(InvalidExpressionError):
         Expression(code_string)
-
 
 def test_execution_error() -> None:
     code_string = '1/0'
