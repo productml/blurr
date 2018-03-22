@@ -7,56 +7,8 @@ from datetime import datetime, timezone
 
 
 @fixture
-def memory_store() -> MemoryStore:
-    schema_loader = SchemaLoader()
-    schema_loader.add_schema({
-        'Name': 'memstore',
-        'Type': 'ProductML:DTC:Store:MemoryStore'
-    })
-    store = MemoryStore('memstore', schema_loader)
-    store.save(
-        Key('user1', 'state'), {
-            'variable_1': 1,
-            'variable_a': 'a',
-            'variable_true': True
-        })
-
-    store.save(
-        Key('user1', 'session',
-            datetime(2018, 3, 7, 22, 35, 31, 0, timezone.utc)), {
-                'events': 1,
-                'start_time': datetime(2018, 3, 7, 22, 35, 31, 0, timezone.utc)
-            }),
-
-    store.save(
-        Key('user1', 'session',
-            datetime(2018, 3, 7, 22, 35, 35, 0, timezone.utc)), {
-                'events': 2,
-                'start_time': datetime(2018, 3, 7, 22, 35, 35, 0, timezone.utc)
-            }),
-
-    store.save(
-        Key('user1', 'session',
-            datetime(2018, 3, 7, 22, 36, 31, 0, timezone.utc)), {
-                'events': 3,
-                'start_time': datetime(2018, 3, 7, 22, 36, 31, 0, timezone.utc)
-            }),
-
-    store.save(
-        Key('user1', 'session',
-            datetime(2018, 3, 7, 22, 38, 31, 0, timezone.utc)), {
-                'events': 4,
-                'start_time': datetime(2018, 3, 7, 22, 38, 31, 0, timezone.utc)
-            }),
-
-    store.save(
-        Key('user1', 'session',
-            datetime(2018, 3, 7, 22, 40, 31, 0, timezone.utc)), {
-                'events': 5,
-                'start_time': datetime(2018, 3, 7, 22, 40, 31, 0, timezone.utc)
-            }),
-
-    return store
+def memory_store(schema_loader_with_mem_store, stream_dtc_name, mem_store_name) -> MemoryStore:
+    return schema_loader_with_mem_store.get_schema_object(stream_dtc_name + '.' + mem_store_name)
 
 
 @fixture
@@ -77,11 +29,12 @@ def test_get(memory_store: MemoryStore) -> None:
         'variable_true': True
     }
 
+    date = datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc)
     key = Key('user1', 'session',
-              datetime(2018, 3, 7, 22, 35, 31, 0, timezone.utc))
+              date)
     assert memory_store.get(key) == {
         'events': 1,
-        'start_time': datetime(2018, 3, 7, 22, 35, 31, 0, timezone.utc)
+        'start_time': date
     }
 
 
@@ -113,12 +66,12 @@ def test_get_range_start_end(memory_store: MemoryStore) -> None:
     Tests that the range get does not include the sessions that lie on the boundary
     """
     start = Key('user1', 'session',
-                datetime(2018, 3, 7, 22, 35, 31, 0, timezone.utc))
+                datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc))
     end = Key('user1', 'session',
               datetime(2018, 3, 7, 22, 38, 31, 0, timezone.utc))
     sessions = memory_store.get_range(start, end)
     assert len(sessions) == 2
-    assert sessions[0][1]['start_time'] == datetime(2018, 3, 7, 22, 35, 35, 0,
+    assert sessions[0][1]['start_time'] == datetime(2018, 3, 7, 20, 35, 35, 0,
                                                     timezone.utc)
 
 
@@ -127,11 +80,11 @@ def test_get_range_start_count(memory_store: MemoryStore) -> None:
     Tests that the range get does not include the sessions that lie on the boundary
     """
     start = Key('user1', 'session',
-                datetime(2018, 3, 7, 22, 35, 31, 0, timezone.utc))
+                datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc))
     sessions = memory_store.get_range(start, None, 2)
     assert len(sessions) == 2
     print(sessions)
-    assert sessions[0][1]['start_time'] == datetime(2018, 3, 7, 22, 35, 35, 0,
+    assert sessions[0][1]['start_time'] == datetime(2018, 3, 7, 20, 35, 35, 0,
                                                     timezone.utc)
 
 
@@ -143,5 +96,5 @@ def test_get_range_end_count(memory_store: MemoryStore) -> None:
               datetime(2018, 3, 7, 22, 38, 31, 0, timezone.utc))
     sessions = memory_store.get_range(end, None, -2)
     assert len(sessions) == 2
-    assert sessions[0][1]['start_time'] == datetime(2018, 3, 7, 22, 35, 35, 0,
+    assert sessions[0][1]['start_time'] == datetime(2018, 3, 7, 20, 35, 35, 0,
                                                     timezone.utc)
