@@ -11,6 +11,7 @@ from blurr.core.window_transformer import WindowTransformer, \
     WindowTransformerSchema
 from tests.core.conftest import init_memory_store
 
+
 @fixture
 def test_stream_schema_spec():
     return yaml.safe_load(open('tests/data/stream.yml'))

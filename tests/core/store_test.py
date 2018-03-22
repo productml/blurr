@@ -7,8 +7,10 @@ from datetime import datetime, timezone
 
 
 @fixture
-def memory_store(schema_loader_with_mem_store, stream_dtc_name, mem_store_name) -> MemoryStore:
-    return schema_loader_with_mem_store.get_schema_object(stream_dtc_name + '.' + mem_store_name)
+def memory_store(schema_loader_with_mem_store, stream_dtc_name,
+                 mem_store_name) -> MemoryStore:
+    return schema_loader_with_mem_store.get_schema_object(
+        stream_dtc_name + '.' + mem_store_name)
 
 
 @fixture
@@ -30,12 +32,8 @@ def test_get(memory_store: MemoryStore) -> None:
     }
 
     date = datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc)
-    key = Key('user1', 'session',
-              date)
-    assert memory_store.get(key) == {
-        'events': 1,
-        'start_time': date
-    }
+    key = Key('user1', 'session', date)
+    assert memory_store.get(key) == {'events': 1, 'start_time': date}
 
 
 def test_set_simple(empty_memory_store) -> None:

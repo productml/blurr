@@ -7,8 +7,8 @@ from blurr.core.window import WindowSchema, Window
 
 
 @fixture
-def window_schema(schema_loader_with_mem_store: SchemaLoader, mem_store_name: str,
-                  stream_dtc_name: str) -> WindowSchema:
+def window_schema(schema_loader_with_mem_store: SchemaLoader,
+                  mem_store_name: str, stream_dtc_name: str) -> WindowSchema:
     schema_loader_with_mem_store.add_schema({
         'Type': 'ProductML:DTC:DataGroup:SessionAggregate',
         'Name': 'session',
