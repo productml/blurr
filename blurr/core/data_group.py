@@ -2,6 +2,7 @@ from abc import ABC
 from typing import Any, Dict, Type
 
 from blurr.core.base import BaseSchemaCollection, BaseItemCollection, BaseItem
+from blurr.core.errors import InvalidSchemaError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.loader import TypeLoader
 from blurr.core.store import Key
@@ -27,12 +28,19 @@ class DataGroupSchema(BaseSchemaCollection, ABC):
         super().__init__(fully_qualified_name, schema_loader,
                          self.ATTRIBUTE_FIELDS)
         self.store = None
+
         if self.ATTRIBUTE_STORE in self._spec:
             store_fq_name = self.schema_loader.get_fully_qualified_name(
                 self.schema_loader.get_transformer_name(
                     self.fully_qualified_name),
                 self._spec[self.ATTRIBUTE_STORE])
-            self.store = self.schema_loader.get_schema_object(store_fq_name)
+            try:
+                self.store = self.schema_loader.get_schema_object(
+                    store_fq_name)
+            except:
+                raise InvalidSchemaError(
+                    "Store {} not declared is schema".format(
+                        self._spec[self.ATTRIBUTE_STORE]))
 
 
 class DataGroup(BaseItemCollection):
