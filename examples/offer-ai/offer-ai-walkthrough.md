@@ -13,7 +13,7 @@ Say we have a game. We want to be able to show personalized offers to the user v
 
 ![Objective](images/objective.png)
 
-To do that, we need the features that were used in training the model readily available to query when the users shows up. If we used `games_played_last_session` as one of the features, when the user starts a new session, we need the `games_played_last_session` data to query the model to get the prediction. Ideally, ASAP.
+To do that, we need the features that were used in training the model readily available to query when the users shows up. If we used `last_session.games_played` as one of the features, when the user starts a new session, we need the `last_session.games_played` data to query the model to get the prediction. Ideally, ASAP.
 
 In this example, we'll work directly with raw data from events in the game to prepare the features needed to run such a model in production.  
 
@@ -28,12 +28,12 @@ For the purposes of this example, let's say we want these features:
 ```
 country
 facebook_connected
-purchases_prev_week_amount
-games_played_last_session
-win_ratio_last_session
+prev_week.purchases_amount
+last_session.games_played
+last_session.win_ratio
 ```
 
-The model predicts `next_7_days_revenue`. The `offer_type` and `offer_price` are picked from a list of offer candidates. The user is served the candidate for which the model predicts the highest `next_7_days_revenue`.
+The model predicts `next_week.purchases_amount`. The `offer_type` and `offer_price` are picked from a list of offer candidates. The user is served the candidate for which the model predicts the highest `next_week.purchases_amount`.
 
 # Raw Data
 
@@ -125,8 +125,8 @@ When an offer is shown, the following events are triggered. We assume that the o
 
 We want the end result to look like this - these are the features in the model.
 
-user_id | country | facebook_connected | purchases_prev_week_amount | games_played_last_session | win_ratio_last_session
-------- | ------- | ------------------ | -------------------------- | ------------------------- | ----------------------
+user_id | country | facebook_connected | last_week.purchase_amount | last_session.games_played | last_session.win_ratio
+------- | ------- | ------------------ | ------------------------- | ------------------------- | ----------------------
 
 # Writing data transforms
 
@@ -176,8 +176,8 @@ The Window DTC is run periodically (we're thinking daily) to generate training d
 
 After a Window DTC is run, we have data in S3 for each anchor point.
 
-user_id | purchases_prev_week_amount | games_played_last_session | win_ratio_last_session | next_7_days_revenue
-------- | -------------------------- | ------------------------- | ---------------------- | -------------------
+user_id | last_week.purchase_amount | last_session.games_played | last_session.win_ratio | next_week.purchase_amount
+------- | ------------------------- | ------------------------- | ---------------------- | -------------------------
 902844 | 1.99 | 6 | 0.50 | 0.99
 768264 | 0 | 10 | 0.75 | 0
 482640| 9.99 | 5 | 0.60 | 4.99
