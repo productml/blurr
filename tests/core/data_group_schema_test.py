@@ -27,21 +27,17 @@ def get_store_spec() -> Dict[str, Any]:
     return {'Type': 'ProductML:DTC:Store:MemoryStore', 'Name': 'memory'}
 
 
-class MockDataGroupSchema(DataGroupSchema):
-    pass
-
-
 def test_data_group_schema_initialization_with_store():
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(get_data_group_schema_spec())
     with pytest.raises(
             InvalidSchemaError, match="Store memory not declared is schema"):
-        mock_data_group_schema = MockDataGroupSchema(name, schema_loader)
+        data_group_schema = DataGroupSchema(name, schema_loader)
 
     schema_loader.add_schema(get_store_spec(), 'user')
-    mock_data_group_schema = MockDataGroupSchema(name, schema_loader)
-    assert mock_data_group_schema.store is not None
-    assert mock_data_group_schema.store.name == 'memory'
+    data_group_schema = DataGroupSchema(name, schema_loader)
+    assert data_group_schema.store is not None
+    assert data_group_schema.store.name == 'memory'
 
 
 def test_data_group_schema_initialization_without_store():
@@ -49,5 +45,5 @@ def test_data_group_schema_initialization_without_store():
     data_group_schema_spec = get_data_group_schema_spec()
     del data_group_schema_spec['Store']
     name = schema_loader.add_schema(data_group_schema_spec)
-    mock_data_group_schema = MockDataGroupSchema(name, schema_loader)
-    assert mock_data_group_schema.store is None
+    data_group_schema = DataGroupSchema(name, schema_loader)
+    assert data_group_schema.store is None

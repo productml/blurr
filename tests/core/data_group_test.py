@@ -36,7 +36,7 @@ def data_group_schema_with_store():
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(get_data_group_schema_spec())
     schema_loader.add_schema(get_store_spec(), 'user')
-    return MockDataGroupSchema(
+    return DataGroupSchema(
         fully_qualified_name=name, schema_loader=schema_loader)
 
 
@@ -46,12 +46,8 @@ def data_group_schema_without_store():
     data_group_schema_spec = get_data_group_schema_spec()
     del data_group_schema_spec['Store']
     name = schema_loader.add_schema(data_group_schema_spec)
-    return MockDataGroupSchema(
+    return DataGroupSchema(
         fully_qualified_name=name, schema_loader=schema_loader)
-
-
-class MockDataGroupSchema(DataGroupSchema):
-    pass
 
 
 def test_data_group_initialization(data_group_schema_with_store):
