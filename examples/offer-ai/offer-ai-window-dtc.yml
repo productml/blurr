@@ -4,39 +4,33 @@
 
 # Type of DTC. Streaming or Window
 # The Window DTC periodically applies windows operations on top of sessionized data
-
 Type: ProductML:DTC:Window
+
 Version: '2018-03-01'
 Description: Second Level processing for feature generation
 
 Name: ProductMLExample
 
 # The DTC used in Step 1
-
 SourceDTC: offer_ai_v1
 
 # Anchor defines the condition used to trigger the decision
 # If an offer is shown to the user in this session, the session
 # in which the offer is shown is the anchor
-
 Anchor:
 
- Condition:  offer_ai_v1.game_stats.offer_type != ''
- Max: 1
+  Condition:  offer_ai_v1.game_stats.offer_type != ''
+  # Max defines the maximum number of output rows to be generated every time the Window DTC is run
+  # We expect the Window DTC is run periodically (perhaps daily) to generate training data
+  # By setting max = 1, we're making sure that we are only selecting one session for each user
+  # in each period the Window DTC is run. This is to avoid over-sampling more active users
+  Max: 1
 
-##
-# Max defines the maximum number of output rows to be generated every time the Window DTC is run
-# We expect the Window DTC is run periodically (perhaps daily) to generate training data
-# By setting max = 1, we're making sure that we are only selecting one session for each user
-# in each period the Window DTC is run. This is to avoid over-sampling more active users 
-##
 
-##
 # Window aggregations are stored in S3 (a Store)
 # Defines the Store properties
-##
-
 Store:
+
    - Type: ProductML:DTC:Storage:S3
      Name: s3
      Bucket: offer-ai-example
@@ -50,50 +44,55 @@ DataGroups:
 
    Window:
 
-# Defines a processing window for the rollup. Supported window types are Day, Hour and Count
-
+      # Defines a processing window for the rollup. Supported window types are Day, Hour and Count
     - Type: count
-
-# Negative values are backward from the Anchor
-
+      # Negative values are backward from the Anchor
       Value: -1
       Source: offer_ai_v1.game_stats
-      Name: prev_session
 
    Fields:
-     - Name: games_played_last_session
+
+       # The output will contain a column for last_session.games_played
+     - Name: games_played
        Type: integer
-       Value: prev_session.games_played[0]
+       # source.games_played is a list containing the games_played information from the
+       # sessions that fall in the window defined above. In this case, because of a count
+       # window of 1 the source.games_played list only contains a single data point.
+       Value: source.games_played[0]
 
-# Field values such as prev_session.games_played is stored as list with length (max) as defined in the Anchor condition
-
-     - Name: win_ratio_last_session
+     - Name: win_ratio
        Type: float
-       Value: prev_session.win_ratio[0]
+       Value: source.win_ratio[0]
 
  - Type: ProductML:DTC:DataGroup:AnchorAggregate
    Name: last_week
+
    Window:
+
      - Type: day
        Values: -7
        Source: offer_ai_v1.game_stats
-       Name: prev_week
 
    Fields:
-     - Name: purchases_prev_week_amount
+
+     - Name: purchase_amount
        Type: float
-       Value: sum(prev_week.purchase_amount)
+       # Here sum() sums up all the data points in the source.purchase_amount, which is a
+       # list containing the purchase_amount information from the last 7 days of sessions.
+       Value: sum(source.purchase_amount)
 
 
   - Type: ProductML:DTC:DataGroup:AnchorAggregate
-    Name: 7_day_revenue
+    Name: next_week
+
     Window:
+
       - Type: day
         Values: 7
         Source: offer_ai_v1.game_stats
-        Name: next_7
 
     Fields:
-      - Name: next_7_days_revenue
+
+      - Name: purchase_amount
         Type: float
-        Value: sum(next_7.purchase_amount)
+        Value: sum(source.purchase_amount)
