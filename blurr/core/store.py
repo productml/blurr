@@ -53,16 +53,26 @@ class Key:
                                     other.timestamp)
 
     def __lt__(self, other: 'Key') -> bool:
-        return (self.identity, self.group) == (
-            other.identity, other.group
-        ) and (other.timestamp is not None) and (
-            self.timestamp is not None) and (self.timestamp < other.timestamp)
+        """
+        Does a less than comparison on two keys. A None timestamp is considered
+        larger than a timestamp that has been set.
+        """
+        if (self.identity, self.group) != (
+                other.identity, other.group) or self.timestamp is None:
+            return False
+
+        return (other.timestamp is None) or (self.timestamp < other.timestamp)
 
     def __gt__(self, other: 'Key') -> bool:
-        return (self.identity,
-                self.group) == (other.identity, other.group) and (
-                    (self.timestamp is None) or (other.timestamp is None) or
-                    (self.timestamp > other.timestamp))
+        """
+        Does a greater than comparison on two keys. A None timestamp is
+        considered larger than a timestamp that has been set.
+        """
+        if (self.identity, self.group) != (
+                other.identity, other.group) or other.timestamp is None:
+            return False
+
+        return (self.timestamp is None) or (self.timestamp > other.timestamp)
 
     def __hash__(self):
         return hash((self.identity, self.group, self.timestamp))
