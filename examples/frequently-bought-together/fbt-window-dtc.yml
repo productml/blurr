@@ -1,0 +1,68 @@
+####
+# Header block that defines the properties of this DTC
+####
+
+# Type of DTC. Streaming or Window
+# The Window DTC periodically applies windows operations on top of sessionized data
+Type: ProductML:DTC:Window
+
+Version: '2018-03-23'
+Description: Second Level processing for feature generation
+
+Name: ProductMLExample
+
+# The DTC used in Step 1
+SourceDTC: fbt_v1
+
+# Anchor defines the condition used to trigger the decision
+# If the user view a primary product in this session, every session
+# where this product is shown becomes an anchor
+
+Anchor:
+
+  Condition:  fbt_v1.item_stats.product_primary != ''
+  # Max defines the maximum number of output rows to be generated every time the Window DTC is run
+  # We expect the Window DTC is run periodically (perhaps daily) to generate training data
+  # By setting max = 1, we're making sure that we are only selecting one product view for each user
+  # in each period the Window DTC is run. This is to avoid over-sampling more active users
+  # We're free to change this the max value to whatever we want, of course
+  Max: 1
+
+
+# Window aggregations are stored in S3 (a Store)
+# Defines the Store properties
+Store:
+
+   - Type: ProductML:DTC:Storage:S3
+     Name: s3
+     Bucket: fbt-example
+     Prefix: /dtc-test/window/
+
+
+DataGroups:
+
+ - Type: ProductML:DTC:DataGroup:AnchorAggregate
+   Name: lifetime
+
+   Window:
+
+      # Defines a processing window for the rollup. Supported window types are Day, Hour and Count
+    - Type: Day
+      # Negative values are backward from the Anchor
+      Value: -10000
+      # Use absurdly large negative values to calculate lifetime stats
+      Source: fbt_v1.session_stats
+
+   Fields:
+
+       # The output will contain a column for last_session.games_played
+     - Name: session_index
+       Type: integer
+       Value: count(session_stats.session_id)
+       # Question: I think this method of calculating is not accurate because
+       # anchor sampling will remove some sessions?
+       # If so, calculating lifetime metrics from raw data is a pain with our setup
+
+     - Name: spend_to_date
+       Type: float
+       Value: sum(session_stats.transaction_value_this_session)

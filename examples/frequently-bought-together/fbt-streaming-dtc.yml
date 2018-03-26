@@ -1,0 +1,122 @@
+####
+# Header block that defines the properties of this DTC
+####
+
+# Type of DTC. Streaming or Window
+# The Streaming DTC processes the raw data and converts it into sessions
+
+Type: ProductML:DTC:Streaming
+Version: '2018-03-23'
+Description: Level 1 transformation from streaming Raw Data
+Name: fbt_v1
+
+# The field in the raw data around which data is aggregated. This is usually a unique user id
+
+Identity: source.appInstanceId
+
+# Question: what should parse_time be here? Not all events have a timestamp I think
+Time: parse_time(source.event_time, 'YYYY/mm/dd HH:MM:SS')
+
+# A boolean expression that determines raw data to be processed if it evaluates to TRUE
+# Question: are we assuming that every event has a package_version?
+
+When: source.package_version = '1.0'
+
+##
+# The raw data is converted to sessions and stored in persistent storage such as DynamoDB (a Store)
+# Store properties. Only DynamoDB is supported currently
+##
+
+Store:
+   - Type: ProductML:DTC:Storage:DynamoDB
+     Name: fbt_v1_dynamo
+     Retention: 180
+     Table: fbt_test
+
+DataGroups:
+
+# IdentityAggregate is meant for user profile information that is rarely updated. This is processed first
+# These are things like country, age etc
+
+ - Type: ProductML:DTC:DataGroup:IdentityAggregate
+   Name: user
+   Store: fbt_v1_dynamo
+   When: source.event_name = 'session_start'
+
+   Fields:
+     - Name: appInstanceId
+       Value: source.appInstanceId
+
+   Fields:
+     - Name: age
+       Value: source.age
+
+    Fields:
+     - Name: gender
+       Value: source.gender
+
+    Fields:
+     - Name: country
+       Value: source.country
+
+    Fields:
+     - Name: days_since_install
+       Value: datetime.strptime('source.start_time', date_format) - datetime.strptime('source.first_open_time', date_format)
+       # Question: Is the above correct (we're assuming that the datetime python package is imported somehow)
+
+##
+# Session aggregates definition
+##
+
+ - Type: ProductML:DTC:DataGroup:SessionAggregate
+   Name: item_stats
+   Store: fbt_v1_dynamo
+   Split: source.session_id != session_id and source.item_id != item_id
+
+   # Split defines when a new session is created. A new session is created when the boolean expression is TRUE
+   # Question: maybe this comment needs to be rewritten/need better name for SessionAggregate
+
+   Fields:
+
+     - Name: product_primary
+
+      # String is the default type and is used if type is not defined
+
+       Type: string
+       Value: source.item_id
+       When: source.event_name == 'view_item' and if ',' in source.item_id
+
+# This will filter out all primary product views that do not show the frequently bought together feature
+
+   Fields:
+     - Name: fbt_1
+       Type: string
+       Value: source.item_id.split(", ")[0]
+       # If our item_id is "32, 42, 94", the split function will create an array [32, 42, 94], where the first element of the array is 32
+       When: source.event_name == 'view_item' and if ',' in source.item_id
+
+       # Any valid Python expression can be used for Value and When fields
+       # The underlying interpreter for DTCs is Python v3.6
+
+   Fields:
+     - Name: fbt_2
+       Type: string
+       Value: source.item_id.split(", ")[1]
+       When: source.event_name == 'view_item' and if ',' in source.item_id
+
+   Fields:
+     - Name: fbt_3
+       Type: string
+       Value: source.item_id.split(", ")[2]
+       When: source.event_name == 'view_item' and if ',' in source.item_id
+
+ - Type: ProductML:DTC:DataGroup:SessionAggregate
+   Name: session_stats
+   Store: fbt_v1_dynamo
+   Split: source.session_id != session_id
+
+   Fields:
+     - Name: transaction_value_this_session
+       Type: float
+       Value: sum(source.value)
+       When: source.event_name = 'ecommerce_purchase' and source.currency = 'usd'
