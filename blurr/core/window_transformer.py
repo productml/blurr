@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Dict, Optional
 
 from blurr.core.anchor import Anchor
 from blurr.core.anchor_data_group import AnchorDataGroup
@@ -7,7 +7,6 @@ from blurr.core.errors import AnchorSessionNotDefinedError, \
 from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.session_data_group import SessionDataGroup
-from blurr.core.store import Store
 from blurr.core.transformer import Transformer, TransformerSchema
 
 
@@ -83,18 +82,22 @@ class WindowTransformer(Transformer):
         super().evaluate()
 
     @property
-    def flattened_snapshot(self):
+    def flattened_snapshot(self) -> Dict:
+        """
+        Generates a flattened snapshot where the final key for a field is <data_group_name>.<field_name>.
+        :return: The flattened snapshot.
+        """
         snapshot_dict = super().snapshot
 
         # Flatten to feature dict
         return self._flatten_snapshot(None, snapshot_dict)
 
-    def _flatten_snapshot(self, prefix: Optional[str], value: Dict):
-        feature_dict = {}
+    def _flatten_snapshot(self, prefix: Optional[str], value: Dict) -> Dict:
+        flattened_dict = {}
         for k, v in value.items():
             if isinstance(v, dict):
-                feature_dict.update(self._flatten_snapshot(k, v))
+                flattened_dict.update(self._flatten_snapshot(k, v))
             else:
-                feature_dict[prefix + '.' + k if prefix is not None else k] = v
+                flattened_dict[prefix + '.' + k if prefix is not None else k] = v
 
-        return feature_dict
+        return flattened_dict

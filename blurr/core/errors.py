@@ -48,12 +48,22 @@ class StreamingSourceNotFoundError(Exception):
 
 
 class AnchorSessionNotDefinedError(Exception):
+    """
+    Raised when anchor session is not defined and a WindowTransformer is evaluated.
+    """
     pass
 
 
 class IdentityMismatchError(Exception):
+    """
+    Raised when the identity of the record being evaluated does not match the
+    identity of existing data.
+    """
     pass
 
 
 class PrepareWindowMissingSessionsError(Exception):
+    """
+    Raised when the window view generated is insufficient as per the window specification.
+    """
     pass
