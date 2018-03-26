@@ -51,6 +51,8 @@ class WindowTransformer(Transformer):
         :return: True, if the anchor condition is met, otherwise, False.
         """
         # Set up context so that anchor can process the session
+        self.evaluation_context.local_context.add(
+            session.schema.fully_qualified_name, session)
         if self.anchor.evaluate_anchor(session):
             self.evaluation_context.global_add('anchor', session)
             self.evaluate()

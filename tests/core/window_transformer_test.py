@@ -7,10 +7,9 @@ from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.session_data_group import SessionDataGroup, \
     SessionDataGroupSchema
-from blurr.core.store import Key
 from blurr.core.window_transformer import WindowTransformer, \
     WindowTransformerSchema
-from blurr.store.memory_store import MemoryStore
+from tests.core.conftest import init_memory_store
 
 
 @fixture
@@ -21,50 +20,6 @@ def test_stream_schema_spec():
 @fixture
 def test_window_schema_spec():
     return yaml.safe_load(open('tests/data/window.yml'))
-
-
-def init_memory_store(store: MemoryStore) -> None:
-    store.save(
-        Key('user1', 'state'), {
-            'variable_1': 1,
-            'variable_a': 'a',
-            'variable_true': True
-        })
-
-    store.save(
-        Key('user1', 'session',
-            datetime(2018, 3, 7, 22, 35, 31, 0, timezone.utc)), {
-                'events': 1,
-                'start_time': datetime(2018, 3, 7, 22, 35, 31, 0, timezone.utc)
-            })
-
-    store.save(
-        Key('user1', 'session',
-            datetime(2018, 3, 7, 22, 35, 35, 0, timezone.utc)), {
-                'events': 2,
-                'start_time': datetime(2018, 3, 7, 22, 35, 35, 0, timezone.utc)
-            })
-
-    store.save(
-        Key('user1', 'session',
-            datetime(2018, 3, 7, 22, 36, 31, 0, timezone.utc)), {
-                'events': 3,
-                'start_time': datetime(2018, 3, 7, 22, 36, 31, 0, timezone.utc)
-            })
-
-    store.save(
-        Key('user1', 'session',
-            datetime(2018, 3, 7, 22, 38, 31, 0, timezone.utc)), {
-                'events': 4,
-                'start_time': datetime(2018, 3, 7, 22, 38, 31, 0, timezone.utc)
-            })
-
-    store.save(
-        Key('user1', 'session',
-            datetime(2018, 3, 7, 22, 40, 31, 0, timezone.utc)), {
-                'events': 5,
-                'start_time': datetime(2018, 3, 7, 22, 40, 31, 0, timezone.utc)
-            })
 
 
 def test_window_transformer(test_stream_schema_spec, test_window_schema_spec):
@@ -81,8 +36,8 @@ def test_window_transformer(test_stream_schema_spec, test_window_schema_spec):
         'user1', EvaluationContext())
     session.restore({
         'events': 3,
-        'start_time': datetime(2018, 3, 7, 22, 36, 31, 0, timezone.utc),
-        'end_time': datetime(2018, 3, 7, 22, 37, 31, 0, timezone.utc)
+        'start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc),
+        'end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc)
     })
 
     assert window_transformer.evaluate_anchor(session) == True
