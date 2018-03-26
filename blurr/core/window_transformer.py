@@ -98,6 +98,7 @@ class WindowTransformer(Transformer):
             if isinstance(v, dict):
                 flattened_dict.update(self._flatten_snapshot(k, v))
             else:
-                flattened_dict[prefix + '.' + k if prefix is not None else k] = v
+                flattened_dict[prefix + '.' + k
+                               if prefix is not None else k] = v
 
         return flattened_dict

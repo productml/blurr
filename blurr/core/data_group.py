@@ -1,3 +1,4 @@
+import sys
 from abc import ABC
 from typing import Any, Dict, Type
 
@@ -80,8 +81,10 @@ class DataGroup(BaseItemCollection):
             if self.schema.store:
                 self.schema.store.save(
                     Key(self.identity, self.name, timestamp), self.snapshot)
-        except ValueError as err:
-            print('Error while trying to persist data for identity',
-                  self.identity, 'and DataGroup', self.name)
-            print('DataGroup snapshot', self.snapshot)
-            raise err
+        except Exception as err:
+            raise type(
+                err
+            )(str(err) +
+              '. Error while trying to persist data for {} identity and {} DataGroup'.
+              format(self.identity, self.name)).with_traceback(
+                  sys.exc_info()[2])
