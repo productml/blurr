@@ -29,7 +29,7 @@ class WindowSchema(BaseSchema):
 class Window:
     """
     Generates a window view on the pre-aggregated source data.
-    Does not inherit from BaseItem a window is use for setting up the evaluation
+    Does not inherit from BaseItem as a window is used for setting up the evaluation
     context and does not directly participate in the evaluation path.
     """
 
