@@ -1,7 +1,8 @@
 from typing import Any, Dict
 
 from blurr.core.base import Expression
-from blurr.core.errors import StreamingSourceNotFoundError
+from blurr.core.errors import StreamingSourceNotFoundError, \
+    IdentityMismatchError
 from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
@@ -33,7 +34,6 @@ class StreamingTransformer(Transformer):
     def __init__(self, schema: TransformerSchema, identity: str,
                  context: Context) -> None:
         super().__init__(schema, identity, context)
-        self.evaluation_context.global_add('identity', self.identity)
 
     def evaluate_record(self, record: Record):
         # Add source record and time to the global context
@@ -41,6 +41,13 @@ class StreamingTransformer(Transformer):
         self.evaluation_context.global_add('time',
                                            self.schema.time.evaluate(
                                                self.evaluation_context))
+
+        record_identity = self.schema.get_identity(
+            self.evaluation_context.global_context)
+        if self.identity != record_identity:
+            raise IdentityMismatchError('Identity in transformer (',
+                                        self.identity, ') and new record (',
+                                        record_identity, ') do not match')
 
         self.evaluate()
 

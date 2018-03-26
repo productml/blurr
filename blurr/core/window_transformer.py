@@ -1,8 +1,9 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from blurr.core.anchor import Anchor
 from blurr.core.anchor_data_group import AnchorDataGroup
-from blurr.core.errors import AnchorSessionNotDefinedError
+from blurr.core.errors import AnchorSessionNotDefinedError, \
+    PrepareWindowMissingSessionsError
 from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.session_data_group import SessionDataGroup
@@ -52,9 +53,16 @@ class WindowTransformer(Transformer):
         """
         # Set up context so that anchor can process the session
         if self.anchor.evaluate_anchor(session):
-            self.evaluation_context.global_add('anchor', session)
-            self.evaluate()
-            del self.evaluation_context.global_context['anchor']
+
+            try:
+                self.evaluation_context.global_add('anchor', session)
+                self.evaluate()
+                self.anchor.add_condition_met()
+            except PrepareWindowMissingSessionsError:
+                return False
+            finally:
+                del self.evaluation_context.global_context['anchor']
+
             return True
 
         return False
@@ -71,3 +79,20 @@ class WindowTransformer(Transformer):
                 item.prepare_window(self.anchor.anchor_session.start_time)
 
         super().evaluate()
+
+    @property
+    def flattened_snapshot(self):
+        snapshot_dict = super().snapshot
+
+        # Flatten to feature dict
+        return self._flatten_snapshot(None, snapshot_dict)
+
+    def _flatten_snapshot(self, prefix: Optional[str], value: Dict):
+        feature_dict = {}
+        for k, v in value.items():
+            if isinstance(v, dict):
+                feature_dict.update(self._flatten_snapshot(k, v))
+            else:
+                feature_dict[prefix + '.' + k if prefix is not None else k] = v
+
+        return feature_dict

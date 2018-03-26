@@ -49,3 +49,11 @@ class StreamingSourceNotFoundError(Exception):
 
 class AnchorSessionNotDefinedError(Exception):
     pass
+
+
+class IdentityMismatchError(Exception):
+    pass
+
+
+class PrepareWindowMissingSessionsError(Exception):
+    pass

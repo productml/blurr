@@ -76,6 +76,12 @@ class DataGroup(BaseItemCollection):
         Persists the current data group
         :param timestamp: Optional timestamp to include in the Key construction
         """
-        if self.schema.store:
-            self.schema.store.save(
-                Key(self.identity, self.name, timestamp), self.snapshot)
+        try:
+            if self.schema.store:
+                self.schema.store.save(
+                    Key(self.identity, self.name, timestamp), self.snapshot)
+        except ValueError as err:
+            print('Error while trying to persist data for identity',
+                  self.identity, 'and DataGroup', self.name)
+            print('DataGroup snapshot', self.snapshot)
+            raise err

@@ -130,7 +130,6 @@ def test_get_range_start_count(memory_store: MemoryStore) -> None:
                 datetime(2018, 3, 7, 22, 35, 31, 0, timezone.utc))
     sessions = memory_store.get_range(start, None, 2)
     assert len(sessions) == 2
-    print(sessions)
     assert sessions[0][1]['start_time'] == datetime(2018, 3, 7, 22, 35, 35, 0,
                                                     timezone.utc)
 
