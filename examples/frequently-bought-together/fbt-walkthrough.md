@@ -2,7 +2,7 @@
 
 In this example, we’ll walk through building a ‘Frequently bought together’ feature to show in a mobile e-commerce app using Firebase events.
 
-![Mockup](images/fbt_mockup.png)
+![Mockup](images/fbt_mockup.PNG)
 
 When a user views a ‘Simple Plant’ in our e-commerce app, we want to promote a set of products to encourage the user to spend more and hence increase the transaction value.
 
