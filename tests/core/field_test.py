@@ -10,19 +10,19 @@ from blurr.core.evaluation import Expression
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 
+
 @fixture
 def test_field_schema() -> Dict[str, Any]:
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(yaml.load('''
-Name: max_attempts
-Type: integer
-Value: 5
-'''))
+    name = schema_loader.add_schema({
+        'Name': 'max_attempts',
+        'Type': 'integer',
+        'Value': 5
+    })
     return MockFieldSchema(name, schema_loader)
 
 
 class MockFieldSchema(FieldSchema):
-
     @property
     def type_object(self) -> Any:
         return int
@@ -50,12 +50,12 @@ def test_field_evaluate_with_needs_evaluation(test_field_schema):
 
 def test_field_evaluate_without_needs_evaluation():
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(yaml.load('''
-Name: max_attempts
-Type: integer
-Value: 5
-When: 2 == 3
-'''))
+    name = schema_loader.add_schema({
+        'Name': 'max_attempts',
+        'Type': 'integer',
+        'Value': 5,
+        'When': '2 == 3'
+    })
     field_schema = MockFieldSchema(name, schema_loader)
     field = MockField(field_schema, EvaluationContext())
     field.evaluate()
@@ -65,11 +65,11 @@ When: 2 == 3
 
 def test_field_evaluate_incorrect_type():
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(yaml.load('''
-Name: max_attempts
-Type: integer
-Value: '"Hi"'
-'''))
+    name = schema_loader.add_schema({
+        'Name': 'max_attempts',
+        'Type': 'integer',
+        'Value': '"Hi"'
+    })
     field_schema = MockFieldSchema(name, schema_loader)
     field = MockField(field_schema, EvaluationContext())
     with pytest.raises(
@@ -83,7 +83,7 @@ Value: '"Hi"'
 def test_field_snapshot(test_field_schema):
     field = MockField(test_field_schema, EvaluationContext())
     assert field.snapshot == 0
-    
+
     field.evaluate()
     assert field.snapshot == 5
 
