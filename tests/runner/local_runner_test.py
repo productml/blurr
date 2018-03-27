@@ -6,10 +6,9 @@ from blurr.core.store import Key
 from blurr.runner.local_runner import LocalRunner
 
 
-def test_local_runner():
+def test_local_runner_session_only():
     local_runner = LocalRunner(['tests/data/raw.json'],
-                               'tests/data/stream.yml',
-                               'tests/data/window.yml')
+                               'tests/data/stream.yml', None)
     local_runner.execute()
 
     assert len(local_runner._session_data) == 7
@@ -45,12 +44,30 @@ def test_local_runner():
         'continent': ''
     }
 
+    assert local_runner._window_data['userA'] == []
+    assert local_runner._window_data['userB'] == []
+
+
+def test_local_runner_no_vars_stored():
+    local_runner = LocalRunner(['tests/data/raw.json'],
+                               'tests/data/stream.yml', None)
+    local_runner.execute()
+
+    # Variables should not be stored
+    assert Key('userA', 'vars') not in local_runner._session_data
+
+
+def test_local_runner_with_window():
+    local_runner = LocalRunner(['tests/data/raw.json'],
+                               'tests/data/stream.yml',
+                               'tests/data/window.yml')
+    local_runner.execute()
+
+    assert len(local_runner._session_data) == 7
+
     # Window DTC output
     assert local_runner._window_data['userA'] == [{
         'last_session.events': 1,
         'last_day.total_events': 1
     }]
     assert local_runner._window_data['userB'] == []
-
-    # Variables should not be stored
-    assert Key('userA', 'vars') not in local_runner._session_data

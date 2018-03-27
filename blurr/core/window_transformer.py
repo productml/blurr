@@ -59,12 +59,11 @@ class WindowTransformer(Transformer):
                 self.evaluation_context.global_add('anchor', session)
                 self.evaluate()
                 self.anchor.add_condition_met()
+                return True
             except PrepareWindowMissingSessionsError:
                 return False
             finally:
                 del self.evaluation_context.global_context['anchor']
-
-            return True
 
         return False
 

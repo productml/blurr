@@ -62,11 +62,11 @@ class Window:
         self._validate_view()
 
     def _validate_view(self):
-        if self.schema.type == 'count':
-            if len(self.view) != abs(self.schema.value):
-                raise PrepareWindowMissingSessionsError(
-                    'Expecting {} but not found {} sessions'.format(
-                        abs(self.schema.value), len(self.view)))
+        if self.schema.type == 'count' and len(self.view) != abs(
+                self.schema.value):
+            raise PrepareWindowMissingSessionsError(
+                'Expecting {} but not found {} sessions'.format(
+                    abs(self.schema.value), len(self.view)))
 
         if len(self.view) == 0:
             raise PrepareWindowMissingSessionsError(
