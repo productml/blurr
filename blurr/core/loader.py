@@ -1,5 +1,6 @@
-import importlib
 from typing import Any
+
+import importlib
 
 ITEM_MAP = {
     'ProductML:DTC:DataGroup:SessionAggregate': 'blurr.core.session_data_group.SessionDataGroup',

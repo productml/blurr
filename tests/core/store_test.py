@@ -1,9 +1,10 @@
+from datetime import datetime, timezone
+
 from pytest import fixture
 
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store import Key
 from blurr.store.memory_store import MemoryStore
-from datetime import datetime, timezone
 
 
 @fixture
@@ -81,7 +82,6 @@ def test_get_range_start_count(memory_store: MemoryStore) -> None:
                 datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc))
     sessions = memory_store.get_range(start, None, 2)
     assert len(sessions) == 2
-    print(sessions)
     assert sessions[0][1]['start_time'] == datetime(2018, 3, 7, 20, 35, 35, 0,
                                                     timezone.utc)
 

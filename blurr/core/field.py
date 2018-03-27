@@ -1,5 +1,6 @@
+from typing import Any
+
 from abc import ABC, abstractmethod
-from typing import Dict, Any
 
 from blurr.core.base import BaseSchema, BaseItem
 from blurr.core.evaluation import Expression, EvaluationContext

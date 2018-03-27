@@ -1,6 +1,7 @@
-from collections import defaultdict
 from datetime import datetime
 from typing import Dict, Any
+
+from collections import defaultdict
 
 from blurr.core.base import BaseSchema, BaseItem
 from blurr.core.evaluation import Expression, EvaluationContext

@@ -1,13 +1,9 @@
 from typing import Dict, Any
 
 import yaml
-import pytest
-from pytest import mark, fixture
+from pytest import fixture
 
 from blurr.core.field import FieldSchema
-from blurr.core.errors import InvalidSchemaError
-from blurr.core.evaluation import Expression
-from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 
 

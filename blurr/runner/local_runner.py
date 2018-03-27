@@ -5,11 +5,9 @@ from dateutil import parser
 
 from blurr.core.evaluation import Context
 from blurr.core.record import Record
-from blurr.core.evaluation import Context
 from blurr.core.schema_loader import SchemaLoader
-from blurr.store.memory_store import MemoryStore
-from dateutil import parser
-from blurr.core.streaming_transformer import StreamingTransformerSchema, StreamingTransformer
+from blurr.core.streaming_transformer import StreamingTransformerSchema, \
+    StreamingTransformer
 from blurr.core.syntax.schema_validator import validate
 
 

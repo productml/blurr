@@ -1,13 +1,8 @@
-from typing import Any, Dict
-
 from blurr.core.base import Expression
-from blurr.core.errors import StreamingSourceNotFoundError
 from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.transformer import Transformer, TransformerSchema
-from blurr.core.store import Store, Key
-from blurr.core.session_data_group import SessionDataGroup
 
 
 class StreamingTransformerSchema(TransformerSchema):
