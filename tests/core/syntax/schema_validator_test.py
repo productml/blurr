@@ -2,7 +2,8 @@ import yaml
 from pytest import raises
 
 from blurr.core.errors import InvalidSchemaError
-from blurr.core.syntax.schema_validator import is_identifier, is_expression, validate
+from blurr.core.syntax.schema_validator import is_identifier, is_expression, \
+    validate
 
 
 def test_valid_identifier():

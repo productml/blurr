@@ -1,6 +1,7 @@
+from datetime import datetime, timezone
+
 from blurr.core.store import Key
 from blurr.runner.local_runner import LocalRunner
-from datetime import datetime, timezone
 
 
 def test_local_runner():

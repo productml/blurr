@@ -1,5 +1,6 @@
+from typing import Any
+
 from abc import ABC, abstractmethod
-from typing import Dict, Any
 
 from blurr.core.base import BaseSchema, BaseItem
 from blurr.core.evaluation import Expression, EvaluationContext
@@ -82,7 +83,8 @@ class Field(BaseItem, ABC):
         # Only set the value if it conforms to the field type
         if not self.schema.is_type_of(new_value):
             raise TypeError(
-                'Value expression for {} returned an incompatible type.'.format(self.name))
+                'Value expression for {} returned an incompatible type.'.
+                format(self.name))
 
         self.value = new_value
 

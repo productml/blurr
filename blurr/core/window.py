@@ -1,11 +1,11 @@
 from datetime import datetime, timedelta
-from typing import Dict, Any, List, Tuple
+from typing import Any, List, Tuple
 
 from blurr.core.base import BaseSchema, BaseItem
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.session_data_group import SessionDataGroup
-from blurr.core.store import Store, Key
+from blurr.core.store import Key
 
 
 class WindowSchema(BaseSchema):
