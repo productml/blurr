@@ -65,7 +65,7 @@ class BaseSchemaCollection(BaseSchema, ABC):
         }
 
 
-BaseItemT = TypeVar('T', bound='BaseItem')
+BaseItemType = TypeVar('T', bound='BaseItem')
 
 
 class BaseItem(ABC):
@@ -118,7 +118,7 @@ class BaseItem(ABC):
         raise NotImplementedError('snapshot() must be implemented')
 
     @abstractmethod
-    def restore(self, snapshot) -> BaseItemT:
+    def restore(self, snapshot) -> BaseItemType:
         """
         Restores the state of an item from a snapshot
         """
