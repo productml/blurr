@@ -72,6 +72,9 @@ class Window:
             raise PrepareWindowMissingSessionsError(
                 'No matching sessions found')
 
+    # TODO: Handle end time which is beyond the expected range of data being
+    # processed. In this case a PrepareWindowMissingSessionsError error should
+    # be raised.
     def _get_end_time(self, start_time: datetime) -> datetime:
         """
         Generates the end time to be used for the store range query.
