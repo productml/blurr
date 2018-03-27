@@ -1,5 +1,5 @@
 from blurr.core.base import Expression
-from blurr.core.errors import IdentityMismatchError
+from blurr.core.errors import IdentityError
 from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
@@ -22,7 +22,19 @@ class StreamingTransformerSchema(TransformerSchema):
         self.time = Expression(self._spec[self.ATTRIBUTE_TIME])
 
     def get_identity(self, context: Context) -> str:
-        return self.identity.evaluate(EvaluationContext(context))
+        """
+        Evaluates and returns the identity as specified in the schema.
+        :param context: Context with the 'source' record set which is used to
+        determine the identity.
+        :return: The evaluated identity
+        :raises: IdentityError if identity cannot be determined.
+        """
+        identity = self.identity.evaluate(EvaluationContext(None, context))
+        if not identity:
+            raise IdentityError(
+                'Could not determine identity using {}. Evaluation context is {}'.
+                format(self.identity.code_string, context))
+        return identity
 
 
 class StreamingTransformer(Transformer):
@@ -32,6 +44,12 @@ class StreamingTransformer(Transformer):
         self.evaluation_context.global_add('identity', self.identity)
 
     def evaluate_record(self, record: Record):
+        """
+        Evaluates and updates data in the StreamingTransformer.
+        :param record: The 'source' record used for the update.
+        :raises: IdentityError if identity is different from the one used during
+        initialization.
+        """
         # Add source record and time to the global context
         self.evaluation_context.global_add('source', record)
         self.evaluation_context.global_add('time',
@@ -41,9 +59,9 @@ class StreamingTransformer(Transformer):
         record_identity = self.schema.get_identity(
             self.evaluation_context.global_context)
         if self.identity != record_identity:
-            raise IdentityMismatchError('Identity in transformer (',
-                                        self.identity, ') and new record (',
-                                        record_identity, ') do not match')
+            raise IdentityError('Identity in transformer (', self.identity,
+                                ') and new record (', record_identity,
+                                ') do not match')
 
         self.evaluate()
 

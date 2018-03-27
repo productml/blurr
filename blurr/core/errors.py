@@ -54,10 +54,9 @@ class AnchorSessionNotDefinedError(Exception):
     pass
 
 
-class IdentityMismatchError(Exception):
+class IdentityError(Exception):
     """
-    Raised when the identity of the record being evaluated does not match the
-    identity of existing data.
+    Raised when there is an error in the identity determination of a record.
     """
     pass
 
