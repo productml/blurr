@@ -1,5 +1,3 @@
-from pytest import fixture
-
 from blurr.core.record import Record
 
 
