@@ -1,4 +1,5 @@
 from pytest import raises
+
 from blurr.core.base import Expression
 from blurr.core.errors import ExpressionEvaluationError, InvalidExpressionError
 from blurr.core.evaluation import Context, EvaluationContext

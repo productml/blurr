@@ -4,7 +4,6 @@ from abc import ABC, abstractmethod
 
 from blurr.core.errors import SnapshotError
 from blurr.core.evaluation import Expression, EvaluationContext
-from blurr.core.loader import TypeLoader
 from blurr.core.schema_loader import SchemaLoader
 
 

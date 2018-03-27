@@ -1,6 +1,7 @@
-from abc import ABC, abstractmethod
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Tuple
+from typing import Any, List, Tuple
+
+from abc import abstractmethod
 from dateutil import parser
 
 from blurr.core.base import BaseSchema
