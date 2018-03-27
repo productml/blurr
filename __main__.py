@@ -8,17 +8,23 @@ Options:
 """
 import sys
 
+import os
 from docopt import docopt
 
 from blurr.cli.cli import cli
 from blurr.util.out import Out
 
+VERSION_PATH = "blurr/VERSION"
+
 
 def read_version():
-    version_file = open("blurr/VERSION","r")
-    version = version_file.readline()
-    version_file.close()
-    return version
+    if os.path.exists(VERSION_PATH) and os.path.isfile(VERSION_PATH):
+        version_file = open("blurr/VERSION", "r")
+        version = version_file.readline()
+        version_file.close()
+        return version
+    else:
+        return "LOCAL"
 
 
 def main():
