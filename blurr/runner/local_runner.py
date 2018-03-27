@@ -1,9 +1,15 @@
+"""
+Usage:
+    local_runner.py --raw_data=<files> --stream_dtc=<file> --window_dtc=<file> --output_file=<file>
+    local_runner.py (-h | --help)
+"""
 import csv
 import json
 from typing import Dict, List, Optional
 
 import yaml
 from collections import defaultdict
+from docopt import docopt
 
 from blurr.core.evaluation import Context
 from blurr.core.record import Record
@@ -67,14 +73,24 @@ class LocalRunner:
         self.execute_for_all_users()
 
     def write_output_file(self, output_file: str):
+        header = []
+        for data_rows in self._window_data.values():
+            for data_row in data_rows:
+                header = data_row.keys()
         with open(output_file, 'w') as csv_file:
-            writer = csv.DictWriter(csv_file, self._window_data[0].keys())
+            writer = csv.DictWriter(csv_file, header)
             writer.writeheader()
-            writer.writerows(self._window_data)
+            for data_rows in self._window_data.values():
+                writer.writerows(data_rows)
 
 
 def main():
-    pass
+    arguments = docopt(__doc__, version='pre-alpha')
+    local_runner = LocalRunner(arguments['--raw_data'].split(','),
+                               arguments['--stream_dtc'],
+                               arguments['--window_dtc'])
+    local_runner.execute()
+    local_runner.write_output_file(arguments['--output_file'])
 
 
 if __name__ == "__main__":
