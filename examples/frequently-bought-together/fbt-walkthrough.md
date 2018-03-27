@@ -23,7 +23,7 @@ Let’s say that we’re looking for the following features to train our initial
 
 and we will predict
 
-9. User's spend in the current session (`transaction_value_this_session`)
+9. User"s spend in the current session (`transaction_value_this_session`)
 
 Once we’ve trained and deployed the model, we query it with the model features and it returns a prediction for the transaction value in this session.
 
@@ -53,41 +53,41 @@ Example events are below.
 
 Session start event
 
-```
+```javascript
 [
 {
-'event_name': 'session_start’
-'session_id': '72a039b9-6759-901a-cf3a-3354d21beed2’
-'start_time': '2018-01-14T17:53:57'
-'appInstanceId': '72a039b9-6759-901a-cf3a-3354d21beed2',
-'age': '25-34',
-'app_Store': 'iTunes',
-'app_Version': '3.4.2',
-'country': 'BR',
-'device_brand': 'Apple',
-'device_category': 'tablet',
-'device_model': 'iPad Pro',
-'first_open_time': '2017-12-02T23:00:00',
-'gender': 'male',
-'interests': 'arts & entertainment, games',
-'language': 'pt-br',
-'new/established': 'established',
-'os_version': '10.1'
+"event_name": "session_start",
+"session_id": "72a039b9-6759-901a-cf3a-3354d21beed2",
+"start_time": "2018-01-14T17:53:57",
+"appInstanceId": "72a039b9-6759-901a-cf3a-3354d21beed2",
+"age": "25-34",
+"app_Store": "iTunes",
+"app_Version": "3.4.2",
+"country": "BR",
+"device_brand": "Apple",
+"device_category": "tablet",
+"device_model": "iPad Pro",
+"first_open_time": "2017-12-02T23:00:00",
+"gender": "male",
+"interests": "arts & entertainment, games",
+"language": "pt-br",
+"new/established": "established",
+"os_version": "10.1"
 }
 ]
 ```
 
 Product page is viewed
 
-```
+```javascript
 [
 {
-'event_name': 'view_item’
-'appInstanceId': '72a039b9-6759-901a-cf3a-3354d21beed2',
-'session_id': '72a039b9-6759-901a-cf3a-3354d21beed2’
-'item_id': '32',
-'item_name': 'simple_plant',
-'item_category': 'plants'
+"event_name": "view_item",
+"appInstanceId": "72a039b9-6759-901a-cf3a-3354d21beed2",
+"session_id": "72a039b9-6759-901a-cf3a-3354d21beed2",
+"item_id": "32",
+"item_name": "simple_plant",
+"item_category": "plants"
 }
 ]
 ```
@@ -97,30 +97,30 @@ Frequently Bought Together can be tracked in many ways and implementations in th
 1. The event is implemented as an list of `item_ids` in the `view_item` event, with the `item_category` being the primary product being viewed - in this case, `simple_plant`.
 2. When a product listing page is shown with the ‘Frequently Bought Together’ feature, 2 separate `view_item` events are triggered - one for the primary product, and one for the frequently bought together
 
-```
+```javascript
 [
 {
-'event_name': 'view_item’
-'appInstanceId': '72a039b9-6759-901a-cf3a-3354d21beed2',
-'session_id': '72a039b9-6759-901a-cf3a-3354d21beed2’
-'item_id': '32, 42, 94',
-'item_name': 'simple_plant, pot, watering_can',
-'item_category': 'itemid=32'
+"event_name": "view_item",
+"appInstanceId": "72a039b9-6759-901a-cf3a-3354d21beed2",
+"session_id": "72a039b9-6759-901a-cf3a-3354d21beed2",
+"item_id": "32, 42, 94",
+"item_name": "simple_plant, pot, watering_can",
+"item_category": "itemid=32"
 }
 ]
 ```
 
 Purchase
 
-```
+```javascript
 [
 {
-'event_name': 'ecommerce_purchase’
-'appInstanceId': '72a039b9-6759-901a-cf3a-3354d21beed2',
-'session_id': '72a039b9-6759-901a-cf3a-3354d21beed2’
-'item_id': '32, 42, 94',
-'currency': 'usd',
-'value': '12'
+"event_name": "ecommerce_purchase",
+"appInstanceId": "72a039b9-6759-901a-cf3a-3354d21beed2",
+"session_id": "72a039b9-6759-901a-cf3a-3354d21beed2"’
+"item_id": "32, 42, 94",
+"currency": "usd",
+"value": "12"
 }
 ]
 ```
