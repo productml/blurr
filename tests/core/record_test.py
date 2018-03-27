@@ -1,3 +1,5 @@
+import pickle
+
 from blurr.core.record import Record
 
 
@@ -36,3 +38,9 @@ def test_complex_array() -> None:
 def test_invalid_field() -> None:
     record = Record({})
     assert record.missing_field is None
+
+
+def test_pickle():
+    record = Record({'test': 1})
+    pickled_record = pickle.dumps(record)
+    assert record == pickle.loads(pickled_record)

@@ -1,5 +1,6 @@
 from typing import List, Dict, Tuple, Any, Optional
 
+from datetime import datetime
 from dateutil import parser
 
 from blurr.core.evaluation import Context, EvaluationContext
@@ -16,9 +17,10 @@ from blurr.store.memory_store import MemoryStore
 
 
 def execute_dtc(
-        identity_events: List[Dict], identity: str, stream_dtc_spec: Dict,
+        identity_events: List[Tuple[datetime, Record]], identity: str, stream_dtc_spec: Dict,
         window_dtc_spec: Dict) -> Tuple[List[Tuple[Key, Any]], List[Dict]]:
     schema_loader = SchemaLoader()
+    identity_events.sort(key=lambda x: x[0])
 
     session_data = execute_stream_dtc(identity_events, identity, schema_loader,
                                       stream_dtc_spec)
@@ -28,7 +30,7 @@ def execute_dtc(
 
 
 def execute_stream_dtc(
-        identity_events: List[Dict], identity: str,
+        identity_events: List[Tuple[datetime, Record]], identity: str,
         schema_loader: SchemaLoader,
         stream_dtc_spec: Optional[Dict]) -> List[Tuple[Key, Any]]:
     if stream_dtc_spec is None:
@@ -42,8 +44,8 @@ def execute_stream_dtc(
 
     stream_transformer = StreamingTransformer(stream_transformer_schema,
                                               identity, exec_context)
-    for event in identity_events:
-        stream_transformer.evaluate_record(Record(event))
+    for time, event in identity_events:
+        stream_transformer.evaluate_record(event)
     stream_transformer.finalize()
 
     return get_memory_store(schema_loader).get_all()

@@ -47,16 +47,17 @@ class LocalRunner:
         if self._window_dtc is not None:
             validate(self._window_dtc)
 
-    def _consume_record(self, record: Dict) -> None:
-        source_context = Context({'source': Record(record)})
+    def _consume_record(self, record: Record) -> None:
+        source_context = Context({'source': record})
         identity = self._stream_transformer_schema.get_identity(source_context)
+        time = self._stream_transformer_schema.get_time(source_context)
 
-        self._user_events[identity].append(record)
+        self._user_events[identity].append((time, record))
 
     def _consume_file(self, file: str) -> None:
         with open(file) as f:
             for record in f:
-                self._consume_record(json.loads(record))
+                self._consume_record(Record(json.loads(record)))
 
     def execute_for_all_users(self) -> None:
         for identity, events in self._user_events.items():

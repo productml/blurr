@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict
 
 
 def wrap(value: Any) -> Any:
@@ -20,6 +20,8 @@ class Record(dict):
         """
         When attributes are not found, None is returned
         """
+        if name.startswith('__') and name.endswith('__'):
+            raise AttributeError
         return wrap(self[name]) if name in self else None
 
 
