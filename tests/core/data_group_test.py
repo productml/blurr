@@ -31,12 +31,20 @@ def get_store_spec() -> Dict[str, Any]:
     return {'Type': 'ProductML:DTC:Store:MemoryStore', 'Name': 'memory'}
 
 
+class MockDataGroupSchema(DataGroupSchema):
+    pass
+
+
+class MockDataGroup(DataGroup):
+    pass
+
+
 @fixture
 def data_group_schema_with_store():
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(get_data_group_schema_spec())
     schema_loader.add_schema(get_store_spec(), 'user')
-    return DataGroupSchema(
+    return MockDataGroupSchema(
         fully_qualified_name=name, schema_loader=schema_loader)
 
 
@@ -46,12 +54,12 @@ def data_group_schema_without_store():
     data_group_schema_spec = get_data_group_schema_spec()
     del data_group_schema_spec['Store']
     name = schema_loader.add_schema(data_group_schema_spec)
-    return DataGroupSchema(
+    return MockDataGroupSchema(
         fully_qualified_name=name, schema_loader=schema_loader)
 
 
 def test_data_group_initialization(data_group_schema_with_store):
-    data_group = DataGroup(
+    data_group = MockDataGroup(
         schema=data_group_schema_with_store,
         identity="12345",
         evaluation_context=EvaluationContext())
@@ -59,7 +67,7 @@ def test_data_group_initialization(data_group_schema_with_store):
 
 
 def test_data_group_nested_items(data_group_schema_with_store):
-    data_group = DataGroup(
+    data_group = MockDataGroup(
         schema=data_group_schema_with_store,
         identity="12345",
         evaluation_context=EvaluationContext())
@@ -71,13 +79,13 @@ def test_data_group_nested_items(data_group_schema_with_store):
 
 def test_data_group_persist(data_group_schema_with_store,
                             data_group_schema_without_store):
-    data_group = DataGroup(
+    data_group = MockDataGroup(
         schema=data_group_schema_without_store,
         identity="12345",
         evaluation_context=EvaluationContext())
     data_group.persist()
 
-    data_group = DataGroup(
+    data_group = MockDataGroup(
         schema=data_group_schema_with_store,
         identity="12345",
         evaluation_context=EvaluationContext())
@@ -91,7 +99,7 @@ def test_data_group_persist(data_group_schema_with_store,
 
 
 def test_data_group_finalize(data_group_schema_with_store):
-    data_group = DataGroup(
+    data_group = MockDataGroup(
         schema=data_group_schema_with_store,
         identity="12345",
         evaluation_context=EvaluationContext())

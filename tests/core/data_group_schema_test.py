@@ -9,7 +9,8 @@ from blurr.core.schema_loader import SchemaLoader
 from blurr.store.memory_store import MemoryStore
 
 
-def get_data_group_schema_spec() -> Dict[str, Any]:
+@fixture
+def data_group_schema_spec() -> Dict[str, Any]:
     return {
         'Type': 'ProductML:DTC:DataGroup:SessionAggregate',
         'Name': 'user',
@@ -23,27 +24,33 @@ def get_data_group_schema_spec() -> Dict[str, Any]:
     }
 
 
-def get_store_spec() -> Dict[str, Any]:
+@fixture
+def store_spec() -> Dict[str, Any]:
     return {'Type': 'ProductML:DTC:Store:MemoryStore', 'Name': 'memory'}
 
 
-def test_data_group_schema_initialization_with_store():
-    schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(get_data_group_schema_spec())
-    with pytest.raises(
-            InvalidSchemaError, match="Store memory not declared is schema"):
-        data_group_schema = DataGroupSchema(name, schema_loader)
+class MockDataGroupSchema(DataGroupSchema):
+    pass
 
-    schema_loader.add_schema(get_store_spec(), 'user')
-    data_group_schema = DataGroupSchema(name, schema_loader)
+
+def test_data_group_schema_initialization_with_store(data_group_schema_spec,
+                                                     store_spec):
+    schema_loader = SchemaLoader()
+    name = schema_loader.add_schema(data_group_schema_spec)
+    with pytest.raises(
+            InvalidSchemaError, match="user.memory not declared is schema"):
+        data_group_schema = MockDataGroupSchema(name, schema_loader)
+
+    schema_loader.add_schema(store_spec, 'user')
+    data_group_schema = MockDataGroupSchema(name, schema_loader)
     assert data_group_schema.store is not None
     assert data_group_schema.store.name == 'memory'
 
 
-def test_data_group_schema_initialization_without_store():
+def test_data_group_schema_initialization_without_store(
+        data_group_schema_spec):
     schema_loader = SchemaLoader()
-    data_group_schema_spec = get_data_group_schema_spec()
     del data_group_schema_spec['Store']
     name = schema_loader.add_schema(data_group_schema_spec)
-    data_group_schema = DataGroupSchema(name, schema_loader)
+    data_group_schema = MockDataGroupSchema(name, schema_loader)
     assert data_group_schema.store is None
