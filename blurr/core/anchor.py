@@ -38,10 +38,12 @@ class Anchor(BaseItem):
             return False
 
         if self.evaluate():
-            self.condition_met[self.anchor_session.start_time.date()] += 1
             return True
 
         return False
+
+    def add_condition_met(self):
+        self.condition_met[self.anchor_session.start_time.date()] += 1
 
     def evaluate(self) -> bool:
         return self.schema.condition.evaluate(self.evaluation_context)

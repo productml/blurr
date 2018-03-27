@@ -67,6 +67,7 @@ def test_anchor_max_one(anchor_schema_max_one: AnchorSchema,
                         session_item: SessionDataGroup) -> None:
     anchor = Anchor(anchor_schema_max_one, EvaluationContext())
     assert anchor.evaluate_anchor(session_item) is True
+    anchor.add_condition_met()
     assert anchor.evaluate_anchor(session_item) is False
 
 
@@ -74,7 +75,9 @@ def test_anchor_max_two(anchor_schema_max_two: AnchorSchema,
                         session_item: SessionDataGroup) -> None:
     anchor = Anchor(anchor_schema_max_two, EvaluationContext())
     assert anchor.evaluate_anchor(session_item) is True
+    anchor.add_condition_met()
     assert anchor.evaluate_anchor(session_item) is True
+    anchor.add_condition_met()
     assert anchor.evaluate_anchor(session_item) is False
 
 
@@ -93,4 +96,5 @@ def test_anchor_condition(anchor_schema_max_one: AnchorSchema,
         'end_time': datetime(2018, 3, 7, 22, 37, 31, 0, timezone.utc)
     })
     assert anchor.evaluate_anchor(session_item) is True
+    anchor.add_condition_met()
     assert anchor.evaluate_anchor(session_item) is False

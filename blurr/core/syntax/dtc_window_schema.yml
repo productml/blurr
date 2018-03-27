@@ -6,7 +6,6 @@ SourceDTC: identifier()
 Time: expression(required=False)
 When: expression(required=False)
 Anchor: include('anchor')
-Stores: List(any(include('s3_store')))
 DataGroups: list(any(include('data_group_variable'), include('data_group_anchor')), min=1)
 
 ---
@@ -30,7 +29,7 @@ data_group_anchor:
   Fields: list(include('field'), min=1)
 
 window:
-  Type: enum('Day', 'Hour', 'Count')
+  Type: enum('day', 'hour', 'count')
   Value: int()
   Source: identifier()
 
@@ -40,9 +39,3 @@ field:
   Value: expression()
   When: expression(required=False)
   Atomic: bool(required=False)
-
-s3_store:
-  Type: enum('ProductML:DTC:Storage:S3')
-  Name: identifier()
-  Bucket: identifier()
-  Prefix: identifier()
