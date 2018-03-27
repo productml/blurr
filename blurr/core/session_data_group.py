@@ -24,7 +24,7 @@ class SessionDataGroupSchema(DataGroupSchema):
     def extend_schema(self):
         # Alter the spec to introduce the session start and end time implicitly
         # handled fields
-        predefined_field = self.build_predefined_fields_spec(
+        predefined_field = self._build_predefined_fields_spec(
             self._spec[self.ATTRIBUTE_NAME])
         self._spec[self.ATTRIBUTE_FIELDS][0:0] = predefined_field
         for field_schema in predefined_field:
@@ -32,7 +32,7 @@ class SessionDataGroupSchema(DataGroupSchema):
                                           self.fully_qualified_name)
 
     @staticmethod
-    def build_predefined_fields_spec(
+    def _build_predefined_fields_spec(
             name_in_context: str) -> List[Dict[str, Any]]:
         """
         Constructs the spec for predefined fields that are to be included in the master spec prior to schema load
