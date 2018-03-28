@@ -18,7 +18,6 @@ def get_data_group_schema_spec() -> Dict[str, Any]:
         'Type': 'ProductML:DTC:DataGroup:SessionAggregate',
         'Name': 'user',
         'Store': 'memory',
-        'Filter': 'source.event_id in ["app_launched", "user_updated"]',
         'Fields': [{
             'Name': 'event_count',
             'Type': 'integer',
