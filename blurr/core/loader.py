@@ -35,7 +35,7 @@ SCHEMA_MAP = {
     'boolean': 'blurr.core.simple_field.BooleanFieldSchema',
     'datetime': 'blurr.core.simple_field.DateTimeFieldSchema',
     'float': 'blurr.core.simple_field.FloatFieldSchema',
-    'map': 'blurr.core.simple_field.MapFieldSchema',
+    'map': 'blurr.core.map_field.MapFieldSchema',
     'list': 'blurr.core.simple_field.ListFieldSchema',
     'set': 'blurr.core.simple_field.SetFieldSchema'
 }

@@ -54,16 +54,6 @@ class DateTimeFieldSchema(FieldSchema):
         return None
 
 
-class MapFieldSchema(FieldSchema):
-    @property
-    def type_object(self) -> Any:
-        return dict
-
-    @property
-    def default(self) -> Any:
-        return dict()
-
-
 class ListFieldSchema(FieldSchema):
     @property
     def type_object(self) -> Any:
