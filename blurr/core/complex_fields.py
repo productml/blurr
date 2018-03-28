@@ -25,3 +25,37 @@ class MapFieldSchema(FieldSchema):
     @property
     def default(self) -> Any:
         return Map()
+
+
+class List(ComplexTypeBase, list):
+    """
+    Extends native list with operations for evaluation support.
+    """
+    pass
+
+
+class ListFieldSchema(FieldSchema):
+    @property
+    def type_object(self) -> Any:
+        return List
+
+    @property
+    def default(self) -> Any:
+        return List()
+
+
+class Set(ComplexTypeBase, set):
+    """
+    Extends native set with operations for evaluation support.
+    """
+    pass
+
+
+class SetFieldSchema(FieldSchema):
+    @property
+    def type_object(self) -> Any:
+        return Set
+
+    @property
+    def default(self) -> Any:
+        return Set()

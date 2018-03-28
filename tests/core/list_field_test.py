@@ -3,9 +3,9 @@ from typing import Dict, Any
 from pytest import fixture
 
 from blurr.core.evaluation import EvaluationContext
-from blurr.core.list_field import List
+from blurr.core.complex_fields import List
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.simple_field import SimpleField
+from blurr.core.simple_fields import SimpleField
 
 # Test the functions of the List object
 

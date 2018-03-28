@@ -3,9 +3,9 @@ from typing import Dict, Any
 from pytest import fixture, raises
 
 from blurr.core.evaluation import EvaluationContext
-from blurr.core.set_field import Set
+from blurr.core.complex_fields import Set
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.simple_field import SimpleField
+from blurr.core.simple_fields import SimpleField
 
 # Test the functions of the Set object
 
