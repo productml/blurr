@@ -1,4 +1,4 @@
-from typing import Dict, Any, Type
+from typing import Dict, Any, Type, TypeVar
 
 from abc import ABC, abstractmethod
 
@@ -65,6 +65,9 @@ class BaseSchemaCollection(BaseSchema, ABC):
         }
 
 
+BaseItemType = TypeVar('T', bound='BaseItem')
+
+
 class BaseItem(ABC):
     """
     Base class for for all leaf items that do not contain sub-items
@@ -115,7 +118,7 @@ class BaseItem(ABC):
         raise NotImplementedError('snapshot() must be implemented')
 
     @abstractmethod
-    def restore(self, snapshot) -> 'BaseItem':
+    def restore(self, snapshot) -> BaseItemType:
         """
         Restores the state of an item from a snapshot
         """
@@ -163,7 +166,7 @@ class BaseItemCollection(BaseItem):
             print('Error while creating snapshot for {}', self.name)
             raise SnapshotError(e)
 
-    def restore(self, snapshot: Dict[str, Any]) -> BaseItem:
+    def restore(self, snapshot: Dict[str, Any]) -> 'BaseItemCollection':
         """
         Restores the state of a collection from a snapshot
         """

@@ -40,8 +40,13 @@ def test_window_transformer(test_stream_schema_spec, test_window_schema_spec):
         'end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc)
     })
 
-    assert window_transformer.evaluate_anchor(session) == True
+    assert window_transformer.evaluate_anchor(session) is True
 
     snapshot = window_transformer.snapshot
     assert snapshot['last_session'] == {'events': 2}
     assert snapshot['last_day'] == {'total_events': 3}
+
+    assert window_transformer.flattened_snapshot == {
+        'last_session.events': 2,
+        'last_day.total_events': 3
+    }

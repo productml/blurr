@@ -1,7 +1,9 @@
 from datetime import datetime, timezone
 
+import pytest
 from pytest import fixture
 
+from blurr.core.errors import PrepareWindowMissingSessionsError
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.window import WindowSchema, Window
 
@@ -35,27 +37,39 @@ def window(window_schema: WindowSchema) -> Window:
     return Window(window_schema)
 
 
-def test_window_type_day(window: Window) -> None:
+def test_window_type_day_positive(window: Window) -> None:
     window.schema.type = 'day'
     window.schema.value = 1
     window.prepare('user1', datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
     assert window.events == [4, 5]
 
+
+def test_window_type_day_negative(window: Window) -> None:
     window.schema.type = 'day'
     window.schema.value = -1
     window.prepare('user1', datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
     assert window.events == [1, 2]
 
+
+def test_window_type_day_zero_value(window: Window) -> None:
     window.schema.type = 'day'
     window.schema.value = 0
-    window.prepare('user1', datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
+    with pytest.raises(
+            PrepareWindowMissingSessionsError,
+            match='No matching sessions found'):
+        window.prepare('user1',
+                       datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
     assert window.events == []
 
 
-def test_window_type_hour(window: Window) -> None:
+def test_window_type_hour_positive(window: Window) -> None:
     window.schema.type = 'hour'
     window.schema.value = 1
-    window.prepare('user1', datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
+    with pytest.raises(
+            PrepareWindowMissingSessionsError,
+            match='No matching sessions found'):
+        window.prepare('user1',
+                       datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
     assert window.events == []
 
     window.schema.type = 'hour'
@@ -63,24 +77,45 @@ def test_window_type_hour(window: Window) -> None:
     window.prepare('user1', datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
     assert window.events == [4]
 
+
+def test_window_type_hour_negative(window: Window) -> None:
     window.schema.type = 'hour'
     window.schema.value = -24
     window.prepare('user1', datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
     assert window.events == [1, 2]
 
+
+def test_window_type_hour_zero_value(window: Window) -> None:
     window.schema.type = 'hour'
     window.schema.value = 0
-    window.prepare('user1', datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
+    with pytest.raises(
+            PrepareWindowMissingSessionsError,
+            match='No matching sessions found'):
+        window.prepare('user1',
+                       datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
     assert window.events == []
 
 
-def test_window_type_count(window: Window) -> None:
+def test_window_type_count_positive(window: Window) -> None:
     window.schema.type = 'count'
     window.schema.value = -1
     window.prepare('user1', datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
     assert window.events == [2]
 
+
+def test_window_type_count_negative(window: Window) -> None:
     window.schema.type = 'count'
     window.schema.value = 1
     window.prepare('user1', datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
     assert window.events == [4]
+
+
+def test_window_type_count_missing_sesssions(window: Window) -> None:
+    window.schema.type = 'count'
+    window.schema.value = 20
+    with pytest.raises(
+            PrepareWindowMissingSessionsError,
+            match='Expecting 20 but not found 3 sessions'):
+        window.prepare('user1',
+                       datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
+    assert window.events == [4, 5, 6]

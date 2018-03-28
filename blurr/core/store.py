@@ -21,8 +21,11 @@ class Key:
         :param group: Secondary identity of the record
         :param timestamp: Optional timestamp that can be used for time range queries
         """
-        if not identity or not group or identity.isspace() or group.isspace():
-            raise ValueError('`identity` and `value` must be present.')
+        if not identity or identity.isspace():
+            raise ValueError('`identity` must be present.')
+
+        if not group or group.isspace():
+            raise ValueError('`group` must be present.')
 
         self.identity = identity
         self.group = group
@@ -51,12 +54,26 @@ class Key:
                                     other.timestamp)
 
     def __lt__(self, other: 'Key') -> bool:
-        return (self.identity, self.group) == (
-            other.identity, other.group) and self.timestamp < other.timestamp
+        """
+        Does a less than comparison on two keys. A None timestamp is considered
+        larger than a timestamp that has been set.
+        """
+        if (self.identity, self.group) != (
+                other.identity, other.group) or self.timestamp is None:
+            return False
+
+        return (other.timestamp is None) or (self.timestamp < other.timestamp)
 
     def __gt__(self, other: 'Key') -> bool:
-        return (self.identity, self.group) == (
-            other.identity, other.group) and self.timestamp > other.timestamp
+        """
+        Does a greater than comparison on two keys. A None timestamp is
+        considered larger than a timestamp that has been set.
+        """
+        if (self.identity, self.group) != (
+                other.identity, other.group) or other.timestamp is None:
+            return False
+
+        return (self.timestamp is None) or (self.timestamp > other.timestamp)
 
     def __hash__(self):
         return hash((self.identity, self.group, self.timestamp))

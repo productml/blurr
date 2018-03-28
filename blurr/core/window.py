@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from typing import Any, List, Tuple
 
 from blurr.core.base import BaseSchema, BaseItem
+from blurr.core.errors import PrepareWindowMissingSessionsError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.session_data_group import SessionDataGroup
@@ -58,6 +59,22 @@ class Window:
                     Key(identity, self.schema.source.name, start_time), None,
                     self.schema.value), identity)
 
+        self._validate_view()
+
+    def _validate_view(self):
+        if self.schema.type == 'count' and len(self.view) != abs(
+                self.schema.value):
+            raise PrepareWindowMissingSessionsError(
+                'Expecting {} but not found {} sessions'.format(
+                    abs(self.schema.value), len(self.view)))
+
+        if len(self.view) == 0:
+            raise PrepareWindowMissingSessionsError(
+                'No matching sessions found')
+
+    # TODO: Handle end time which is beyond the expected range of data being
+    # processed. In this case a PrepareWindowMissingSessionsError error should
+    # be raised.
     def _get_end_time(self, start_time: datetime) -> datetime:
         """
         Generates the end time to be used for the store range query.
