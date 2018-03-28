@@ -29,11 +29,10 @@ workflows:
       - build:
           context: aws
           filters:
-            branches:
-              ignore: master
             tags:
               ignore: /.*/
-
+            branches:
+              ignore: master
   build_and_deploy:
     jobs:
       - build_and_deploy:
