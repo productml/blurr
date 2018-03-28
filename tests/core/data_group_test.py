@@ -76,14 +76,15 @@ def test_data_group_nested_items(data_group_schema_with_store):
     assert isinstance(nested_items["event_count"], Field)
 
 
-def test_data_group_persist(data_group_schema_with_store,
-                            data_group_schema_without_store):
+def test_data_group_persist_without_store(data_group_schema_without_store):
     data_group = MockDataGroup(
         schema=data_group_schema_without_store,
         identity="12345",
         evaluation_context=EvaluationContext())
     data_group.persist()
 
+
+def test_data_group_persist_with_store(data_group_schema_with_store):
     data_group = MockDataGroup(
         schema=data_group_schema_with_store,
         identity="12345",
