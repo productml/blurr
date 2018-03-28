@@ -86,8 +86,11 @@ class Expression:
         # For non string single value expressions. Ex: 5, False.
         code_string = str(code_string)
 
-        # TODO Add validation to see that there are no direct setting using the '=' character
+        # For None / empty code strings
         self.code_string = 'None' if code_string.isspace() else code_string
+
+        # Validate the expression for errors / unsupported expressions
+        self.validate(code_string)
 
         try:
             self.code_object = compile(self.code_string, '<string>', 'eval')
@@ -106,5 +109,13 @@ class Expression:
                         evaluation_context.local_context)
 
         except Exception as e:
-            print('Expression:', self.code_string)
             raise ExpressionEvaluationError(e)
+
+    @staticmethod
+    def validate(code_string: str) -> None:
+        equal_index = code_string.find('=', 0)
+        while equal_index != -1:
+            next_index = equal_index + 1
+            if next_index == len(code_string) or code_string[next_index] != '=':
+                raise InvalidExpressionError('Setting value using `=` is not allowed.')
+            equal_index = code_string.find('=', next_index + 1)
