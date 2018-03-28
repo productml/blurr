@@ -7,8 +7,8 @@ from blurr.core.list_field import List
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.simple_field import SimpleField
 
-
 # Test the functions of the List object
+
 
 def test_list_append():
     sample = List()
@@ -61,6 +61,7 @@ def test_list_copy():
 
 
 # Test the List Field Evaluation in isolation
+
 
 @fixture(scope='module')
 def field_schema_spec() -> Dict[str, Any]:

@@ -7,8 +7,8 @@ from blurr.core.map_field import Map
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.simple_field import SimpleField
 
-
 # Test the functions of the Map object
+
 
 def test_map_set():
     sample = Map()
@@ -46,6 +46,7 @@ def test_map_clear():
 
 
 # Test the Map Field Evaluation in isolation
+
 
 @fixture(scope='module')
 def field_schema_spec() -> Dict[str, Any]:

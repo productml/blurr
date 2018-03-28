@@ -7,8 +7,8 @@ from blurr.core.set_field import Set
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.simple_field import SimpleField
 
-
 # Test the functions of the Set object
+
 
 def test_set_add():
     sample = Set()
@@ -119,6 +119,7 @@ def test_set_update():
 
 
 # Test the List Field Evaluation in isolation
+
 
 @fixture(scope='module')
 def field_schema_spec() -> Dict[str, Any]:
