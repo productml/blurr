@@ -48,7 +48,7 @@ def execute_stream_dtc(
         stream_transformer.evaluate_record(event)
     stream_transformer.finalize()
 
-    return [(k, v) for k, v in get_memory_store(schema_loader).get_all()]
+    return get_memory_store(schema_loader).get_all()
 
 
 def execute_window_dtc(identity: str, schema_loader: SchemaLoader,
