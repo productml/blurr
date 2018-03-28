@@ -38,8 +38,6 @@ workflows:
     jobs:
       - build_and_deploy:
           context: org-global
-          requires:
-            - build
           filters:
             tags:
               only: /.*/
