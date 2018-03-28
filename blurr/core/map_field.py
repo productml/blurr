@@ -13,7 +13,7 @@ class Map(dict):
         Sets the value of a key to a supplied value and returns itself
         :param key: Key to be set
         :param value: Value for the key
-        :return: The object itself
+        :return: The map itself
         """
         self[key] = value
         return self
@@ -23,7 +23,7 @@ class Map(dict):
         Increments the value set against a key.  If the key is not present, 0 is assumed as the initial state
         :param key: Key to change the value for
         :param by: Unit to increment the value by
-        :return: The object itself
+        :return: The map itself
         """
         self[key] = self.get(key, 0) + by
         return self
@@ -33,7 +33,7 @@ class Map(dict):
         Updates the map with another map and returns the updated current map
         :param m: New map to update current map with
         :param kwargs: Additional arguments
-        :return: The object itself
+        :return: The map itself
         """
         super().update(m, **kwargs)
         return self
@@ -41,10 +41,17 @@ class Map(dict):
     def clear(self):
         """
         Clears all keys and values form the map and returns itself
-        :return: The object itself
+        :return: The map itself
         """
         super().clear()
         return self
+
+    def copy(self):
+        """
+        Creates a copy of the map
+        :return: Copy of the map as a Map object
+        """
+        return Map(super().copy())
 
 
 class MapFieldSchema(FieldSchema):

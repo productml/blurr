@@ -48,7 +48,7 @@ def test_map_clear():
 # Test the Map Field Evaluation in isolation
 
 @fixture(scope='module')
-def map_field_schema_spec() -> Dict[str, Any]:
+def field_schema_spec() -> Dict[str, Any]:
     return {
         'Name': 'map_field',
         'Type': 'map',
@@ -62,21 +62,21 @@ def schema_loader() -> SchemaLoader:
 
 
 @fixture(scope='module')
-def map_field_schema(schema_loader, map_field_schema_spec):
-    return schema_loader.add_schema(map_field_schema_spec)
+def field_schema(schema_loader, field_schema_spec):
+    return schema_loader.add_schema(field_schema_spec)
 
 
-def test_map_field_evaluation(schema_loader, map_field_schema):
+def test_map_field_evaluation(schema_loader, field_schema):
     context = EvaluationContext()
-    field = SimpleField(schema_loader.get_schema_object(map_field_schema), context)
+    field = SimpleField(schema_loader.get_schema_object(field_schema), context)
     context.global_add('map_field', field.value)
 
-    initial_map = field.value
-    assert len(initial_map) == 0
+    initial_value = field.value
+    assert len(initial_value) == 0
 
     field.evaluate()
 
-    assert field.value is initial_map
+    assert field.value is initial_value
     assert len(field.value) == 3
     assert field.value['incr'] == 10
     assert field.value['set'] == 'value'
