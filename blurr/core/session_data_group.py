@@ -1,7 +1,7 @@
 from typing import Dict, Any, List
 
-from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.data_group import DataGroup, DataGroupSchema
+from blurr.core.evaluation import Expression
 from blurr.core.schema_loader import SchemaLoader
 
 

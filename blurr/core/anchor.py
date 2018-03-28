@@ -1,6 +1,7 @@
-from collections import defaultdict
 from datetime import datetime
 from typing import Dict, Any
+
+from collections import defaultdict
 
 from blurr.core.base import BaseSchema, BaseItem
 from blurr.core.evaluation import Expression, EvaluationContext
@@ -37,10 +38,12 @@ class Anchor(BaseItem):
             return False
 
         if self.evaluate():
-            self.condition_met[self.anchor_session.start_time.date()] += 1
             return True
 
         return False
+
+    def add_condition_met(self):
+        self.condition_met[self.anchor_session.start_time.date()] += 1
 
     def evaluate(self) -> bool:
         return self.schema.condition.evaluate(self.evaluation_context)

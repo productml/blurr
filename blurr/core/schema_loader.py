@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Any, List, Tuple
 
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.loader import TypeLoader
@@ -93,6 +93,11 @@ class SchemaLoader:
         :return: Schema dictionary.
         """
         return self._spec[fully_qualified_name]
+
+    def get_schemas_of_type(self,
+                            type: str) -> List[Tuple[str, Dict[str, Any]]]:
+        return [(fq_name, schema) for fq_name, schema in self._spec.items()
+                if schema.get(self.ATTRIBUTE_TYPE, '') == type]
 
     @staticmethod
     def get_transformer_name(fully_qualified_name: str) -> str:

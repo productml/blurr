@@ -4,7 +4,7 @@ import yaml
 from pytest import mark, fixture
 
 from blurr.core.base import BaseSchema, BaseItem
-from blurr.core.evaluation import Context, EvaluationContext
+from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from tests.core.base_schema_test import TestSchema
 
