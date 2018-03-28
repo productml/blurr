@@ -46,15 +46,6 @@ def version():
         return "0." + os.getenv('CIRCLE_BUILD_NUM')
 
 
-def description():
-    if not is_ci_build():
-        return "LOCAL"
-    elif is_release():
-        return os.getenv('CIRCLE_TAG')
-    else:
-        return "0." + os.getenv('CIRCLE_BUILD_NUM')
-
-
 # emit a VERSION file the CLI can use to check current version
 version_file = open("blurr/VERSION", "w")
 version_file.write(version())
