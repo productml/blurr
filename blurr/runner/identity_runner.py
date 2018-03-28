@@ -16,9 +16,9 @@ from blurr.core.window_transformer import WindowTransformerSchema, \
 from blurr.store.memory_store import MemoryStore
 
 
-def execute_dtc(
-        identity_events: List[Tuple[datetime, Record]], identity: str, stream_dtc_spec: Dict,
-        window_dtc_spec: Dict) -> Tuple[List[Tuple[Key, Any]], List[Dict]]:
+def execute_dtc(identity_events: List[Tuple[datetime, Record]], identity: str,
+                stream_dtc_spec: Dict, window_dtc_spec: Dict
+                ) -> Tuple[List[Tuple[Key, Any]], List[Dict]]:
     schema_loader = SchemaLoader()
     identity_events.sort(key=lambda x: x[0])
 
@@ -48,7 +48,7 @@ def execute_stream_dtc(
         stream_transformer.evaluate_record(event)
     stream_transformer.finalize()
 
-    return get_memory_store(schema_loader).get_all()
+    return [(k, v) for k, v in get_memory_store(schema_loader).get_all()]
 
 
 def execute_window_dtc(identity: str, schema_loader: SchemaLoader,

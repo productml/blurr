@@ -1,14 +1,15 @@
 """
 Usage:
-    local_runner.py --raw_data=<files> --stream_dtc=<file> --window_dtc=<file> --output_file=<file>
+    local_runner.py --raw_data=<files> --stream_dtc=<file> [--window_dtc=<file>] [--output_file=<file>]
     local_runner.py (-h | --help)
 """
 import csv
 import json
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 import yaml
 from collections import defaultdict
+from dateutil import parser
 from docopt import docopt
 
 from blurr.core.evaluation import Context
@@ -49,6 +50,7 @@ class LocalRunner:
 
     def _consume_record(self, record: Record) -> None:
         source_context = Context({'source': record})
+        source_context.add('parser', parser)
         identity = self._stream_transformer_schema.get_identity(source_context)
         time = self._stream_transformer_schema.get_time(source_context)
 
@@ -73,6 +75,14 @@ class LocalRunner:
 
         self.execute_for_all_users()
 
+    def print_output(self) -> None:
+        if self._window_dtc is not None:
+            for row in self._window_data.items():
+                print(row)
+        else:
+            for row in self._session_data.items():
+                print(json.dumps(row, default=str))
+
     def write_output_file(self, output_file: str):
         header = []
         for data_rows in self._window_data.values():
@@ -91,7 +101,10 @@ def main():
                                arguments['--stream_dtc'],
                                arguments['--window_dtc'])
     local_runner.execute()
-    local_runner.write_output_file(arguments['--output_file'])
+    if arguments['--output_file'] is None:
+        local_runner.print_output()
+    else:
+        local_runner.write_output_file(arguments['--output_file'])
 
 
 if __name__ == "__main__":
