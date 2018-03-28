@@ -8,8 +8,8 @@ from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.variable_data_group import VariableDataGroup, VariableDataGroupSchema
 
-
 # Test custom functions implemented for complex fields
+
 
 def test_map_set():
     sample = Map()
@@ -31,6 +31,7 @@ def test_map_increment():
 
 # Test the Complex object evaluation
 
+
 @fixture(scope='module')
 def data_group_schema_spec() -> Dict[str, Any]:
     return {
@@ -40,18 +41,15 @@ def data_group_schema_spec() -> Dict[str, Any]:
             'Name': 'map_field',
             'Type': 'map',
             'Value': 'test.map_field.set("set", "value").increment("incr", 10).update({"update": "value"})'
-        },
-            {
-                'Name': 'list_field',
-                'Type': 'list',
-                'Value': 'test.list_field.append(1).insert(0, 0).extend([2, 3]).remove(3)'
-            },
-            {
-                'Name': 'set_field',
-                'Type': 'set',
-                'Value': 'test.set_field.add(1).copy().union({2, 3}).update({3, 4, 5}).discard(0).remove(1).intersection({2, 4, 5}).symmetric_difference_update({4, 6})'
-            }
-        ]
+        }, {
+            'Name': 'list_field',
+            'Type': 'list',
+            'Value': 'test.list_field.append(1).insert(0, 0).extend([2, 3]).remove(3)'
+        }, {
+            'Name': 'set_field',
+            'Type': 'set',
+            'Value': 'test.set_field.add(1).copy().union({2, 3}).update({3, 4, 5}).discard(0).remove(1).intersection({2, 4, 5}).symmetric_difference_update({4, 6})'
+        }]
     }
 
 
@@ -61,8 +59,11 @@ def schema_loader() -> SchemaLoader:
 
 
 @fixture(scope='module')
-def data_group_schema(schema_loader: SchemaLoader, data_group_schema_spec: Dict[str, Any]) -> DataGroupSchema:
-    return VariableDataGroupSchema(schema_loader.add_schema(data_group_schema_spec), schema_loader)
+def data_group_schema(
+        schema_loader: SchemaLoader,
+        data_group_schema_spec: Dict[str, Any]) -> DataGroupSchema:
+    return VariableDataGroupSchema(
+        schema_loader.add_schema(data_group_schema_spec), schema_loader)
 
 
 @fixture
@@ -70,9 +71,7 @@ def data_group(data_group_schema: DataGroupSchema) -> DataGroup:
     context = EvaluationContext()
 
     dg = VariableDataGroup(
-        schema=data_group_schema,
-        identity="12345",
-        evaluation_context=context)
+        schema=data_group_schema, identity="12345", evaluation_context=context)
     context.global_add('test', dg)
 
     return dg

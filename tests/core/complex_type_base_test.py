@@ -22,6 +22,7 @@ class TestType(ComplexTypeBase, BaseType):
     """
     Test type that extends Complex Type Base and some base type
     """
+
     def __init__(self, itself=None):
         if itself and hasattr(itself, 'test_field'):
             self.test_field = itself.test_field
@@ -72,4 +73,3 @@ def test_builtin_override():
     """ Ensures that when built-in methods are overridden, the overrides are properly executed """
     sample = TestType()
     assert str(sample) == 'string'
-

@@ -116,6 +116,8 @@ class Expression:
         equal_index = code_string.find('=', 0)
         while equal_index != -1:
             next_index = equal_index + 1
-            if next_index == len(code_string) or code_string[next_index] != '=':
-                raise InvalidExpressionError('Setting value using `=` is not allowed.')
+            if next_index == len(
+                    code_string) or code_string[next_index] != '=':
+                raise InvalidExpressionError(
+                    'Setting value using `=` is not allowed.')
             equal_index = code_string.find('=', next_index + 1)
