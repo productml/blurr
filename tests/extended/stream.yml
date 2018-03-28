@@ -1,20 +1,20 @@
-Type: 'ProductML:DTC:Streaming'
+Type: ProductML:DTC:Streaming
 Version: '2018-03-01'
 Name: Sessions
 Identity: source.customer_identifier
 Time: parser.parse(source.event_time)
 Stores:
   -
-    Type: 'ProductML:DTC:Store:MemoryStore'
+    Type: ProductML:DTC:Store:MemoryStore
     Name: memory
 DataGroups:
   -
-    Type: 'ProductML:DTC:DataGroup:VariableAggregate'
+    Type: ProductML:DTC:DataGroup:VariableAggregate
     Name: vars
     Fields:
-      - { Name: continent, Type: string, Value: '''North America'' if source.country == ''US'' else ''World''', When: bool(source.country) }
+      - { Name: continent, Type: string, Value: "'North America' if source.country == 'US' else 'World'", When: bool(source.country) }
   -
-    Type: 'ProductML:DTC:DataGroup:IdentityAggregate'
+    Type: ProductML:DTC:DataGroup:IdentityAggregate
     Name: state
     Store: memory
     When: source.event_id == 'app_launched'
@@ -49,9 +49,9 @@ DataGroups:
         Value: "'fb' when 'facebook.com' in source.signin_method else 'other'"
         When: source.signin_method is not None and source.signin_method != ''
 
-  - Type: 'ProductML:DTC:DataGroup:SessionAggregate'
+  - Type: ProductML:DTC:DataGroup:SessionAggregate
     Name: session
-    Split: '(time - session.end_time).seconds > 1800'
+    Split: (time - session.end_time).seconds > 1800
     Store: memory
     Fields:
       - { Name: offers_shown, Type: integer, Value: session.offers_shown + 1, When: source.event_id == 'offer_shown' }
