@@ -38,7 +38,7 @@ def test_data_group_schema_initialization_with_store(data_group_schema_spec,
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(data_group_schema_spec)
     with pytest.raises(
-            InvalidSchemaError, match="user.memory not declared is schema"):
+            InvalidSchemaError, match="user.memory not declared in schema"):
         data_group_schema = MockDataGroupSchema(name, schema_loader)
 
     schema_loader.add_schema(store_spec, 'user')

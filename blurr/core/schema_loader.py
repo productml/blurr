@@ -97,7 +97,7 @@ class SchemaLoader:
             return self._spec[fully_qualified_name]
         except:
             raise InvalidSchemaError(
-                "{} not declared is schema".format(fully_qualified_name))
+                "{} not declared in schema".format(fully_qualified_name))
 
     @staticmethod
     def get_transformer_name(fully_qualified_name: str) -> str:
