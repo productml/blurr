@@ -52,20 +52,3 @@ class DateTimeFieldSchema(FieldSchema):
     @property
     def default(self) -> Any:
         return None
-
-
-class SetFieldSchema(FieldSchema):
-    @property
-    def type_object(self) -> Any:
-        return set
-
-    @property
-    def default(self) -> Any:
-        return set()
-
-
-class SimpleField(Field):
-    """
-    Represents a simple field that can be of any native feild type
-    """
-    pass
