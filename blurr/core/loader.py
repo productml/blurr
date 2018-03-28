@@ -37,7 +37,7 @@ SCHEMA_MAP = {
     'float': 'blurr.core.simple_field.FloatFieldSchema',
     'map': 'blurr.core.map_field.MapFieldSchema',
     'list': 'blurr.core.list_field.ListFieldSchema',
-    'set': 'blurr.core.simple_field.SetFieldSchema'
+    'set': 'blurr.core.set_field.SetFieldSchema'
 }
 
 # TODO Build dynamic type loader from a central configuration rather than reading a static dictionary
