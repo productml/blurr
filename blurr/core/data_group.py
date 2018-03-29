@@ -3,6 +3,7 @@ from typing import Dict, Type
 from abc import ABC
 
 from blurr.core.base import BaseSchemaCollection, BaseItemCollection, BaseItem
+from blurr.core.errors import InvalidSchemaError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.loader import TypeLoader
 from blurr.core.schema_loader import SchemaLoader
@@ -29,14 +30,20 @@ class DataGroupSchema(BaseSchemaCollection, ABC):
                          self.ATTRIBUTE_FIELDS)
         self.store = None
         if self.ATTRIBUTE_STORE in self._spec:
-            store_fq_name = self.schema_loader.get_fully_qualified_name(
-                self.schema_loader.get_transformer_name(
-                    self.fully_qualified_name),
-                self._spec[self.ATTRIBUTE_STORE])
-            self.store = self.schema_loader.get_schema_object(store_fq_name)
+            self.store = self._load_store(self._spec[self.ATTRIBUTE_STORE])
+
+    def _load_store(self, store_name: str) -> 'Store':
+        """
+        Load a store into the datagroup
+        :param store_name: The name of the store
+        """
+        store_fq_name = self.schema_loader.get_fully_qualified_name(
+            self.schema_loader.get_transformer_name(self.fully_qualified_name),
+            store_name)
+        return self.schema_loader.get_schema_object(store_fq_name)
 
 
-class DataGroup(BaseItemCollection):
+class DataGroup(BaseItemCollection, ABC):
     """
     All Data Groups inherit from this base.  Provides an abstraction for 'value' of the encapsulated
     to be called as properties of the data group itself.
