@@ -55,6 +55,7 @@ DataGroups:
     Split: (time - session.end_time).seconds > 1800
     Store: memory
     Fields:
+      - { Name: events, Type: integer, Value: session.events + 1 }
       - { Name: offers_shown, Type: integer, Value: session.offers_shown + 1, When: source.event_id == 'offer_shown' }
       - { Name: games_played, Type: integer, Value: session.games_played + 1, When: source.event_id == 'game_start' }
       - { Name: games_won, Type: integer, Value: session.games_won + 1, When: source.event_id == 'game_end' and source.won }
@@ -63,7 +64,7 @@ DataGroups:
       - Name: badges_won
         Type: map
         Value: session.badges_won.increment(source.badge)
-        When: "'badge' in source and source[badge]"
+        When: source.event_id in ['game_start', 'game_end']
 
       - Name: start_score
         Type: integer
