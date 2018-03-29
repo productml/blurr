@@ -6,3 +6,39 @@ jobs:
     steps:
       - checkout
       - run: sh build.sh
+  build_and_deploy:
+    docker:
+      - image: productml/build-image:fb9ba7674b2590ff5abbd45516b9a27e9dfc5f6d
+    steps:
+      - checkout
+      - run:
+          name: init .pypirc
+          command: |
+            echo -e "[pypi]" >> ~/.pypirc
+            echo -e "username = $PYPI_USER" >> ~/.pypirc
+            echo -e "password = $PYPI_PASS" >> ~/.pypirc
+      - run:
+          name: build and deploy pypi
+          command: |
+            sh build.sh
+            pipenv run twine upload dist/*
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build:
+          context: aws
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              ignore: master
+  build_and_deploy:
+    jobs:
+      - build_and_deploy:
+          context: org-global
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              only: master
