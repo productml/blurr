@@ -5,17 +5,17 @@ from pipenv.utils import convert_deps_to_pip
 from setuptools import setup
 
 
-def requirements():
+def requirements() -> list:
     pipfile = Project(chdir=False).parsed_pipfile
     return convert_deps_to_pip(pipfile['packages'], r=False)
 
 
-def readme():
+def readme() -> str:
     with open('README.md') as f:
         return f.read()
 
 
-def version():
+def version() -> str:
     tag_version = os.getenv('CIRCLE_TAG')
     return tag_version if tag_version else "LOCAL"
 

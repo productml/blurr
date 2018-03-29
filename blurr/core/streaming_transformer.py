@@ -43,7 +43,7 @@ class StreamingTransformer(Transformer):
         super().__init__(schema, identity, context)
         self.evaluation_context.global_add('identity', self.identity)
 
-    def evaluate_record(self, record: Record):
+    def evaluate_record(self, record: Record) -> None:
         """
         Evaluates and updates data in the StreamingTransformer.
         :param record: The 'source' record used for the update.
@@ -52,11 +52,12 @@ class StreamingTransformer(Transformer):
         """
         # Add source record and time to the global context
         self.evaluation_context.global_add('source', record)
-        self.evaluation_context.global_add('time',
-                                           self.schema.time.evaluate(
-                                               self.evaluation_context))
+        self.evaluation_context.global_add(
+            'time',
+            self.schema.time.evaluate(  # type: ignore
+                self.evaluation_context))
 
-        record_identity = self.schema.get_identity(
+        record_identity = self.schema.get_identity(  # type: ignore
             self.evaluation_context.global_context)
         if self.identity != record_identity:
             raise IdentityError('Identity in transformer (', self.identity,

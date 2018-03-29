@@ -10,7 +10,7 @@ from blurr.core.session_data_group import SessionDataGroupSchema, \
 
 
 @fixture
-def schema_loader():
+def schema_loader() -> SchemaLoader:
     return SchemaLoader()
 
 

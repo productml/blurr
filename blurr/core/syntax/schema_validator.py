@@ -83,7 +83,7 @@ def _validate_streaming(dtc_dict: Dict, name: str) -> None:
         raise InvalidSchemaError(str(e))
 
 
-def validate(dtc_dict: Dict, name="dtc") -> None:
+def validate(dtc_dict: Dict, name: str = "dtc") -> None:
     if dtc_dict['Type'] == 'ProductML:DTC:Window':
         _validate_window(dtc_dict, name)
     elif dtc_dict['Type'] == 'ProductML:DTC:Streaming':

@@ -4,7 +4,7 @@ from datetime import datetime
 from blurr.core.store import Key
 
 
-def test_invalid_identity():
+def test_invalid_identity() -> None:
     with pytest.raises(ValueError, match='`identity` must be present.'):
         Key('', 'group')
 
@@ -12,7 +12,7 @@ def test_invalid_identity():
         Key(None, 'group')
 
 
-def test_invalid_group():
+def test_invalid_group() -> None:
     with pytest.raises(ValueError, match='`group` must be present.'):
         Key('id', '')
 
@@ -20,7 +20,7 @@ def test_invalid_group():
         Key('id', None)
 
 
-def test_parse():
+def test_parse() -> None:
     assert Key.parse('a/b/2018-03-07T22:35:31+00:00') == Key(
         'a', 'b', datetime(2018, 3, 7, 22, 35, 31))
     assert Key.parse('a/b') == Key('a', 'b', None)
@@ -34,7 +34,7 @@ def test_parse():
         Key.parse('None')
 
 
-def test_equals():
+def test_equals() -> None:
     assert Key('a', 'b') == Key('a', 'b')
     assert Key('a', 'b') != Key('a', 'c')
     assert Key('a', 'b') != Key('a', 'b', datetime(2018, 3, 7, 22, 35, 31))
@@ -44,7 +44,7 @@ def test_equals():
         'a', 'b', datetime(2018, 3, 6, 22, 35, 31))
 
 
-def test_greater_than():
+def test_greater_than() -> None:
     assert (Key('a', 'b') > Key('a', 'b')) is False
     assert (Key('a', 'b') > Key('a', 'c')) is False
     assert (Key('a', 'b') > Key('a', 'b', datetime(2018, 3, 7, 22, 35,
@@ -59,7 +59,7 @@ def test_greater_than():
         'a', 'b', datetime(2018, 3, 6, 22, 35, 31))) is True
 
 
-def test_less_than():
+def test_less_than() -> None:
     assert (Key('a', 'b') < Key('a', 'b')) is False
     assert (Key('a', 'b') < Key('a', 'c')) is False
     assert (Key('a', 'b') < Key('a', 'b', datetime(2018, 3, 7, 22, 35,

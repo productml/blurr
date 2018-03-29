@@ -14,7 +14,7 @@ class MemoryStore(Store):
         super().__init__(fully_qualified_name, schema_loader)
         self._cache: Dict[Key, Any] = dict()
 
-    def load(self):
+    def load(self) -> None:
         pass
 
     def get(self, key: Key) -> Any:

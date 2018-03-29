@@ -6,7 +6,7 @@ from blurr.core.store import Key
 from blurr.runner.local_runner import LocalRunner
 
 
-def test_local_runner_session_only():
+def test_local_runner_session_only() -> None:
     local_runner = LocalRunner(['tests/data/raw.json'],
                                'tests/data/stream.yml', None)
     local_runner.execute()
@@ -48,7 +48,7 @@ def test_local_runner_session_only():
     assert local_runner._window_data['userB'] == []
 
 
-def test_local_runner_no_vars_stored():
+def test_local_runner_no_vars_stored() -> None:
     local_runner = LocalRunner(['tests/data/raw.json'],
                                'tests/data/stream.yml', None)
     local_runner.execute()
@@ -57,7 +57,7 @@ def test_local_runner_no_vars_stored():
     assert Key('userA', 'vars') not in local_runner._session_data
 
 
-def test_local_runner_with_window():
+def test_local_runner_with_window() -> None:
     local_runner = LocalRunner(['tests/data/raw.json'],
                                'tests/data/stream.yml',
                                'tests/data/window.yml')

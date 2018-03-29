@@ -16,7 +16,7 @@ class Record(dict):
     Wraps a dictionary into an object to allow dictionary keys to be accessed as object properties
     """
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> Any:
         """
         When attributes are not found, None is returned
         """
@@ -26,5 +26,5 @@ class Record(dict):
 class RecordList(list):
     """ Wraps a list to list of Records"""
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: Any) -> Any:
         return wrap(super().__getitem__(item))

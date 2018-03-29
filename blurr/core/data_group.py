@@ -56,7 +56,8 @@ class DataGroup(BaseItemCollection):
         self._fields: Dict[str, Type[BaseItem]] = {
             name: TypeLoader.load_item(item_schema.type)(
                 item_schema, self.evaluation_context)
-            for name, item_schema in self.schema.nested_schema.items()
+            for name, item_schema in
+            self.schema.nested_schema.items()  # type: ignore
         }
 
     @property
@@ -72,11 +73,11 @@ class DataGroup(BaseItemCollection):
         """
         self.persist()
 
-    def persist(self, timestamp=None) -> None:
+    def persist(self, timestamp=None) -> None:  # type: ignore
         """
         Persists the current data group
         :param timestamp: Optional timestamp to include in the Key construction
         """
-        if self.schema.store:
-            self.schema.store.save(
+        if self.schema.store:  # type: ignore
+            self.schema.store.save(  # type: ignore
                 Key(self.identity, self.name, timestamp), self.snapshot)

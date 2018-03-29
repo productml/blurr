@@ -14,7 +14,7 @@ from blurr.cli.cli import cli
 from blurr.util.out import Out
 
 
-def main():
+def main() -> None:
     arguments = docopt(__doc__, version='pre-alpha')
     result = cli(arguments, Out())
     sys.exit(result)

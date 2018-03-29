@@ -10,7 +10,7 @@ class Context(dict):
     Evaluation context provides a dictionary of declared context objects
     """
 
-    def __init__(self, initial_value: Dict[str, Any] = None):
+    def __init__(self, initial_value: Dict[str, Any] = None) -> None:
         """
         Initializes a new context with an existing dictionary
         :param initial_value: Dictionary mapping strings to execution context objects
@@ -18,7 +18,7 @@ class Context(dict):
         if initial_value:
             super().__init__(initial_value)
 
-    def add(self, name, value):
+    def add(self, name: str, value: Any) -> None:
         """
         Adds a context item by name
         :param name: Name of the item in the context for evaluation

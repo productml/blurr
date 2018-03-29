@@ -8,8 +8,8 @@ from blurr.store.memory_store import MemoryStore
 
 
 @fixture
-def memory_store(schema_loader_with_mem_store, stream_dtc_name,
-                 mem_store_name) -> MemoryStore:
+def memory_store(schema_loader_with_mem_store: SchemaLoader,
+                 stream_dtc_name: str, mem_store_name: str) -> MemoryStore:
     return schema_loader_with_mem_store.get_schema_object(
         stream_dtc_name + '.' + mem_store_name)
 
@@ -37,7 +37,7 @@ def test_get(memory_store: MemoryStore) -> None:
     assert memory_store.get(key) == {'events': 1, 'start_time': date}
 
 
-def test_set_simple(empty_memory_store) -> None:
+def test_set_simple(empty_memory_store: MemoryStore) -> None:
     """
     Tests that the setter stores an item in memory that can be retrieved by the same key
     :return:
@@ -48,7 +48,7 @@ def test_set_simple(empty_memory_store) -> None:
     assert store.get(Key('test_user', 'test_group')) == 1
 
 
-def test_set_get_date(empty_memory_store) -> None:
+def test_set_get_date(empty_memory_store: MemoryStore) -> None:
     """
     Tests that the timestamp is used as part of the key object
     """
