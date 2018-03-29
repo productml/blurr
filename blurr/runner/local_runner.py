@@ -1,6 +1,6 @@
 """
 Usage:
-    local_runner.py --raw_data=<files> --stream_dtc=<file> [--window_dtc=<file>] [--output_file=<file>]
+    local_runner.py --raw-data=<files> --streaming-dtc=<file> [--window-dtc=<file>] [--output-file=<file>]
     local_runner.py (-h | --help)
 """
 import csv
@@ -97,14 +97,14 @@ class LocalRunner:
 
 def main():
     arguments = docopt(__doc__, version='pre-alpha')
-    local_runner = LocalRunner(arguments['--raw_data'].split(','),
-                               arguments['--stream_dtc'],
-                               arguments['--window_dtc'])
+    local_runner = LocalRunner(arguments['--raw-data'].split(','),
+                               arguments['--streaming-dtc'],
+                               arguments['--window-dtc'])
     local_runner.execute()
-    if arguments['--output_file'] is None:
+    if arguments['--output-file'] is None:
         local_runner.print_output()
     else:
-        local_runner.write_output_file(arguments['--output_file'])
+        local_runner.write_output_file(arguments['--output-file'])
 
 
 if __name__ == "__main__":

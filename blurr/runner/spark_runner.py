@@ -1,6 +1,6 @@
 """
 Usage:
-    spark_runner.py --raw_data=<files> --stream_dtc=<file> [--window_dtc=<file>] --output_file=<file>
+    spark_runner.py --raw-data=<files> --streaming-dtc=<file> [--window-dtc=<file>] --output-file=<file>
     spark_runner.py (-h | --help)
 """
 
@@ -90,9 +90,9 @@ class SparkRunner:
 
 def main():
     arguments = docopt(__doc__, version='pre-alpha')
-    spark_runner = SparkRunner(arguments['--raw_data'].split(','),
-                               arguments['--stream_dtc'],
-                               arguments['--window_dtc'])
+    spark_runner = SparkRunner(arguments['--raw-data'].split(','),
+                               arguments['--streaming-dtc'],
+                               arguments['--window-dtc'])
 
     spark = SparkSession \
         .builder \
@@ -100,7 +100,7 @@ def main():
         .getOrCreate()
     spark_context = spark.sparkContext
     per_user_data_rdd = spark_runner.execute(spark_context)
-    spark_runner.write_output_file(spark, arguments['--output_file'],
+    spark_runner.write_output_file(spark, arguments['--output-file'],
                                    per_user_data_rdd)
 
 
