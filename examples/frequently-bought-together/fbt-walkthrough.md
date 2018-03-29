@@ -1,6 +1,6 @@
 # Frequently bought together
 
-In this example, we’ll walk through building a ‘Frequently bought together’ feature to show in a mobile e-commerce app using Firebase events.
+In this example, we’ll walk through building a ‘Frequently bought together’ feature to show in a mobile e-commerce app.
 
 ![Mockup](images/fbt_mockup.PNG)
 
@@ -23,7 +23,7 @@ Let’s say that we’re looking for the following features to train our initial
 
 and we will predict
 
-9. User"s spend in the current session (`transaction_value_this_session`)
+9. User's spend in the current session (`transaction_value_this_session`)
 
 Once we’ve trained and deployed the model, we query it with the model features and it returns a prediction for the transaction value in this session.
 
@@ -37,19 +37,9 @@ Doing it this way allows us to query the model multiple times with different `fb
 
 The model predicts a higher `transaction_value_this_session` for `simple_plant`, `complex_plant` and `plant_food`, so we’ll show that to the user instead of `simple_plant`, `pot` and `watering_can`.
 
-# Getting Firebase or Swrve data into S3
+## Raw data
 
-TODO: write this section/link to another article
-(Cloud Functions for Firebase + https://support.klipfolio.com/hc/en-us/articles/216181627-Use-Swrve-as-a-data-source for Swrve)
-
-
-## Default Firebase events
-
-If we’re using the Firebase SDK, some events and user properties are collected by default. A full list of events and user properties can be found in the [official Firebase documentation](https://support.google.com/firebase/answer/6317485?hl=en&ref_topic=6317484).
-
-We’re assuming that we are using the Firebase SDK, and have implemented the [recommended events for retail/e-commerce](https://support.google.com/firebase/answer/6317499?hl=en&ref_topic=6317484). We’ll work with these + [automatically collected user properties](https://support.google.com/firebase/answer/6317486?hl=en&ref_topic=6317484).
-
-Example events are below.
+We're assuming that we have the following raw data. These events are based on the Firebase SDK.
 
 Session start event
 
@@ -92,24 +82,6 @@ Product page is viewed
 ]
 ```
 
-Frequently Bought Together can be tracked in many ways and implementations in the wild will almost certainly involve custom event params. For this example, we assume that:
-
-1. The event is implemented as an list of `item_ids` in the `view_item` event, with the `item_category` being the primary product being viewed - in this case, `simple_plant`.
-2. When a product listing page is shown with the ‘Frequently Bought Together’ feature, 2 separate `view_item` events are triggered - one for the primary product, and one for the frequently bought together
-
-```javascript
-[
-{
-"event_name": "view_item",
-"appInstanceId": "72a039b9-6759-901a-cf3a-3354d21beed2",
-"session_id": "72a039b9-6759-901a-cf3a-3354d21beed2",
-"item_id": "32, 42, 94",
-"item_name": "simple_plant, pot, watering_can",
-"item_category": "itemid=32"
-}
-]
-```
-
 Purchase
 
 ```javascript
@@ -120,7 +92,7 @@ Purchase
 "session_id": "72a039b9-6759-901a-cf3a-3354d21beed2"’
 "item_id": "32, 42, 94",
 "currency": "usd",
-"value": "12"
+"value": "12, 23, 5"
 }
 ]
 ```
@@ -131,6 +103,10 @@ To train the model, we are looking for data to be organized like this.
 
 Unique user_id (appInstanceId) | product_primary | fbt_1 | fbt_2 | fbt_3 | session_index | days_since_install | age | gender | country | spend_to_date | transaction_value_this_session
 ------- | ------- | ------------------ | ------------------------- | ------------------------- | ---------------------- | ----- | ----- | ----- | ----- | ----- | -------
+
+We assume that we want to look at the products that were bought together in a specific transaction, and any other transactions that were made 24 hours on either side.
+
+![Anchor](images/fbt-anchor.png)
 
 [Streaming DTC](fbt-streaming-dtc.yml)
 

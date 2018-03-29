@@ -20,10 +20,10 @@ SourceDTC: fbt_v1
 
 Anchor:
 
-  Condition:  fbt_v1.item_stats.product_primary != ''
+  Condition:  fbt_v1.item_stats.transaction_value_this_session > 0
   # Max defines the maximum number of output rows to be generated every time the Window DTC is run
   # We expect the Window DTC is run periodically (perhaps daily) to generate training data
-  # By setting max = 1, we're making sure that we are only selecting one product view for each user
+  # By setting max = 1, we're making sure that we are only selecting one transaction for each user
   # in each period the Window DTC is run. This is to avoid over-sampling more active users
   # We're free to change this the max value to whatever we want, of course
   Max: 1
@@ -50,19 +50,50 @@ DataGroups:
     - Type: Day
       # Negative values are backward from the Anchor
       Value: -10000
-      # Use absurdly large negative values to calculate lifetime stats
+      # Use large negative values to calculate lifetime stats
       Source: fbt_v1.session_stats
 
    Fields:
 
-       # The output will contain a column for last_session.games_played
      - Name: session_index
        Type: integer
        Value: count(session_stats.session_id)
-       # Question: I think this method of calculating is not accurate because
-       # anchor sampling will remove some sessions?
-       # If so, calculating lifetime metrics from raw data is a pain with our setup
 
      - Name: spend_to_date
        Type: float
        Value: sum(session_stats.transaction_value_this_session)
+
+ - Type: ProductML:DTC:DataGroup:AnchorAggregate
+   Name: last_24_hours
+
+   Window:
+    - Type: Hour
+      Value: -24
+      Source: fbt_v1.item_stats
+
+   Fields:
+     - Name: products_bought
+       Type: list
+       Value: last_24_hours.products_bought.append(item_stats.products_bought)
+
+ - Type: ProductML:DTC:DataGroup:AnchorAggregate
+   Name: next_24_hours
+
+   Window:
+    - Type: Hour
+      Value: 24
+      Source: fbt_v1.item_stats
+
+   Fields:
+     - Name: products_bought
+       Type: list
+       Value: next_24_hours.products_bought.append(item_stats.products_bought)
+
+ - Type: ProductML:DTC:DataGroup:AnchorAggregate
+   Name: 48_hours_around_transaction
+
+   Fields:
+     - Name: products_bought
+       Type: list
+       Value: sorted(last_24_hours.products_bought.append(next_24_hours.products_bought).items(), key=operator.itemgetter(1), reverse=True)[:3]
+       # combining the 2 lists, sorting by descending order of value (most expensive items first) and then picking the top 3
