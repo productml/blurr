@@ -49,7 +49,7 @@ Type | Description | URI example
 
 Transformed data is output to S3. Data destination details are defined inside the DTC.
 
-More destinations will be supported in the future, please create an issue (TODO: add link) to request for a specific data destination! Or better yet, contribute to Blurr and build it!
+More destinations will be supported in the future, please create [an issue](https://github.com/productml/blurr/issues/new) to request for a specific data destination! Or better yet, contribute to Blurr and build it!
 
 # Deploying Blurr on AWS
 
@@ -82,7 +82,7 @@ Available options are:
 
 ## The deploy command
 
-Blurr gets deployed as a Cloudformation Stack. After a successful deployment we should see a stack named Blurr in out Cloudformation console:
+Blurr gets deployed as a Cloudformation Stack. After a successful deployment we should see a stack named Blurr in the Cloudformation console.
 
 TODO: add image
 
