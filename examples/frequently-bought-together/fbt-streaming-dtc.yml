@@ -51,7 +51,7 @@ DataGroups:
 
     Fields:
      - Name: days_since_install
-       Value: datetime.strptime('source.start_time', date_format) - datetime.strptime('source.first_open_time', date_format)
+       Value: datetime.strptime("source.start_time", "%d %m %Y") - datetime.strptime("source.first_open_time", "%d %m %Y")
 
 ##
 # Session aggregates definition
