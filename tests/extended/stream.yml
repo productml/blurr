@@ -1,6 +1,7 @@
 Type: ProductML:DTC:Streaming
 Version: '2018-03-01'
 Name: Sessions
+Description: Streaming Extended Test
 Identity: source.customer_identifier
 Time: parser.parse(source.event_time)
 Stores:
@@ -41,12 +42,12 @@ DataGroups:
 
       - Name: offers_shown
         Type: map
-        Value: state.offers_shown[source.offer_id] = state.offers_shown.get(source.offer_id, 0) + 1
+        Value: state.offers_shown.increment(source.offer_id)
         When: source.event_id == 'offer_shown'
 
       - Name: signin_method
         Type: string
-        Value: "'fb' when 'facebook.com' in source.signin_method else 'other'"
+        Value: "'fb' if 'facebook.com' in source.signin_method else 'other'"
         When: source.signin_method is not None and source.signin_method != ''
 
   - Type: ProductML:DTC:DataGroup:SessionAggregate
@@ -61,7 +62,7 @@ DataGroups:
 
       - Name: badges_won
         Type: map
-        Value: session.badges_won[source.badge] = session.badges_won.get(source.badge, 0) + 1
+        Value: session.badges_won.increment(source.badge)
         When: "'badge' in source and source[badge]"
 
       - Name: start_score
