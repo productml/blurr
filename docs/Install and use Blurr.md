@@ -76,9 +76,9 @@ Blurr configuration can become a bit verbose, and some data formats (such as lis
 
 Available options are:
 
-dtcs: The set of DTCs to be part of the deployment
-sources: URIs for the data sources to be transformed
-(TODO: how many sources can we define in the config?)
+`dtcs`: The set of DTCs to be part of the deployment
+
+`sources`: URIs for the data sources to be transformed (TODO: how many sources can we define in the config?)
 
 ## The deploy command
 

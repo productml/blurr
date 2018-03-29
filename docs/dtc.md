@@ -1,16 +1,16 @@
 The core of Blurr is the Data Transformation Configuration (DTC).
 
-![Data Transformer](examples/offer-ai/images/data-transformer.png)
+![Data Transformer](images/data-transformer.png)
 
 There are 2 types of DTCs - Streaming and Window DTC.
 
 The Streaming DTC takes raw data and converts it into blocks.
 
-TODO: add diagram
+![Blocks](images/blocks-intro.png)
 
 The Window DTC generates model features relative to a block.
 
-TODO: add diagram
+![Window](images/window.png)
 
 # The anatomy of a Streaming DTC
 
@@ -35,7 +35,7 @@ Version | Version number of the DTC, used by the Data Transformer Library to par
 Description | Text description for the DTC | Any (TODO: check length restrictions) | Optional
 Name | Unique name for the DTC | Any (TODO: check restrictions) | Required
 Identity | The dimension in the raw data around which data is aggregated | `source.<field>` | Required
-Time | The expression for Time should return a python datetime object and is available as ‘time’ for other expressions to use. If source does not not contain time then the datetime.datetime.utcnow() expression can be used to retrieve the current utc datetime (TODO: need a better description) | Any python `datetime` object | Optional (TODO: check)
+Time | The expression for Time should return a python datetime object and is available as `time` for other expressions to use. If source does not contain time then the datetime.datetime.utcnow() expression can be used to retrieve the current utc datetime | Any python `datetime` object | Optional (TODO: check)
 When | Boolean expression that defines which raw data should be processed | Any `boolean` expression | Optional
 
 ## Store
@@ -103,7 +103,7 @@ A DataGroup contains fields for the information being stored. Fields in the Iden
  --- | ------------ | -------------- | --------
  Name | Name of the field | Any (TODO: check) | Required
  Type | Type of data being stored | `integer`, `boolean`, `string`, `datetime`, `float`, `map`, `list`, `set` | Optional. If Type is not set, the DTL uses `string` as the default type
- Value | Value of the field | Any python expression, and must match the Type (TODO: what happens if it doesn't) | Required  
+ Value | Value of the field | Any python expression, and must match the Type | Required  
 
  All fields in the DataGroup are encapsulated in a DataGroup object. The object is available in the DTL, which is a python environment processing the DTC. Field values can be accessed using `DataGroupName.FieldName`
 
@@ -146,7 +146,7 @@ Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
 Name | Name of the field | Any (TODO: check) | Required
 Type | Type of data being stored | `integer`, `boolean`, `string`, `datetime`, `float`, `map`, `list`, `set` | Optional. If Type is not set, the DTL uses `string` as the default type
-Value | Value of the field | Any python expression, and must match the Type (TODO: what happens if it doesn't) | Required  
+Value | Value of the field | Any python expression, and must match the Type | Required  
 When | Boolean expression that defines which raw events to process | Any `boolean` expression | Optional
 
 TODO: is there a specific order to aggregates? Identity first, then Variable then Block?
@@ -271,7 +271,7 @@ Prefix | S3 prefix to used when storing the output data. A dated directory is cr
 ## DataGroups
 
 All DataGroup operations that are performed in a window DTC can only use the following available data:
-1. Anchor session - Session that satisfies the anchor condition. The fields from the anchor block can be accessed as `anchor.FieldName`.
+1. Anchor block - Block that satisfies the anchor condition. The fields from the anchor block can be accessed as `anchor.FieldName`.
 2. IdentityAggregate - Identity aggregates available from the source Streaming DTC. The fields from an IdentityAggregate can be accessed as `StreamingDTCName.IdentityAggregateName.Field Name`.
 3. A window of blocks around the anchor block - A list of blocks from a BlockAggregate DataGroup before or after the anchor block based on the window defined. A field from the list of blocks is referenced as `WindowName.FieldName`.
 
@@ -308,7 +308,7 @@ Key |  Description | Allowed values | Required
 Type | Type of DataGroup | `ProductML:DTC:DataGroup:AnchorAggregate`, `ProductML:DTC:DataGroup:Variable` | Required
 Name | Name of the DataGroup | Any, unique within the DTC (TODO: check)| Required
 (Window) Type | The type of window to use around the anchor block | `day`, `hour`, `count` | Optional (TODO: really this is optional?)
-(Window) Value | The number of days, hours or blocks to window around the anchor block | Integer (TODO: correct?)| Required
+(Window) Value | The number of days, hours or blocks to window around the anchor block | Integer | Required
 Source | The BlockAggregate DataGroup (defined in the Streaming DTC) on which the window operations should be performed | Valid BlockAggregate DataGroup | Required
 
 All functions defined on windows work on a list of values. For e.g. if a session contains a games_played field and a last_week window is defined on it, then last_week.games_played represents the list of values from last week sessions.
@@ -319,16 +319,17 @@ Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
 Name | Name of the field | Any (TODO: check) | Required
 Type | Type of data being stored | `integer`, `boolean`, `string`, `datetime`, `float`, `map`, `list`, `set` | Optional. If Type is not set, the DTL uses `string` as the default type
-Value | Value of the field | Any python expression, and must match the Type (TODO: what happens if it doesn't) | Required  
+Value | Value of the field | Any python expression, and must match the Type | Required  
 When (TODO: are when conditions allowed in the AnchorAggregate fields?) | Boolean expression that defines which raw events to process | Any `boolean` expression | Optional
 
 ### Variable
 
-The Variable DataGroup works exactly the same as in the Streaming DTC. (TODO: add link)
+The Variable DataGroup works exactly the same as in the Streaming DTC.
 
 # Reserved keywords
 
 ## Reserved Field Names
+```
 identity
 time
 start_time
@@ -339,10 +340,12 @@ type
 window
 split
 filter
-
+```
 ## Reserved Function Names
+```
 add_to_map
 add_to_set
 counter
+```
 
 TODO: Are we doing user defined functions? Our gdoc says so

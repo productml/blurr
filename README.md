@@ -1,6 +1,7 @@
 # Blurr
 
 [![CircleCI](https://circleci.com/gh/productml/blurr/tree/master.svg?style=svg)](https://circleci.com/gh/productml/blurr/tree/master)
+[![Documentation Status](https://readthedocs.org/projects/productml-blurr/badge/?version=latest)](http://productml-blurr.readthedocs.io/en/latest/?badge=latest)
 
 ```
 We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer.
