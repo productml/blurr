@@ -113,11 +113,20 @@ class Expression:
 
     @staticmethod
     def validate(code_string: str) -> None:
+        def is_valid_equal(index):
+            return (character_exists(index, -1) and code_string[index - 1] == '!') \
+                or (character_exists(index, 1) and code_string[index + 1] == '=')
+
+        def character_exists(index, shift):
+            if shift < 0:
+                return index + shift >= 0
+
+            return index + shift < len(code_string)
+
         equal_index = code_string.find('=', 0)
         while equal_index != -1:
             next_index = equal_index + 1
-            if next_index == len(
-                    code_string) or code_string[next_index] != '=':
+            if not is_valid_equal(equal_index):
                 raise InvalidExpressionError(
                     'Setting value using `=` is not allowed.')
             equal_index = code_string.find('=', next_index + 1)
