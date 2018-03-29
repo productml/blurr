@@ -20,4 +20,9 @@ export PYTHONPATH=`pwd`:$PYTHONPATH
 pipenv run pytest -v
 
 
+echo "building package..."
+pipenv run python setup.py sdist
+pipenv run python setup.py bdist_wheel
+
+
 echo "Done."

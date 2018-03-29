@@ -52,6 +52,7 @@ class SchemaLoader:
         :param fully_qualified_name: The fully qualified name of the object needed.
         :return: An initialized schema object
         """
+
         if fully_qualified_name not in self._object_cache:
             spec = self.get_schema_spec(fully_qualified_name)
             if self.ATTRIBUTE_TYPE not in spec:
@@ -94,7 +95,11 @@ class SchemaLoader:
         :param fully_qualified_name: The fully qualified name of the schema needed.
         :return: Schema dictionary.
         """
-        return self._spec[fully_qualified_name]
+        try:
+            return self._spec[fully_qualified_name]
+        except:
+            raise InvalidSchemaError(
+                "{} not declared in schema".format(fully_qualified_name))
 
     def get_schemas_of_type(self,
                             type: str) -> List[Tuple[str, Dict[str, Any]]]:
