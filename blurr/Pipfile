@@ -7,13 +7,14 @@ name = "pypi"
 
 [packages]
 
+pipenv = "*"
 
 
 [dev-packages]
 
+
 twine = "*"
 yapf = "*"
-pipenv = "*"
 
 
 [requires]
