@@ -93,6 +93,14 @@ def test_validate_valid() -> None:
     Expression.validate('==b')
     Expression.validate('c ==')
 
+    Expression.validate('a!=b')
+    Expression.validate('a != c')
+    Expression.validate('a!=b != c')
+    Expression.validate('!=a !=b!= c!=')
+    Expression.validate('!= ')
+    Expression.validate('!=b')
+    Expression.validate('c !=')
+
 
 def test_validate_invalid() -> None:
     with raises(
@@ -103,7 +111,7 @@ def test_validate_invalid() -> None:
     with raises(
             InvalidExpressionError,
             message='Setting value using `=` is not allowed.'):
-        Expression.validate('a==b = ')
+        Expression.validate('a!=b = ')
 
     with raises(
             InvalidExpressionError,
