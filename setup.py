@@ -13,11 +13,11 @@ CircleCI (https://circleci.com/gh/productml/blurr).
 '''
 
 
-def is_ci_build():
+def is_ci_build() -> bool:
     return True if os.getenv('CIRCLECI') else False
 
 
-def is_release():
+def is_release() -> bool:
     if not is_ci_build():
         return False
     return True if os.getenv('CIRCLE_TAG') else False
@@ -33,18 +33,18 @@ def readme() -> str:
         return f.read()
 
 
-def name():
+def name() -> str:
     return "blurr" if is_release() else "blurr-dev"
 
 
-def version():
+def version() -> str:
     if not is_ci_build():
         return "LOCAL"
     elif is_release():
         return os.getenv('CIRCLE_TAG')
     else:
         return "0." + os.getenv('CIRCLE_BUILD_NUM')
-      
+
 
 # emit a VERSION file the CLI can use to check current version
 version_file = open("blurr/VERSION", "w")

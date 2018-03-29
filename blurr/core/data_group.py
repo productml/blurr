@@ -32,7 +32,7 @@ class DataGroupSchema(BaseSchemaCollection, ABC):
         if self.ATTRIBUTE_STORE in self._spec:
             self.store = self._load_store(self._spec[self.ATTRIBUTE_STORE])
 
-    def _load_store(self, store_name: str) -> 'Store':
+    def _load_store(self, store_name: str) -> 'Store':  # type: ignore
         """
         Load a store into the datagroup
         :param store_name: The name of the store

@@ -1,12 +1,11 @@
-import yaml
 from typing import Dict, Any
-from pytest import fixture
+
 import pytest
+from pytest import fixture
 
 from blurr.core.data_group import DataGroupSchema
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.schema_loader import SchemaLoader
-from blurr.store.memory_store import MemoryStore
 
 
 @fixture
@@ -32,8 +31,9 @@ class MockDataGroupSchema(DataGroupSchema):
     pass
 
 
-def test_data_group_schema_initialization_with_store(data_group_schema_spec,
-                                                     store_spec):
+def test_data_group_schema_initialization_with_store(
+        data_group_schema_spec: Dict[str, Any],
+        store_spec: Dict[str, Any]) -> None:
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(data_group_schema_spec)
     with pytest.raises(
@@ -47,7 +47,7 @@ def test_data_group_schema_initialization_with_store(data_group_schema_spec,
 
 
 def test_data_group_schema_initialization_without_store(
-        data_group_schema_spec):
+        data_group_schema_spec: Dict[str, Any]) -> None:
     schema_loader = SchemaLoader()
     del data_group_schema_spec['Store']
     name = schema_loader.add_schema(data_group_schema_spec)

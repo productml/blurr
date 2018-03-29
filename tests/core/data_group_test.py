@@ -1,16 +1,13 @@
 from datetime import datetime, timezone
-import yaml
 from typing import Dict, Any
-from pytest import fixture
-import pytest
 
-from blurr.core.evaluation import EvaluationContext
+from pytest import fixture
+
 from blurr.core.data_group import DataGroupSchema, DataGroup
-from blurr.core.errors import InvalidSchemaError
+from blurr.core.evaluation import EvaluationContext
 from blurr.core.field import Field
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store import Key
-from blurr.store.memory_store import MemoryStore
 
 
 def get_data_group_schema_spec() -> Dict[str, Any]:
@@ -39,7 +36,7 @@ class MockDataGroup(DataGroup):
 
 
 @fixture
-def data_group_schema_with_store():
+def data_group_schema_with_store() -> DataGroupSchema:
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(get_data_group_schema_spec())
     schema_loader.add_schema(get_store_spec(), 'user')
@@ -48,7 +45,7 @@ def data_group_schema_with_store():
 
 
 @fixture
-def data_group_schema_without_store():
+def data_group_schema_without_store() -> DataGroupSchema:
     schema_loader = SchemaLoader()
     data_group_schema_spec = get_data_group_schema_spec()
     del data_group_schema_spec['Store']
@@ -57,7 +54,8 @@ def data_group_schema_without_store():
         fully_qualified_name=name, schema_loader=schema_loader)
 
 
-def test_data_group_initialization(data_group_schema_with_store):
+def test_data_group_initialization(
+        data_group_schema_with_store: DataGroupSchema) -> None:
     data_group = MockDataGroup(
         schema=data_group_schema_with_store,
         identity="12345",
@@ -65,7 +63,8 @@ def test_data_group_initialization(data_group_schema_with_store):
     assert data_group.identity == "12345"
 
 
-def test_data_group_nested_items(data_group_schema_with_store):
+def test_data_group_nested_items(
+        data_group_schema_with_store: DataGroupSchema) -> None:
     data_group = MockDataGroup(
         schema=data_group_schema_with_store,
         identity="12345",
@@ -76,7 +75,8 @@ def test_data_group_nested_items(data_group_schema_with_store):
     assert isinstance(nested_items["event_count"], Field)
 
 
-def test_data_group_persist_without_store(data_group_schema_without_store):
+def test_data_group_persist_without_store(
+        data_group_schema_without_store: DataGroupSchema) -> None:
     data_group = MockDataGroup(
         schema=data_group_schema_without_store,
         identity="12345",
@@ -84,7 +84,8 @@ def test_data_group_persist_without_store(data_group_schema_without_store):
     data_group.persist()
 
 
-def test_data_group_persist_with_store(data_group_schema_with_store):
+def test_data_group_persist_with_store(
+        data_group_schema_with_store: DataGroupSchema) -> None:
     data_group = MockDataGroup(
         schema=data_group_schema_with_store,
         identity="12345",
@@ -92,19 +93,20 @@ def test_data_group_persist_with_store(data_group_schema_with_store):
     dt = datetime.now()
     dt.replace(tzinfo=timezone.utc)
     data_group.persist(dt)
-    snapshot_data_group = data_group.schema.store.get(
+    snapshot_data_group = data_group.schema.store.get(  # type: ignore
         Key(identity="12345", group="user", timestamp=dt))
     assert snapshot_data_group is not None
     assert snapshot_data_group == data_group.snapshot
 
 
-def test_data_group_finalize(data_group_schema_with_store):
+def test_data_group_finalize(
+        data_group_schema_with_store: DataGroupSchema) -> None:
     data_group = MockDataGroup(
         schema=data_group_schema_with_store,
         identity="12345",
         evaluation_context=EvaluationContext())
     data_group.finalize()
-    snapshot_data_group = data_group.schema.store.get(
+    snapshot_data_group = data_group.schema.store.get(  # type: ignore
         Key(identity="12345", group="user"))
     assert snapshot_data_group is not None
     assert snapshot_data_group == data_group.snapshot
