@@ -1,0 +1,75 @@
+Type: ProductML:DTC:Streaming
+Version: '2018-03-01'
+Name: Sessions
+Identity: source.customer_identifier
+Time: parser.parse(source.event_time)
+Stores:
+  -
+    Type: ProductML:DTC:Store:MemoryStore
+    Name: memory
+DataGroups:
+  -
+    Type: ProductML:DTC:DataGroup:VariableAggregate
+    Name: vars
+    Fields:
+      - { Name: continent, Type: string, Value: "'North America' if source.country == 'US' else 'World'", When: bool(source.country) }
+  -
+    Type: ProductML:DTC:DataGroup:IdentityAggregate
+    Name: state
+    Store: memory
+    When: source.event_id == 'app_launched'
+    Fields:
+      - { Name: country, Type: string, Value: source.country, When: source.event_id == 'app_launched' }
+      - { Name: language, Type: string, Value: source.language, When: source.event_id == 'app_launched' }
+      - { Name: package_name, Type: string, Value: source.package_name, When: source.event_id == 'app_launched' }
+      - { Name: package_version, Type: string, Value: source.package_version, When: source.event_id == 'app_launched' }
+      - { Name: os, Type: string, Value: source.os, When: source.event_id == 'app_launched' }
+      - { Name: os_version, Type: string, Value: source.os_version, When: source.event_id == 'app_launched' }
+      - { Name: device_type, Type: string, Value: source.device_type, When: source.event_id == 'app_launched' }
+      - { Name: device_make, Type: string, Value: source.device_make, When: source.event_id == 'app_launched' }
+      - { Name: device_model, Type: string, Value: source.device_model, When: source.event_id == 'app_launched' }
+      - { Name: device_id, Type: set, Value: state.device_id.add(source.device_id) }
+      - Name: max_level_attempted
+        Type: integer
+        Value: max(source.level, state.max_level_attempted)
+        When: source.event_id == 'game_start'
+
+      - Name: max_level_completed
+        Type: integer
+        Value: max(source.level, state.max_level_completed)
+        When: source.event_id == 'game_end' and source.won
+
+      - Name: offers_shown
+        Type: map
+        Value: state.offers_shown[source.offer_id] = state.offers_shown.get(source.offer_id, 0) + 1
+        When: source.event_id == 'offer_shown'
+
+      - Name: signin_method
+        Type: string
+        Value: "'fb' when 'facebook.com' in source.signin_method else 'other'"
+        When: source.signin_method is not None and source.signin_method != ''
+
+  - Type: ProductML:DTC:DataGroup:SessionAggregate
+    Name: session
+    Split: (time - session.end_time).seconds > 1800
+    Store: memory
+    Fields:
+      - { Name: offers_shown, Type: integer, Value: session.offers_shown + 1, When: source.event_id == 'offer_shown' }
+      - { Name: games_played, Type: integer, Value: session.games_played + 1, When: source.event_id == 'game_start' }
+      - { Name: games_won, Type: integer, Value: session.games_won + 1, When: source.event_id == 'game_end' and source.won }
+      - { Name: levels_played, Type: set, Value: session.levels_played.add(source.level), When: source.event_id == 'game_start' }
+
+      - Name: badges_won
+        Type: map
+        Value: session.badges_won[source.badge] = session.badges_won.get(source.badge, 0) + 1
+        When: "'badge' in source and source[badge]"
+
+      - Name: start_score
+        Type: integer
+        Value: source.score
+        When: source.event_time == session.start_time and 'score' in source
+
+      - Name: end_score
+        Type: integer
+        Value: source.score
+        When: source.event_time == session.end_time and 'score' in source
