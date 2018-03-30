@@ -22,7 +22,11 @@ For production ML applications, `experimentation and iteration speed` is importa
 
 Blurr provides a `high-level expressive YAML-based language` called the Data Transform Configuration (DTC). The DTC defines custom data transformations and aggregations from a `data source` (S3), to `transform the data` (in lambdas) and output to a `data store` (S3). The data in the store can be used for any application dependent on real-time transformations like analytics or predictions.
 
-![2steps](examples/offer-ai/images/2steps.png)
+The Streaming DTC aggregates the raw data into blocks and the Window DTC drops an anchor on a block and generates model features relative to that block.
+
+![Blocks](docs/images/blocks-intro.png)
+
+![Window](docs/images/window.png)
 
 Blurr has first class support for serverless data processing which means near zero standing costs, great for spiky usage, infinite scale and zero maintenance headache.
 
@@ -44,3 +48,7 @@ Inspired by the (old school) [Joel Test](https://www.joelonsoftware.com/2000/08/
 3. Deploying to production needs minimal engineering help
 4. Successful ML is a long game. You play it like it is
 5. Kaizen. Experimentation and iterations are a way of life
+
+# Get in touch
+
+Email us at blurr@productml.com or star this project to stay in touch!
