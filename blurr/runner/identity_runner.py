@@ -74,7 +74,8 @@ def execute_window_dtc(identity: str, schema_loader: SchemaLoader,
     for key, data in all_data.items():
         if key.group != session_aggregate_schemas[0][1]['Name']:
             continue
-        if window_transformer.evaluate_anchor(session_obj.restore(data)):
+        if window_transformer.evaluate_anchor(  # type: ignore
+                session_obj.restore(data)):
             window_data.append(window_transformer.flattened_snapshot)
 
     return window_data

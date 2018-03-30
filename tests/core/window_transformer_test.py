@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from typing import Dict, Any
 
 import yaml
 from pytest import fixture
@@ -13,16 +14,17 @@ from tests.core.conftest import init_memory_store
 
 
 @fixture
-def test_stream_schema_spec():
+def test_stream_schema_spec() -> Dict[str, Any]:
     return yaml.safe_load(open('tests/data/stream.yml'))
 
 
 @fixture
-def test_window_schema_spec():
+def test_window_schema_spec() -> Dict[str, Any]:
     return yaml.safe_load(open('tests/data/window.yml'))
 
 
-def test_window_transformer(test_stream_schema_spec, test_window_schema_spec):
+def test_window_transformer(test_stream_schema_spec: Dict[str, Any],
+                            test_window_schema_spec: Dict[str, Any]) -> None:
     schema_loader = SchemaLoader()
     stream_dtc_name = schema_loader.add_schema(test_stream_schema_spec)
     window_dtc_name = schema_loader.add_schema(test_window_schema_spec)

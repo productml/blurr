@@ -11,9 +11,9 @@ class SchemaLoader:
     ATTRIBUTE_NAME = 'Name'
     ATTRIBUTE_TYPE = 'Type'
 
-    def __init__(self):
-        self._spec = {}
-        self._object_cache: Dict[str, 'BaseSchema'] = {}
+    def __init__(self) -> None:
+        self._spec: Dict[str, Any] = {}
+        self._object_cache: Dict[str, 'BaseSchema'] = {}  # type: ignore
 
     def add_schema(self,
                    spec: Dict[str, Any],
@@ -45,7 +45,8 @@ class SchemaLoader:
         return spec[self.ATTRIBUTE_NAME]
 
     # Using forward reference to avoid cyclic dependency.
-    def get_schema_object(self, fully_qualified_name: str) -> 'BaseSchema':
+    def get_schema_object(
+            self, fully_qualified_name: str) -> 'BaseSchema':  # type: ignore
         """
         Used to generate a schema object from the given fully_qualified_name.
         :param fully_qualified_name: The fully qualified name of the object needed.
@@ -61,8 +62,9 @@ class SchemaLoader:
 
         return self._object_cache[fully_qualified_name]
 
-    def get_nested_schema_object(self, fully_qualified_parent_name: str,
-                                 nested_item_name: str) -> 'BaseSchema':
+    def get_nested_schema_object(
+            self, fully_qualified_parent_name: str,
+            nested_item_name: str) -> 'BaseSchema':  # type: ignore
         """
         Used to generate a schema object from the given fully_qualified_parent_name
         and the nested_item_name.

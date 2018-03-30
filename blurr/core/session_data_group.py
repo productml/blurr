@@ -21,7 +21,7 @@ class SessionDataGroupSchema(DataGroupSchema):
             self._spec[self.ATTRIBUTE_SPLIT]
         ) if self.ATTRIBUTE_SPLIT in self._spec else None
 
-    def extend_schema(self):
+    def extend_schema(self) -> None:
         # Alter the spec to introduce the session start and end time implicitly
         # handled fields
         predefined_field = self._build_predefined_fields_spec(
@@ -70,15 +70,18 @@ class SessionDataGroup(DataGroup):
         """
 
         # If a split is imminent, save the current session snapshot with the timestamp
-        split_should_be_evaluated = not (self.schema.split is None
-                                         or self.start_time is None
-                                         or self.end_time is None)
+        split_should_be_evaluated = not (
+            self.schema.split is None  # type: ignore
+            or self.start_time is None or self.end_time is None)
 
-        if split_should_be_evaluated and self.schema.split.evaluate(
+        if split_should_be_evaluated and self.schema.split.evaluate(  # type: ignore
                 self.evaluation_context) is True:
             # Save the current snapshot with the current timestamp
             self.persist(self.start_time)
             # Reset the state of the contents
-            self.__init__(self.schema, self.identity, self.evaluation_context)
+
+            # TODO: mypy error - error: Cannot access "__init__" directly
+            self.__init__(  # type: ignore
+                self.schema, self.identity, self.evaluation_context)
 
         super().evaluate()

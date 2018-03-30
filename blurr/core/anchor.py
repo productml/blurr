@@ -27,10 +27,10 @@ class AnchorSchema(BaseSchema):
 
 class Anchor(BaseItem):
     def __init__(self, schema: AnchorSchema,
-                 evaluation_context: EvaluationContext):
+                 evaluation_context: EvaluationContext) -> None:
         super().__init__(schema, evaluation_context)
         self.condition_met: Dict[datetime, int] = defaultdict(int)
-        self.anchor_session = None
+        self.anchor_session: SessionDataGroup = None
 
     def evaluate_anchor(self, session: SessionDataGroup) -> bool:
         self.anchor_session = session
@@ -42,18 +42,20 @@ class Anchor(BaseItem):
 
         return False
 
-    def add_condition_met(self):
+    def add_condition_met(self) -> None:
         self.condition_met[self.anchor_session.start_time.date()] += 1
 
-    def evaluate(self) -> bool:
-        return self.schema.condition.evaluate(self.evaluation_context)
+    def evaluate(self) -> bool:  # type: ignore
+        return self.schema.condition.evaluate(  # type: ignore
+            self.evaluation_context)
 
     def max_condition_met(self, session: SessionDataGroup) -> bool:
-        return self.condition_met[session.start_time.date()] >= self.schema.max
+        return self.condition_met[session.start_time.date(
+        )] >= self.schema.max  # type: ignore
 
     def restore(self, snapshot: Dict[str, Any]) -> BaseItem:
         pass
 
     @property
-    def snapshot(self):
+    def snapshot(self) -> Dict[str, any]:  # type: ignore
         pass

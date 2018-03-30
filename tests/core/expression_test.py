@@ -6,12 +6,12 @@ from blurr.core.evaluation import Context, EvaluationContext
 
 
 def test_expression_valid_single_value() -> None:
-    code_string = 1
+    code_string = '1'
     expr = Expression(code_string)
     assert expr.code_string == str(code_string)
     assert expr.evaluate(EvaluationContext()) == 1
 
-    code_string = False
+    code_string = str(False)
     expr = Expression(code_string)
     assert expr.code_string == str(code_string)
     assert expr.evaluate(EvaluationContext()) is False
@@ -62,7 +62,7 @@ def test_expression_conditional() -> None:
 def test_expression_user_function() -> None:
     code_string = '2 if test_function() else 3'
 
-    def test_function():
+    def test_function() -> bool:
         return 3 > 4
 
     expr = Expression(code_string)

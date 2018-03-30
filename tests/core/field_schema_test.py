@@ -32,19 +32,19 @@ def get_mock_field_schema(schema_spec: Dict[str, Any]) -> MockFieldSchema:
     return MockFieldSchema(name, schema_loader)
 
 
-def test_field_schema_type_object(field_schema_spec):
+def test_field_schema_type_object(field_schema_spec: Dict[str, Any]) -> None:
     valid_field_schema = get_mock_field_schema(field_schema_spec)
 
     assert valid_field_schema.type_object == int
 
 
-def test_field_schema_default_value(field_schema_spec):
+def test_field_schema_default_value(field_schema_spec: Dict[str, Any]) -> None:
     valid_field_schema = get_mock_field_schema(field_schema_spec)
 
     assert valid_field_schema.default == 0
 
 
-def test_field_schema_is_type_of(field_schema_spec):
+def test_field_schema_is_type_of(field_schema_spec: Dict[str, Any]) -> None:
     valid_field_schema = get_mock_field_schema(field_schema_spec)
 
     assert valid_field_schema.is_type_of("Hello") == False

@@ -15,7 +15,7 @@ When: True == True
 
 
 @fixture
-def test_schema_spec():
+def test_schema_spec() -> Dict[str, Any]:
     return yaml.load(TEST_SCHEMA_SPEC)
 
 
@@ -28,7 +28,7 @@ class TestSchema(BaseSchema):
     def load(self) -> None:
         pass
 
-    def validate(self, spec: Dict[str, Any]):
+    def validate(self, spec: Dict[str, Any]) -> None:
         pass
 
 

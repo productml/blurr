@@ -13,31 +13,31 @@ CircleCI (https://circleci.com/gh/productml/blurr).
 '''
 
 
-def is_ci_build():
+def is_ci_build() -> bool:
     return True if os.getenv('CIRCLECI') else False
 
 
-def is_release():
+def is_release() -> bool:
     if not is_ci_build():
         return False
     return True if os.getenv('CIRCLE_TAG') else False
 
 
-def requirements():
+def requirements() -> list:
     pipfile = Project(chdir=False).parsed_pipfile
     return convert_deps_to_pip(pipfile['packages'], r=False)
 
 
-def readme():
+def readme() -> str:
     with open('README.md') as f:
         return f.read()
 
 
-def name():
+def name() -> str:
     return "blurr" if is_release() else "blurr-dev"
 
 
-def version():
+def version() -> str:
     if not is_ci_build():
         return "LOCAL"
     elif is_release():

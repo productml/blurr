@@ -5,7 +5,7 @@ Usage:
 """
 import csv
 import json
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 
 import yaml
 from collections import defaultdict
@@ -14,6 +14,7 @@ from docopt import docopt
 from blurr.core.evaluation import Context
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
+from blurr.core.store import Key
 from blurr.core.streaming_transformer import StreamingTransformerSchema
 from blurr.core.syntax.schema_validator import validate
 from blurr.runner.identity_runner import execute_dtc
@@ -23,7 +24,7 @@ class LocalRunner:
     def __init__(self,
                  local_json_files: List[str],
                  stream_dtc_file: str,
-                 window_dtc_file: Optional[str] = None):
+                 window_dtc_file: Optional[str] = None) -> None:
         self._raw_files = local_json_files
         self._schema_loader = SchemaLoader()
 
@@ -36,9 +37,9 @@ class LocalRunner:
         self._window_dtc = None if window_dtc_file is None else yaml.safe_load(
             open(window_dtc_file))
 
-        self._user_events = defaultdict(list)
-        self._session_data = {}
-        self._window_data = {}
+        self._user_events: Dict[str, Any] = defaultdict(list)
+        self._session_data: Dict[Key, Any] = {}
+        self._window_data: Dict[str, Any] = {}
 
         self._validate_dtc_syntax()
 
@@ -72,8 +73,8 @@ class LocalRunner:
 
         self.execute_for_all_users()
 
-    def write_output_file(self, output_file: str):
-        header = []
+    def write_output_file(self, output_file: str) -> None:
+        header: List = []
         for data_rows in self._window_data.values():
             for data_row in data_rows:
                 header = data_row.keys()
@@ -84,7 +85,7 @@ class LocalRunner:
                 writer.writerows(data_rows)
 
 
-def main():
+def main() -> None:
     arguments = docopt(__doc__, version='pre-alpha')
     local_runner = LocalRunner(arguments['--raw_data'].split(','),
                                arguments['--stream_dtc'],

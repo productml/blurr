@@ -39,7 +39,7 @@ class Key:
         return Key(parts[0], parts[1],
                    parser.parse(parts[2]) if len(parts) > 2 else None)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """ Returns the string representation of the key"""
         if self.timestamp:
             return Key.PARTITION.join(
@@ -48,7 +48,7 @@ class Key:
 
         return Key.PARTITION.join([self.identity, self.group])
 
-    def __eq__(self, other: 'Key') -> bool:
+    def __eq__(self, other: 'Key') -> bool:  # type: ignore
         return (self.identity, self.group,
                 self.timestamp) == (other.identity, other.group,
                                     other.timestamp)
@@ -75,7 +75,7 @@ class Key:
 
         return (self.timestamp is None) or (self.timestamp > other.timestamp)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.identity, self.group, self.timestamp))
 
 

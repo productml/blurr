@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Any
 
 import pytest
 from pytest import fixture
@@ -6,17 +6,6 @@ from pytest import fixture
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.field import FieldSchema, Field
 from blurr.core.schema_loader import SchemaLoader
-
-
-@fixture
-def test_field_schema() -> Dict[str, Any]:
-    schema_loader = SchemaLoader()
-    name = schema_loader.add_schema({
-        'Name': 'max_attempts',
-        'Type': 'integer',
-        'Value': 5
-    })
-    return MockFieldSchema(name, schema_loader)
 
 
 class MockFieldSchema(FieldSchema):
@@ -29,23 +18,35 @@ class MockFieldSchema(FieldSchema):
         return int(0)
 
 
+@fixture
+def test_field_schema() -> FieldSchema:
+    schema_loader = SchemaLoader()
+    name = schema_loader.add_schema({
+        'Name': 'max_attempts',
+        'Type': 'integer',
+        'Value': 5
+    })
+    return MockFieldSchema(name, schema_loader)
+
+
 class MockField(Field):
     pass
 
 
-def test_field_initialization(test_field_schema):
+def test_field_initialization(test_field_schema: FieldSchema) -> None:
     field = MockField(test_field_schema, EvaluationContext())
     assert field.value == 0
 
 
-def test_field_evaluate_with_needs_evaluation(test_field_schema):
+def test_field_evaluate_with_needs_evaluation(
+        test_field_schema: FieldSchema) -> None:
     field = MockField(test_field_schema, EvaluationContext())
     field.evaluate()
 
     assert field.value == 5
 
 
-def test_field_evaluate_without_needs_evaluation():
+def test_field_evaluate_without_needs_evaluation() -> None:
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema({
         'Name': 'max_attempts',
@@ -60,7 +61,7 @@ def test_field_evaluate_without_needs_evaluation():
     assert field.value == 0
 
 
-def test_field_evaluate_incorrect_type():
+def test_field_evaluate_incorrect_type() -> None:
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema({
         'Name': 'max_attempts',
@@ -77,7 +78,7 @@ def test_field_evaluate_incorrect_type():
         field.evaluate()
 
 
-def test_field_snapshot(test_field_schema):
+def test_field_snapshot(test_field_schema: FieldSchema) -> None:
     field = MockField(test_field_schema, EvaluationContext())
     assert field.snapshot == 0
 
@@ -85,7 +86,7 @@ def test_field_snapshot(test_field_schema):
     assert field.snapshot == 5
 
 
-def test_field_restore(test_field_schema):
+def test_field_restore(test_field_schema: FieldSchema) -> None:
     field = MockField(test_field_schema, EvaluationContext())
     field.restore(5)
     assert field.value == 5

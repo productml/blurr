@@ -37,7 +37,7 @@ class BaseSchema(ABC):
             self._spec[self.ATTRIBUTE_WHEN]
         ) if self.ATTRIBUTE_WHEN in self._spec else None
 
-    def extend_schema(self):
+    def extend_schema(self) -> None:
         pass
 
 
@@ -65,7 +65,7 @@ class BaseSchemaCollection(BaseSchema, ABC):
         }
 
 
-BaseItemType = TypeVar('T', bound='BaseItem')
+BaseItemType = TypeVar('T', bound='BaseItem')  # type: ignore
 
 
 class BaseItem(ABC):
@@ -110,7 +110,7 @@ class BaseItem(ABC):
 
     @property
     @abstractmethod
-    def snapshot(self):
+    def snapshot(self) -> Dict[str, Any]:
         """
         Gets a dictionary representation of the current state items in the current hierarchy
         :return: Name, Value map of the current tree
@@ -118,7 +118,8 @@ class BaseItem(ABC):
         raise NotImplementedError('snapshot() must be implemented')
 
     @abstractmethod
-    def restore(self, snapshot) -> BaseItemType:
+    def restore(self,
+                snapshot: Dict[str, Any]) -> BaseItemType:  # type: ignore
         """
         Restores the state of an item from a snapshot
         """
@@ -148,7 +149,7 @@ class BaseItemCollection(BaseItem):
         """
         if self.needs_evaluation:
             for _, item in self.nested_items.items():
-                item.evaluate()
+                item.evaluate()  # type: ignore
 
     @property
     def snapshot(self) -> Dict[str, Any]:
@@ -173,7 +174,7 @@ class BaseItemCollection(BaseItem):
         try:
 
             for name, snap in snapshot.items():
-                self.nested_items[name].restore(snap)
+                self.nested_items[name].restore(snap)  # type: ignore
             return self
 
         except Exception as e:

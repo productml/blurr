@@ -38,7 +38,7 @@ class AnchorDataGroup(DataGroup):
     def __init__(self, schema: AnchorDataGroupSchema, identity: str,
                  evaluation_context: EvaluationContext) -> None:
         super().__init__(schema, identity, evaluation_context)
-        self.window = Window(self.schema.window_schema
+        self.window = Window(self.schema.window_schema  # type: ignore
                              ) if schema.window_schema is not None else None
 
     def prepare_window(self, start_time: datetime) -> None:

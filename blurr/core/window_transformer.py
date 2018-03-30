@@ -67,7 +67,7 @@ class WindowTransformer(Transformer):
 
         return False
 
-    def evaluate(self):
+    def evaluate(self) -> None:
         if 'anchor' not in self.evaluation_context.global_context or self.anchor.anchor_session is None:
             raise AnchorSessionNotDefinedError()
 

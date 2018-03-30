@@ -48,20 +48,20 @@ class Window:
         """
         store = self.schema.source.store
         if self.schema.type == 'day' or self.schema.type == 'hour':
-            self.view = self._load_sessions(
+            self.view = self._load_sessions(  # type: ignore
                 store.get_range(
                     Key(identity, self.schema.source.name, start_time),
                     Key(identity, self.schema.source.name,
                         self._get_end_time(start_time))), identity)
         else:
-            self.view = self._load_sessions(
+            self.view = self._load_sessions(  # type: ignore
                 store.get_range(
                     Key(identity, self.schema.source.name, start_time), None,
                     self.schema.value), identity)
 
         self._validate_view()
 
-    def _validate_view(self):
+    def _validate_view(self) -> None:
         if self.schema.type == 'count' and len(self.view) != abs(
                 self.schema.value):
             raise PrepareWindowMissingSessionsError(
@@ -86,6 +86,10 @@ class Window:
             return start_time + timedelta(days=self.schema.value)
         elif self.schema.type == 'hour':
             return start_time + timedelta(hours=self.schema.value)
+        else:
+            raise ValueError(
+                "invalid schema type: " +
+                self.schema.type)  # TODO: test case for this invalid input
 
     def _load_sessions(self, sessions: List[Tuple[Key, Any]],
                        identity: str) -> List[BaseItem]:

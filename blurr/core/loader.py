@@ -45,11 +45,11 @@ SCHEMA_MAP = {
 
 class TypeLoader:
     @staticmethod
-    def load_schema(type_name: str):
+    def load_schema(type_name: str) -> Any:
         return TypeLoader.load_type(type_name, SCHEMA_MAP)
 
     @staticmethod
-    def load_item(type_name: str):
+    def load_item(type_name: str) -> Any:
         return TypeLoader.load_type(type_name, ITEM_MAP)
 
     @staticmethod
@@ -57,7 +57,7 @@ class TypeLoader:
         return TypeLoader.import_class_by_full_name(type_map[type_name])
 
     @staticmethod
-    def import_class_by_full_name(name):
+    def import_class_by_full_name(name: str) -> Any:
         components = name.rsplit('.', 1)
         mod = importlib.import_module(components[0])
         loaded_class = getattr(mod, components[1])

@@ -24,13 +24,13 @@ class TestItem(BaseItem):
     This class is to test abstract behavior, and thus, adds no functionality
     """
 
-    def snapshot(self):
+    def snapshot(self) -> Dict[str, Any]:
         pass
 
     def evaluate(self) -> None:
         pass
 
-    def restore(self, snapshot) -> None:
+    def restore(self, snapshot: Any) -> None:
         pass
 
 

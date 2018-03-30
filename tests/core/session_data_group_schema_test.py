@@ -1,11 +1,10 @@
 from typing import Dict, Any
 
-import pytest
-from pytest import mark, fixture
+from pytest import fixture
 
-from blurr.core.session_data_group import SessionDataGroupSchema
 from blurr.core.evaluation import Expression
 from blurr.core.schema_loader import SchemaLoader
+from blurr.core.session_data_group import SessionDataGroupSchema
 
 
 @fixture
@@ -22,7 +21,7 @@ def session_data_group_schema_spec() -> Dict[str, Any]:
     }
 
 
-def match_fields(fields):
+def match_fields(fields: Dict[str, Any]) -> bool:
     expected_fields = [{
         'Name': 'start_time',
         'Type': 'datetime',
@@ -42,7 +41,7 @@ def match_fields(fields):
 
 
 def test_session_data_group_schema_initialization(
-        session_data_group_schema_spec):
+        session_data_group_schema_spec: Dict[str, Any]) -> None:
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(session_data_group_schema_spec)
     session_data_group_schema = SessionDataGroupSchema(name, schema_loader)
@@ -54,7 +53,7 @@ def test_session_data_group_schema_initialization(
 
 
 def test_session_data_group_schema_with_split_initialization(
-        session_data_group_schema_spec):
+        session_data_group_schema_spec: Dict[str, Any]) -> None:
     session_data_group_schema_spec['Split'] = '4 > 2'
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(session_data_group_schema_spec)
