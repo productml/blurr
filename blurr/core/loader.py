@@ -10,14 +10,14 @@ ITEM_MAP = {
     'day': 'blurr.core.window.Window',
     'hour': 'blurr.core.window.Window',
     'count': 'blurr.core.window.Window',
-    'string': 'blurr.core.simple_field.SimpleField',
-    'integer': 'blurr.core.simple_field.SimpleField',
-    'boolean': 'blurr.core.simple_field.SimpleField',
-    'datetime': 'blurr.core.simple_field.SimpleField',
-    'float': 'blurr.core.simple_field.SimpleField',
-    'map': 'blurr.core.simple_field.SimpleField',
-    'list': 'blurr.core.simple_field.SimpleField',
-    'set': 'blurr.core.simple_field.SimpleField',
+    'string': 'blurr.core.simple_fields.SimpleField',
+    'integer': 'blurr.core.simple_fields.SimpleField',
+    'boolean': 'blurr.core.simple_fields.SimpleField',
+    'datetime': 'blurr.core.simple_fields.SimpleField',
+    'float': 'blurr.core.simple_fields.SimpleField',
+    'map': 'blurr.core.simple_fields.SimpleField',
+    'list': 'blurr.core.simple_fields.SimpleField',
+    'set': 'blurr.core.simple_fields.SimpleField',
 }
 
 SCHEMA_MAP = {
@@ -30,14 +30,14 @@ SCHEMA_MAP = {
     'day': 'blurr.core.window.WindowSchema',
     'hour': 'blurr.core.window.WindowSchema',
     'count': 'blurr.core.window.WindowSchema',
-    'string': 'blurr.core.simple_field.StringFieldSchema',
-    'integer': 'blurr.core.simple_field.IntegerFieldSchema',
-    'boolean': 'blurr.core.simple_field.BooleanFieldSchema',
-    'datetime': 'blurr.core.simple_field.DateTimeFieldSchema',
-    'float': 'blurr.core.simple_field.FloatFieldSchema',
-    'map': 'blurr.core.simple_field.MapFieldSchema',
-    'list': 'blurr.core.simple_field.ListFieldSchema',
-    'set': 'blurr.core.simple_field.SetFieldSchema'
+    'string': 'blurr.core.simple_fields.StringFieldSchema',
+    'integer': 'blurr.core.simple_fields.IntegerFieldSchema',
+    'boolean': 'blurr.core.simple_fields.BooleanFieldSchema',
+    'datetime': 'blurr.core.simple_fields.DateTimeFieldSchema',
+    'float': 'blurr.core.simple_fields.FloatFieldSchema',
+    'map': 'blurr.core.complex_fields.MapFieldSchema',
+    'list': 'blurr.core.complex_fields.ListFieldSchema',
+    'set': 'blurr.core.complex_fields.SetFieldSchema'
 }
 
 # TODO Build dynamic type loader from a central configuration rather than reading a static dictionary
