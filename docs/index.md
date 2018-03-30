@@ -10,8 +10,8 @@ Blurr provides a `high-level expressive YAML-based language` called the Data Tra
 
 The Streaming DTC aggregates the raw data into blocks and the Window DTC drops an anchor on a block and generates model features relative to that block.
 
-![Blocks](docs/images/blocks-intro.png)
+![Blocks](images/blocks-intro.png)
 
-![Window](docs/images/window.png)
+![Window](images/window.png)
 
 Blurr has first class support for serverless data processing which means near zero standing costs, great for spiky usage, infinite scale and zero maintenance headache.
