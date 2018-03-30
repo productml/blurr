@@ -137,6 +137,7 @@ class ComplexTypeBase(ABC):
             if isinstance(result, self_type.__bases__) and not isinstance(
                     result, self_type):
                 return self_type(result)
+                # TODO This creates a shallow copy of the object - find a way to optimize this
 
             # Return the result as-is on all other conditions
             return result

@@ -121,20 +121,40 @@ def test_validate_valid() -> None:
 def test_validate_invalid() -> None:
     with raises(
             InvalidExpressionError,
-            message='Setting value using `=` is not allowed.'):
+            message='Modifying value using `=` is not allowed.'):
         Expression('a= b')
 
     with raises(
             InvalidExpressionError,
-            message='Setting value using `=` is not allowed.'):
+            message='Modifying value using `=` is not allowed.'):
         Expression('a!=b = ')
 
     with raises(
             InvalidExpressionError,
-            message='Setting value using `=` is not allowed.'):
+            message='Modifying value using `=` is not allowed.'):
         Expression(' =a')
 
     with raises(
             InvalidExpressionError,
-            message='Setting value using `=` is not allowed.'):
+            message='Modifying value using `=` is not allowed.'):
         Expression('b =')
+
+    with raises(
+            InvalidExpressionError,
+            message='Modifying value using `=` is not allowed.'):
+        Expression('b &= c')
+
+    with raises(
+            InvalidExpressionError,
+            message='Modifying value using `=` is not allowed.'):
+        Expression('b += c')
+
+    with raises(
+            InvalidExpressionError,
+            message='Modifying value using `=` is not allowed.'):
+        Expression('b |= c')
+
+    with raises(
+            InvalidExpressionError,
+            message='Modifying value using `=` is not allowed.'):
+        Expression('b /= c')

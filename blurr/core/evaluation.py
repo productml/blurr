@@ -95,7 +95,7 @@ class Expression:
 
         # Validate the expression for errors / unsupported expressions
         if VALIDATION_INVALID_EQUALS_REGULAR_EXPRESSION.findall(code_string):
-            raise InvalidExpressionError('Setting value using `=` is not allowed.')
+            raise InvalidExpressionError('Modifying value using `=` is not allowed.')
 
         try:
             self.code_object = compile(self.code_string, '<string>', 'eval')
