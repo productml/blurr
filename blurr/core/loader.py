@@ -2,6 +2,8 @@ from typing import Any
 
 import importlib
 
+from blurr.core.errors import InvalidSchemaError
+
 ITEM_MAP = {
     'ProductML:DTC:DataGroup:SessionAggregate': 'blurr.core.session_data_group.SessionDataGroup',
     'ProductML:DTC:DataGroup:IdentityAggregate': 'blurr.core.identity_data_group.IdentityDataGroup',
@@ -21,6 +23,8 @@ ITEM_MAP = {
 }
 
 SCHEMA_MAP = {
+    'ProductML:DTC:Streaming': 'blurr.core.streaming_transformer.StreamingTransformerSchema',
+    'ProductML:DTC:Window': 'blurr.core.window_transformer.WindowTransformerSchema',
     'ProductML:DTC:DataGroup:SessionAggregate': 'blurr.core.session_data_group.SessionDataGroupSchema',
     'ProductML:DTC:DataGroup:IdentityAggregate': 'blurr.core.identity_data_group.IdentityDataGroupSchema',
     'ProductML:DTC:DataGroup:VariableAggregate': 'blurr.core.variable_data_group.VariableDataGroupSchema',
@@ -54,6 +58,9 @@ class TypeLoader:
 
     @staticmethod
     def load_type(type_name: str, type_map: dict) -> Any:
+        if type_name not in type_map:
+            raise InvalidSchemaError(
+                'Unknown schema type {}'.format(type_name))
         return TypeLoader.import_class_by_full_name(type_map[type_name])
 
     @staticmethod
