@@ -85,40 +85,56 @@ def test_execution_error() -> None:
 
 
 def test_validate_valid() -> None:
-    Expression.validate('a==b')
-    Expression.validate('a == c')
-    Expression.validate('a==b == c')
-    Expression.validate('==a ==b== c==')
-    Expression.validate('== ')
-    Expression.validate('==b')
-    Expression.validate('c ==')
+    Expression('a==b')
+    Expression('a == c')
+    Expression('a==b == c')
 
-    Expression.validate('a!=b')
-    Expression.validate('a != c')
-    Expression.validate('a!=b != c')
-    Expression.validate('!=a !=b!= c!=')
-    Expression.validate('!= ')
-    Expression.validate('!=b')
-    Expression.validate('c !=')
+    Expression('a!=b')
+    Expression('a != c')
+    Expression('a!=b != c')
+
+    with raises(InvalidExpressionError, message='invalid syntax'):
+        Expression('==a ==b== c==')
+
+    with raises(InvalidExpressionError, message='invalid syntax'):
+        Expression('!=a !=b!= c!=')
+
+    with raises(InvalidExpressionError, message='invalid syntax'):
+        Expression('!= ')
+
+    with raises(InvalidExpressionError, message='invalid syntax'):
+        Expression('!=b')
+
+    with raises(InvalidExpressionError, message='invalid syntax'):
+        Expression('c !=')
+
+    with raises(InvalidExpressionError, message='invalid syntax'):
+        Expression('== ')
+
+    with raises(InvalidExpressionError, message='invalid syntax'):
+        Expression('==b')
+
+    with raises(InvalidExpressionError, message='invalid syntax'):
+        Expression('c ==')
 
 
 def test_validate_invalid() -> None:
     with raises(
             InvalidExpressionError,
             message='Setting value using `=` is not allowed.'):
-        Expression.validate('a= b')
+        Expression('a= b')
 
     with raises(
             InvalidExpressionError,
             message='Setting value using `=` is not allowed.'):
-        Expression.validate('a!=b = ')
+        Expression('a!=b = ')
 
     with raises(
             InvalidExpressionError,
             message='Setting value using `=` is not allowed.'):
-        Expression.validate(' =a')
+        Expression(' =a')
 
     with raises(
             InvalidExpressionError,
             message='Setting value using `=` is not allowed.'):
-        Expression.validate('b =')
+        Expression('b =')

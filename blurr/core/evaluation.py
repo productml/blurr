@@ -75,7 +75,7 @@ class EvaluationContext:
         self.global_context[key] = value
 
 
-VALIDATION_INVALID_EQUALS_REGULAR_EXPRESSION = re.compile('[^!=]+=[^=]+')
+VALIDATION_INVALID_EQUALS_REGULAR_EXPRESSION = re.compile('(?:^|[^!=]+)=(?:[^=]+|$)')
 
 
 class Expression:
