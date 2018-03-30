@@ -1,10 +1,27 @@
 """
 Usage:
-  blurr validate <DTC>
+    blurr validate [<DTC> ...]
+    blurr transform [--streaming-dtc=<file>] [--window-dtc=<file>] <raw-json-files> ...
+
+Commands:
+    validate        Runs syntax validation on the list of DTC files provided. If
+                    no files are provided then all *.dtc files in the current
+                    directory are validated.
+    transform       Runs blurr to process the given raw log file. This command
+                    can be run with the following combinations:
+                    1. No DTC provided - The current directory is searched for
+                    DTCs. First first streaming and the first window DTC are used.
+                    2. Only streaming DTC given - Transform outputs the result of
+                    applying the on the raw data file.
+                    3. Both streaming and window DTC are provided - Transform
+                    outputs the final result of applying the streaming and window
+                    DTC on the raw data file.
 
 Options:
-  -h --help     Show this screen.
-  --version     Show version.
+    -h --help                   Show this screen.
+    --version                   Show version.
+    --streaming-dtc=<file>      Streaming DTC file to use.
+    --window-dtc=<file>         Window DTC file to use.
 """
 import sys
 
@@ -12,7 +29,7 @@ import os
 from docopt import docopt
 
 from blurr.cli.cli import cli
-from blurr.util.out import Out
+from blurr.cli.out import Out
 
 VERSION_PATH = "blurr/VERSION"
 
