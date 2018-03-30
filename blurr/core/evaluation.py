@@ -1,6 +1,7 @@
 from typing import Any, Dict
 
 from copy import copy
+import re
 
 from blurr.core.errors import ExpressionEvaluationError, InvalidExpressionError
 
@@ -74,6 +75,9 @@ class EvaluationContext:
         self.global_context[key] = value
 
 
+VALIDATION_INVALID_EQUALS_REGULAR_EXPRESSION = re.compile('[^!=]+=[^=]+')
+
+
 class Expression:
     """ Encapsulates a python code statement in string and in compilable expression"""
 
@@ -90,7 +94,8 @@ class Expression:
         self.code_string = 'None' if code_string.isspace() else code_string
 
         # Validate the expression for errors / unsupported expressions
-        self.validate(code_string)
+        if VALIDATION_INVALID_EQUALS_REGULAR_EXPRESSION.findall(code_string):
+            raise InvalidExpressionError('Setting value using `=` is not allowed.')
 
         try:
             self.code_object = compile(self.code_string, '<string>', 'eval')
@@ -110,23 +115,3 @@ class Expression:
 
         except Exception as e:
             raise ExpressionEvaluationError(e)
-
-    @staticmethod
-    def validate(code_string: str) -> None:
-        def is_valid_equal(index):
-            return (character_exists(index, -1) and code_string[index - 1] == '!') \
-                or (character_exists(index, 1) and code_string[index + 1] == '=')
-
-        def character_exists(index, shift):
-            if shift < 0:
-                return index + shift >= 0
-
-            return index + shift < len(code_string)
-
-        equal_index = code_string.find('=', 0)
-        while equal_index != -1:
-            next_index = equal_index + 1
-            if not is_valid_equal(equal_index):
-                raise InvalidExpressionError(
-                    'Setting value using `=` is not allowed.')
-            equal_index = code_string.find('=', next_index + 1)

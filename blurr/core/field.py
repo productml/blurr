@@ -122,15 +122,15 @@ class ComplexTypeBase(ABC):
         # Wrap the attribute in a function that changes its return value
         def wrapped_attribute(*args, **kwargs):
 
-            # Execution the underlying method
+            # Executing the underlying method
             result = attribute(*args, **kwargs)
-
-            # Get the type of the current object
-            self_type = type(self)
 
             # If the execution does not return a value
             if result is None:
                 return self
+
+            # Get the type of the current object
+            self_type = type(self)
 
             # If the method executed is defined in the base type and a base type object is returned
             # (and not the current type), then wrap the base object into an object of the current type
