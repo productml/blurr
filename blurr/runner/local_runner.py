@@ -1,14 +1,15 @@
 """
 Usage:
-    local_runner.py --raw_data=<files> --stream_dtc=<file> --window_dtc=<file> --output_file=<file>
+    local_runner.py --raw-data=<files> --streaming-dtc=<file> [--window-dtc=<file>] [--output-file=<file>]
     local_runner.py (-h | --help)
 """
 import csv
 import json
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 import yaml
 from collections import defaultdict
+from dateutil import parser
 from docopt import docopt
 
 from blurr.core.evaluation import Context
@@ -47,16 +48,18 @@ class LocalRunner:
         if self._window_dtc is not None:
             validate(self._window_dtc)
 
-    def _consume_record(self, record: Dict) -> None:
-        source_context = Context({'source': Record(record)})
+    def _consume_record(self, record: Record) -> None:
+        source_context = Context({'source': record})
+        source_context.add('parser', parser)
         identity = self._stream_transformer_schema.get_identity(source_context)
+        time = self._stream_transformer_schema.get_time(source_context)
 
-        self._user_events[identity].append(record)
+        self._user_events[identity].append((time, record))
 
     def _consume_file(self, file: str) -> None:
         with open(file) as f:
             for record in f:
-                self._consume_record(json.loads(record))
+                self._consume_record(Record(json.loads(record)))
 
     def execute_for_all_users(self) -> None:
         for identity, events in self._user_events.items():
@@ -72,6 +75,14 @@ class LocalRunner:
 
         self.execute_for_all_users()
 
+    def print_output(self) -> None:
+        if self._window_dtc is not None:
+            for row in self._window_data.items():
+                print(row)
+        else:
+            for row in self._session_data.items():
+                print(json.dumps(row, default=str))
+
     def write_output_file(self, output_file: str):
         header = []
         for data_rows in self._window_data.values():
@@ -86,11 +97,14 @@ class LocalRunner:
 
 def main():
     arguments = docopt(__doc__, version='pre-alpha')
-    local_runner = LocalRunner(arguments['--raw_data'].split(','),
-                               arguments['--stream_dtc'],
-                               arguments['--window_dtc'])
+    local_runner = LocalRunner(arguments['--raw-data'].split(','),
+                               arguments['--streaming-dtc'],
+                               arguments['--window-dtc'])
     local_runner.execute()
-    local_runner.write_output_file(arguments['--output_file'])
+    if arguments['--output-file'] is None:
+        local_runner.print_output()
+    else:
+        local_runner.write_output_file(arguments['--output-file'])
 
 
 if __name__ == "__main__":
