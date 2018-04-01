@@ -2,6 +2,7 @@
 Usage:
     blurr validate [<DTC> ...]
     blurr transform [--streaming-dtc=<file>] [--window-dtc=<file>] <raw-json-files> ...
+    blurr -h | --help
 
 Commands:
     validate        Runs syntax validation on the list of DTC files provided. If
@@ -10,9 +11,9 @@ Commands:
     transform       Runs blurr to process the given raw log file. This command
                     can be run with the following combinations:
                     1. No DTC provided - The current directory is searched for
-                    DTCs. First first streaming and the first window DTC are used.
+                    DTCs. First streaming and the first window DTC are used.
                     2. Only streaming DTC given - Transform outputs the result of
-                    applying the on the raw data file.
+                    applying the DTC on the raw data file.
                     3. Both streaming and window DTC are provided - Transform
                     outputs the final result of applying the streaming and window
                     DTC on the raw data file.

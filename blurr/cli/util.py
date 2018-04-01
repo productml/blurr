@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 
 import os
 import yaml
@@ -9,7 +9,7 @@ from blurr.core.syntax.schema_validator import is_streaming_dtc, is_window_dtc
 def get_yml_files(path: str = '.') -> List[str]:
     return [
         os.path.join(path, file) for file in os.listdir(path)
-        if file.endswith('.yml')
+        if (file.endswith('.yml') or file.endswith('.yaml'))
     ]
 
 
