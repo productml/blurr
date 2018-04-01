@@ -23,9 +23,8 @@ def my_open(filename):
 
 def test_get_yml_files():
     assert get_yml_files() == []
-    assert get_yml_files('tests/data') == [
-        'tests/data/window.yml', 'tests/data/stream.yml'
-    ]
+    assert sorted(get_yml_files('tests/data')) == sorted(
+        ['tests/data/window.yml', 'tests/data/stream.yml'])
 
 
 @mock.patch('builtins.open', new=my_open)
