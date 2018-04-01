@@ -1,9 +1,10 @@
+from typing import Any
 from unittest import mock
 
 from blurr.cli.util import get_yml_files, get_stream_window_dtc_files
 
 
-def my_open(filename):
+def override_open(filename: str) -> Any:
     if filename == 'invalid.yml':
         content = "Type: ABC"
     elif filename == 'stream1.yml':
@@ -21,31 +22,46 @@ def my_open(filename):
     return file_object
 
 
+def override_listdir(path: str) -> Any:
+    if path == '.':
+        content = []
+    elif path == 'path1':
+        content = ['file1.yml', 'file2.csv', 'file3.yaml', 'file4yml']
+    elif path == 'path/inner_path':
+        content = ['file1.yml']
+    else:
+        raise FileNotFoundError(path)
+
+    return content
+
+
+@mock.patch('os.listdir', new=override_listdir)
 def test_get_yml_files():
     assert get_yml_files() == []
-    assert sorted(get_yml_files('tests/data')) == sorted(
-        ['tests/data/window.yml', 'tests/data/stream.yml'])
+    assert sorted(get_yml_files('path1')) == sorted(
+        ['path1/file1.yml', 'path1/file3.yaml'])
+    assert get_yml_files('path/inner_path') == ['path/inner_path/file1.yml']
 
 
-@mock.patch('builtins.open', new=my_open)
+@mock.patch('builtins.open', new=override_open)
 def test_get_stream_window_dtc_files_bad_files():
     assert get_stream_window_dtc_files([]) == (None, None)
     assert get_stream_window_dtc_files(['invalid.yml']) == (None, None)
 
 
-@mock.patch('builtins.open', new=my_open)
+@mock.patch('builtins.open', new=override_open)
 def test_get_stream_window_dtc_files_missing_stream():
     assert get_stream_window_dtc_files(
         ['invalid.yml', 'stream1.yml']) == ('stream1.yml', None)
 
 
-@mock.patch('builtins.open', new=my_open)
+@mock.patch('builtins.open', new=override_open)
 def test_get_stream_window_dtc_files_missing_window():
     assert get_stream_window_dtc_files(
         ['invalid.yml', 'window2.yml']) == (None, 'window2.yml')
 
 
-@mock.patch('builtins.open', new=my_open)
+@mock.patch('builtins.open', new=override_open)
 def test_get_stream_window_dtc_files_valid():
     assert get_stream_window_dtc_files(
         ['stream1.yml', 'stream2.yml', 'window1.yml']) == ('stream1.yml',
