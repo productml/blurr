@@ -2,76 +2,87 @@ Type: ProductML:DTC:Streaming
 Version: '2018-03-01'
 Name: Sessions
 Description: Streaming Extended Test
-Identity: source.customer_identifier
-Time: parser.parse(source.event_time)
+Identity: source.user_id
+Time: parser.parse(source.time)
 Stores:
   -
     Type: ProductML:DTC:Store:MemoryStore
     Name: memory
+
 DataGroups:
   -
     Type: ProductML:DTC:DataGroup:VariableAggregate
     Name: vars
     Fields:
-      - { Name: continent, Type: string, Value: "'North America' if source.country == 'US' else 'World'", When: bool(source.country) }
+
+      # Checks for conditional filters
+      - { Name: is_paid, Type: boolean, Value: True, When: source.event_id == 'purchase_completed' }
+
+      # Checks for exception handling in cases where os-version is not specified
+      # Checks for using the bracket notation to access fields that do not have python valid fieldnames
+      - { Name: os_version_parts, Type: list, Value: "source['os-version'].split('-')" }
   -
     Type: ProductML:DTC:DataGroup:IdentityAggregate
     Name: state
     Store: memory
-    When: source.event_id == 'app_launched'
     Fields:
-      - { Name: country, Type: string, Value: source.country, When: source.event_id == 'app_launched' }
-      - { Name: language, Type: string, Value: source.language, When: source.event_id == 'app_launched' }
-      - { Name: package_name, Type: string, Value: source.package_name, When: source.event_id == 'app_launched' }
-      - { Name: package_version, Type: string, Value: source.package_version, When: source.event_id == 'app_launched' }
-      - { Name: os, Type: string, Value: source.os, When: source.event_id == 'app_launched' }
-      - { Name: os_version, Type: string, Value: source.os_version, When: source.event_id == 'app_launched' }
-      - { Name: device_type, Type: string, Value: source.device_type, When: source.event_id == 'app_launched' }
-      - { Name: device_make, Type: string, Value: source.device_make, When: source.event_id == 'app_launched' }
-      - { Name: device_model, Type: string, Value: source.device_model, When: source.event_id == 'app_launched' }
+      # Check for missing data in following events
+      - { Name: country, Type: string, Value: source.country }
+      # Check for data changes across events
+      # Uses bracket notation to access data
+      - { Name: build, Type: integer, Value: "source['build']" }
+      # Check for prior state value
+      # Checks for variable usage
+      - { Name: is_paid, Type: boolean, Value: state.is_paid or vars.is_paid }
+      # Tests set additions with items
       - { Name: device_id, Type: set, Value: state.device_id.add(source.device_id) }
-      - Name: max_level_attempted
-        Type: integer
-        Value: max(source.level, state.max_level_attempted)
-        When: source.event_id == 'game_start'
-
+      # Tests accessing variables.
+      # Tests exceptional cases when variables don't exist
+      - { Name: os_name, Type: string, Value: "vars.os_version_parts[0]" }
+      - { Name: os_version, Type: string, Value: "vars.os_version_parts[1]" }
+      # Tests usage of max functions and conditional executions
       - Name: max_level_completed
         Type: integer
         Value: max(source.level, state.max_level_completed)
         When: source.event_id == 'game_end' and source.won
-
-      - Name: offers_shown
+      # Tests dictionary increment
+      - Name: offers_purchased
         Type: map
-        Value: state.offers_shown.increment(source.offer_id)
-        When: source.event_id == 'offer_shown'
+        Value: state.offers_bought.increment(source.offer_key)
+        When: source.event_id == 'purchase_completed' and 'offer_key' in source
 
+      # Shows how if else conditions can be used in expressions
+      # Shows how expressions that start with a quote character are to be wrapped YAML
       - Name: signin_method
         Type: string
         Value: "'fb' if 'facebook.com' in source.signin_method else 'other'"
-        When: source.signin_method is not None and source.signin_method != ''
+        When: state.build > 210 and state.build < 440
+
 
   - Type: ProductML:DTC:DataGroup:SessionAggregate
     Name: session
-    Split: (time - session.end_time).seconds > 1800
+    Split: (time - session.end_time).seconds > 1800 or sessions.session_id != source.session_id
     Store: memory
     Fields:
+      # Tests basic aggregation
       - { Name: events, Type: integer, Value: session.events + 1 }
-      - { Name: offers_shown, Type: integer, Value: session.offers_shown + 1, When: source.event_id == 'offer_shown' }
-      - { Name: games_played, Type: integer, Value: session.games_played + 1, When: source.event_id == 'game_start' }
       - { Name: games_won, Type: integer, Value: session.games_won + 1, When: source.event_id == 'game_end' and source.won }
-      - { Name: levels_played, Type: set, Value: session.levels_played.add(source.level), When: source.event_id == 'game_start' }
+      # Tests list aggregation
+      - { Name: levels_played, Type: list, Value: session.levels_played.append(source.level), When: source.event_id == 'game_start' }
 
-      - Name: badges_won
+      # Tests Dictionary Aggregation
+      - Name: badges
         Type: map
         Value: session.badges_won.increment(source.badge)
-        When: source.event_id in ['game_start', 'game_end']
+        When: source.won is True
 
+      # Tests access to time fields in a session
       - Name: start_score
         Type: integer
         Value: source.score
-        When: source.event_time == session.start_time and 'score' in source
+        When: source.event_time == session.start_time
 
       - Name: end_score
         Type: integer
         Value: source.score
-        When: source.event_time == session.end_time and 'score' in source
+        When: source.event_time == session.end_time

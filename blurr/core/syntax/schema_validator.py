@@ -14,6 +14,8 @@ def is_expression(s: str) -> bool:
         ast.parse(s)
     except SyntaxError:
         return False
+    except TypeError:
+        return False
     return True
 
 
@@ -50,7 +52,7 @@ class Expression(Validator):
     TAG = 'expression'
 
     def _is_valid(self, value: str) -> bool:
-        return is_expression(value)
+        return is_expression(str(value))
 
     def get_name(self) -> str:
         return 'Expression'

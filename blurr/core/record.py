@@ -25,6 +25,9 @@ class Record(dict):
                 'Record object has no {} attribute.'.format(name))
         return wrap(self[name]) if name in self else None
 
+    def __getitem__(self, item):
+        return wrap(super().__getitem__(item)) if item in self else None
+
 
 class RecordList(list):
     """ Wraps a list to list of Records"""

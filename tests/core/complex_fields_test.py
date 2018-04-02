@@ -2,24 +2,27 @@ from typing import Dict, Any
 
 from pytest import fixture
 
-from blurr.core.complex_fields import Map
+from blurr.core.complex_fields import Map, List, Set
 from blurr.core.data_group import DataGroup, DataGroupSchema
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.variable_data_group import VariableDataGroup, VariableDataGroupSchema
 
+
 # Test custom functions implemented for complex fields
 
 
-def test_map_set():
+def test_map_set() -> None:
     sample = Map()
 
     assert 'key' not in sample
     assert sample.set('key', 'value') is sample
     assert sample.get('key') == 'value'
 
+    assert sample.set(None, 'value') == sample
 
-def test_map_increment():
+
+def test_map_increment() -> None:
     sample = Map()
 
     assert 'key' not in sample
@@ -27,6 +30,36 @@ def test_map_increment():
     assert sample['key'] == 1
     assert sample.increment('key', 100) is sample
     assert sample.get('key') == 101
+
+    assert sample.increment(None, 'value') == sample
+
+
+def test_list_append() -> None:
+    sample = List()
+
+    assert 'key' not in sample
+    assert sample.append('key') is sample
+    assert 'key' in sample
+
+    assert sample.append(None) == sample
+
+
+def test_list_insert() -> None:
+    sample = List([1, 2])
+
+    assert sample.insert(0, 0) is sample
+    assert sample[0] == 0
+    assert len(sample) == 3
+    assert sample.insert(0, None) == sample
+
+
+def test_set_add() -> None:
+    sample = Set()
+
+    assert sample.add(0) is sample
+    assert 0 in sample
+    assert len(sample) == 1
+    assert sample.add(None) == sample
 
 
 # Test the Complex object evaluation
