@@ -6,7 +6,7 @@ from blurr.core.store import Key
 from blurr.runner.local_runner import LocalRunner
 
 
-def test_local_runner_session_only():
+def test_local_runner_stream_only():
     local_runner = LocalRunner(['tests/data/raw.json'],
                                'tests/data/stream.yml', None)
     local_runner.execute()

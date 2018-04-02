@@ -12,7 +12,7 @@ from blurr.core.store import Key
 
 
 @fixture
-def session_data_group_schema_spec() -> Dict[str, Any]:
+def block_data_group_schema_spec() -> Dict[str, Any]:
     return {
         'Type': 'Blurr:DataGroup:BlockAggregate',
         'Name': 'user',
@@ -51,71 +51,69 @@ def check_fields(fields: Dict[str, Field],
     return True
 
 
-def create_session_data_group(schema, time) -> BlockDataGroup:
+def create_block_data_group(schema, time) -> BlockDataGroup:
     evaluation_context = EvaluationContext()
-    session_data_group = BlockDataGroup(
+    block_data_group = BlockDataGroup(
         schema=schema, identity='12345', evaluation_context=evaluation_context)
     evaluation_context.global_add('time', time)
-    evaluation_context.global_add('user', session_data_group)
-    return session_data_group
+    evaluation_context.global_add('user', block_data_group)
+    return block_data_group
 
 
-def test_session_data_group_schema_evaluate_without_split(
-        session_data_group_schema_spec, schema_loader):
-    name = schema_loader.add_schema(session_data_group_schema_spec)
-    session_data_group_schema = BlockDataGroupSchema(name, schema_loader)
+def test_block_data_group_schema_evaluate_without_split(
+        block_data_group_schema_spec, schema_loader):
+    name = schema_loader.add_schema(block_data_group_schema_spec)
+    block_data_group_schema = BlockDataGroupSchema(name, schema_loader)
 
     time = datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc)
-    session_data_group = create_session_data_group(session_data_group_schema,
-                                                   time)
-    session_data_group.evaluate()
+    block_data_group = create_block_data_group(block_data_group_schema, time)
+    block_data_group.evaluate()
 
     # Check eval results of various fields
-    assert len(session_data_group.nested_items) == 3
-    assert check_fields(session_data_group.nested_items, {
+    assert len(block_data_group.nested_items) == 3
+    assert check_fields(block_data_group.nested_items, {
         'event_count': 1,
         'start_time': time,
         'end_time': time
     })
 
     # aggregate snapshot should not exist in store
-    assert session_data_group_schema.store.get(
-        Key(identity=session_data_group.identity,
-            group=session_data_group.name,
-            timestamp=session_data_group.start_time)) is None
+    assert block_data_group_schema.store.get(
+        Key(identity=block_data_group.identity,
+            group=block_data_group.name,
+            timestamp=block_data_group.start_time)) is None
 
 
-def test_session_data_group_schema_evaluate_with_split(
-        session_data_group_schema_spec, schema_loader):
-    session_data_group_schema_spec['Split'] = 'user.event_count == 2'
-    name = schema_loader.add_schema(session_data_group_schema_spec)
-    session_data_group_schema = BlockDataGroupSchema(name, schema_loader)
+def test_block_data_group_schema_evaluate_with_split(
+        block_data_group_schema_spec, schema_loader):
+    block_data_group_schema_spec['Split'] = 'user.event_count == 2'
+    name = schema_loader.add_schema(block_data_group_schema_spec)
+    block_data_group_schema = BlockDataGroupSchema(name, schema_loader)
 
     time = datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc)
-    session_data_group = create_session_data_group(session_data_group_schema,
-                                                   time)
-    session_data_group.evaluate()
-    session_data_group.evaluate()
+    block_data_group = create_block_data_group(block_data_group_schema, time)
+    block_data_group.evaluate()
+    block_data_group.evaluate()
 
     # Check eval results of various fields before split
-    assert check_fields(session_data_group.nested_items, {
+    assert check_fields(block_data_group.nested_items, {
         'event_count': 2,
         'start_time': time,
         'end_time': time
     })
 
-    current_snapshot = session_data_group.snapshot
-    session_data_group.evaluate()
+    current_snapshot = block_data_group.snapshot
+    block_data_group.evaluate()
 
     # Check eval results of various fields
-    assert check_fields(session_data_group.nested_items, {
+    assert check_fields(block_data_group.nested_items, {
         'event_count': 1,
         'start_time': time,
         'end_time': time
     })
 
     # Check aggregate snapshot present in store
-    assert session_data_group_schema.store.get(
-        Key(identity=session_data_group.identity,
-            group=session_data_group.name,
+    assert block_data_group_schema.store.get(
+        Key(identity=block_data_group.identity,
+            group=block_data_group.name,
             timestamp=time)) == current_snapshot

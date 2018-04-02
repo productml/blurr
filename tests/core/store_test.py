@@ -62,37 +62,37 @@ def test_set_get_date(empty_memory_store) -> None:
 
 def test_get_range_start_end(memory_store: MemoryStore) -> None:
     """
-    Tests that the range get does not include the sessions that lie on the boundary
+    Tests that the range get does not include the blocks that lie on the boundary
     """
     start = Key('user1', 'session',
                 datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc))
     end = Key('user1', 'session',
               datetime(2018, 3, 7, 22, 38, 31, 0, timezone.utc))
-    sessions = memory_store.get_range(start, end)
-    assert len(sessions) == 2
-    assert sessions[0][1]['start_time'] == datetime(2018, 3, 7, 20, 35, 35, 0,
-                                                    timezone.utc)
+    blocks = memory_store.get_range(start, end)
+    assert len(blocks) == 2
+    assert blocks[0][1]['start_time'] == datetime(2018, 3, 7, 20, 35, 35, 0,
+                                                  timezone.utc)
 
 
 def test_get_range_start_count(memory_store: MemoryStore) -> None:
     """
-    Tests that the range get does not include the sessions that lie on the boundary
+    Tests that the range get does not include the blocks that lie on the boundary
     """
     start = Key('user1', 'session',
                 datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc))
-    sessions = memory_store.get_range(start, None, 2)
-    assert len(sessions) == 2
-    assert sessions[0][1]['start_time'] == datetime(2018, 3, 7, 20, 35, 35, 0,
-                                                    timezone.utc)
+    blocks = memory_store.get_range(start, None, 2)
+    assert len(blocks) == 2
+    assert blocks[0][1]['start_time'] == datetime(2018, 3, 7, 20, 35, 35, 0,
+                                                  timezone.utc)
 
 
 def test_get_range_end_count(memory_store: MemoryStore) -> None:
     """
-    Tests that the range get does not include the sessions that lie on the boundary
+    Tests that the range get does not include the blocks that lie on the boundary
     """
     end = Key('user1', 'session',
               datetime(2018, 3, 7, 22, 38, 31, 0, timezone.utc))
-    sessions = memory_store.get_range(end, None, -2)
-    assert len(sessions) == 2
-    assert sessions[0][1]['start_time'] == datetime(2018, 3, 7, 20, 35, 35, 0,
-                                                    timezone.utc)
+    blocks = memory_store.get_range(end, None, -2)
+    assert len(blocks) == 2
+    assert blocks[0][1]['start_time'] == datetime(2018, 3, 7, 20, 35, 35, 0,
+                                                  timezone.utc)
