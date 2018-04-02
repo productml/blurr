@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from blurr.core.base import Expression
 from blurr.core.errors import IdentityError
 from blurr.core.evaluation import Context, EvaluationContext
@@ -35,6 +37,9 @@ class StreamingTransformerSchema(TransformerSchema):
                 'Could not determine identity using {}. Evaluation context is {}'.
                 format(self.identity.code_string, context))
         return identity
+
+    def get_time(self, context: Context) -> datetime:
+        return self.time.evaluate(EvaluationContext(None, context))
 
 
 class StreamingTransformer(Transformer):

@@ -83,10 +83,18 @@ def _validate_streaming(dtc_dict: Dict, name: str) -> None:
         raise InvalidSchemaError(str(e))
 
 
+def is_window_dtc(dtc_dict: Dict) -> bool:
+    return dtc_dict.get('Type', '') == 'ProductML:DTC:Window'
+
+
+def is_streaming_dtc(dtc_dict: Dict) -> bool:
+    return dtc_dict.get('Type', '') == 'ProductML:DTC:Streaming'
+
+
 def validate(dtc_dict: Dict, name="dtc") -> None:
-    if dtc_dict['Type'] == 'ProductML:DTC:Window':
+    if is_window_dtc(dtc_dict):
         _validate_window(dtc_dict, name)
-    elif dtc_dict['Type'] == 'ProductML:DTC:Streaming':
+    elif is_streaming_dtc(dtc_dict):
         _validate_streaming(dtc_dict, name)
     else:
         raise ValueError("Document is not a valid DTC")

@@ -28,7 +28,9 @@ class TransformerSchema(BaseSchemaCollection, ABC):
 
         # Load the schema specific attributes
         self.version = self._spec[self.ATTRIBUTE_VERSION]
-        self.description = self._spec[self.ATTRIBUTE_DESCRIPTION]
+        self.description = self._spec[
+            self.
+            ATTRIBUTE_DESCRIPTION] if self.ATTRIBUTE_DESCRIPTION in self._spec else None
 
         # Load list of stores from the schema
         self.stores: Dict[str, Type[Store]] = {

@@ -1,4 +1,4 @@
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Tuple, Optional
 
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.loader import TypeLoader
@@ -10,6 +10,7 @@ class SchemaLoader:
     """
     ATTRIBUTE_NAME = 'Name'
     ATTRIBUTE_TYPE = 'Type'
+    ITEM_SEPARATOR = '.'
 
     def __init__(self):
         self._spec = {}
@@ -17,10 +18,10 @@ class SchemaLoader:
 
     def add_schema(self,
                    spec: Dict[str, Any],
-                   fully_qualified_parent_name: str = None) -> str:
+                   fully_qualified_parent_name: str = None) -> Optional[str]:
         """
         Add a schema dictionary to the schema loader. The given schema is stored
-        against fully_qualified_parent_name + '.' + schema.name.
+        against fully_qualified_parent_name + ITEM_SEPARATOR('.') + schema.name.
         :param spec: Schema specification.
         :param fully_qualified_parent_name: Full qualified name of the parent.
         If None is passed then the schema is stored against the schema name.
@@ -51,10 +52,11 @@ class SchemaLoader:
         :param fully_qualified_name: The fully qualified name of the object needed.
         :return: An initialized schema object
         """
+
         if fully_qualified_name not in self._object_cache:
             spec = self.get_schema_spec(fully_qualified_name)
             if self.ATTRIBUTE_TYPE not in spec:
-                raise InvalidSchemaError('Name not defined in schema')
+                raise InvalidSchemaError('Type not defined in schema')
             self._object_cache[fully_qualified_name] = TypeLoader.load_schema(
                 spec[self.ATTRIBUTE_TYPE])(fully_qualified_name, self)
 
@@ -83,7 +85,7 @@ class SchemaLoader:
         :param nested_item_name: The nested item name.
         :return: The fully qualified name of the nested item.
         """
-        return fully_qualified_parent_name + '.' + nested_item_name
+        return fully_qualified_parent_name + SchemaLoader.ITEM_SEPARATOR + nested_item_name
 
     def get_schema_spec(self, fully_qualified_name: str) -> Dict[str, Any]:
         """
@@ -92,13 +94,29 @@ class SchemaLoader:
         :param fully_qualified_name: The fully qualified name of the schema needed.
         :return: Schema dictionary.
         """
-        return self._spec[fully_qualified_name]
+        try:
+            return self._spec[fully_qualified_name]
+        except:
+            raise InvalidSchemaError(
+                "{} not declared in schema".format(fully_qualified_name))
 
     def get_schemas_of_type(self,
                             type: str) -> List[Tuple[str, Dict[str, Any]]]:
+        """
+        Returns a list of fully qualified names and schema dictionary tuples for
+        the schema type provided.
+        :param type: Schema type.
+        :return: List of fully qualified names and schema dictionary tuples.
+        """
         return [(fq_name, schema) for fq_name, schema in self._spec.items()
                 if schema.get(self.ATTRIBUTE_TYPE, '') == type]
 
     @staticmethod
     def get_transformer_name(fully_qualified_name: str) -> str:
-        return fully_qualified_name.split('.', 1)[0]
+        """
+        Returns the DTC transformer name based on the given fully_qualified_name
+        of one of the nested child items.
+        :param fully_qualified_name: Fully qualified name of the nested child item.
+        :return: DTC transformer name.
+        """
+        return fully_qualified_name.split(SchemaLoader.ITEM_SEPARATOR, 1)[0]

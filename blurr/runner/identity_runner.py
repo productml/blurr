@@ -1,5 +1,6 @@
 from typing import List, Dict, Tuple, Any, Optional
 
+from datetime import datetime
 from dateutil import parser
 
 from blurr.core.evaluation import Context, EvaluationContext
@@ -15,10 +16,11 @@ from blurr.core.window_transformer import WindowTransformerSchema, \
 from blurr.store.memory_store import MemoryStore
 
 
-def execute_dtc(
-        identity_events: List[Dict], identity: str, stream_dtc_spec: Dict,
-        window_dtc_spec: Dict) -> Tuple[List[Tuple[Key, Any]], List[Dict]]:
+def execute_dtc(identity_events: List[Tuple[datetime, Record]], identity: str,
+                stream_dtc_spec: Dict, window_dtc_spec: Dict
+                ) -> Tuple[List[Tuple[Key, Any]], List[Dict]]:
     schema_loader = SchemaLoader()
+    identity_events.sort(key=lambda x: x[0])
 
     session_data = execute_stream_dtc(identity_events, identity, schema_loader,
                                       stream_dtc_spec)
@@ -28,22 +30,22 @@ def execute_dtc(
 
 
 def execute_stream_dtc(
-        identity_events: List[Dict], identity: str,
+        identity_events: List[Tuple[datetime, Record]], identity: str,
         schema_loader: SchemaLoader,
         stream_dtc_spec: Optional[Dict]) -> List[Tuple[Key, Any]]:
     if stream_dtc_spec is None:
         return []
 
     stream_dtc_name = schema_loader.add_schema(stream_dtc_spec)
-    stream_transformer_schema = StreamingTransformerSchema(
-        stream_dtc_name, schema_loader)
+    stream_transformer_schema = schema_loader.get_schema_object(
+        stream_dtc_name)
     exec_context = Context()
     exec_context.add('parser', parser)
 
     stream_transformer = StreamingTransformer(stream_transformer_schema,
                                               identity, exec_context)
-    for event in identity_events:
-        stream_transformer.evaluate_record(Record(event))
+    for time, event in identity_events:
+        stream_transformer.evaluate_record(event)
     stream_transformer.finalize()
 
     return get_memory_store(schema_loader).get_all()
@@ -66,8 +68,8 @@ def execute_window_dtc(identity: str, schema_loader: SchemaLoader,
     all_data = dict(get_memory_store(schema_loader).get_all())
 
     window_dtc_name = schema_loader.add_schema(window_dtc_spec)
-    window_transformer_schema = WindowTransformerSchema(
-        window_dtc_name, schema_loader)
+    window_transformer_schema = schema_loader.get_schema_object(
+        window_dtc_name)
     window_transformer = WindowTransformer(window_transformer_schema, identity,
                                            exec_context)
 
