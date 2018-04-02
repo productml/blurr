@@ -1,6 +1,6 @@
 # Installing the Command Line Interface (CLI)
 
-We interact with Blurr using a Command Line Interface (CLI). Blurr can be installed via pip:
+We interact with Blurr using a Command Line Interface (CLI). Blurr is installed via pip:
 
 `$ pip install blurr`
 
@@ -32,7 +32,7 @@ Example:
 $ blurr transform \
      --streaming-dtc ./dtcs/sessionize-dtc.yml \
      --window-dtc ./dtcs/windowing-dtc.yml \
-     --source s3://bucket/key
+     --source file://path
 ```
 
 ## Supported data sources
@@ -47,7 +47,7 @@ Type | Description | URI example
 
 ## Supported data destinations
 
-Transformed data is output to S3. Data destination details are defined inside the DTC.
+Transformed data is output to `stdout`. Data destination details are defined inside the DTC.
 
 More destinations will be supported in the future, please create [an issue](https://github.com/productml/blurr/issues/new) to request for a specific data destination! Or better yet, contribute to Blurr and build it!
 

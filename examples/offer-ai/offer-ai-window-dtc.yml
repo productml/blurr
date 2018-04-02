@@ -4,14 +4,14 @@
 
 # Type of DTC. Streaming or Window
 # The Window DTC periodically applies windows operations on top of sessionized data
-Type: ProductML:DTC:Window
+Type: Blurr:Window
 
 Version: '2018-03-01'
-Description: Second Level processing for feature generation
+Description: Window ops for feature generation
 
-Name: ProductMLExample
+Name: offer_ai_window
 
-# The DTC used in Step 1
+# The Streaming DTC used
 SourceDTC: offer_ai_v1
 
 # Anchor defines the condition used to trigger the decision
@@ -31,7 +31,7 @@ Anchor:
 # Defines the Store properties
 Store:
 
-   - Type: ProductML:DTC:Storage:S3
+   - Type: Blurr:Storage:S3
      Name: s3
      Bucket: offer-ai-example
      Prefix: /dtc-test/window/
@@ -39,7 +39,7 @@ Store:
 
 DataGroups:
 
- - Type: ProductML:DTC:DataGroup:AnchorAggregate
+ - Type: Blurr:DataGroup:AnchorAggregate
    Name: last_session
 
    Window:
@@ -64,13 +64,13 @@ DataGroups:
        Type: float
        Value: source.win_ratio[0]
 
- - Type: ProductML:DTC:DataGroup:AnchorAggregate
+ - Type: Blurr:DataGroup:AnchorAggregate
    Name: last_week
 
    Window:
 
      - Type: day
-       Values: -7
+       Value: -7
        Source: offer_ai_v1.game_stats
 
    Fields:
@@ -82,13 +82,13 @@ DataGroups:
        Value: sum(source.purchase_amount)
 
 
-  - Type: ProductML:DTC:DataGroup:AnchorAggregate
+  - Type: Blurr:DataGroup:AnchorAggregate
     Name: next_week
 
     Window:
 
       - Type: day
-        Values: 7
+        Value: 7
         Source: offer_ai_v1.game_stats
 
     Fields:

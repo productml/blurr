@@ -1,13 +1,4 @@
-# Offer AI example
-
-## What is Blurr?
-
-Blurr enables data scientists and engineers to build and deploy real-time predictive models by:
-
-1. Providing a data pipeline that transforms `raw data` into `features` for model training and prediction
-2. Defining a high level authoring language that executes data transforms without writing code
-
-## Offer AI objective
+# Offer AI objective
 
 Say we have a game. We want to be able to show personalized offers to the user via an in-app purchase.
 
@@ -36,15 +27,6 @@ last_session.win_ratio
 The model predicts `next_week.purchases_amount`. The `offer_type` and `offer_price` are picked from a list of offer candidates. The user is served the candidate for which the model predicts the highest `next_week.purchases_amount`.
 
 # Raw Data
-
-Blurr assumes that there is raw data from the game landing
-in an S3 bucket. Depending on your internal setup, this could be as simple as pointing your current raw data ingestion end-point (such as Firehose) to an S3 bucket.
-
-We also assume that the raw data arrives in a JSON format.
-
-Here’s an example JSON file with raw data from a game. Even though we are using a game example, we’ve built Blurr to be used in any product context - not just games.
-
-## Peeking at raw data
 
 We assume that when a user open the app and plays a game, the following events are sent as raw data.
 
@@ -130,16 +112,6 @@ user_id | country | facebook_connected | last_week.purchase_amount | last_sessio
 
 # Writing data transforms
 
-Data is prepared in a two step process.
-
-![2Steps](images/2steps.png)
-
-First, we process raw data and aggregate into sessions. Processing instructions are defined in a Data Transform Configuration (DTC). Event Data + DTC creates DataGroups, which can be used as session aggregates.
-
-![Data Transformer](images/data-transformer.png)
-
-Separate data transform configs (DTCs) are used for each step - Streaming DTC for stream processing (Step 1) and Window DTC for rollups (Step 2).
-
 ## Streaming DTC
 
 [Streaming DTC](offer-ai-streaming-dtc.yml)
@@ -172,8 +144,6 @@ Let's write the Window DTC that defines this.
 
 [Window DTC](offer-ai-window-dtc.yml)
 
-The Window DTC is run periodically (we're thinking daily) to generate training data. How and where this is defined is TBD.
-
 After a Window DTC is run, we have data in S3 for each anchor point.
 
 user_id | last_week.purchase_amount | last_session.games_played | last_session.win_ratio | next_week.purchase_amount
@@ -190,7 +160,7 @@ Once the data is in S3 and DynamoDB, we can set up any training pipeline we want
 
 AWS Sagemaker is an option here to train the model and host it for predictions. We’ve also put together a guide to building your own AMI to run Tensorflow.
 
-TODO: Write article and add link @vigbk
+TODO: Write article and add link
 
 Sagemaker starts off with creating a hosted Jupyter notebook instance which is used for working with data and training models.
 
