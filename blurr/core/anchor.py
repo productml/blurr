@@ -49,6 +49,8 @@ class Anchor(BaseItem):
         return self.schema.condition.evaluate(self.evaluation_context)
 
     def max_condition_met(self, session: SessionDataGroup) -> bool:
+        if self.schema.max is None:
+            return False
         return self.condition_met[session.start_time.date()] >= self.schema.max
 
     def restore(self, snapshot: Dict[str, Any]) -> BaseItem:
