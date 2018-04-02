@@ -81,6 +81,17 @@ def test_anchor_max_two(anchor_schema_max_two: AnchorSchema,
     assert anchor.evaluate_anchor(block_item) is False
 
 
+def test_anchor_max_not_specified(anchor_schema_max_one: AnchorSchema,
+                                  block_item: BlockDataGroup) -> None:
+    anchor_schema_max_one.max = None
+    anchor = Anchor(anchor_schema_max_one, EvaluationContext())
+    assert anchor.evaluate_anchor(block_item) is True
+    anchor.add_condition_met()
+    assert anchor.evaluate_anchor(block_item) is True
+    anchor.add_condition_met()
+    assert anchor.evaluate_anchor(block_item) is True
+
+
 def test_anchor_condition(anchor_schema_max_one: AnchorSchema,
                           block_item: BlockDataGroup) -> None:
     anchor_schema_max_one.condition = Expression('session.events > 3')
