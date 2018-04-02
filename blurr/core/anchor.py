@@ -6,7 +6,7 @@ from collections import defaultdict
 from blurr.core.base import BaseSchema, BaseItem
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.session_data_group import SessionDataGroup
+from blurr.core.block_data_group import BlockDataGroup
 
 
 class AnchorSchema(BaseSchema):
@@ -30,11 +30,11 @@ class Anchor(BaseItem):
                  evaluation_context: EvaluationContext):
         super().__init__(schema, evaluation_context)
         self.condition_met: Dict[datetime, int] = defaultdict(int)
-        self.anchor_session = None
+        self.anchor_block = None
 
-    def evaluate_anchor(self, session: SessionDataGroup) -> bool:
-        self.anchor_session = session
-        if self.max_condition_met(session):
+    def evaluate_anchor(self, block: BlockDataGroup) -> bool:
+        self.anchor_block = block
+        if self.max_condition_met(block):
             return False
 
         if self.evaluate():
@@ -43,13 +43,13 @@ class Anchor(BaseItem):
         return False
 
     def add_condition_met(self):
-        self.condition_met[self.anchor_session.start_time.date()] += 1
+        self.condition_met[self.anchor_block.start_time.date()] += 1
 
     def evaluate(self) -> bool:
         return self.schema.condition.evaluate(self.evaluation_context)
 
-    def max_condition_met(self, session: SessionDataGroup) -> bool:
-        return self.condition_met[session.start_time.date()] >= self.schema.max
+    def max_condition_met(self, block: BlockDataGroup) -> bool:
+        return self.condition_met[block.start_time.date()] >= self.schema.max
 
     def restore(self, snapshot: Dict[str, Any]) -> BaseItem:
         pass

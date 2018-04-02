@@ -2,11 +2,11 @@ from typing import Dict, Optional
 
 from blurr.core.anchor import Anchor
 from blurr.core.window_data_group import WindowDataGroup
-from blurr.core.errors import AnchorSessionNotDefinedError, \
-    PrepareWindowMissingSessionsError
+from blurr.core.errors import AnchorBlockNotDefinedError, \
+    PrepareWindowMissingBlocksError
 from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.session_data_group import SessionDataGroup
+from blurr.core.block_data_group import BlockDataGroup
 from blurr.core.transformer import Transformer, TransformerSchema
 
 
@@ -35,7 +35,7 @@ class WindowTransformerSchema(TransformerSchema):
 class WindowTransformer(Transformer):
     """
     The Window DTC transformer that performs window operations on pre-aggregated
-    session data.
+    block data.
     """
 
     def __init__(self, schema: WindowTransformerSchema, identity: str,
@@ -44,23 +44,23 @@ class WindowTransformer(Transformer):
         self.anchor = Anchor(
             schema.anchor, EvaluationContext(global_context=context))
 
-    def evaluate_anchor(self, session: SessionDataGroup) -> bool:
+    def evaluate_anchor(self, block: BlockDataGroup) -> bool:
         """
-        Evaluates the anchor condition against the specified session.
-        :param session: Session to run the anchor condition against.
+        Evaluates the anchor condition against the specified block.
+        :param block: Block to run the anchor condition against.
         :return: True, if the anchor condition is met, otherwise, False.
         """
-        # Set up context so that anchor can process the session
+        # Set up context so that anchor can process the block
         self.evaluation_context.local_context.add(
-            session.schema.fully_qualified_name, session)
-        if self.anchor.evaluate_anchor(session):
+            block.schema.fully_qualified_name, block)
+        if self.anchor.evaluate_anchor(block):
 
             try:
-                self.evaluation_context.global_add('anchor', session)
+                self.evaluation_context.global_add('anchor', block)
                 self.evaluate()
                 self.anchor.add_condition_met()
                 return True
-            except PrepareWindowMissingSessionsError:
+            except PrepareWindowMissingBlocksError:
                 return False
             finally:
                 del self.evaluation_context.global_context['anchor']
@@ -68,15 +68,15 @@ class WindowTransformer(Transformer):
         return False
 
     def evaluate(self):
-        if 'anchor' not in self.evaluation_context.global_context or self.anchor.anchor_session is None:
-            raise AnchorSessionNotDefinedError()
+        if 'anchor' not in self.evaluation_context.global_context or self.anchor.anchor_block is None:
+            raise AnchorBlockNotDefinedError()
 
         if not self.needs_evaluation:
             return
 
         for item in self.nested_items.values():
             if isinstance(item, WindowDataGroup):
-                item.prepare_window(self.anchor.anchor_session.start_time)
+                item.prepare_window(self.anchor.anchor_block.start_time)
 
         super().evaluate()
 

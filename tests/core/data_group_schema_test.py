@@ -11,7 +11,7 @@ from blurr.core.schema_loader import SchemaLoader
 @fixture
 def data_group_schema_spec() -> Dict[str, Any]:
     return {
-        'Type': 'ProductML:DTC:DataGroup:SessionAggregate',
+        'Type': 'Blurr:DataGroup:BlockAggregate',
         'Name': 'user',
         'Store': 'memory',
         'Fields': [{
@@ -24,7 +24,7 @@ def data_group_schema_spec() -> Dict[str, Any]:
 
 @fixture
 def store_spec() -> Dict[str, Any]:
-    return {'Type': 'ProductML:DTC:Store:MemoryStore', 'Name': 'memory'}
+    return {'Type': 'Blurr:Store:MemoryStore', 'Name': 'memory'}
 
 
 class MockDataGroupSchema(DataGroupSchema):

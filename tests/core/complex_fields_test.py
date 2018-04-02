@@ -36,7 +36,7 @@ def test_map_increment():
 @fixture(scope='module')
 def data_group_schema_spec() -> Dict[str, Any]:
     return {
-        'Type': 'ProductML:DTC:DataGroup:VariableAggregate',
+        'Type': 'Blurr:DataGroup:VariableAggregate',
         'Name': 'test',
         'Fields': [{
             'Name': 'map_field',

@@ -37,7 +37,7 @@ class LocalRunner:
             open(window_dtc_file))
 
         self._user_events = defaultdict(list)
-        self._session_data = {}
+        self._block_data = {}
         self._window_data = {}
 
         self._validate_dtc_syntax()
@@ -62,10 +62,10 @@ class LocalRunner:
 
     def execute_for_all_users(self) -> None:
         for identity, events in self._user_events.items():
-            session_data, window_data = execute_dtc(
+            block_data, window_data = execute_dtc(
                 events, identity, self._stream_dtc, self._window_dtc)
 
-            self._session_data.update(session_data)
+            self._block_data.update(block_data)
             self._window_data[identity] = window_data
 
     def execute(self) -> None:
@@ -79,7 +79,7 @@ class LocalRunner:
             for row in self._window_data.items():
                 print(json.dumps(row, default=str))
         else:
-            for row in self._session_data.items():
+            for row in self._block_data.items():
                 print(json.dumps(row, default=str))
 
     def write_output_file(self, output_file: str):
