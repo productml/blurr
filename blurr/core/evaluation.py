@@ -114,7 +114,6 @@ class Expression:
         try:
             return eval(self.code_object, evaluation_context.global_context,
                         evaluation_context.local_context)
-        except Exception as e:
-            print(e)
+        except:
             # TODO Log exception
             return None
