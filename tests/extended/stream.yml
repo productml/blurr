@@ -34,8 +34,6 @@ DataGroups:
       # Check for prior state value
       # Checks for variable usage
       - { Name: is_paid, Type: boolean, Value: state.is_paid or vars.is_paid }
-      # Tests set additions with items
-      - { Name: device_id, Type: set, Value: state.device_id.add(source.device_id) }
       # Tests accessing variables.
       # Tests exceptional cases when variables don't exist
       - { Name: os_name, Type: string, Value: "vars.os_version_parts[0]" }
@@ -45,12 +43,15 @@ DataGroups:
         Type: integer
         Value: max(source.level, state.max_level_completed)
         When: source.event_id == 'game_end' and source.won
+      # Tests set addition
+      - Name: badges
+        Type: set
+        Value: state.badges.add(source.badge)
       # Tests dictionary increment
       - Name: offers_purchased
         Type: map
-        Value: state.offers_bought.increment(source.offer_key)
-        When: source.event_id == 'purchase_completed' and 'offer_key' in source
-
+        Value: state.offers_purchased.increment(source.offer_key)
+        When: source.event_id == 'purchase_completed' and source.offer_key
       # Shows how if else conditions can be used in expressions
       # Shows how expressions that start with a quote character are to be wrapped YAML
       - Name: signin_method
@@ -61,9 +62,10 @@ DataGroups:
 
   - Type: ProductML:DTC:DataGroup:SessionAggregate
     Name: session
-    Split: (time - session.end_time).seconds > 1800 or sessions.session_id != source.session_id
+    Split: (time - session.end_time).total_seconds() > 1800 or session.session_id != source.session_id
     Store: memory
     Fields:
+      - { Name: session_id, Type: string, Value: source.session_id }
       # Tests basic aggregation
       - { Name: events, Type: integer, Value: session.events + 1 }
       - { Name: games_won, Type: integer, Value: session.games_won + 1, When: source.event_id == 'game_end' and source.won }
@@ -73,16 +75,16 @@ DataGroups:
       # Tests Dictionary Aggregation
       - Name: badges
         Type: map
-        Value: session.badges_won.increment(source.badge)
+        Value: session.badges.increment(source.badge)
         When: source.won is True
 
       # Tests access to time fields in a session
       - Name: start_score
         Type: integer
         Value: source.score
-        When: source.event_time == session.start_time
+        When: time == session.start_time
 
       - Name: end_score
         Type: integer
         Value: source.score
-        When: source.event_time == session.end_time
+        When: time == session.end_time

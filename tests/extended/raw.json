@@ -9,12 +9,12 @@
 {"event_id": "purchase_completed", "time": "2016-02-11T00:00:22", "user_id": "user-1", "session_id": "session-2", "offer_key": "offer1"}
 {"event_id": "game_start", "time": "2016-02-11T00:00:24", "user_id": "user-1", "session_id": "session-2", "level": 6, "score": 8}
 {"event_id": "game_end", "time": "2016-02-11T00:00:28", "user_id": "user-1", "session_id": "session-2", "level": 6, "score": 18, "badge": "bronze", "won": false}
-{"event_id": "app_launched", "time": "2016-12-12T00:00:00", "user_id": "user-1", "session_id": "session-3", "build": 245, "signin_method": "https://www.instagram.com/something"}
+{"event_id": "app_launched", "time": "2016-02-12T00:00:00", "user_id": "user-1", "session_id": "session-3", "build": 245, "signin_method": "https://www.instagram.com/something", "os-version": "ios"}
 {"event_id": "game_start", "time": "2016-02-12T00:00:32", "user_id": "user-1", "session_id": "session-3", "level": 6, "score": 18}
 {"event_id": "game_end", "time": "2016-02-12T00:00:39", "user_id": "user-1", "session_id": "session-3", "level": 6, "score": 38, "badge": "bronze", "won": false}
 {"event_id": "game_start", "time": "2016-02-12T00:00:46", "user_id": "user-1", "session_id": "session-3", "level": 6, "score": 38}
-{"event_id": "game_end", "time": "2016-02-12T00:00:53", "user_id": "user-1", "session_id": "session-3", "level": 6, "score": 51, "badge": "bronze", "won": true}
-{"event_id": "offer_shown", "time": "2016-02-12T00:00:56", "user_id": "user-1", "session_id": "session-2", "offer_key": "offer2", "item_category": "cat2" }
+{"event_id": "game_end", "time": "2016-02-12T00:00:53", "user_id": "user-1", "session_id": "session-3", "level": 6, "score": 51, "badge": "gold", "won": true}
+{"event_id": "offer_shown", "time": "2016-02-12T00:00:56", "user_id": "user-1", "session_id": "session-3", "offer_key": "offer2", "item_category": "cat2" }
 {"event_id": "game_start", "time": "2016-02-13T00:00:58", "user_id": "user-1", "session_id": "session-3", "level": 7, "score": 51}
 {"event_id": "game_end", "time": "2016-02-13T00:01:04", "user_id": "user-1", "session_id": "session-3", "level": 7, "score": 61, "badge": "bronze", "won": true}
 {"event_id": "offer_shown", "time": "2016-02-13T00:01:17", "user_id": "user-1", "session_id": "session-3", "offer_key": "offer3", "item_category": "cat2" }
