@@ -1,43 +1,134 @@
-# Blurr
+# Turn raw data into features for machine learning without ETLs
 
-[![CircleCI](https://circleci.com/gh/productml/blurr/tree/master.svg?style=svg)](https://circleci.com/gh/productml/blurr/tree/master)
+[![CircleCI](https://circleci.com/gh/productml/blurr/tree/master.svg?style=svg)](https://circleci.com/gh/productml/blurr/tree/master) |
+[![Documentation Status](https://readthedocs.org/projects/productml-blurr/badge/?version=latest)](http://productml-blurr.readthedocs.io/en/latest/?badge=latest)
 
 ```
-We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer.
-The distinction is increasingly blurry (*cough*).
-Like development and operations merged into DevOps over time.
+We believe in a
+world where everyone is a
+data engineer
+
+A data scientist
+An ML engineer, ooh!
+The lines are blurred (cough)
+
+Like development
+and operations became
+DevOps over time
 ```
 
-Work directly with raw data to construct a production ML pipeline, in minutes - without writing code.
+![Data Transformer](docs/images/data-transformer.png)
 
-Blurr enables data scientists and engineers to build and deploy real-time predictive models by:
+Blurr provides a `high-level expressive YAML-based language` called the Data Transform Configuration (DTC).
 
-1. Providing a data pipeline that transforms `raw data` into `features` for model training and prediction
-2. Defining a high level authoring language that executes data transforms without writing code
+The Streaming DTC aggregates raw data into blocks.
 
-For production ML applications, `experimentation and iteration speed` is important. Working directly with raw data provides the most flexibility. Blurr allows product teams to iterate quickly during ML dev and provides a self-service way to take experiments to production.
+![Blocks](docs/images/blocks-intro.png)
 
-![Data Transformer](examples/offer-ai/images/data-transformer.png)
+Window DTC drops an anchor on a block and generates model features relative to that block.
 
-Blurr provides a `high-level expressive YAML-based language` called the Data Transform Configuration (DTC). The DTC defines custom data transformations and aggregations from a `data source` (S3), to `transform the data` (in lambdas) and output to a `data store` (DynamoDB). The data in the store can be used for any application dependent on real-time transformations like analytics or predictions.
+![Window](docs/images/window.png)
 
-![2steps](examples/offer-ai/images/2steps.png)
 
-Blurr has first class support for serverless data processing which means near zero standing costs, great for spiky usage, infinite scale and zero maintenance headache.
+Raw data like this
 
-# Examples
+```javascript
+{ "user_id": "09C1", "session_id": "915D", "country" : "US", "event_id": "game_start" }
+{ "user_id": "09C1", "session_id": "915D", "country" : "US", "event_id": "game_end", "won": 1 }
+{ "user_id": "09C1", "session_id": "915D", "country" : "US", "event_id": "game_start" }
+{ "user_id": "09C1", "session_id": "915D", "country" : "US", "event_id": "game_end", "won": 1 }
+{ "user_id": "B6FA", "session_id": "D043", "country" : "US", "event_id": "game_start" }
+{ "user_id": "B6FA", "session_id": "D043", "country" : "US", "event_id": "game_end", "won": 1 }
+{ "user_id": "09C1", "session_id": "T8KA", "country" : "UK", "event_id": "game_start" }
+{ "user_id": "09C1", "session_id": "T8KA", "country" : "UK", "event_id": "game_end", "won": 1 }
+```
 
-We're putting together examples for how to use Blurr to build models for specific use cases.
+turns into
+
+session_id |  user_id | games_played | games_won
+--- | ------------ | -------------- | --------
+915D | 09C1 | 2 | 2
+D043 | B6FA | 1 | 1
+T8KA | 09C1 | 1 | 1
+
+using this DTC
+
+```yaml
+
+Type: Blurr:Streaming
+Version: '2018-03-07'
+
+Store:
+   - Type: Blurr:Store:MemoryStore
+     Name: hello_world_store
+
+Identity: source.user_id
+
+DataGroups:
+
+ - Type: Blurr:DataGroup:BlockAggregate
+   Name: session_stats
+   Store: hello_world_store
+   Split: source.session_id != session_stats.session_id
+
+   Fields:
+
+     - Name: session_id
+       Type: string
+       Value: source.session_id
+
+     - Name: games_played
+       Type: integer
+       When: source.event_id == 'game_start'
+       Value: session_stats.games_played + 1
+
+     - Name: games_won
+       Type: integer
+       When: source.event_id == 'game_end' and source.won == '1'
+       Value: session_stats.games_won + 1
+
+```
+
+# Tutorial and Docs
+
+[Streaming DTC Tutorial](http://productml-blurr.readthedocs.io/en/latest/Streaming%20dtc%20tutorial/) |
+[Window DTC Tutorial](http://productml-blurr.readthedocs.io/en/latest/Window%20dtc%20tutorial/)
+
+
+[Read the docs](http://productml-blurr.readthedocs.io/en/latest/)
+
+
+# Walkthroughs
+Walkthroughs for using Blurr to build models for specific use cases.
 
 [Dynamic in-game offers (Offer AI)](examples/offer-ai/offer-ai-walkthrough.md)
 
-More to come!
+[Frequently Bought Together](examples/frequently-bought-together/fbt-walkthrough.md)
 
-# Status and License
+# Install
 
-Blurr is currently in closed development. We're targeting a first release in early April, 2018. Email blurr@productml.com to get notified when it is out! Even better, star or watch this GitHub project!
+We interact with Blurr using a Command Line Interface (CLI). Blurr is installed via pip:
 
-We intend to license Blurr as an open source project. We will update the license + contribution guidelines with the first release.
+`$ pip install blurr`
+
+Transform data
+
+```
+$ blurr transform \
+     --streaming-dtc ./dtcs/sessionize-dtc.yml \
+     --window-dtc ./dtcs/windowing-dtc.yml \
+     --source file://path
+```
+
+[CLI documentation](http://productml-blurr.readthedocs.io/en/latest/Blurr%20CLI/)
+
+# Contribute to Blurr
+
+Welcome to the Blurr community! We are so glad that you share our passion for making data management and machine learning accessible to everyone.
+
+Please create a [new issue](https://github.com/productml/blurr/issues/new) to begin a discussion. Alternatively, feel free to pick up an existing issue!
+
+Please sign the [Contributor License Agreement](https://docs.google.com/forms/d/e/1FAIpQLSeUP5RFuXH0Kbi4CnV6V3IZ-xyJmd3KQP_2Ij-pTvN-_h7wUg/viewform) before raising a pull request.
 
 # Data Science 'Joel Test'
 
@@ -48,3 +139,19 @@ Inspired by the (old school) [Joel Test](https://www.joelonsoftware.com/2000/08/
 3. Deploying to production needs minimal engineering help
 4. Successful ML is a long game. You play it like it is
 5. Kaizen. Experimentation and iterations are a way of life
+
+# Get in touch
+
+Email us at blurr@productml.com or star this project to stay in touch!
+
+# Roadmap
+
+Blurr is all about enabling machine learning and AI teams to run faster.
+
+**Developer Preview 0**: Local transformations only
+
+**Developer Preview 1**: S3-S3 data transformations
+
+**Developer Preview 2**: Add DynamoDB as a Store + Features server for ML production use
+
+Ingestion connectors to Kafka and Spark
