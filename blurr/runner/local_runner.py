@@ -31,8 +31,8 @@ class LocalRunner:
         self._stream_dtc = yaml.safe_load(open(stream_dtc_file))
         self._stream_dtc_name = self._schema_loader.add_schema(
             self._stream_dtc)
-        self._stream_transformer_schema = StreamingTransformerSchema(
-            self._stream_dtc_name, self._schema_loader)
+        self._stream_transformer_schema = self._schema_loader.get_schema_object(
+            self._stream_dtc_name)
 
         self._window_dtc = None if window_dtc_file is None else yaml.safe_load(
             open(window_dtc_file))

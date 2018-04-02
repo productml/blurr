@@ -37,8 +37,8 @@ def execute_stream_dtc(
         return []
 
     stream_dtc_name = schema_loader.add_schema(stream_dtc_spec)
-    stream_transformer_schema = StreamingTransformerSchema(
-        stream_dtc_name, schema_loader)
+    stream_transformer_schema = schema_loader.get_schema_object(
+        stream_dtc_name)
     exec_context = Context()
     exec_context.add('parser', parser)
 
@@ -68,8 +68,8 @@ def execute_window_dtc(identity: str, schema_loader: SchemaLoader,
     all_data = dict(get_memory_store(schema_loader).get_all())
 
     window_dtc_name = schema_loader.add_schema(window_dtc_spec)
-    window_transformer_schema = WindowTransformerSchema(
-        window_dtc_name, schema_loader)
+    window_transformer_schema = schema_loader.get_schema_object(
+        window_dtc_name)
     window_transformer = WindowTransformer(window_transformer_schema, identity,
                                            exec_context)
 
