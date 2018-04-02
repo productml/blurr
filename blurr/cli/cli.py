@@ -1,8 +1,8 @@
 from typing import Dict, Any
 
+from blurr.cli.out import Out
 from blurr.cli.transform import transform
 from blurr.cli.validate import validate_command
-from blurr.cli.out import Out
 
 
 def cli(arguments: Dict[str, Any], out: Out) -> int:

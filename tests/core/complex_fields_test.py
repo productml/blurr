@@ -6,7 +6,8 @@ from blurr.core.complex_fields import Map, List, Set
 from blurr.core.data_group import DataGroup, DataGroupSchema
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.variable_data_group import VariableDataGroup, VariableDataGroupSchema
+from blurr.core.variable_data_group import VariableDataGroup, \
+    VariableDataGroupSchema
 
 
 # Test custom functions implemented for complex fields

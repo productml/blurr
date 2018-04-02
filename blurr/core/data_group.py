@@ -3,7 +3,6 @@ from typing import Dict, Type
 from abc import ABC
 
 from blurr.core.base import BaseSchemaCollection, BaseItemCollection, BaseItem
-from blurr.core.errors import InvalidSchemaError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.loader import TypeLoader
 from blurr.core.schema_loader import SchemaLoader

@@ -1,7 +1,7 @@
 from typing import Any, Dict
 
-from copy import copy
 import re
+from copy import copy
 
 from blurr.core.errors import ExpressionEvaluationError, InvalidExpressionError
 
@@ -75,7 +75,8 @@ class EvaluationContext:
         self.global_context[key] = value
 
 
-VALIDATION_INVALID_EQUALS_REGULAR_EXPRESSION = re.compile('(?:^|[^!=]+)=(?:[^=]+|$)')
+VALIDATION_INVALID_EQUALS_REGULAR_EXPRESSION = re.compile(
+    '(?:^|[^!=]+)=(?:[^=]+|$)')
 
 
 class Expression:
@@ -95,7 +96,8 @@ class Expression:
 
         # Validate the expression for errors / unsupported expressions
         if VALIDATION_INVALID_EQUALS_REGULAR_EXPRESSION.findall(code_string):
-            raise InvalidExpressionError('Modifying value using `=` is not allowed.')
+            raise InvalidExpressionError(
+                'Modifying value using `=` is not allowed.')
 
         try:
             self.code_object = compile(self.code_string, '<string>', 'eval')

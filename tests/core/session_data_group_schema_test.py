@@ -1,11 +1,10 @@
 from typing import Dict, Any
 
-import pytest
-from pytest import mark, fixture
+from pytest import fixture
 
-from blurr.core.session_data_group import SessionDataGroupSchema
 from blurr.core.evaluation import Expression
 from blurr.core.schema_loader import SchemaLoader
+from blurr.core.session_data_group import SessionDataGroupSchema
 
 
 @fixture
