@@ -100,3 +100,47 @@ class Field(BaseItem, ABC):
         Restores the value of a field from a snapshot
         """
         self.value = snapshot
+
+
+class ComplexTypeBase(ABC):
+    """
+    Implements a wrapper for base methods declared in base types such that the current object
+    is returned in cases there are no returned values.  This ensures that evaluating the `Value`
+    expression for field always returns an object.
+    """
+
+    def __getattribute__(self, item):
+        """ Overrides the default getattribute to return self"""
+
+        # Resolve the attribute by inspecting the current object
+        attribute = super().__getattribute__(item)
+
+        # Return the attribute as-is when it is NOT a function
+        if not callable(attribute):
+            return attribute
+
+        # Wrap the attribute in a function that changes its return value
+        def wrapped_attribute(*args, **kwargs):
+
+            # Executing the underlying method
+            result = attribute(*args, **kwargs)
+
+            # If the execution does not return a value
+            if result is None:
+                return self
+
+            # Get the type of the current object
+            self_type = type(self)
+
+            # If the method executed is defined in the base type and a base type object is returned
+            # (and not the current type), then wrap the base object into an object of the current type
+            if isinstance(result, self_type.__bases__) and not isinstance(
+                    result, self_type):
+                return self_type(result)
+                # TODO This creates a shallow copy of the object - find a way to optimize this
+
+            # Return the result as-is on all other conditions
+            return result
+
+        # Return the wrapped attribute instead of the default
+        return wrapped_attribute

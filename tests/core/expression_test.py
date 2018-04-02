@@ -82,3 +82,79 @@ def test_execution_error() -> None:
     code_string = '1/0'
     with raises(ExpressionEvaluationError):
         Expression(code_string).evaluate(EvaluationContext())
+
+
+def test_validate_valid() -> None:
+    Expression('a==b')
+    Expression('a == c')
+    Expression('a==b == c')
+
+    Expression('a!=b')
+    Expression('a != c')
+    Expression('a!=b != c')
+
+    with raises(InvalidExpressionError, message='invalid syntax'):
+        Expression('==a ==b== c==')
+
+    with raises(InvalidExpressionError, message='invalid syntax'):
+        Expression('!=a !=b!= c!=')
+
+    with raises(InvalidExpressionError, message='invalid syntax'):
+        Expression('!= ')
+
+    with raises(InvalidExpressionError, message='invalid syntax'):
+        Expression('!=b')
+
+    with raises(InvalidExpressionError, message='invalid syntax'):
+        Expression('c !=')
+
+    with raises(InvalidExpressionError, message='invalid syntax'):
+        Expression('== ')
+
+    with raises(InvalidExpressionError, message='invalid syntax'):
+        Expression('==b')
+
+    with raises(InvalidExpressionError, message='invalid syntax'):
+        Expression('c ==')
+
+
+def test_validate_invalid() -> None:
+    with raises(
+            InvalidExpressionError,
+            message='Modifying value using `=` is not allowed.'):
+        Expression('a= b')
+
+    with raises(
+            InvalidExpressionError,
+            message='Modifying value using `=` is not allowed.'):
+        Expression('a!=b = ')
+
+    with raises(
+            InvalidExpressionError,
+            message='Modifying value using `=` is not allowed.'):
+        Expression(' =a')
+
+    with raises(
+            InvalidExpressionError,
+            message='Modifying value using `=` is not allowed.'):
+        Expression('b =')
+
+    with raises(
+            InvalidExpressionError,
+            message='Modifying value using `=` is not allowed.'):
+        Expression('b &= c')
+
+    with raises(
+            InvalidExpressionError,
+            message='Modifying value using `=` is not allowed.'):
+        Expression('b += c')
+
+    with raises(
+            InvalidExpressionError,
+            message='Modifying value using `=` is not allowed.'):
+        Expression('b |= c')
+
+    with raises(
+            InvalidExpressionError,
+            message='Modifying value using `=` is not allowed.'):
+        Expression('b /= c')
