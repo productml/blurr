@@ -1,17 +1,17 @@
-Type: ProductML:DTC:Streaming
+Type: Blurr:Streaming
 Version: '2018-03-01'
 Name: Sessions
 Description: Streaming Extended Test
 Identity: source.user_id
 Time: parser.parse(source.time)
-Stores:
+Stores: 
   -
-    Type: ProductML:DTC:Store:MemoryStore
+    Type: Blurr:Store:MemoryStore
     Name: memory
 
 DataGroups:
   -
-    Type: ProductML:DTC:DataGroup:VariableAggregate
+    Type: Blurr:DataGroup:VariableAggregate
     Name: vars
     Fields:
 
@@ -22,7 +22,7 @@ DataGroups:
       # Checks for using the bracket notation to access fields that do not have python valid fieldnames
       - { Name: os_version_parts, Type: list, Value: "source['os-version'].split('-')" }
   -
-    Type: ProductML:DTC:DataGroup:IdentityAggregate
+    Type: Blurr:DataGroup:IdentityAggregate
     Name: state
     Store: memory
     Fields:
@@ -60,7 +60,7 @@ DataGroups:
         When: state.build > 210 and state.build < 440
 
 
-  - Type: ProductML:DTC:DataGroup:SessionAggregate
+  - Type: Blurr:DataGroup:BlockAggregate
     Name: session
     Split: (time - session.end_time).total_seconds() > 1800 or session.session_id != source.session_id
     Store: memory
