@@ -8,7 +8,6 @@ jobs:
       - run:
           name: build
           command: |
-            cd blurr
             sh build.sh
   deploy:
     docker:
@@ -24,7 +23,6 @@ jobs:
       - run:
           name: deploy pypi
           command: |
-            cd blurr
             sh build.sh
             pipenv run python setup.py sdist
             pipenv run python setup.py bdist_wheel
