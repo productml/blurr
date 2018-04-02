@@ -54,6 +54,13 @@ def test_invalid_wrong_version():
     assert "Version: '2088-03-01' not in ('2018-03-01',)" in str(err.value)
 
 
+def test_invalid_missing_time():
+    with raises(InvalidSchemaError) as err:
+        dtc_dict = load_example('invalid_missing_time.yml')
+        validate(dtc_dict)
+    assert "Time: Required field missing" in str(err.value)
+
+
 def test_invalid_string_instead_of_integer():
     with raises(InvalidSchemaError) as err:
         dtc_dict = load_example('invalid_string_instead_integer.yml')

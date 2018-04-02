@@ -5,7 +5,7 @@ from pytest import fixture
 
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.simple_field import IntegerFieldSchema
+from blurr.core.simple_fields import IntegerFieldSchema
 from blurr.core.streaming_transformer import StreamingTransformerSchema
 
 

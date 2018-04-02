@@ -15,7 +15,6 @@ from docopt import docopt
 from blurr.core.evaluation import Context
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.streaming_transformer import StreamingTransformerSchema
 from blurr.core.syntax.schema_validator import validate
 from blurr.runner.identity_runner import execute_dtc
 

@@ -1,5 +1,6 @@
-import pytest
 from datetime import datetime
+
+import pytest
 
 from blurr.core.store import Key
 

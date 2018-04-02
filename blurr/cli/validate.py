@@ -2,10 +2,10 @@ from typing import List, Optional
 
 import yaml
 
+from blurr.cli.out import Out
 from blurr.cli.util import get_yml_files
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.syntax.schema_validator import validate
-from blurr.cli.out import Out
 
 
 def validate_command(dtc_files: List[str], out: Optional[Out] = None) -> int:
