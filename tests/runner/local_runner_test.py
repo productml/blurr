@@ -24,26 +24,12 @@ def test_local_runner_stream_only():
 
     assert local_runner._block_data[Key('userA', 'session',
                                         datetime(2018, 3, 7, 22, 35, 31))] == {
-                                            'start_time': datetime(
-                                                2018,
-                                                3,
-                                                7,
-                                                22,
-                                                35,
-                                                31,
-                                                tzinfo=tzutc()),
-                                            'end_time': datetime(
-                                                2018,
-                                                3,
-                                                7,
-                                                22,
-                                                35,
-                                                31,
-                                                tzinfo=tzutc()),
-                                            'events': 1,
-                                            'country': 'US',
-                                            'continent': 'North America'
-                                        }
+        'start_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=tzutc()),
+        'end_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=tzutc()),
+        'events': 1,
+        'country': 'US',
+        'continent': 'North America'
+    }  # yapf: disable
 
     assert local_runner._block_data[Key('userA', 'state')] == {
         'country': 'IN',
