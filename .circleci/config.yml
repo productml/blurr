@@ -25,6 +25,7 @@ jobs:
           name: deploy pypi
           command: |
             cd blurr
+            sh build.sh
             pipenv run python setup.py sdist
             pipenv run python setup.py bdist_wheel
             pipenv run twine upload dist/*
