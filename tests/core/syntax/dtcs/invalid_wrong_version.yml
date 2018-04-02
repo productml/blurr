@@ -8,6 +8,7 @@ Version: '2088-03-01'
 Description: Example
 Name: example_name
 Identity: source.user_id
+Time: source.timestamp
 When: source.package_version = '1.0'
 Stores:
  - Type: ProductML:DTC:Store:MemoryStore
