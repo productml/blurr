@@ -78,7 +78,7 @@ class LocalRunner:
     def print_output(self) -> None:
         if self._window_dtc is not None:
             for row in self._window_data.items():
-                print(row)
+                print(json.dumps(row, default=str))
         else:
             for row in self._session_data.items():
                 print(json.dumps(row, default=str))
