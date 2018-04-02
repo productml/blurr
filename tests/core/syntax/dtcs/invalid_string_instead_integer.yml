@@ -1,4 +1,4 @@
-Type: ProductML:DTC:Window
+Type: Blurr:Window
 Version: '2018-03-01'
 Description: Example
 SourceDTC: test
@@ -10,7 +10,7 @@ Anchor:
   Max: one
 
 DataGroups:
- - Type: ProductML:DTC:DataGroup:VariableAggregate
+ - Type: Blurr:DataGroup:VariableAggregate
    Name: user
    Store: offer_ai_dynamo
    Fields:

@@ -2,10 +2,10 @@ from datetime import datetime, timedelta
 from typing import Any, List, Tuple
 
 from blurr.core.data_group import DataGroup, DataGroupSchema
-from blurr.core.errors import PrepareWindowMissingSessionsError
+from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.session_data_group import SessionDataGroup
+from blurr.core.block_data_group import BlockDataGroup
 from blurr.core.store import Key
 from blurr.core.base import BaseItem
 
@@ -33,10 +33,10 @@ class _WindowSource:
     """
 
     def __init__(self):
-        self.view: List[SessionDataGroup] = []
+        self.view: List[BlockDataGroup] = []
 
     def __getattr__(self, item: str) -> List[Any]:
-        return [getattr(session, item) for session in self.view]
+        return [getattr(block, item) for block in self.view]
 
 
 class WindowDataGroup(DataGroup):
@@ -52,19 +52,19 @@ class WindowDataGroup(DataGroup):
     def prepare_window(self, start_time: datetime) -> None:
         """
         Prepares window if any is specified.
-        :param start_time: The anchor session start_time from where the window
+        :param start_time: The anchor block start_time from where the window
         should be generated.
         """
         # evaluate window first which sets the correct window in the store
         store = self.schema.source.store
         if self.schema.window_type == 'day' or self.schema.window_type == 'hour':
-            self.window_source.view = self._load_sessions(
+            self.window_source.view = self._load_blocks(
                 store.get_range(
                     Key(self.identity, self.schema.source.name, start_time),
                     Key(self.identity, self.schema.source.name,
                         self._get_end_time(start_time))))
         else:
-            self.window_source.view = self._load_sessions(
+            self.window_source.view = self._load_blocks(
                 store.get_range(
                     Key(self.identity, self.schema.source.name, start_time),
                     None, self.schema.window_value))
@@ -74,17 +74,16 @@ class WindowDataGroup(DataGroup):
     def _validate_view(self):
         if self.schema.window_type == 'count' and len(
                 self.window_source.view) != abs(self.schema.window_value):
-            raise PrepareWindowMissingSessionsError(
-                'Expecting {} but not found {} sessions'.format(
+            raise PrepareWindowMissingBlocksError(
+                'Expecting {} but not found {} blocks'.format(
                     abs(self.schema.window_value),
                     len(self.window_source.view)))
 
         if len(self.window_source.view) == 0:
-            raise PrepareWindowMissingSessionsError(
-                'No matching sessions found')
+            raise PrepareWindowMissingBlocksError('No matching blocks found')
 
     # TODO: Handle end time which is beyond the expected range of data being
-    # processed. In this case a PrepareWindowMissingSessionsError error should
+    # processed. In this case a PrepareWindowMissingBlocksError error should
     # be raised.
     def _get_end_time(self, start_time: datetime) -> datetime:
         """
@@ -98,17 +97,16 @@ class WindowDataGroup(DataGroup):
         elif self.schema.window_type == 'hour':
             return start_time + timedelta(hours=self.schema.window_value)
 
-    def _load_sessions(self,
-                       sessions: List[Tuple[Key, Any]]) -> List[BaseItem]:
+    def _load_blocks(self, blocks: List[Tuple[Key, Any]]) -> List[BaseItem]:
         """
-        Converts [(Key, Session)] to [SessionDataGroup]
-        :param sessions: List of (Key, Session) sessions.
-        :return: List of SessionDataGroup
+        Converts [(Key, block)] to [BlockDataGroup]
+        :param blocks: List of (Key, block) blocks.
+        :return: List of BlockDataGroup
         """
         return [
-            SessionDataGroup(self.schema.source, self.identity,
-                             EvaluationContext()).restore(session)
-            for (_, session) in sessions
+            BlockDataGroup(self.schema.source, self.identity,
+                           EvaluationContext()).restore(block)
+            for (_, block) in blocks
         ]
 
     def evaluate(self) -> None:

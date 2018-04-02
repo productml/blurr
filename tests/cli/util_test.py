@@ -1,6 +1,8 @@
 from typing import Any
 from unittest import mock
 
+import os
+
 from blurr.cli.util import get_yml_files, get_stream_window_dtc_files
 
 
@@ -8,13 +10,13 @@ def override_open(filename: str) -> Any:
     if filename == 'invalid.yml':
         content = "Type: ABC"
     elif filename == 'stream1.yml':
-        content = 'Type: ProductML:DTC:Streaming'
+        content = 'Type: Blurr:Streaming'
     elif filename == 'stream2.yml':
-        content = 'Type: ProductML:DTC:Streaming'
+        content = 'Type: Blurr:Streaming'
     elif filename == 'window1.yml':
-        content = 'Type: ProductML:DTC:Window'
+        content = 'Type: Blurr:Window'
     elif filename == 'window2.yml':
-        content = 'Type: ProductML:DTC:Window'
+        content = 'Type: Blurr:Window'
     else:
         raise FileNotFoundError(filename)
     file_object = mock.mock_open(read_data=content).return_value
@@ -38,9 +40,13 @@ def override_listdir(path: str) -> Any:
 @mock.patch('os.listdir', new=override_listdir)
 def test_get_yml_files():
     assert get_yml_files() == []
-    assert sorted(get_yml_files('path1')) == sorted(
-        ['path1/file1.yml', 'path1/file3.yaml'])
-    assert get_yml_files('path/inner_path') == ['path/inner_path/file1.yml']
+    assert sorted(get_yml_files('path1')) == sorted([
+        os.path.join('path1', 'file1.yml'),
+        os.path.join('path1', 'file3.yaml')
+    ])
+    assert get_yml_files('path/inner_path') == [
+        os.path.join('path/inner_path', 'file1.yml')
+    ]
 
 
 @mock.patch('builtins.open', new=override_open)

@@ -13,7 +13,7 @@ from blurr.core.streaming_transformer import StreamingTransformerSchema
 def nested_schema_spec_bad_type() -> Dict:
     return {
         'Name': 'test',
-        'Type': 'ProductML:DTC:Unknown',
+        'Type': 'Blurr:Unknown',
         'Ignored': 2,
         'DataGroups': [{
             'Name': 'test_group',
@@ -34,14 +34,14 @@ def nested_schema_spec_bad_type() -> Dict:
 def nested_schema_spec() -> Dict:
     return {
         'Name': 'test',
-        'Type': 'ProductML:DTC:Streaming',
+        'Type': 'Blurr:Streaming',
         "Version": "2018-03-01",
         "Time": "parser.parse(source.event_time)",
         "Identity": "source.user_id",
         'Ignored': 2,
         'DataGroups': [{
             'Name': 'test_group',
-            'Type': 'ProductML:DTC:DataGroup:IdentityAggregate',
+            'Type': 'Blurr:DataGroup:IdentityAggregate',
             'Fields': [{
                 "Type": "string",
                 "Name": "country",
@@ -103,8 +103,7 @@ def test_get_schema_object_error(nested_schema_spec_bad_type: Dict) -> None:
     schema_loader.add_schema(nested_schema_spec_bad_type)
 
     with pytest.raises(
-            InvalidSchemaError,
-            match='Unknown schema type ProductML:DTC:Unknown'):
+            InvalidSchemaError, match='Unknown schema type Blurr:Unknown'):
         schema_loader.get_schema_object('test')
 
     with pytest.raises(InvalidSchemaError, match='Type not defined in schema'):

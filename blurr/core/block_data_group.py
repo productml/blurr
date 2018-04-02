@@ -5,9 +5,9 @@ from blurr.core.evaluation import Expression
 from blurr.core.schema_loader import SchemaLoader
 
 
-class SessionDataGroupSchema(DataGroupSchema):
+class BlockDataGroupSchema(DataGroupSchema):
     """
-    Data group that handles the session rollup aggregation
+    Data group that handles the block rollup aggregation
     """
 
     ATTRIBUTE_SPLIT = 'Split'
@@ -22,7 +22,7 @@ class SessionDataGroupSchema(DataGroupSchema):
         ) if self.ATTRIBUTE_SPLIT in self._spec else None
 
     def extend_schema(self):
-        # Alter the spec to introduce the session start and end time implicitly
+        # Alter the spec to introduce the block start and end time implicitly
         # handled fields
         predefined_field = self._build_predefined_fields_spec(
             self._spec[self.ATTRIBUTE_NAME])
@@ -59,9 +59,9 @@ class SessionDataGroupSchema(DataGroupSchema):
         ]
 
 
-class SessionDataGroup(DataGroup):
+class BlockDataGroup(DataGroup):
     """
-    Manages the aggregates for session based roll-ups of streaming data
+    Manages the aggregates for block based roll-ups of streaming data
     """
 
     def evaluate(self) -> None:
@@ -69,7 +69,7 @@ class SessionDataGroup(DataGroup):
         Evaluates the current item
         """
 
-        # If a split is imminent, save the current session snapshot with the timestamp
+        # If a split is imminent, save the current block snapshot with the timestamp
         split_should_be_evaluated = not (self.schema.split is None
                                          or self.start_time is None
                                          or self.end_time is None)
