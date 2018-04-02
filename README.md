@@ -148,7 +148,10 @@ Email us at blurr@productml.com or star this project to stay in touch!
 
 Blurr is all about enabling machine learning and AI teams to run faster.
 
-0. Developer Preview 0: Local transformations only
-1. Developer Preview 1: S3-S3 data transformations
-2. Developer Preview 2: Add DynamoDB as a Store + Features server for ML production use
-3. Ingestion connectors to Kafka and Spark
+Developer Preview 0: Local transformations only
+
+Developer Preview 1: S3-S3 data transformations
+
+Developer Preview 2: Add DynamoDB as a Store + Features server for ML production use
+
+Ingestion connectors to Kafka and Spark
