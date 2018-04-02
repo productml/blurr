@@ -6,15 +6,15 @@ from pytest import fixture
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.field import Field
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.session_data_group import SessionDataGroupSchema, \
-    SessionDataGroup
+from blurr.core.block_data_group import BlockDataGroupSchema, \
+    BlockDataGroup
 from blurr.core.store import Key
 
 
 @fixture
 def session_data_group_schema_spec() -> Dict[str, Any]:
     return {
-        'Type': 'ProductML:DTC:DataGroup:SessionAggregate',
+        'Type': 'Blurr:DataGroup:BlockAggregate',
         'Name': 'user',
         'Store': 'memstore',
         'Fields': [{
@@ -27,7 +27,7 @@ def session_data_group_schema_spec() -> Dict[str, Any]:
 
 @fixture
 def store_spec() -> Dict[str, Any]:
-    return {'Name': 'memstore', 'Type': 'ProductML:DTC:Store:MemoryStore'}
+    return {'Name': 'memstore', 'Type': 'Blurr:Store:MemoryStore'}
 
 
 @fixture
@@ -51,9 +51,9 @@ def check_fields(fields: Dict[str, Field],
     return True
 
 
-def create_session_data_group(schema, time) -> SessionDataGroup:
+def create_session_data_group(schema, time) -> BlockDataGroup:
     evaluation_context = EvaluationContext()
-    session_data_group = SessionDataGroup(
+    session_data_group = BlockDataGroup(
         schema=schema, identity='12345', evaluation_context=evaluation_context)
     evaluation_context.global_add('time', time)
     evaluation_context.global_add('user', session_data_group)
@@ -63,7 +63,7 @@ def create_session_data_group(schema, time) -> SessionDataGroup:
 def test_session_data_group_schema_evaluate_without_split(
         session_data_group_schema_spec, schema_loader):
     name = schema_loader.add_schema(session_data_group_schema_spec)
-    session_data_group_schema = SessionDataGroupSchema(name, schema_loader)
+    session_data_group_schema = BlockDataGroupSchema(name, schema_loader)
 
     time = datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc)
     session_data_group = create_session_data_group(session_data_group_schema,
@@ -89,7 +89,7 @@ def test_session_data_group_schema_evaluate_with_split(
         session_data_group_schema_spec, schema_loader):
     session_data_group_schema_spec['Split'] = 'user.event_count == 2'
     name = schema_loader.add_schema(session_data_group_schema_spec)
-    session_data_group_schema = SessionDataGroupSchema(name, schema_loader)
+    session_data_group_schema = BlockDataGroupSchema(name, schema_loader)
 
     time = datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc)
     session_data_group = create_session_data_group(session_data_group_schema,

@@ -4,13 +4,13 @@ from pytest import fixture
 
 from blurr.core.evaluation import Expression
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.session_data_group import SessionDataGroupSchema
+from blurr.core.block_data_group import BlockDataGroupSchema
 
 
 @fixture
 def session_data_group_schema_spec() -> Dict[str, Any]:
     return {
-        'Type': 'ProductML:DTC:DataGroup:SessionAggregate',
+        'Type': 'Blurr:DataGroup:BlockAggregate',
         'Name': 'user',
         'Filter': 'source.event_id in ["app_launched", "user_updated"]',
         'Fields': [{
@@ -44,7 +44,7 @@ def test_session_data_group_schema_initialization(
         session_data_group_schema_spec):
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(session_data_group_schema_spec)
-    session_data_group_schema = SessionDataGroupSchema(name, schema_loader)
+    session_data_group_schema = BlockDataGroupSchema(name, schema_loader)
     assert session_data_group_schema.split is None
     assert match_fields(session_data_group_schema_spec['Fields'])
 
@@ -57,7 +57,7 @@ def test_session_data_group_schema_with_split_initialization(
     session_data_group_schema_spec['Split'] = '4 > 2'
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(session_data_group_schema_spec)
-    session_data_group_schema = SessionDataGroupSchema(name, schema_loader)
+    session_data_group_schema = BlockDataGroupSchema(name, schema_loader)
     assert isinstance(session_data_group_schema.split, Expression)
     assert match_fields(session_data_group_schema_spec['Fields'])
 

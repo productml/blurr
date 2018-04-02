@@ -1,4 +1,4 @@
-Type: ProductML:DTC:Window
+Type: Blurr:Window
 Version: '2018-03-01'
 Description: Second Level processing for feature generation
 
@@ -12,7 +12,7 @@ Anchor:
 
 
 DataGroups:
-  - Type: ProductML:DTC:DataGroup:AnchorAggregate
+  - Type: Blurr:DataGroup:AnchorAggregate
     Name: last_session
     Window:
       Type: count
@@ -24,7 +24,7 @@ DataGroups:
        Type: integer
        Value: source.events[0]
 
-  - Type: ProductML:DTC:DataGroup:AnchorAggregate
+  - Type: Blurr:DataGroup:AnchorAggregate
     Name: last_day
     Window:
       Type: day

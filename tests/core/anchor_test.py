@@ -5,8 +5,8 @@ from pytest import fixture
 from blurr.core.anchor import AnchorSchema, Anchor
 from blurr.core.evaluation import EvaluationContext, Expression
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.session_data_group import SessionDataGroupSchema, \
-    SessionDataGroup
+from blurr.core.block_data_group import BlockDataGroupSchema, \
+    BlockDataGroup
 
 
 @fixture
@@ -37,9 +37,9 @@ def anchor_schema_max_two(schema_loader: SchemaLoader) -> AnchorSchema:
 
 
 @fixture
-def session_schema(schema_loader: SchemaLoader) -> SessionDataGroupSchema:
+def session_schema(schema_loader: SchemaLoader) -> BlockDataGroupSchema:
     name = schema_loader.add_schema({
-        'Type': 'ProductML:DTC:DataGroup:SessionAggregate',
+        'Type': 'Blurr:DataGroup:BlockAggregate',
         'Name': 'session',
         'Fields': [
             {
@@ -49,12 +49,12 @@ def session_schema(schema_loader: SchemaLoader) -> SessionDataGroupSchema:
             },
         ],
     })
-    return SessionDataGroupSchema(name, schema_loader)
+    return BlockDataGroupSchema(name, schema_loader)
 
 
 @fixture
-def session_item(session_schema: SessionDataGroupSchema) -> SessionDataGroup:
-    session = SessionDataGroup(session_schema, 'user1', EvaluationContext())
+def session_item(session_schema: BlockDataGroupSchema) -> BlockDataGroup:
+    session = BlockDataGroup(session_schema, 'user1', EvaluationContext())
     session.restore({
         'events': 3,
         'start_time': datetime(2018, 3, 7, 22, 36, 31, 0, timezone.utc),
@@ -64,7 +64,7 @@ def session_item(session_schema: SessionDataGroupSchema) -> SessionDataGroup:
 
 
 def test_anchor_max_one(anchor_schema_max_one: AnchorSchema,
-                        session_item: SessionDataGroup) -> None:
+                        session_item: BlockDataGroup) -> None:
     anchor = Anchor(anchor_schema_max_one, EvaluationContext())
     assert anchor.evaluate_anchor(session_item) is True
     anchor.add_condition_met()
@@ -72,7 +72,7 @@ def test_anchor_max_one(anchor_schema_max_one: AnchorSchema,
 
 
 def test_anchor_max_two(anchor_schema_max_two: AnchorSchema,
-                        session_item: SessionDataGroup) -> None:
+                        session_item: BlockDataGroup) -> None:
     anchor = Anchor(anchor_schema_max_two, EvaluationContext())
     assert anchor.evaluate_anchor(session_item) is True
     anchor.add_condition_met()
@@ -82,7 +82,7 @@ def test_anchor_max_two(anchor_schema_max_two: AnchorSchema,
 
 
 def test_anchor_condition(anchor_schema_max_one: AnchorSchema,
-                          session_item: SessionDataGroup) -> None:
+                          session_item: BlockDataGroup) -> None:
     anchor_schema_max_one.condition = Expression('session.events > 3')
     eval_context = EvaluationContext()
     anchor = Anchor(anchor_schema_max_one, eval_context)

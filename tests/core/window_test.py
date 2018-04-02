@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 import pytest
 from pytest import fixture
 
-from blurr.core.errors import PrepareWindowMissingSessionsError
+from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.window import WindowSchema, Window
 
@@ -12,7 +12,7 @@ from blurr.core.window import WindowSchema, Window
 def window_schema(schema_loader_with_mem_store: SchemaLoader,
                   mem_store_name: str, stream_dtc_name: str) -> WindowSchema:
     schema_loader_with_mem_store.add_schema({
-        'Type': 'ProductML:DTC:DataGroup:SessionAggregate',
+        'Type': 'Blurr:DataGroup:BlockAggregate',
         'Name': 'session',
         'Store': mem_store_name,
         'Fields': [
@@ -55,8 +55,7 @@ def test_window_type_day_zero_value(window: Window) -> None:
     window.schema.type = 'day'
     window.schema.value = 0
     with pytest.raises(
-            PrepareWindowMissingSessionsError,
-            match='No matching sessions found'):
+            PrepareWindowMissingBlocksError, match='No matching blocks found'):
         window.prepare('user1',
                        datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
     assert window.events == []
@@ -66,8 +65,7 @@ def test_window_type_hour_positive(window: Window) -> None:
     window.schema.type = 'hour'
     window.schema.value = 1
     with pytest.raises(
-            PrepareWindowMissingSessionsError,
-            match='No matching sessions found'):
+            PrepareWindowMissingBlocksError, match='No matching blocks found'):
         window.prepare('user1',
                        datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
     assert window.events == []
@@ -89,8 +87,7 @@ def test_window_type_hour_zero_value(window: Window) -> None:
     window.schema.type = 'hour'
     window.schema.value = 0
     with pytest.raises(
-            PrepareWindowMissingSessionsError,
-            match='No matching sessions found'):
+            PrepareWindowMissingBlocksError, match='No matching blocks found'):
         window.prepare('user1',
                        datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
     assert window.events == []
@@ -114,8 +111,8 @@ def test_window_type_count_missing_sesssions(window: Window) -> None:
     window.schema.type = 'count'
     window.schema.value = 20
     with pytest.raises(
-            PrepareWindowMissingSessionsError,
-            match='Expecting 20 but not found 3 sessions'):
+            PrepareWindowMissingBlocksError,
+            match='Expecting 20 but not found 3 blocks'):
         window.prepare('user1',
                        datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
     assert window.events == [4, 5, 6]

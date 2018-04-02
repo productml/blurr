@@ -1,4 +1,4 @@
-Type: ProductML:DTC:Window
+Type: Blurr:Window
 Version: '2018-03-01'
 Description: Second Level processing for feature generation
 Name: ProductMLExample
@@ -7,7 +7,7 @@ Anchor:
   Condition:  offer_ai_v1.game_stats.offer_type != ''
   Max: 1
 DataGroups:
-  - Type: ProductML:DTC:DataGroup:AnchorAggregate
+  - Type: Blurr:DataGroup:AnchorAggregate
     Name: last_session
     Window:
       Type: count

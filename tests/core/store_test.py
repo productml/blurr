@@ -19,7 +19,7 @@ def empty_memory_store() -> MemoryStore:
     schema_loader = SchemaLoader()
     schema_loader.add_schema({
         'Name': 'memstore',
-        'Type': 'ProductML:DTC:Store:MemoryStore'
+        'Type': 'Blurr:Store:MemoryStore'
     })
     return MemoryStore('memstore', schema_loader)
 

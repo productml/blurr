@@ -46,7 +46,7 @@ class AnchorDataGroup(DataGroup):
         Prepares window if any is specified.
         :param store: Store to be used to query for the source data.
         :param identity: Identity is used as a Key for store query.
-        :param start_time: The Anchor session start_time from where the window
+        :param start_time: The Anchor block start_time from where the window
         should be generated.
         """
         # evaluate window first which sets the correct window in the store
