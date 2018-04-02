@@ -5,8 +5,6 @@ import importlib
 from blurr.core.errors import InvalidSchemaError
 
 ITEM_MAP = {
-    k.lower(): v
-    for k, v in {
         'Blurr:DataGroup:BlockAggregate': 'blurr.core.block_data_group.BlockDataGroup',
         'Blurr:DataGroup:IdentityAggregate': 'blurr.core.identity_data_group.IdentityDataGroup',
         'Blurr:DataGroup:VariableAggregate': 'blurr.core.variable_data_group.VariableDataGroup',
@@ -22,12 +20,10 @@ ITEM_MAP = {
         'map': 'blurr.core.simple_fields.SimpleField',
         'list': 'blurr.core.simple_fields.SimpleField',
         'set': 'blurr.core.simple_fields.SimpleField',
-    }.items()
 }
+ITEM_MAP_LOWER_CASE = {k.lower(): v for k, v in ITEM_MAP.items()}
 
 SCHEMA_MAP = {
-    k.lower(): v
-    for k, v in {
         'Blurr:Streaming': 'blurr.core.streaming_transformer.StreamingTransformerSchema',
         'Blurr:Window': 'blurr.core.window_transformer.WindowTransformerSchema',
         'Blurr:DataGroup:BlockAggregate': 'blurr.core.block_data_group.BlockDataGroupSchema',
@@ -47,8 +43,8 @@ SCHEMA_MAP = {
         'map': 'blurr.core.complex_fields.MapFieldSchema',
         'list': 'blurr.core.complex_fields.ListFieldSchema',
         'set': 'blurr.core.complex_fields.SetFieldSchema'
-    }.items()
 }
+SCHEMA_MAP_LOWER_CASE = {k.lower(): v for k, v in SCHEMA_MAP.items()}
 
 # TODO Build dynamic type loader from a central configuration rather than reading a static dictionary
 
@@ -56,11 +52,11 @@ SCHEMA_MAP = {
 class TypeLoader:
     @staticmethod
     def load_schema(type_name: str):
-        return TypeLoader.load_type(type_name, SCHEMA_MAP)
+        return TypeLoader.load_type(type_name, SCHEMA_MAP_LOWER_CASE)
 
     @staticmethod
     def load_item(type_name: str):
-        return TypeLoader.load_type(type_name, ITEM_MAP)
+        return TypeLoader.load_type(type_name, ITEM_MAP_LOWER_CASE)
 
     @staticmethod
     def load_type(type_name: str, type_map: dict) -> Any:
