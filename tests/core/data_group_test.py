@@ -1,16 +1,13 @@
 from datetime import datetime, timezone
-import yaml
 from typing import Dict, Any
-from pytest import fixture
-import pytest
 
-from blurr.core.evaluation import EvaluationContext
+from pytest import fixture
+
 from blurr.core.data_group import DataGroupSchema, DataGroup
-from blurr.core.errors import InvalidSchemaError
+from blurr.core.evaluation import EvaluationContext
 from blurr.core.field import Field
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store import Key
-from blurr.store.memory_store import MemoryStore
 
 
 def get_data_group_schema_spec() -> Dict[str, Any]:

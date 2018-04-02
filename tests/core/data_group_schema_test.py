@@ -1,12 +1,11 @@
-import yaml
 from typing import Dict, Any
-from pytest import fixture
+
 import pytest
+from pytest import fixture
 
 from blurr.core.data_group import DataGroupSchema
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.schema_loader import SchemaLoader
-from blurr.store.memory_store import MemoryStore
 
 
 @fixture

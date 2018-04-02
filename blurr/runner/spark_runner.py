@@ -5,10 +5,10 @@ Usage:
 """
 
 import json
+from datetime import datetime
 from typing import List, Optional, Tuple, Any, Dict, Union
 
 import yaml
-from datetime import datetime
 from dateutil import parser
 from docopt import docopt
 
