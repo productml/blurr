@@ -20,7 +20,7 @@ from blurr.core.store import Key
 from blurr.core.streaming_transformer import StreamingTransformerSchema
 from blurr.core.syntax.schema_validator import validate
 from pyspark import RDD, SparkContext
-from pyspark.sql import SparkSession
+from pyspark.sql import SparkBlock
 
 
 class SparkRunner:
@@ -52,10 +52,10 @@ class SparkRunner:
     ) -> Union[List[Tuple[Key, Any]], List[Dict]]:
         identity = user_events[0]
         events = user_events[1]
-        session_data, window_data = identity_runner.execute_dtc(
+        block_data, window_data = identity_runner.execute_dtc(
             events, identity, self._stream_dtc, self._window_dtc)
         if self._window_dtc is None:
-            return session_data
+            return block_data
         else:
             return window_data
 
@@ -78,7 +78,7 @@ class SparkRunner:
         return per_user_records.flatMap(
             lambda x: self.execute_per_user_events(x))
 
-    def write_output_file(self, spark: SparkSession, path: str,
+    def write_output_file(self, spark: SparkBlock, path: str,
                           per_user_data: RDD) -> None:
         if self._window_dtc is None:
             per_user_data.map(
@@ -94,7 +94,7 @@ def main():
                                arguments['--streaming-dtc'],
                                arguments['--window-dtc'])
 
-    spark = SparkSession \
+    spark = SparkBlock \
         .builder \
         .appName("BlurrSparkRunner") \
         .getOrCreate()

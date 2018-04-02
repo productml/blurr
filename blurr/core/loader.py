@@ -5,10 +5,10 @@ import importlib
 from blurr.core.errors import InvalidSchemaError
 
 ITEM_MAP = {
-    'ProductML:DTC:DataGroup:SessionAggregate': 'blurr.core.session_data_group.SessionDataGroup',
-    'ProductML:DTC:DataGroup:IdentityAggregate': 'blurr.core.identity_data_group.IdentityDataGroup',
-    'ProductML:DTC:DataGroup:VariableAggregate': 'blurr.core.variable_data_group.VariableDataGroup',
-    'ProductML:DTC:DataGroup:WindowAggregate': 'blurr.core.window_data_group.WindowDataGroup',
+    'Blurr:DataGroup:BlockAggregate': 'blurr.core.block_data_group.BlockDataGroup',
+    'Blurr:DataGroup:IdentityAggregate': 'blurr.core.identity_data_group.IdentityDataGroup',
+    'Blurr:DataGroup:VariableAggregate': 'blurr.core.variable_data_group.VariableDataGroup',
+    'Blurr:DataGroup:WindowAggregate': 'blurr.core.window_data_group.WindowDataGroup',
     'day': 'blurr.core.window.Window',
     'hour': 'blurr.core.window.Window',
     'count': 'blurr.core.window.Window',
@@ -21,15 +21,16 @@ ITEM_MAP = {
     'list': 'blurr.core.simple_fields.SimpleField',
     'set': 'blurr.core.simple_fields.SimpleField',
 }
+ITEM_MAP_LOWER_CASE = {k.lower(): v for k, v in ITEM_MAP.items()}
 
 SCHEMA_MAP = {
-    'ProductML:DTC:Streaming': 'blurr.core.streaming_transformer.StreamingTransformerSchema',
-    'ProductML:DTC:Window': 'blurr.core.window_transformer.WindowTransformerSchema',
-    'ProductML:DTC:DataGroup:SessionAggregate': 'blurr.core.session_data_group.SessionDataGroupSchema',
-    'ProductML:DTC:DataGroup:IdentityAggregate': 'blurr.core.identity_data_group.IdentityDataGroupSchema',
-    'ProductML:DTC:DataGroup:VariableAggregate': 'blurr.core.variable_data_group.VariableDataGroupSchema',
-    'ProductML:DTC:DataGroup:WindowAggregate': 'blurr.core.window_data_group.WindowDataGroupSchema',
-    'ProductML:DTC:Store:MemoryStore': 'blurr.store.memory_store.MemoryStore',
+    'Blurr:Streaming': 'blurr.core.streaming_transformer.StreamingTransformerSchema',
+    'Blurr:Window': 'blurr.core.window_transformer.WindowTransformerSchema',
+    'Blurr:DataGroup:BlockAggregate': 'blurr.core.block_data_group.BlockDataGroupSchema',
+    'Blurr:DataGroup:IdentityAggregate': 'blurr.core.identity_data_group.IdentityDataGroupSchema',
+    'Blurr:DataGroup:VariableAggregate': 'blurr.core.variable_data_group.VariableDataGroupSchema',
+    'Blurr:DataGroup:WindowAggregate': 'blurr.core.window_data_group.WindowDataGroupSchema',
+    'Blurr:Store:MemoryStore': 'blurr.store.memory_store.MemoryStore',
     'anchor': 'blurr.core.anchor.AnchorSchema',
     'day': 'blurr.core.window.WindowSchema',
     'hour': 'blurr.core.window.WindowSchema',
@@ -43,6 +44,7 @@ SCHEMA_MAP = {
     'list': 'blurr.core.complex_fields.ListFieldSchema',
     'set': 'blurr.core.complex_fields.SetFieldSchema'
 }
+SCHEMA_MAP_LOWER_CASE = {k.lower(): v for k, v in SCHEMA_MAP.items()}
 
 # TODO Build dynamic type loader from a central configuration rather than reading a static dictionary
 
@@ -50,18 +52,19 @@ SCHEMA_MAP = {
 class TypeLoader:
     @staticmethod
     def load_schema(type_name: str):
-        return TypeLoader.load_type(type_name, SCHEMA_MAP)
+        return TypeLoader.load_type(type_name, SCHEMA_MAP_LOWER_CASE)
 
     @staticmethod
     def load_item(type_name: str):
-        return TypeLoader.load_type(type_name, ITEM_MAP)
+        return TypeLoader.load_type(type_name, ITEM_MAP_LOWER_CASE)
 
     @staticmethod
     def load_type(type_name: str, type_map: dict) -> Any:
-        if type_name not in type_map:
+        lower_type_name = type_name.lower()
+        if lower_type_name not in type_map:
             raise InvalidSchemaError(
                 'Unknown schema type {}'.format(type_name))
-        return TypeLoader.import_class_by_full_name(type_map[type_name])
+        return TypeLoader.import_class_by_full_name(type_map[lower_type_name])
 
     @staticmethod
     def import_class_by_full_name(name):

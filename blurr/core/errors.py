@@ -33,9 +33,9 @@ class SnapshotError(Exception):
     pass
 
 
-class StaleSessionError(Exception):
+class StaleBlockError(Exception):
     """
-    Indicates that the event being processed cannot be added to the session rollup that is loaded
+    Indicates that the event being processed cannot be added to the block rollup that is loaded
     """
     pass
 
@@ -47,9 +47,9 @@ class StreamingSourceNotFoundError(Exception):
     pass
 
 
-class AnchorSessionNotDefinedError(Exception):
+class AnchorBlockNotDefinedError(Exception):
     """
-    Raised when anchor session is not defined and a WindowTransformer is evaluated.
+    Raised when anchor block is not defined and a WindowTransformer is evaluated.
     """
     pass
 
@@ -61,7 +61,7 @@ class IdentityError(Exception):
     pass
 
 
-class PrepareWindowMissingSessionsError(Exception):
+class PrepareWindowMissingBlocksError(Exception):
     """
     Raised when the window view generated is insufficient as per the window specification.
     """

@@ -22,7 +22,7 @@ def schema_loader_with_mem_store(stream_dtc_name: str) -> SchemaLoader:
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema({
         'Name': 'memstore',
-        'Type': 'ProductML:DTC:Store:MemoryStore'
+        'Type': 'Blurr:Store:MemoryStore'
     }, stream_dtc_name)
     store = schema_loader.get_schema_object(stream_dtc_name + '.' + name)
     init_memory_store(store)

@@ -18,7 +18,7 @@ def is_expression(s: str) -> bool:
 
 
 def is_identifier(s: str) -> bool:
-    return len(re.findall(r"[^\S]", s)) == 0
+    return len(re.findall(r'[^\S]', s)) == 0
 
 
 class DataType(Validator):
@@ -84,17 +84,17 @@ def _validate_streaming(dtc_dict: Dict, name: str) -> None:
 
 
 def is_window_dtc(dtc_dict: Dict) -> bool:
-    return dtc_dict.get('Type', '') == 'ProductML:DTC:Window'
+    return dtc_dict.get('Type', '').lower() == 'blurr:window'
 
 
 def is_streaming_dtc(dtc_dict: Dict) -> bool:
-    return dtc_dict.get('Type', '') == 'ProductML:DTC:Streaming'
+    return dtc_dict.get('Type', '').lower() == 'blurr:streaming'
 
 
-def validate(dtc_dict: Dict, name="dtc") -> None:
+def validate(dtc_dict: Dict, name='dtc') -> None:
     if is_window_dtc(dtc_dict):
         _validate_window(dtc_dict, name)
     elif is_streaming_dtc(dtc_dict):
         _validate_streaming(dtc_dict, name)
     else:
-        raise ValueError("Document is not a valid DTC")
+        raise ValueError('Document is not a valid DTC')
