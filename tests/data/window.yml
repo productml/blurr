@@ -12,24 +12,22 @@ Anchor:
 
 
 DataGroups:
-  - Type: Blurr:DataGroup:AnchorAggregate
+  - Type: Blurr:DataGroup:WindowAggregate
     Name: last_session
-    Window:
-      Type: count
-      Value: -1
-      Source: Sessions.session
+    WindowType: count
+    WindowValue: -1
+    Source: Sessions.session
 
     Fields:
      - Name: events
        Type: integer
        Value: source.events[0]
 
-  - Type: Blurr:DataGroup:AnchorAggregate
+  - Type: Blurr:DataGroup:WindowAggregate
     Name: last_day
-    Window:
-      Type: day
-      Value: -1
-      Source: Sessions.session
+    WindowType: day
+    WindowValue: -1
+    Source: Sessions.session
 
     Fields:
      - Name: total_events

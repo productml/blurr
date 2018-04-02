@@ -1,7 +1,7 @@
 from typing import Dict, Optional
 
 from blurr.core.anchor import Anchor
-from blurr.core.anchor_data_group import AnchorDataGroup
+from blurr.core.window_data_group import WindowDataGroup
 from blurr.core.errors import AnchorBlockNotDefinedError, \
     PrepareWindowMissingBlocksError
 from blurr.core.evaluation import Context, EvaluationContext
@@ -75,7 +75,7 @@ class WindowTransformer(Transformer):
             return
 
         for item in self.nested_items.values():
-            if isinstance(item, AnchorDataGroup):
+            if isinstance(item, WindowDataGroup):
                 item.prepare_window(self.anchor.anchor_block.start_time)
 
         super().evaluate()
