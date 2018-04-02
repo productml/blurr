@@ -3,12 +3,19 @@
 [![CircleCI](https://circleci.com/gh/productml/blurr/tree/master.svg?style=svg)](https://circleci.com/gh/productml/blurr/tree/master) |
 [![Documentation Status](https://readthedocs.org/projects/productml-blurr/badge/?version=latest)](http://productml-blurr.readthedocs.io/en/latest/?badge=latest)
 
+```
+We believe in a
+world where everyone is a
+data engineer
 
-*
-We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer.
-The distinction is increasingly blurry **cough**.
-Like development and operations became DevOps over time.
-*
+A data scientist
+An ML engineer, ooh!
+The lines are blurred (cough)
+
+Like development
+and operations became
+DevOps over time
+```
 
 ![Data Transformer](docs/images/data-transformer.png)
 
