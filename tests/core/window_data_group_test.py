@@ -53,7 +53,7 @@ def test_window_type_day_positive(window_data_group: WindowDataGroup) -> None:
     window_data_group.schema.window_value = 1
     window_data_group.prepare_window(
         datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
-    assert window_data_group.window.events == [4, 5]
+    assert window_data_group.window_source.events == [4, 5]
 
 
 def test_window_type_day_negative(window_data_group: WindowDataGroup) -> None:
@@ -61,7 +61,7 @@ def test_window_type_day_negative(window_data_group: WindowDataGroup) -> None:
     window_data_group.schema.window_value = -1
     window_data_group.prepare_window(
         datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
-    assert window_data_group.window.events == [1, 2]
+    assert window_data_group.window_source.events == [1, 2]
 
 
 def test_window_type_day_zero_value(
@@ -73,7 +73,7 @@ def test_window_type_day_zero_value(
             match='No matching sessions found'):
         window_data_group.prepare_window(
             datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
-    assert window_data_group.window.events == []
+    assert window_data_group.window_source.events == []
 
 
 def test_window_type_hour_positive(window_data_group: WindowDataGroup) -> None:
@@ -84,13 +84,13 @@ def test_window_type_hour_positive(window_data_group: WindowDataGroup) -> None:
             match='No matching sessions found'):
         window_data_group.prepare_window(
             datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
-    assert window_data_group.window.events == []
+    assert window_data_group.window_source.events == []
 
     window_data_group.schema.window_type = 'hour'
     window_data_group.schema.window_value = 2
     window_data_group.prepare_window(
         datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
-    assert window_data_group.window.events == [4]
+    assert window_data_group.window_source.events == [4]
 
 
 def test_window_type_hour_negative(window_data_group: WindowDataGroup) -> None:
@@ -98,7 +98,7 @@ def test_window_type_hour_negative(window_data_group: WindowDataGroup) -> None:
     window_data_group.schema.window_value = -24
     window_data_group.prepare_window(
         datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
-    assert window_data_group.window.events == [1, 2]
+    assert window_data_group.window_source.events == [1, 2]
 
 
 def test_window_type_hour_zero_value(
@@ -110,7 +110,7 @@ def test_window_type_hour_zero_value(
             match='No matching sessions found'):
         window_data_group.prepare_window(
             datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
-    assert window_data_group.window.events == []
+    assert window_data_group.window_source.events == []
 
 
 def test_window_type_count_positive(
@@ -119,7 +119,7 @@ def test_window_type_count_positive(
     window_data_group.schema.window_value = -1
     window_data_group.prepare_window(
         datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
-    assert window_data_group.window.events == [2]
+    assert window_data_group.window_source.events == [2]
 
 
 def test_window_type_count_negative(
@@ -128,7 +128,7 @@ def test_window_type_count_negative(
     window_data_group.schema.window_value = 1
     window_data_group.prepare_window(
         datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
-    assert window_data_group.window.events == [4]
+    assert window_data_group.window_source.events == [4]
 
 
 def test_window_type_count_missing_sesssions(
@@ -140,7 +140,7 @@ def test_window_type_count_missing_sesssions(
             match='Expecting 20 but not found 3 sessions'):
         window_data_group.prepare_window(
             datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
-    assert window_data_group.window.events == [4, 5, 6]
+    assert window_data_group.window_source.events == [4, 5, 6]
 
 
 def test_evaluate(window_data_group):

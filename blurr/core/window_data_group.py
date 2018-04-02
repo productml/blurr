@@ -27,7 +27,7 @@ class WindowDataGroupSchema(DataGroupSchema):
             self._spec[self.ATTRIBUTE_SOURCE])
 
 
-class _Window:
+class _WindowSource:
     """
     Represents a window on the pre-aggregated source data.
     """
@@ -47,7 +47,7 @@ class WindowDataGroup(DataGroup):
     def __init__(self, schema: WindowDataGroupSchema, identity: str,
                  evaluation_context: EvaluationContext) -> None:
         super().__init__(schema, identity, evaluation_context)
-        self.window = _Window()
+        self.window_source = _WindowSource()
 
     def prepare_window(self, start_time: datetime) -> None:
         """
@@ -58,13 +58,13 @@ class WindowDataGroup(DataGroup):
         # evaluate window first which sets the correct window in the store
         store = self.schema.source.store
         if self.schema.window_type == 'day' or self.schema.window_type == 'hour':
-            self.window.view = self._load_sessions(
+            self.window_source.view = self._load_sessions(
                 store.get_range(
                     Key(self.identity, self.schema.source.name, start_time),
                     Key(self.identity, self.schema.source.name,
                         self._get_end_time(start_time))))
         else:
-            self.window.view = self._load_sessions(
+            self.window_source.view = self._load_sessions(
                 store.get_range(
                     Key(self.identity, self.schema.source.name, start_time),
                     None, self.schema.window_value))
@@ -72,13 +72,14 @@ class WindowDataGroup(DataGroup):
         self._validate_view()
 
     def _validate_view(self):
-        if self.schema.window_type == 'count' and len(self.window.view) != abs(
-                self.schema.window_value):
+        if self.schema.window_type == 'count' and len(
+                self.window_source.view) != abs(self.schema.window_value):
             raise PrepareWindowMissingSessionsError(
                 'Expecting {} but not found {} sessions'.format(
-                    abs(self.schema.window_value), len(self.window.view)))
+                    abs(self.schema.window_value),
+                    len(self.window_source.view)))
 
-        if len(self.window.view) == 0:
+        if len(self.window_source.view) == 0:
             raise PrepareWindowMissingSessionsError(
                 'No matching sessions found')
 
@@ -111,5 +112,5 @@ class WindowDataGroup(DataGroup):
         ]
 
     def evaluate(self) -> None:
-        self.evaluation_context.local_context.add('source', self.window)
+        self.evaluation_context.local_context.add('source', self.window_source)
         super().evaluate()
