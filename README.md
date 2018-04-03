@@ -3,19 +3,12 @@
 [![CircleCI](https://circleci.com/gh/productml/blurr/tree/master.svg?style=svg)](https://circleci.com/gh/productml/blurr/tree/master)
 [![Documentation Status](https://readthedocs.org/projects/productml-blurr/badge/?version=latest)](http://productml-blurr.readthedocs.io/en/latest/?badge=latest)
 
-```
-We believe in a
-world where everyone is a
-data engineer
+>We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer. The lines are blurred (*cough*). Just like development and operations became DevOps over time
 
-A data scientist
-An ML engineer, ooh!
-The lines are blurred (cough)
+>-- Blurr authors
 
-Like development
-and operations became
-DevOps over time
-```
+
+# Table of contents
 
 - [Blurr is raw data to features](#turn-raw-data-into-features-for-machine-learning-without-etls)
 - [DTC at a glance](#dtc-at-a-glance)
