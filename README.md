@@ -2,7 +2,7 @@
 
 >We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer. The lines are blurred (*cough*). Just like development and operations became DevOps over time
 
->— Blurr authors
+>--- Blurr authors
 
 [![CircleCI](https://circleci.com/gh/productml/blurr/tree/master.svg?style=svg)](https://circleci.com/gh/productml/blurr/tree/master)
 [![Documentation Status](https://readthedocs.org/projects/productml-blurr/badge/?version=latest)](http://productml-blurr.readthedocs.io/en/latest/?badge=latest)
@@ -14,7 +14,8 @@ For production ML applications, __experimentation__ and __iteration speed__ is i
 ![Data Transformer](docs/images/data-transformer.png)
 
 >Coming up with features is difficult, time-consuming, requires expert knowledge. 'Applied machine learning' is basically feature engineering
->— Prof. Andrew Ng.
+
+>--- Andrew Ng
 
 # Table of contents
 

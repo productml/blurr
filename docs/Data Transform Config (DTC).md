@@ -31,7 +31,11 @@ When: source.package_version = '1.0'
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
 Type | The type of DTC - Streaming or Window | `Blurr:Streaming` or `Blurr:Window` | Required
+<<<<<<< HEAD:docs/Data Transform Config (DTC).md
+Version | Version number of the DTC, used by the Data Transformer Library to parse the template | Any `string` | Required
+=======
 Version | Version number of the DTC, used by the Data Transformer Library to parse the template | Specific DTC versions only `2018-03-07` | Required
+>>>>>>> master:docs/Data Transform Config (DTC).md
 Description | Text description for the DTC | Any `string`  | Optional
 Name | Unique name for the DTC | Any `string` | Required
 Identity | The dimension in the raw data around which data is aggregated | `source.<field>` | Required
