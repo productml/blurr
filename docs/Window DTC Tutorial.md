@@ -49,7 +49,7 @@ A result like this would be pretty conclusive: activating a boost increases enga
 In order to obtain the output described before, Blurr will perform __time-based aggregation__ over the historic session data obtained with the Streaming DTC in the first tutorial. This transformation is defined in a __Window DTC__:
 
 ```yaml
-Type: ProductML:DTC:Window
+Type: Blurr:DTC:Window
 Version: '2018-03-01'
 Name: boost_data
 
@@ -59,7 +59,7 @@ Anchor:
   Condition: source.event_id == "game_start" and source.boost == True
 
 DataGroups:
-  - Type: ProductML:DTC:DataGroup:AnchorAggregate
+  - Type: Blurr:DTC:DataGroup:AnchorAggregate
     Name: last_7_days
     Window:
       Type: day
@@ -71,7 +71,7 @@ DataGroups:
        Type: float
        Value: sum(source.games_played) / len(source.session_id)
 
-  - Type: ProductML:DTC:DataGroup:AnchorAggregate
+  - Type: Blurr:DTC:DataGroup:AnchorAggregate
     Name: next_3_days
     Window:
       Type: day
@@ -98,7 +98,7 @@ SourceDTC: sessions
 
 ```yaml
 # excerpt from Streaming DTC
-Type: ProductML:DTC:Streaming
+Type: Blurr:DTC:Streaming
 Version: '2018-03-07'
 Name : sessions
 ```
@@ -140,7 +140,7 @@ How each aggregated is calculated is defined by `AnchorAggregate` DataGroups:
 
 
 ```yaml
-- Type: ProductML:DTC:DataGroup:AnchorAggregate
+- Type: Blurr:DTC:DataGroup:AnchorAggregate
     Name: last_7_days
     Window:
       Type: day
@@ -174,7 +174,7 @@ In this case the input is session data produced in `session_stats` DataGroup in 
 ```yaml
 # excerpt from Streaming DTC
 DataGroups:
- - Type: ProductML:DTC:DataGroup:BlockAggregate
+ - Type: Blurr:DTC:DataGroup:BlockAggregate
    Name: session_stats
 ```
 
