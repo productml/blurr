@@ -76,4 +76,4 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3 :: Only",
     ],
-    entry_points={'console_scripts': ['blurr = __main__:main']})
+    entry_points={'console_scripts': ['blurr = blurr.__main__:main']})
