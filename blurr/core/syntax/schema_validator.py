@@ -1,6 +1,7 @@
 import ast
 from typing import Dict
 
+import os
 import re
 from yamale import yamale
 from yamale.schema import Data
@@ -64,11 +65,14 @@ VALIDATORS = {
     Expression.TAG: Expression
 }
 
+package_directory = os.path.dirname(os.path.abspath(__file__))
 STREAMING_SCHEMA = yamale.make_schema(
-    'blurr/core/syntax/dtc_streaming_schema.yml', validators=VALIDATORS)
+    os.path.join(package_directory, 'dtc_streaming_schema.yml'),
+    validators=VALIDATORS)
 
 WINDOW_SCHEMA = yamale.make_schema(
-    'blurr/core/syntax/dtc_window_schema.yml', validators=VALIDATORS)
+    os.path.join(package_directory, 'dtc_window_schema.yml'),
+    validators=VALIDATORS)
 
 
 def _validate_window(dtc_dict: Dict, name: str) -> None:

@@ -49,9 +49,10 @@ def test_multiple_dtc_files(out):
     assert 'invalid yaml' in out.stderr
 
 
-def test_invalid_dtc(out, snapshot):
+def test_invalid_dtc(out):
     code = run_command(['invalid_wrong_version.yml'], out)
     assert code == 1
+    assert 'Error validating data dtc with schema' in out.stderr
+    assert 'Version: \'2088-03-01\' not in (\'2018-03-01\',)' in out.stderr
     assert get_running_validation_str(
         'invalid_wrong_version.yml') in out.stdout
-    snapshot.assert_match(out.stderr)

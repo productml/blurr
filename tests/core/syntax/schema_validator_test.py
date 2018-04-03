@@ -33,8 +33,7 @@ def test_validation_errors_contain_dtc_name_and_schema_location():
     with raises(InvalidSchemaError) as err:
         dtc_dict = load_example('invalid_wrong_version.yml')
         validate(dtc_dict, 'dtc_name')
-    assert 'Error validating data dtc_name with schema blurr/core/syntax/dtc_streaming_schema.yml' in str(
-        err.value)
+    assert 'Error validating data dtc_name with schema' in str(err.value)
 
 
 def test_valid_basic_streaming_dtc():
