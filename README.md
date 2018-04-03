@@ -20,7 +20,6 @@ For production ML applications, __experimentation__ and __iteration speed__ is i
 
 # Table of contents
 
-- [What is Blurr?](#what-is-blurr)
 - [DTC at a glance](#dtc-at-a-glance)
 - [Tutorial & Docs](#tutorial-and-docs)
 - [Install](#use-blurr)
