@@ -46,7 +46,7 @@ def version():
         return "0." + os.getenv('CIRCLE_BUILD_NUM')
 
 
-# emit a VERSION file the CLI can use to cpheck current version
+# emit a VERSION file the CLI can use to check current version
 version_file = open("blurr/VERSION", "w")
 version_file.write(version())
 version_file.close()
