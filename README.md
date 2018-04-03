@@ -1,6 +1,6 @@
-# Turn raw data into features for machine learning without ETLs
+![Blurr](logo.png)
 
-[![CircleCI](https://circleci.com/gh/productml/blurr/tree/master.svg?style=svg)](https://circleci.com/gh/productml/blurr/tree/master) |
+[![CircleCI](https://circleci.com/gh/productml/blurr/tree/master.svg?style=svg)](https://circleci.com/gh/productml/blurr/tree/master)
 [![Documentation Status](https://readthedocs.org/projects/productml-blurr/badge/?version=latest)](http://productml-blurr.readthedocs.io/en/latest/?badge=latest)
 
 ```
@@ -17,18 +17,26 @@ and operations became
 DevOps over time
 ```
 
+- [What is Blurr](# Turn raw data into features for machine learning without ETLs)
+- [DTC at a glance](# DTC at a glance)
+- [Tutorial and Docs](#Tutorial and Docs)
+- [Install](#Use Blurr)
+- [Walkthroughs](#Walkthroughs)
+- [Contribute](#Contribute to Blurr)
+- [Data Science 'Joel Test'](#Data Science 'Joel Test')
+- [Get in touch](#Get in touch)
+- [Roadmap](#Roadmap)
+
+# Turn raw data into features for machine learning without ETLs
+
+Blurr transforms `raw data` into `features` for model training and prediction using a `high-level expressive YAML-based language` called the Data Transform Configuration (DTC).
+
+For production ML applications, `experimentation` and `iteration speed` is important. Working directly with raw data provides the most flexibility. Blurr allows product teams to iterate quickly during ML dev and provides a self-service way to take experiments to production.
+
 ![Data Transformer](docs/images/data-transformer.png)
 
-Blurr provides a `high-level expressive YAML-based language` called the Data Transform Configuration (DTC).
 
-The Streaming DTC aggregates raw data into blocks.
-
-![Blocks](docs/images/blocks-intro.png)
-
-Window DTC drops an anchor on a block and generates model features relative to that block.
-
-![Window](docs/images/window.png)
-
+# DTC at a glance
 
 Raw data like this
 
@@ -79,13 +87,13 @@ DataGroups:
 
      - Name: games_played
        Type: integer
-       When: source.event_id == 'game_start'
        Value: session_stats.games_played + 1
+       When: source.event_id == 'game_start'
 
      - Name: games_won
        Type: integer
-       When: source.event_id == 'game_end' and source.won == '1'
        Value: session_stats.games_won + 1
+       When: source.event_id == 'game_end' and source.won == '1'
 
 ```
 
@@ -97,15 +105,7 @@ DataGroups:
 
 [Read the docs](http://productml-blurr.readthedocs.io/en/latest/)
 
-
-# Walkthroughs
-Walkthroughs for using Blurr to build models for specific use cases.
-
-[Dynamic in-game offers (Offer AI)](examples/offer-ai/offer-ai-walkthrough.md)
-
-[Frequently Bought Together](examples/frequently-bought-together/fbt-walkthrough.md)
-
-# Install
+# Use Blurr
 
 We interact with Blurr using a Command Line Interface (CLI). Blurr is installed via pip:
 
@@ -121,6 +121,14 @@ $ blurr transform \
 ```
 
 [CLI documentation](http://productml-blurr.readthedocs.io/en/latest/Blurr%20CLI/)
+
+
+# Walkthroughs
+Walkthroughs for using Blurr to build models for specific use cases.
+
+[Dynamic in-game offers (Offer AI)](examples/offer-ai/offer-ai-walkthrough.md)
+
+[Frequently Bought Together](examples/frequently-bought-together/fbt-walkthrough.md)
 
 # Contribute to Blurr
 
