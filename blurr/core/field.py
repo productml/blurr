@@ -82,9 +82,8 @@ class Field(BaseItem, ABC):
 
         # Only set the value if it conforms to the field type
         if not self.schema.is_type_of(new_value):
-            raise TypeError(
-                'Value expression for {} returned an incompatible type.'.
-                format(self.name))
+            new_value = self.schema.type_object(new_value)
+            # TODO Resolve what to do in case of type cast failures
 
         self.value = new_value
 

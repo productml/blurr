@@ -10,17 +10,19 @@ class Map(ComplexTypeBase, dict):
 
     def set(self, key: Any, value: Any) -> None:
         """ Sets the value of a key to a supplied value """
-        self[key] = value
+        if key is not None:
+            self[key] = value
 
     def increment(self, key: Any, by: int = 1) -> None:
         """ Increments the value set against a key.  If the key is not present, 0 is assumed as the initial state """
-        self[key] = self.get(key, 0) + by
+        if key is not None:
+            self[key] = self.get(key, 0) + by
 
 
 class MapFieldSchema(FieldSchema):
     @property
     def type_object(self) -> Any:
-        return Map
+        return dict
 
     @property
     def default(self) -> Any:
@@ -31,13 +33,22 @@ class List(ComplexTypeBase, list):
     """
     Extends native list with operations for evaluation support.
     """
-    pass
+
+    def append(self, obj: Any) -> None:
+        """ Appends an object to the list as long as it is not None """
+        if obj is not None:
+            super().append(obj)
+
+    def insert(self, index: int, obj: Any) -> None:
+        """ Inserts an item to the list as long as it is not None """
+        if obj is not None:
+            super().insert(index, obj)
 
 
 class ListFieldSchema(FieldSchema):
     @property
     def type_object(self) -> Any:
-        return List
+        return list
 
     @property
     def default(self) -> Any:
@@ -48,13 +59,16 @@ class Set(ComplexTypeBase, set):
     """
     Extends native set with operations for evaluation support.
     """
-    pass
+    def add(self, element: Any) -> None:
+        """ Adds an element to the set as long as it is not None """
+        if element is not None:
+            super().add(element)
 
 
 class SetFieldSchema(FieldSchema):
     @property
     def type_object(self) -> Any:
-        return Set
+        return set
 
     @property
     def default(self) -> Any:
