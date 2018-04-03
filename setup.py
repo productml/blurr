@@ -2,7 +2,7 @@ import os
 
 from pipenv.project import Project
 from pipenv.utils import convert_deps_to_pip
-from setuptools import setup
+from setuptools import setup, find_packages
 '''
 This setup.py script is expected to perform development and final releases using 
 CircleCI (https://circleci.com/gh/productml/blurr).
@@ -60,15 +60,14 @@ setup(
     author="productml.com",
     author_email="info@productml.com",
     url="https://github.com/productml/blurr",
-    packages=['blurr'],
+    packages=find_packages(),
     install_requires=requirements(),
     python_requires='>=3.6',
     classifiers=[
         "Development Status :: 1 - Planning",  # https://pypi.python.org/pypi?%3Aaction=list_classifiers
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
-        # license commented out while deciding the final license
-        # "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
         "Topic :: Software Development :: Libraries :: Python Modules",
