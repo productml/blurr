@@ -68,9 +68,18 @@ DataGroups:
       - { Name: session_id, Type: string, Value: source.session_id }
       # Tests basic aggregation
       - { Name: events, Type: integer, Value: session.events + 1 }
-      - { Name: games_won, Type: integer, Value: session.games_won + 1, When: source.event_id == 'game_end' and source.won }
+
+      # Tests a combination of when conditions
+      - Name: games_won
+        Type: integer
+        Value: session.games_won + 1
+        When: source.event_id == 'game_end' and source.won
+
       # Tests list aggregation
-      - { Name: levels_played, Type: list, Value: session.levels_played.append(source.level), When: source.event_id == 'game_start' }
+      - Name: levels_played
+        Type: list
+        Value: session.levels_played.append(source.level)
+        When: source.event_id == 'game_start'
 
       # Tests Dictionary Aggregation
       - Name: badges
