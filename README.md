@@ -2,7 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/productml/blurr/tree/master.svg?style=svg)](https://circleci.com/gh/productml/blurr/tree/master)
 [![Documentation Status](https://readthedocs.org/projects/productml-blurr/badge/?version=latest)](http://productml-blurr.readthedocs.io/en/latest/?badge=latest)
-[![Coverage Status](https://coveralls.io/repos/github/productml/blurr/badge.svg?branch=master)](https://coveralls.io/github/productml/blurr?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/productml/blurr/badge.svg?branch=coverage-report)](https://coveralls.io/github/productml/blurr?branch=coverage-report)
 
 ```
 We believe in a
