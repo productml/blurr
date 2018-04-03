@@ -20,6 +20,7 @@ mypy = "*"
 yapf = "*"
 pipenv = "*"
 snapshottest = "*"
+twine = "*"
 
 
 [requires]

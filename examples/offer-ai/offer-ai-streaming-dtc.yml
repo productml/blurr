@@ -1,0 +1,94 @@
+####
+# Header block that defines the properties of this DTC
+####
+
+# Type of DTC. Streaming or Window
+# The Streaming DTC processes the raw data and converts it into sessions
+Type: Blurr:Streaming
+Version: '2018-03-07'
+Description: Generate sessions from streaming Raw Data
+Name: offer_ai_v1
+
+# The field in the raw data around which data is aggregated. This is usually a unique user id
+Identity: source.user_id
+
+Time: parse_time(source.event_time, 'YYYY/mm/dd HH:MM:SS')
+
+# A boolean expression that determines raw data to be processed if it evaluates to TRUE
+When: source.package_version = '1.0'
+
+# The raw data is converted to sessions and stored in persistent storage such as DynamoDB (a Store)
+# Store properties. Only DynamoDB is supported currently
+Store:
+
+   - Type: Blurr:Storage:DynamoDB
+     Name: offer_ai_dynamo
+     Retention: 180
+     Table: ProductML_Test_Win_Ratios
+
+DataGroups:
+
+   # IdentityAggregate is meant for user profile information that is rarely updated. This is processed first
+   # These are things like country, install source and whether user is logged in to Facebook
+ - Type: Blurr:DataGroup:IdentityAggregate
+   Name: user
+   Store: offer_ai_dynamo
+   When: source.event_id in ['app_launched', 'user_updated']
+
+   Fields:
+
+     - Name: user_id
+       Value: source.customer_identifier
+
+     - Name: country
+       Value: source.country
+
+     - Name: fb_connected
+       Value: source.fb
+
+
+   # BlockAggregates definition
+ - Type: Blurr:DataGroup:BlockAggregate
+   Name: game_stats
+   # We defined this store earlier
+   Store: offer_ai_dynamo
+   # Split defines when a new session is created when the boolean expression is TRUE
+   Split: source.session_id != session_id
+
+   Fields:
+
+     - Name: games_played
+       Type: integer # String is the default type and is used if type is not defined
+       Value: game_stats.games_played + 1
+       When: source.event_id == 'game_start'
+
+       # Any valid Python expression can be used for Value and When fields
+       # The underlying interpreter for DTCs is Python v3.6
+     - Name: games_won
+       Type: integer
+       Value: games_stats.games_won + 1
+       When: source.event_id == 'game_end' and source.won == '1'
+
+     - Name: win_ratio
+       Type: float
+       Value: game_stats.games_played/game_stats.games_won
+       When: source.event_id == 'game_end'
+
+     - Name: purchase_amount
+       Type: float
+       Value: games_stats.purchase_amount + source.txn_amount
+       When: source.event_id == 'purchase'
+
+     - Name: offer_type
+       Value: source.offer_type
+       When: source.event_id == 'offer_shown'
+
+     - Name: offer_purchased
+       Value: source.offer_purchased
+       Type: boolean
+       When: source.event_id == 'offer_shown'
+
+     - Name: offer_price
+       Type: float
+       Value: source.offer_price
+       When: source.event_id == 'offer_shown'
