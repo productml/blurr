@@ -6,7 +6,7 @@
 # The Streaming DTC processes the raw data and converts it into sessions
 
 Type: Blurr:Streaming
-Version: '2018-03-23'
+Version: '2018-03-07'
 Description: Level 1 transformation from streaming Raw Data
 Name: fbt_v1
 
