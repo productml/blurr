@@ -7,14 +7,19 @@ name = "pypi"
 
 [packages]
 
-pipenv = "*"
+pyyaml = "*"
+python-dateutil = "*"
+docopt = "*"
+yamale = "*"
 
 
 [dev-packages]
 
-
-twine = "*"
+pytest = "*"
+mypy = "*"
 yapf = "*"
+pipenv = "*"
+twine = "*"
 
 
 [requires]

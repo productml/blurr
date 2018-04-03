@@ -1,0 +1,32 @@
+Type: 'Blurr:Streaming'
+Version: '2018-03-01'
+Description: 'Level 1 trasnformation from streaming Raw Data'
+Name: Sessions
+Identity: source.user_id
+Time: parser.parse(source.event_time)
+Stores:
+  -
+    Type: 'Blurr:Store:MemoryStore'
+    Name: memory
+DataGroups:
+  -
+    Type: 'Blurr:DataGroup:VariableAggregate'
+    Name: vars
+    Fields:
+      - { Name: continent, Type: string, Value: '''North America'' if source.country == ''US'' else ''World''', When: bool(source.country) }
+  -
+    Type: 'Blurr:DataGroup:IdentityAggregate'
+    Name: state
+    Store: memory
+    Fields:
+      - { Name: country, Type: string, Value: source.country }
+      - { Name: continent, Type: string, Value: vars.continent, When: bool(vars.continent) }
+  -
+    Type: 'Blurr:DataGroup:BlockAggregate'
+    Name: session
+    Split: '(time - session.end_time).seconds > 1800'
+    Store: memory
+    Fields:
+      - { Name: events, Type: integer, Value: 'session.events + 1' }
+      - { Name: country, Type: string, Value: source.country }
+      - { Name: continent, Type: string, Value: vars.continent, When: bool(vars.continent) }

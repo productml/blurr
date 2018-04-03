@@ -12,7 +12,7 @@ Name: offer_ai_v1
 # The field in the raw data around which data is aggregated. This is usually a unique user id
 Identity: source.user_id
 
-Time: parse_time(source.event_time, 'YYYY/mm/dd HH:MM:SS')
+Time: parser.parse(source.event_time) #This tells the DTC that source.event_time is time of the source event
 
 # A boolean expression that determines raw data to be processed if it evaluates to TRUE
 When: source.package_version = '1.0'
