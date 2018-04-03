@@ -21,15 +21,14 @@ class BaseSchema(ABC):
     def __init__(self, fully_qualified_name: str,
                  schema_loader: SchemaLoader) -> None:
         """
-        A schema object must be initialized with a schema spec
-        :param spec: Dictionary representation of the YAML schema spec
+        Initializes a schema by providing the path to the schema and the schema loader resource
+        :param fully_qualified_name: Fully qualified path to the schema
+        :param schema_loader: Schema repository that returns schema spec by fully qualified name
         """
         self.schema_loader = schema_loader
         self.fully_qualified_name = fully_qualified_name
-        self._spec: Dict[str, Any] = self.schema_loader.get_schema_spec(
-            self.fully_qualified_name)
-
-        self.extend_schema()
+        self._spec: Dict[str, Any] = self.extend_schema(
+            self.schema_loader.get_schema_spec(self.fully_qualified_name))
 
         self.name: str = self._spec[self.ATTRIBUTE_NAME]
         self.type: str = self._spec[self.ATTRIBUTE_TYPE]
@@ -37,8 +36,9 @@ class BaseSchema(ABC):
             self._spec[self.ATTRIBUTE_WHEN]
         ) if self.ATTRIBUTE_WHEN in self._spec else None
 
-    def extend_schema(self):
-        pass
+    def extend_schema(self, spec: Dict[str, Any]):
+        """ Extends the defined schema specifications at runtime with defaults """
+        return spec
 
 
 class BaseSchemaCollection(BaseSchema, ABC):
@@ -49,9 +49,10 @@ class BaseSchemaCollection(BaseSchema, ABC):
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader,
                  nested_schema_attribute: str) -> None:
         """
-        Initializes the schema for schema that contain a nested schema
-        :param spec:
-        :param nested_schema_attribute:
+        Initializes a schema collection with nested items
+        :param fully_qualified_name: Fully qualified path to the schema
+        :param schema_loader: Schema repository that returns schema spec by fully qualified name
+        :param nested_schema_attribute: Name of the attribute that contains the nested elements
         """
         super().__init__(fully_qualified_name, schema_loader)
 

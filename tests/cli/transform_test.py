@@ -37,6 +37,7 @@ def test_transform_only_stream(capsys) -> None:
                      Out()) == 0
     out, err = capsys.readouterr()
     assert_record_in_ouput(('userA/session/2018-03-07T22:35:31+00:00', {
+        'identity': 'userA',
         'start_time': '2018-03-07 22:35:31+00:00',
         'end_time': '2018-03-07 22:35:31+00:00',
         'events': 1,
@@ -44,10 +45,12 @@ def test_transform_only_stream(capsys) -> None:
         'continent': 'North America'
     }), out)
     assert_record_in_ouput(('userA/state', {
+        'identity': 'userA',
         'country': 'IN',
         'continent': 'World'
     }), out)
     assert_record_in_ouput(('userA/session', {
+        'identity': 'userA',
         'start_time': '2018-03-07 23:35:31+00:00',
         'end_time': '2018-03-07 23:35:32+00:00',
         'events': 2,
@@ -62,7 +65,9 @@ def test_transform_valid(capsys) -> None:
                      ['tests/data/raw.json'], Out()) == 0
     out, err = capsys.readouterr()
     assert_record_in_ouput(('userA', [{
+        'last_session.identity': 'userA',
         'last_session.events': 1,
+        'last_day.identity': 'userA',
         'last_day.total_events': 1
     }]), out)
     assert err == ''

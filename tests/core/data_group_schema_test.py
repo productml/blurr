@@ -31,13 +31,23 @@ class MockDataGroupSchema(DataGroupSchema):
     pass
 
 
+def test_data_group_identity_field(data_group_schema_spec):
+    schema_loader = SchemaLoader()
+    del data_group_schema_spec['Store']
+    name = schema_loader.add_schema(data_group_schema_spec)
+
+    data_group_schema = MockDataGroupSchema(name, schema_loader)
+    assert len(data_group_schema.nested_schema) == 2
+    assert 'identity' in data_group_schema.nested_schema
+
+
 def test_data_group_schema_initialization_with_store(data_group_schema_spec,
                                                      store_spec):
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(data_group_schema_spec)
     with pytest.raises(
             InvalidSchemaError, match="user.memory not declared in schema"):
-        data_group_schema = MockDataGroupSchema(name, schema_loader)
+        MockDataGroupSchema(name, schema_loader)
 
     schema_loader.add_schema(store_spec, 'user')
     data_group_schema = MockDataGroupSchema(name, schema_loader)

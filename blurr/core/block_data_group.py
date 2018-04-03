@@ -21,18 +21,23 @@ class BlockDataGroupSchema(DataGroupSchema):
             self._spec[self.ATTRIBUTE_SPLIT]
         ) if self.ATTRIBUTE_SPLIT in self._spec else None
 
-    def extend_schema(self):
-        # Alter the spec to introduce the block start and end time implicitly
-        # handled fields
-        predefined_field = self._build_predefined_fields_spec(
-            self._spec[self.ATTRIBUTE_NAME])
-        self._spec[self.ATTRIBUTE_FIELDS][0:0] = predefined_field
+    def extend_schema(self, spec: Dict[str, Any]):
+        """ Injects the block start and end times """
+
+        # Add new fields to the schema spec
+        predefined_field = self._build_block_start_end_fields_spec(
+            spec[self.ATTRIBUTE_NAME])
+        spec[self.ATTRIBUTE_FIELDS][0:0] = predefined_field
+
+        # Add new field schema to the schema loader
         for field_schema in predefined_field:
             self.schema_loader.add_schema(field_schema,
                                           self.fully_qualified_name)
 
+        return super().extend_schema(spec)
+
     @staticmethod
-    def _build_predefined_fields_spec(
+    def _build_block_start_end_fields_spec(
             name_in_context: str) -> List[Dict[str, Any]]:
         """
         Constructs the spec for predefined fields that are to be included in the master spec prior to schema load

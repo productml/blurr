@@ -1,4 +1,4 @@
-from typing import Dict, Type
+from typing import Dict, Type, Any, List
 
 from abc import ABC
 
@@ -40,6 +40,24 @@ class DataGroupSchema(BaseSchemaCollection, ABC):
             self.schema_loader.get_transformer_name(self.fully_qualified_name),
             store_name)
         return self.schema_loader.get_schema_object(store_fq_name)
+
+    def extend_schema(self, spec: Dict[str, Any]):
+        """ Injects the identity field """
+
+        # Add new field to the schema spec
+        identity_field = self._build_identity_field_spec()
+        spec[self.ATTRIBUTE_FIELDS].insert(0, identity_field)
+
+        # Add new field schema to the schema loader
+        self.schema_loader.add_schema(identity_field,
+                                      self.fully_qualified_name)
+
+        return super().extend_schema(spec)
+
+    @staticmethod
+    def _build_identity_field_spec() -> Dict[str, Any]:
+        """ Constructs the spec for an identity field """
+        return {'Name': 'identity', 'Type': 'string', 'Value': 'identity'}
 
 
 class DataGroup(BaseItemCollection, ABC):
