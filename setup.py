@@ -57,6 +57,7 @@ setup(
     description=
     "Data aggregation pipeline for running real-time predictive models",
     long_description=readme(),
+    long_description_content_type='text/markdown',
     author="productml.com",
     author_email="info@productml.com",
     url="https://github.com/productml/blurr",
