@@ -52,6 +52,11 @@ class DataGroupSchema(BaseSchemaCollection, ABC):
         self.schema_loader.add_schema(identity_field,
                                       self.fully_qualified_name)
 
+        # If field type is missing, set it to string by default
+        for field in spec[self.ATTRIBUTE_FIELDS]:
+            if self.ATTRIBUTE_TYPE not in field:
+                field[self.ATTRIBUTE_TYPE] = 'string'
+
         return super().extend_schema(spec)
 
     @staticmethod
