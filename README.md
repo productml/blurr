@@ -1,11 +1,11 @@
 ![Blurr](logo.png)
 
-[![CircleCI](https://circleci.com/gh/productml/blurr/tree/master.svg?style=svg)](https://circleci.com/gh/productml/blurr/tree/master)
-[![Documentation Status](https://readthedocs.org/projects/productml-blurr/badge/?version=latest)](http://productml-blurr.readthedocs.io/en/latest/?badge=latest)
-
 >We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer. The lines are blurred (*cough*). Just like development and operations became DevOps over time
 
 >-- Blurr authors
+
+[![CircleCI](https://circleci.com/gh/productml/blurr/tree/master.svg?style=svg)](https://circleci.com/gh/productml/blurr/tree/master)
+[![Documentation Status](https://readthedocs.org/projects/productml-blurr/badge/?version=latest)](http://productml-blurr.readthedocs.io/en/latest/?badge=latest)
 
 Blurr transforms `raw data` into `features` for model training and prediction using a `high-level expressive YAML-based language` called the Data Transform Configuration (DTC).
 
@@ -20,7 +20,6 @@ For production ML applications, __experimentation__ and __iteration speed__ is i
 - [Install](#use-blurr)
 - [Contribute](#contribute-to-blurr)
 - [Data Science 'Joel Test'](#data-science-joel-test)
-- [Get in touch](#get-in-touch)
 - [Roadmap](#roadmap)
 
 # DTC at a glance
@@ -130,9 +129,7 @@ Inspired by the (old school) [Joel Test](https://www.joelonsoftware.com/2000/08/
 4. Successful ML is a long game. You play it like it is
 5. Kaizen. Experimentation and iterations are a way of life
 
-# Get in touch
-
-Email us at blurr@productml.com or star this project to stay in touch!
+__Stay in touch!__ Star this project or email hello@blurr.ai
 
 # Roadmap
 
