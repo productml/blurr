@@ -1,7 +1,5 @@
-# Turn raw data into features for machine learning without ETLs
 ![Blurr](logo.png)
 
-[![CircleCI](https://circleci.com/gh/productml/blurr/tree/master.svg?style=svg)](https://circleci.com/gh/productml/blurr/tree/master) |
 >We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer. The lines are blurred (*cough*). Just like development and operations became DevOps over time
 
 >--- Blurr authors
