@@ -9,7 +9,6 @@ from blurr.core.schema_loader import SchemaLoader
 from blurr.core.variable_data_group import VariableDataGroup, \
     VariableDataGroupSchema
 
-
 # Test custom functions implemented for complex fields
 
 

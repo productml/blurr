@@ -59,6 +59,7 @@ class Set(ComplexTypeBase, set):
     """
     Extends native set with operations for evaluation support.
     """
+
     def add(self, element: Any) -> None:
         """ Adds an element to the set as long as it is not None """
         if element is not None:
