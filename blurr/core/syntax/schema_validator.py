@@ -6,6 +6,7 @@ import re
 from yamale import yamale
 from yamale.schema import Data
 from yamale.validators import DefaultValidators, Validator
+from yamale.validators.constraints import Constraint
 
 from blurr.core.errors import InvalidSchemaError
 
@@ -22,6 +23,19 @@ def is_expression(s: str) -> bool:
 
 def is_identifier(s: str) -> bool:
     return len(re.findall(r'[^\S]', s)) == 0
+
+
+
+
+class StringExclude(Constraint):
+    keywords = {'exclude': list}
+    fail = '\'%s\' is a reserved keyword.  Please try another.'
+
+    def _is_valid(self, value):
+        return value not in self.exclude
+
+    def _fail(self, value):
+        return self.fail % value
 
 
 class DataType(Validator):
@@ -41,6 +55,7 @@ class DataType(Validator):
 
 class Identifier(Validator):
     TAG = 'identifier'
+    constraints = [StringExclude]
 
     def _is_valid(self, value: str) -> bool:
         return is_identifier(value)

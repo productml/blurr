@@ -33,7 +33,7 @@ data_group_block:
   Fields: list(include('field'), min=1)
 
 field:
-  Name: identifier()
+  Name: identifier(exclude=['name', 'identity', 'needs_evaluation', 'schema', 'snapshot', 'nested_items', 'evaluation_context', 'window_source'])
   Type: data_type(required=False)
   Value: expression()
   When: expression(required=False)
