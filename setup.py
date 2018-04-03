@@ -46,7 +46,7 @@ def version():
         return "0." + os.getenv('CIRCLE_BUILD_NUM')
 
 
-# emit a VERSION file the CLI can use to check current version
+# emit a VERSION file the CLI can use to cpheck current version
 version_file = open("blurr/VERSION", "w")
 version_file.write(version())
 version_file.close()
@@ -60,7 +60,7 @@ setup(
     author="productml.com",
     author_email="info@productml.com",
     url="https://github.com/productml/blurr",
-    packages=find_packages(include="blurr"),
+    packages=find_packages(),
     data_files=[
         "blurr/core/syntax/dtc_window_schema.yml",
         "blurr/core/syntax/dtc_streaming_schema.yml"
