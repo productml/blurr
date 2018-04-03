@@ -1,0 +1,24 @@
+Type: Blurr:Window
+Version: '2018-03-01'
+Description: Second Level processing for feature generation
+Name: ProductMLExample
+SourceDTC: offer_ai_v1
+Anchor:
+  Condition:  offer_ai_v1.game_stats.offer_type != ''
+  Max: 1
+DataGroups:
+  - Type: Blurr:DataGroup:WindowAggregate
+    Name: last_session
+    WindowType: count
+    WindowValue: -1
+    Source: offer_ai_v1.game_stats
+    Name: prev_session
+    Fields:
+      - Name: games_played_last_session
+        Type: integer
+        Value: prev_session.games_played[0]
+        When: last_session = None
+      - Name: win_ratio_last_session
+        Type: float
+        Value: prev_session.win_ratio[0]
+        Atomic: true

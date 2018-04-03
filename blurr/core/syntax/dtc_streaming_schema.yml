@@ -1,0 +1,44 @@
+Type: enum('Blurr:Streaming')
+Version: enum('2018-03-01')
+Description: str(min=1, required=False)
+Name: identifier()
+Identity: expression()
+Time: expression(required=True)
+When: expression(required=False)
+Stores: List(any(include('memory_store')), min=1)
+DataGroups: list(any(include('data_group_variable'), include('data_group_identity'), include('data_group_block')), min=1)
+
+---
+
+data_group_variable:
+  Name: identifier()
+  Type: enum('Blurr:DataGroup:VariableAggregate')
+  Store: identifier(required=False)
+  When: expression(required=False)
+  Fields: list(include('field'), min=1)
+
+data_group_identity:
+  Name: identifier()
+  Type: enum('Blurr:DataGroup:IdentityAggregate')
+  Store: identifier(required=False)
+  When: expression(required=False)
+  Fields: list(include('field'), min=1)
+
+data_group_block:
+  Name: identifier()
+  Type: enum('Blurr:DataGroup:BlockAggregate')
+  Store: identifier(required=False)
+  When: expression(required=False)
+  Split: expression(required=False)
+  Fields: list(include('field'), min=1)
+
+field:
+  Name: identifier()
+  Type: data_type(required=False)
+  Value: expression()
+  When: expression(required=False)
+  Atomic: bool(required=False)
+
+memory_store:
+  Type: enum('Blurr:Store:MemoryStore')
+  Name: identifier()

@@ -1,0 +1,5 @@
+{"user_id": "userA", "event_time": "2018-03-07T22:35:31+00:00", "country": "US"}
+{"user_id": "userA", "event_time": "2018-03-07T23:35:31+00:00", "country": "IN"}
+{"user_id": "userA", "event_time": "2018-03-07T23:35:32+00:00"}
+{"user_id": "userB", "event_time": "2018-03-07T22:35:31+00:00"}
+{"user_id": "userC", "event_time": "2018-03-07T22:35:31+00:00"}
