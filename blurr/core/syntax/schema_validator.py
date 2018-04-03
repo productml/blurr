@@ -65,13 +65,13 @@ VALIDATORS = {
     Expression.TAG: Expression
 }
 
-package_directory = os.path.dirname(os.path.abspath(__file__))
+PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
 STREAMING_SCHEMA = yamale.make_schema(
-    os.path.join(package_directory, 'dtc_streaming_schema.yml'),
+    os.path.join(PACKAGE_DIR, 'dtc_streaming_schema.yml'),
     validators=VALIDATORS)
 
 WINDOW_SCHEMA = yamale.make_schema(
-    os.path.join(package_directory, 'dtc_window_schema.yml'),
+    os.path.join(PACKAGE_DIR, 'dtc_window_schema.yml'),
     validators=VALIDATORS)
 
 
