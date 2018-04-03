@@ -19,7 +19,6 @@ pytest = "*"
 mypy = "*"
 yapf = "*"
 pipenv = "*"
-snapshottest = "*"
 twine = "*"
 
 
