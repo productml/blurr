@@ -29,7 +29,7 @@ def requirements():
 
 
 def readme():
-    with open('README.md') as f:
+    with open('README.md', 'r', encoding='utf-8') as f:
         return f.read()
 
 
@@ -61,10 +61,7 @@ setup(
     author_email="info@productml.com",
     url="https://github.com/productml/blurr",
     packages=find_packages(),
-    data_files=[
-        "blurr/core/syntax/dtc_window_schema.yml",
-        "blurr/core/syntax/dtc_streaming_schema.yml"
-    ],
+    include_package_data=True,
     install_requires=requirements(),
     python_requires='>=3.6',
     classifiers=[
