@@ -17,14 +17,14 @@ and operations became
 DevOps over time
 ```
 
-- [What is Blurr](# Turn raw data into features for machine learning without ETLs)
-- [DTC at a glance](# DTC at a glance)
-- [Tutorial and Docs](#Tutorial and Docs)
-- [Install](#Use Blurr)
+- [What is Blurr](# Turn-raw-data-into-features-for-machine-learning-without-ETLs)
+- [DTC at a glance](# DTC-at-a-glance)
+- [Tutorial and Docs](#Tutorial-and-Docs)
+- [Install](#Use-Blurr)
 - [Walkthroughs](#Walkthroughs)
-- [Contribute](#Contribute to Blurr)
-- [Data Science 'Joel Test'](#Data Science 'Joel Test')
-- [Get in touch](#Get in touch)
+- [Contribute](#Contribute-to-Blurr)
+- [Data Science 'Joel Test'](#Data-Science-'Joel-Test')
+- [Get in touch](#Get-in-touch)
 - [Roadmap](#Roadmap)
 
 # Turn raw data into features for machine learning without ETLs
