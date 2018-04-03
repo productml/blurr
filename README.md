@@ -8,26 +8,26 @@
 >-- Blurr authors
 
 
+# What is Blurr?
+
+>Raw data to features for machine learning with serverless data transforms
+
+Blurr transforms `raw data` into `features` for model training and prediction using a `high-level expressive YAML-based language` called the Data Transform Configuration (DTC).
+
+For production ML applications, __experimentation__ and __iteration speed__ is important. Working directly with raw data provides the most flexibility. Blurr allows product teams to iterate quickly during ML dev and provides a self-service way to take experiments to production.
+
+![Data Transformer](docs/images/data-transformer.png)
+
 # Table of contents
 
-- [Blurr is raw data to features](#turn-raw-data-into-features-for-machine-learning-without-etls)
+- [What is Blurr?](#what-is-blurr)
 - [DTC at a glance](#dtc-at-a-glance)
-- [Tutorial and Docs](#tutorial-and-docs)
+- [Tutorial & Docs](#tutorial-and-docs)
 - [Install](#use-blurr)
-- [Walkthroughs](#walkthroughs)
 - [Contribute](#contribute-to-blurr)
 - [Data Science 'Joel Test'](#data-science-joel-test)
 - [Get in touch](#get-in-touch)
 - [Roadmap](#roadmap)
-
-# Turn raw data into features for machine learning without ETLs
-
-Blurr transforms `raw data` into `features` for model training and prediction using a `high-level expressive YAML-based language` called the Data Transform Configuration (DTC).
-
-For production ML applications, `experimentation` and `iteration speed` is important. Working directly with raw data provides the most flexibility. Blurr allows product teams to iterate quickly during ML dev and provides a self-service way to take experiments to production.
-
-![Data Transformer](docs/images/data-transformer.png)
-
 
 # DTC at a glance
 
@@ -92,11 +92,14 @@ DataGroups:
 
 # Tutorial and Docs
 
+[Read the docs](http://productml-blurr.readthedocs.io/en/latest/)
+
 [Streaming DTC Tutorial](http://productml-blurr.readthedocs.io/en/latest/Streaming%20dtc%20tutorial/) |
 [Window DTC Tutorial](http://productml-blurr.readthedocs.io/en/latest/Window%20dtc%20tutorial/)
 
+Preparing data for specific use cases using Blurr
 
-[Read the docs](http://productml-blurr.readthedocs.io/en/latest/)
+[Dynamic in-game offers (Offer AI)](examples/offer-ai/offer-ai-walkthrough.md) | [Frequently Bought Together](examples/frequently-bought-together/fbt-walkthrough.md)
 
 # Use Blurr
 
@@ -114,14 +117,6 @@ $ blurr transform \
 ```
 
 [CLI documentation](http://productml-blurr.readthedocs.io/en/latest/Blurr%20CLI/)
-
-
-# Walkthroughs
-Walkthroughs for using Blurr to build models for specific use cases.
-
-[Dynamic in-game offers (Offer AI)](examples/offer-ai/offer-ai-walkthrough.md)
-
-[Frequently Bought Together](examples/frequently-bought-together/fbt-walkthrough.md)
 
 # Contribute to Blurr
 
