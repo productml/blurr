@@ -7,11 +7,6 @@
 
 >-- Blurr authors
 
-
-# What is Blurr?
-
->Raw data to features for machine learning with serverless data transforms
-
 Blurr transforms `raw data` into `features` for model training and prediction using a `high-level expressive YAML-based language` called the Data Transform Configuration (DTC).
 
 For production ML applications, __experimentation__ and __iteration speed__ is important. Working directly with raw data provides the most flexibility. Blurr allows product teams to iterate quickly during ML dev and provides a self-service way to take experiments to production.
