@@ -4,7 +4,7 @@
 
 # Type of DTC. Streaming or Window
 # The Window DTC periodically applies windows operations on top of sessionized data
-Type: ProductML:DTC:Window
+Type: Blurr:Window
 
 Version: '2018-03-23'
 Description: Second Level processing for feature generation
@@ -33,7 +33,7 @@ Anchor:
 # Defines the Store properties
 Store:
 
-   - Type: ProductML:DTC:Storage:S3
+   - Type: Blurr:Storage:S3
      Name: s3
      Bucket: fbt-example
      Prefix: /dtc-test/window/
@@ -41,7 +41,7 @@ Store:
 
 DataGroups:
 
- - Type: ProductML:DTC:DataGroup:AnchorAggregate
+ - Type: Blurr:DataGroup:AnchorAggregate
    Name: lifetime
 
    Window:
@@ -63,7 +63,7 @@ DataGroups:
        Type: float
        Value: sum(session_stats.transaction_value_this_session)
 
- - Type: ProductML:DTC:DataGroup:AnchorAggregate
+ - Type: Blurr:DataGroup:AnchorAggregate
    Name: last_24_hours
 
    Window:
@@ -74,9 +74,10 @@ DataGroups:
    Fields:
      - Name: products_bought
        Type: list
-       Value: last_24_hours.products_bought.append(item_stats.products_bought)
+       Value: [item for sublist in source.products_bought for item in sublist]
+       # Flattens the list of list of tuples of products_bought
 
- - Type: ProductML:DTC:DataGroup:AnchorAggregate
+ - Type: Blurr:DataGroup:AnchorAggregate
    Name: next_24_hours
 
    Window:
@@ -87,13 +88,14 @@ DataGroups:
    Fields:
      - Name: products_bought
        Type: list
-       Value: next_24_hours.products_bought.append(item_stats.products_bought)
+       Value: [item for sublist in source.products_bought for item in sublist]
+      # Flattens the list of list of tuples of products_bought
 
- - Type: ProductML:DTC:DataGroup:AnchorAggregate
+ - Type: Blurr:DataGroup:AnchorAggregate
    Name: 48_hours_around_transaction
 
    Fields:
      - Name: products_bought
        Type: list
-       Value: sorted(last_24_hours.products_bought.append(next_24_hours.products_bought).items(), key=operator.itemgetter(1), reverse=True)[:3]
+       Value: sorted(last_24_hours.products_bought.extend(next_24_hours.products_bought), key=lambda x: x[1], reverse=True)[:3]
        # combining the 2 lists, sorting by descending order of value (most expensive items first) and then picking the top 3

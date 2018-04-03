@@ -5,7 +5,7 @@
 # Type of DTC. Streaming or Window
 # The Streaming DTC processes the raw data and converts it into sessions
 
-Type: ProductML:DTC:Streaming
+Type: Blurr:Streaming
 Version: '2018-03-23'
 Description: Level 1 transformation from streaming Raw Data
 Name: fbt_v1
@@ -13,7 +13,7 @@ Name: fbt_v1
 # The field in the raw data around which data is aggregated. This is usually a unique user id
 
 Identity: source.appInstanceId
-Time: parse_time(source.event_time, 'YYYY/mm/dd HH:MM:SS')
+Time: parser.parse(source.start_time) #This tells the DTC that source.start_time is time of the source event
 
 ##
 # The raw data is converted to sessions and stored in persistent storage such as DynamoDB (a Store)
@@ -21,14 +21,14 @@ Time: parse_time(source.event_time, 'YYYY/mm/dd HH:MM:SS')
 ##
 
 Store:
-   - Type: ProductML:DTC:Storage:DynamoDB
+   - Type: Blurr:Storage:DynamoDB
      Name: fbt_v1_dynamo
      Retention: 180
      Table: fbt_test
 
 DataGroups:
 
- - Type: ProductML:DTC:DataGroup:IdentityAggregate
+ - Type: Blurr:DataGroup:IdentityAggregate
    Name: user
    Store: fbt_v1_dynamo
    When: source.event_name = 'session_start'
@@ -50,14 +50,25 @@ DataGroups:
        Value: source.country
 
     Fields:
+     - Name: install_date
+       Type: datetime
+       Value: time
+       # time is defined above as the start time of the event
+       When: user.time > time
+       # This field only gets updated if the current field (user.time)
+       # is later than the time of the event being processed, so user.time will
+       # always be the first event that was seen for the user
+
+
+    Fields:
      - Name: days_since_install
-       Value: datetime.strptime("source.start_time", "%d %m %Y") - datetime.strptime("source.first_open_time", "%d %m %Y")
+       Value: (time - user.time).days
 
 ##
 # Session aggregates definition
 ##
 
- - Type: ProductML:DTC:DataGroup:SessionAggregate
+ - Type: Blurr:DataGroup:BlockAggregate
    Name: item_stats
    Store: fbt_v1_dynamo
    Split: source.session_id != session_id
@@ -72,13 +83,13 @@ DataGroups:
    Fields:
      - Name: transaction_value_this_session
        Type: float
-       Value: sum(source.value)
+       Value: sum([float(val.strip()) for val in source.value.split(',')])
        #This also sums all the values in the list if multiple items were bought in one transaction
        When: source.event_name = 'ecommerce_purchase' and source.currency = 'usd'
 
    Fields:
      - Name: products_bought
        Type: list
-       Value: zip(item_stats.products_bought.append(source.item_id), item_stats.products_bought.append(source.value))
+       Value: item_stats.products_bought.extend(list(zip([val.strip() for val in source.item_id.split(',')], [float(val.strip()) for val in source.value.split(',')])))
        # This creates a list of tuples [(item_id1, value1), (item_id2, value2)...]
        When: source.event_name = 'ecommerce_purchase' and source.currency = 'usd'
