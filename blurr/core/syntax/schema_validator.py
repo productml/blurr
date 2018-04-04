@@ -71,8 +71,7 @@ STREAMING_SCHEMA = yamale.make_schema(
     validators=VALIDATORS)
 
 WINDOW_SCHEMA = yamale.make_schema(
-    os.path.join(PACKAGE_DIR, 'dtc_window_schema.yml'),
-    validators=VALIDATORS)
+    os.path.join(PACKAGE_DIR, 'dtc_window_schema.yml'), validators=VALIDATORS)
 
 
 def _validate_window(dtc_dict: Dict, name: str) -> None:
