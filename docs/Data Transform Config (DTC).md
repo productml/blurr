@@ -47,7 +47,7 @@ When | Boolean expression that defines which raw data should be processed | Any 
 At the end of a transform, data is persisted in the store. The Data Transform Library (DTL) works with an abstraction of storage which isolates the actual storage tier from how it works with the DTL.
 
 ```YAML
-Store:
+Stores:
    - Type: Blurr:Store:MemoryStore
      Name: hello_world_store
 ```
@@ -218,7 +218,7 @@ When the number of blocks that satisfy the anchor condition is more than the max
 
 
 ```YAML
-Store:
+Stores:
    - Type: Blurr:Store:MemoryStore
      Name: hello_world_store
 ```
