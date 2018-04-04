@@ -1,4 +1,4 @@
-from typing import Dict, Type, Any, List
+from typing import Dict, Type, Any
 
 from abc import ABC
 

@@ -60,8 +60,8 @@ class BaseSchemaCollection(BaseSchema, ABC):
         # Load nested schema items
         self.nested_schema: Dict[str, Type[BaseSchema]] = {
             schema_spec[self.ATTRIBUTE_NAME]:
-            self.schema_loader.get_nested_schema_object(
-                self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
+                self.schema_loader.get_nested_schema_object(
+                    self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
             for schema_spec in self._spec[self._nested_item_attribute]
         }
 
@@ -192,6 +192,16 @@ class BaseItemCollection(BaseItem):
             return self.nested_items[item].snapshot
 
         return self.__getattribute__(item)
+
+    def __getitem__(self, item):
+        """
+        Makes the nested items available though the square bracket notation.
+        :raises KeyError: When a requested item is not found in nested items
+        """
+        if item not in self.nested_items:
+            raise KeyError('{item} not defined in {name}'.format(item=item, name=self.name))
+
+        return self.nested_items[item].snapshot
 
     @abstractmethod
     def finalize(self) -> None:
