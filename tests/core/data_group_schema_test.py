@@ -67,7 +67,7 @@ def test_data_group_schema_initialization_without_store(
     assert data_group_schema.store is None
 
 
-def test_field_without_type(data_group_schema_spec):
+def test_field_without_type_defaults_to_string(data_group_schema_spec):
     schema_loader = SchemaLoader()
     del data_group_schema_spec['Store']
     name = schema_loader.add_schema(data_group_schema_spec)
