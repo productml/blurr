@@ -18,18 +18,15 @@ class WindowTransformerSchema(TransformerSchema):
 
     ATTRIBUTE_ANCHOR = 'Anchor'
 
-    def __init__(self, fully_qualified_name: str,
-                 schema_loader: SchemaLoader) -> None:
+    def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
 
         # Inject name and type as expected by BaseSchema
         self._spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_NAME] = 'anchor'
         self._spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_TYPE] = 'anchor'
-        self.schema_loader.add_schema(self._spec[self.ATTRIBUTE_ANCHOR],
-                                      self.fully_qualified_name)
+        self.schema_loader.add_schema(self._spec[self.ATTRIBUTE_ANCHOR], self.fully_qualified_name)
 
-        self.anchor = self.schema_loader.get_schema_object(
-            self.fully_qualified_name + '.anchor')
+        self.anchor = self.schema_loader.get_schema_object(self.fully_qualified_name + '.anchor')
 
 
 class WindowTransformer(Transformer):
@@ -38,11 +35,9 @@ class WindowTransformer(Transformer):
     block data.
     """
 
-    def __init__(self, schema: WindowTransformerSchema, identity: str,
-                 context: Context) -> None:
+    def __init__(self, schema: WindowTransformerSchema, identity: str, context: Context) -> None:
         super().__init__(schema, identity, context)
-        self.anchor = Anchor(
-            schema.anchor, EvaluationContext(global_context=context))
+        self.anchor = Anchor(schema.anchor, EvaluationContext(global_context=context))
 
     def evaluate_anchor(self, block: BlockDataGroup) -> bool:
         """
@@ -51,8 +46,7 @@ class WindowTransformer(Transformer):
         :return: True, if the anchor condition is met, otherwise, False.
         """
         # Set up context so that anchor can process the block
-        self.evaluation_context.local_context.add(
-            block.schema.fully_qualified_name, block)
+        self.evaluation_context.local_context.add(block.schema.fully_qualified_name, block)
         if self.anchor.evaluate_anchor(block):
 
             try:
@@ -97,7 +91,6 @@ class WindowTransformer(Transformer):
             if isinstance(v, dict):
                 flattened_dict.update(self._flatten_snapshot(k, v))
             else:
-                flattened_dict[prefix + '.' + k
-                               if prefix is not None else k] = v
+                flattened_dict[prefix + '.' + k if prefix is not None else k] = v
 
         return flattened_dict

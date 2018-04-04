@@ -18,13 +18,11 @@ class WindowDataGroupSchema(DataGroupSchema):
     ATTRIBUTE_WINDOW_TYPE = 'WindowType'
     ATTRIBUTE_SOURCE = 'Source'
 
-    def __init__(self, fully_qualified_name: str,
-                 schema_loader: SchemaLoader) -> None:
+    def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
         self.window_value = self._spec[self.ATTRIBUTE_WINDOW_VALUE]
         self.window_type = self._spec[self.ATTRIBUTE_WINDOW_TYPE]
-        self.source = self.schema_loader.get_schema_object(
-            self._spec[self.ATTRIBUTE_SOURCE])
+        self.source = self.schema_loader.get_schema_object(self._spec[self.ATTRIBUTE_SOURCE])
 
 
 class _WindowSource:
@@ -61,23 +59,20 @@ class WindowDataGroup(DataGroup):
             self.window_source.view = self._load_blocks(
                 store.get_range(
                     Key(self.identity, self.schema.source.name, start_time),
-                    Key(self.identity, self.schema.source.name,
-                        self._get_end_time(start_time))))
+                    Key(self.identity, self.schema.source.name, self._get_end_time(start_time))))
         else:
             self.window_source.view = self._load_blocks(
                 store.get_range(
-                    Key(self.identity, self.schema.source.name, start_time),
-                    None, self.schema.window_value))
+                    Key(self.identity, self.schema.source.name, start_time), None,
+                    self.schema.window_value))
 
         self._validate_view()
 
     def _validate_view(self):
-        if self.schema.window_type == 'count' and len(
-                self.window_source.view) != abs(self.schema.window_value):
-            raise PrepareWindowMissingBlocksError(
-                'Expecting {} but not found {} blocks'.format(
-                    abs(self.schema.window_value),
-                    len(self.window_source.view)))
+        if self.schema.window_type == 'count' and len(self.window_source.view) != abs(
+                self.schema.window_value):
+            raise PrepareWindowMissingBlocksError('Expecting {} but not found {} blocks'.format(
+                abs(self.schema.window_value), len(self.window_source.view)))
 
         if len(self.window_source.view) == 0:
             raise PrepareWindowMissingBlocksError('No matching blocks found')
@@ -104,8 +99,7 @@ class WindowDataGroup(DataGroup):
         :return: List of BlockDataGroup
         """
         return [
-            BlockDataGroup(self.schema.source, self.identity,
-                           EvaluationContext()).restore(block)
+            BlockDataGroup(self.schema.source, self.identity, EvaluationContext()).restore(block)
             for (_, block) in blocks
         ]
 

@@ -21,29 +21,24 @@ class TransformerSchema(BaseSchemaCollection, ABC):
     ATTRIBUTE_STORES = 'Stores'
     ATTRIBUTE_DATA_GROUPS = 'DataGroups'
 
-    def __init__(self, fully_qualified_name: str,
-                 schema_loader: SchemaLoader) -> None:
-        super().__init__(fully_qualified_name, schema_loader,
-                         self.ATTRIBUTE_DATA_GROUPS)
+    def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
+        super().__init__(fully_qualified_name, schema_loader, self.ATTRIBUTE_DATA_GROUPS)
 
         # Load the schema specific attributes
         self.version = self._spec[self.ATTRIBUTE_VERSION]
         self.description = self._spec[
-            self.
-            ATTRIBUTE_DESCRIPTION] if self.ATTRIBUTE_DESCRIPTION in self._spec else None
+            self.ATTRIBUTE_DESCRIPTION] if self.ATTRIBUTE_DESCRIPTION in self._spec else None
 
         # Load list of stores from the schema
         self.stores: Dict[str, Type[Store]] = {
-            schema_spec[self.ATTRIBUTE_NAME]:
-            self.schema_loader.get_nested_schema_object(
+            schema_spec[self.ATTRIBUTE_NAME]: self.schema_loader.get_nested_schema_object(
                 self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
             for schema_spec in self._spec.get(self.ATTRIBUTE_STORES, [])
         }
 
         # Load nested schema items
         self.nested_schema: Dict[str, Type[DataGroup]] = {
-            schema_spec[self.ATTRIBUTE_NAME]:
-            self.schema_loader.get_nested_schema_object(
+            schema_spec[self.ATTRIBUTE_NAME]: self.schema_loader.get_nested_schema_object(
                 self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
             for schema_spec in self._spec[self._nested_item_attribute]
         }
@@ -55,13 +50,12 @@ class Transformer(BaseItemCollection, ABC):
     to the context
     """
 
-    def __init__(self, schema: TransformerSchema, identity: str,
-                 context: Context) -> None:
+    def __init__(self, schema: TransformerSchema, identity: str, context: Context) -> None:
         super().__init__(schema, EvaluationContext(global_context=context))
         # Load the nested items into the item
         self._data_groups: Dict[str, Type[BaseItem]] = {
-            name: TypeLoader.load_item(item_schema.type)(
-                item_schema, identity, self.evaluation_context)
+            name: TypeLoader.load_item(item_schema.type)(item_schema, identity,
+                                                         self.evaluation_context)
             for name, item_schema in schema.nested_schema.items()
         }
         self.identity = identity

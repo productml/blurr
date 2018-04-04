@@ -21,8 +21,7 @@ class FieldSchema(BaseSchema, ABC):
     # Field Name Definitions
     ATTRIBUTE_VALUE = 'Value'
 
-    def __init__(self, fully_qualified_name: str,
-                 schema_loader: SchemaLoader) -> None:
+    def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
         self.value: Expression = Expression(self._spec[self.ATTRIBUTE_VALUE])
 
@@ -56,8 +55,7 @@ class Field(BaseItem, ABC):
     An individual field object responsible for retaining the field value
     """
 
-    def __init__(self, schema: FieldSchema,
-                 evaluation_context: EvaluationContext) -> None:
+    def __init__(self, schema: FieldSchema, evaluation_context: EvaluationContext) -> None:
         """
         Initializes the Field with the default for the schema
         :param schema: Field schema
@@ -133,8 +131,7 @@ class ComplexTypeBase(ABC):
 
             # If the method executed is defined in the base type and a base type object is returned
             # (and not the current type), then wrap the base object into an object of the current type
-            if isinstance(result, self_type.__bases__) and not isinstance(
-                    result, self_type):
+            if isinstance(result, self_type.__bases__) and not isinstance(result, self_type):
                 return self_type(result)
                 # TODO This creates a shallow copy of the object - find a way to optimize this
 

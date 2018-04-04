@@ -7,8 +7,7 @@ from blurr.runner.local_runner import LocalRunner
 
 
 def test_local_runner_stream_only():
-    local_runner = LocalRunner(['tests/data/raw.json'],
-                               'tests/data/stream.yml', None)
+    local_runner = LocalRunner(['tests/data/raw.json'], 'tests/data/stream.yml', None)
     local_runner.execute()
 
     assert len(local_runner._block_data) == 7
@@ -53,8 +52,7 @@ def test_local_runner_stream_only():
 
 
 def test_local_runner_no_vars_stored():
-    local_runner = LocalRunner(['tests/data/raw.json'],
-                               'tests/data/stream.yml', None)
+    local_runner = LocalRunner(['tests/data/raw.json'], 'tests/data/stream.yml', None)
     local_runner.execute()
 
     # Variables should not be stored
@@ -62,8 +60,7 @@ def test_local_runner_no_vars_stored():
 
 
 def test_local_runner_with_window():
-    local_runner = LocalRunner(['tests/data/raw.json'],
-                               'tests/data/stream.yml',
+    local_runner = LocalRunner(['tests/data/raw.json'], 'tests/data/stream.yml',
                                'tests/data/window.yml')
     local_runner.execute()
 

@@ -62,8 +62,7 @@ class TypeLoader:
     def load_type(type_name: str, type_map: dict) -> Any:
         lower_type_name = type_name.lower()
         if lower_type_name not in type_map:
-            raise InvalidSchemaError(
-                'Unknown schema type {}'.format(type_name))
+            raise InvalidSchemaError('Unknown schema type {}'.format(type_name))
         return TypeLoader.import_class_by_full_name(type_map[lower_type_name])
 
     @staticmethod

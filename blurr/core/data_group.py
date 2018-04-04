@@ -19,14 +19,12 @@ class DataGroupSchema(BaseSchemaCollection, ABC):
     ATTRIBUTE_STORE = 'Store'
     ATTRIBUTE_FIELDS = 'Fields'
 
-    def __init__(self, fully_qualified_name: str,
-                 schema_loader: SchemaLoader) -> None:
+    def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         """
         Initializing the nested field schema that all data groups contain
         :param spec: Schema specifications for the field
         """
-        super().__init__(fully_qualified_name, schema_loader,
-                         self.ATTRIBUTE_FIELDS)
+        super().__init__(fully_qualified_name, schema_loader, self.ATTRIBUTE_FIELDS)
         self.store = None
         if self.ATTRIBUTE_STORE in self._spec:
             self.store = self._load_store(self._spec[self.ATTRIBUTE_STORE])
@@ -37,8 +35,7 @@ class DataGroupSchema(BaseSchemaCollection, ABC):
         :param store_name: The name of the store
         """
         store_fq_name = self.schema_loader.get_fully_qualified_name(
-            self.schema_loader.get_transformer_name(self.fully_qualified_name),
-            store_name)
+            self.schema_loader.get_transformer_name(self.fully_qualified_name), store_name)
         return self.schema_loader.get_schema_object(store_fq_name)
 
     def extend_schema(self, spec: Dict[str, Any]) -> Dict[str, Any]:
@@ -47,8 +44,7 @@ class DataGroupSchema(BaseSchemaCollection, ABC):
         identity_field = {'Name': 'identity', 'Type': 'string', 'Value': 'identity'}
         spec[self.ATTRIBUTE_FIELDS].insert(0, identity_field)
 
-        self.schema_loader.add_schema(identity_field,
-                                      self.fully_qualified_name)
+        self.schema_loader.add_schema(identity_field, self.fully_qualified_name)
 
         # If field type is missing, set it to string by default
         for field in spec[self.ATTRIBUTE_FIELDS]:
@@ -76,8 +72,7 @@ class DataGroup(BaseItemCollection, ABC):
         self.identity = identity
 
         self._fields: Dict[str, Type[BaseItem]] = {
-            name: TypeLoader.load_item(item_schema.type)(
-                item_schema, self.evaluation_context)
+            name: TypeLoader.load_item(item_schema.type)(item_schema, self.evaluation_context)
             for name, item_schema in self.schema.nested_schema.items()
         }
 
@@ -100,5 +95,4 @@ class DataGroup(BaseItemCollection, ABC):
         :param timestamp: Optional timestamp to include in the Key construction
         """
         if self.schema.store:
-            self.schema.store.save(
-                Key(self.identity, self.name, timestamp), self.snapshot)
+            self.schema.store.save(Key(self.identity, self.name, timestamp), self.snapshot)

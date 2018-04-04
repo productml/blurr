@@ -29,11 +29,10 @@ def test_window_transformer(test_stream_schema_spec, test_window_schema_spec):
     init_memory_store(schema_loader.get_schema_object('Sessions.memory'))
 
     window_transformer = WindowTransformer(
-        WindowTransformerSchema(window_dtc_name, schema_loader), 'user1',
-        Context())
+        WindowTransformerSchema(window_dtc_name, schema_loader), 'user1', Context())
     block = BlockDataGroup(
-        BlockDataGroupSchema(stream_dtc_name + '.session', schema_loader),
-        'user1', EvaluationContext())
+        BlockDataGroupSchema(stream_dtc_name + '.session', schema_loader), 'user1',
+        EvaluationContext())
     block.restore({
         'events': 3,
         'start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc),

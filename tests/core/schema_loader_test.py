@@ -88,22 +88,19 @@ def test_add_valid_nested_schema(nested_schema_spec_bad_type: Dict) -> None:
     schema_loader = SchemaLoader()
 
     assert schema_loader.add_schema(nested_schema_spec_bad_type) == 'test'
-    assert schema_loader.get_schema_spec(
-        'test.test_group') == nested_schema_spec_bad_type['DataGroups'][0]
-    assert schema_loader.get_schema_spec(
-        'test.test_group.country') == nested_schema_spec_bad_type[
-            'DataGroups'][0]['Fields'][0]
-    assert schema_loader.get_schema_spec(
-        'test.test_group.events') == nested_schema_spec_bad_type['DataGroups'][
-            0]['Fields'][1]
+    assert schema_loader.get_schema_spec('test.test_group') == nested_schema_spec_bad_type[
+        'DataGroups'][0]
+    assert schema_loader.get_schema_spec('test.test_group.country') == nested_schema_spec_bad_type[
+        'DataGroups'][0]['Fields'][0]
+    assert schema_loader.get_schema_spec('test.test_group.events') == nested_schema_spec_bad_type[
+        'DataGroups'][0]['Fields'][1]
 
 
 def test_get_schema_object_error(nested_schema_spec_bad_type: Dict) -> None:
     schema_loader = SchemaLoader()
     schema_loader.add_schema(nested_schema_spec_bad_type)
 
-    with pytest.raises(
-            InvalidSchemaError, match='Unknown schema type Blurr:Unknown'):
+    with pytest.raises(InvalidSchemaError, match='Unknown schema type Blurr:Unknown'):
         schema_loader.get_schema_object('test')
 
     with pytest.raises(InvalidSchemaError, match='Type not defined in schema'):
@@ -111,17 +108,14 @@ def test_get_schema_object_error(nested_schema_spec_bad_type: Dict) -> None:
 
 
 def test_get_schema_object(schema_loader: SchemaLoader) -> None:
-    assert isinstance(
-        schema_loader.get_schema_object('test'),
-        StreamingTransformerSchema) is True
+    assert isinstance(schema_loader.get_schema_object('test'), StreamingTransformerSchema) is True
     field_schema = schema_loader.get_schema_object('test.test_group.events')
     assert isinstance(field_schema, IntegerFieldSchema) is True
 
     # Assert that the same object is returned and a new one is not created.
     assert field_schema.when is None
     field_schema.when = 'True'
-    assert schema_loader.get_schema_object(
-        'test.test_group.events').when == 'True'
+    assert schema_loader.get_schema_object('test.test_group.events').when == 'True'
 
 
 def test_get_nested_schema_object(schema_loader: SchemaLoader):
@@ -131,15 +125,12 @@ def test_get_nested_schema_object(schema_loader: SchemaLoader):
 
 
 def test_get_fully_qualified_name() -> None:
-    assert SchemaLoader.get_fully_qualified_name('parent',
-                                                 'child') == 'parent.child'
+    assert SchemaLoader.get_fully_qualified_name('parent', 'child') == 'parent.child'
 
 
-def test_get_schemas_of_type(schema_loader: SchemaLoader,
-                             nested_schema_spec: Dict) -> None:
+def test_get_schemas_of_type(schema_loader: SchemaLoader, nested_schema_spec: Dict) -> None:
     assert schema_loader.get_schemas_of_type('integer') == [
-        ('test.test_group.events',
-         nested_schema_spec['DataGroups'][0]['Fields'][1])
+        ('test.test_group.events', nested_schema_spec['DataGroups'][0]['Fields'][1])
     ]
 
 

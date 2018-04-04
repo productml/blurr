@@ -16,8 +16,7 @@ class SchemaLoader:
         self._spec = {}
         self._object_cache: Dict[str, 'BaseSchema'] = {}
 
-    def add_schema(self,
-                   spec: Dict[str, Any],
+    def add_schema(self, spec: Dict[str, Any],
                    fully_qualified_parent_name: str = None) -> Optional[str]:
         """
         Add a schema dictionary to the schema loader. The given schema is stored
@@ -72,12 +71,10 @@ class SchemaLoader:
         :return: An initialized schema object of the nested item.
         """
         return self.get_schema_object(
-            self.get_fully_qualified_name(fully_qualified_parent_name,
-                                          nested_item_name))
+            self.get_fully_qualified_name(fully_qualified_parent_name, nested_item_name))
 
     @staticmethod
-    def get_fully_qualified_name(fully_qualified_parent_name: str,
-                                 nested_item_name: str) -> str:
+    def get_fully_qualified_name(fully_qualified_parent_name: str, nested_item_name: str) -> str:
         """
         Returns the fully qualified name by combining the fully_qualified_parent_name
         and nested_item_name.
@@ -97,11 +94,9 @@ class SchemaLoader:
         try:
             return self._spec[fully_qualified_name]
         except:
-            raise InvalidSchemaError(
-                "{} not declared in schema".format(fully_qualified_name))
+            raise InvalidSchemaError("{} not declared in schema".format(fully_qualified_name))
 
-    def get_schemas_of_type(self,
-                            type: str) -> List[Tuple[str, Dict[str, Any]]]:
+    def get_schemas_of_type(self, type: str) -> List[Tuple[str, Dict[str, Any]]]:
         """
         Returns a list of fully qualified names and schema dictionary tuples for
         the schema type provided.

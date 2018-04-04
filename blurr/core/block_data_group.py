@@ -12,33 +12,28 @@ class BlockDataGroupSchema(DataGroupSchema):
 
     ATTRIBUTE_SPLIT = 'Split'
 
-    def __init__(self, fully_qualified_name: str,
-                 schema_loader: SchemaLoader) -> None:
+    def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
 
         # Load type specific attributes
         self.split: Expression = Expression(
-            self._spec[self.ATTRIBUTE_SPLIT]
-        ) if self.ATTRIBUTE_SPLIT in self._spec else None
+            self._spec[self.ATTRIBUTE_SPLIT]) if self.ATTRIBUTE_SPLIT in self._spec else None
 
     def extend_schema(self, spec: Dict[str, Any]) -> Dict[str, Any]:
         """ Injects the block start and end times """
 
         # Add new fields to the schema spec
-        predefined_field = self._build_time_fields_spec(
-            spec[self.ATTRIBUTE_NAME])
+        predefined_field = self._build_time_fields_spec(spec[self.ATTRIBUTE_NAME])
         spec[self.ATTRIBUTE_FIELDS][0:0] = predefined_field
 
         # Add new field schema to the schema loader
         for field_schema in predefined_field:
-            self.schema_loader.add_schema(field_schema,
-                                          self.fully_qualified_name)
+            self.schema_loader.add_schema(field_schema, self.fully_qualified_name)
 
         return super().extend_schema(spec)
 
     @staticmethod
-    def _build_time_fields_spec(
-            name_in_context: str) -> List[Dict[str, Any]]:
+    def _build_time_fields_spec(name_in_context: str) -> List[Dict[str, Any]]:
         """
         Constructs the spec for predefined fields that are to be included in the master spec prior to schema load
         :param name_in_context: Name of the current object in the context
@@ -48,18 +43,16 @@ class BlockDataGroupSchema(DataGroupSchema):
             {
                 'Name': 'start_time',
                 'Type': 'datetime',
-                'Value': (
-                    'time if {data_group}.start_time is None else time '
-                    'if time < {data_group}.start_time else {data_group}.start_time'
-                ).format(data_group=name_in_context)
+                'Value': ('time if {data_group}.start_time is None else time '
+                          'if time < {data_group}.start_time else {data_group}.start_time'
+                          ).format(data_group=name_in_context)
             },
             {
                 'Name': 'end_time',
                 'Type': 'datetime',
-                'Value': (
-                    'time if {data_group}.end_time is None else time '
-                    'if time > {data_group}.end_time else {data_group}.end_time'
-                ).format(data_group=name_in_context)
+                'Value': ('time if {data_group}.end_time is None else time '
+                          'if time > {data_group}.end_time else {data_group}.end_time'
+                          ).format(data_group=name_in_context)
             },
         ]
 
@@ -75,8 +68,7 @@ class BlockDataGroup(DataGroup):
         """
 
         # If a split is imminent, save the current block snapshot with the timestamp
-        split_should_be_evaluated = not (self.schema.split is None
-                                         or self.start_time is None
+        split_should_be_evaluated = not (self.schema.split is None or self.start_time is None
                                          or self.end_time is None)
 
         if split_should_be_evaluated and self.schema.split.evaluate(

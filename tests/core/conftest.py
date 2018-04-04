@@ -30,51 +30,22 @@ def schema_loader_with_mem_store(stream_dtc_name: str) -> SchemaLoader:
 
 
 def init_memory_store(store: MemoryStore) -> None:
-    store.save(
-        Key('user1', 'state'), {
-            'variable_1': 1,
-            'variable_a': 'a',
-            'variable_true': True
-        })
+    store.save(Key('user1', 'state'), {'variable_1': 1, 'variable_a': 'a', 'variable_true': True})
 
     date = datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc)
-    store.save(
-        Key('user1', 'session', date), {
-            'events': 1,
-            'start_time': date
-        })
+    store.save(Key('user1', 'session', date), {'events': 1, 'start_time': date})
 
     date = datetime(2018, 3, 7, 20, 35, 35, 0, timezone.utc)
-    store.save(
-        Key('user1', 'session', date), {
-            'events': 2,
-            'start_time': date
-        })
+    store.save(Key('user1', 'session', date), {'events': 2, 'start_time': date})
 
     date = datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc)
-    store.save(
-        Key('user1', 'session', date), {
-            'events': 3,
-            'start_time': date
-        })
+    store.save(Key('user1', 'session', date), {'events': 3, 'start_time': date})
 
     date = datetime(2018, 3, 7, 22, 38, 31, 0, timezone.utc)
-    store.save(
-        Key('user1', 'session', date), {
-            'events': 4,
-            'start_time': date
-        })
+    store.save(Key('user1', 'session', date), {'events': 4, 'start_time': date})
 
     date = datetime(2018, 3, 7, 23, 40, 31, 0, timezone.utc)
-    store.save(
-        Key('user1', 'session', date), {
-            'events': 5,
-            'start_time': date
-        })
+    store.save(Key('user1', 'session', date), {'events': 5, 'start_time': date})
 
     date = datetime(2018, 3, 8, 23, 40, 31, 0, timezone.utc)
-    store.save(
-        Key('user1', 'session', date), {
-            'events': 6,
-            'start_time': date
-        })
+    store.save(Key('user1', 'session', date), {'events': 6, 'start_time': date})

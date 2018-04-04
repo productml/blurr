@@ -38,19 +38,15 @@ class Context(dict):
 
 
 class EvaluationContext:
-    def __init__(self,
-                 global_context: Context = None,
-                 local_context: Context = None) -> None:
+    def __init__(self, global_context: Context = None, local_context: Context = None) -> None:
         """
         Initializes an evaluation context with global and local context dictionaries.  The unset parameters default
         to an empty context dictionary.
         :param global_context: Global context dictionary
         :param local_context: Local context dictionary.
         """
-        self.global_context = Context(
-        ) if global_context is None else global_context
-        self.local_context = Context(
-        ) if local_context is None else local_context
+        self.global_context = Context() if global_context is None else global_context
+        self.local_context = Context() if local_context is None else local_context
 
     @property
     def fork(self) -> 'EvaluationContext':
@@ -75,8 +71,7 @@ class EvaluationContext:
         self.global_context[key] = value
 
 
-VALIDATION_INVALID_EQUALS_REGULAR_EXPRESSION = re.compile(
-    '(?:^|[^!=]+)=(?:[^=]+|$)')
+VALIDATION_INVALID_EQUALS_REGULAR_EXPRESSION = re.compile('(?:^|[^!=]+)=(?:[^=]+|$)')
 
 
 class Expression:
@@ -96,8 +91,7 @@ class Expression:
 
         # Validate the expression for errors / unsupported expressions
         if VALIDATION_INVALID_EQUALS_REGULAR_EXPRESSION.findall(code_string):
-            raise InvalidExpressionError(
-                'Modifying value using `=` is not allowed.')
+            raise InvalidExpressionError('Modifying value using `=` is not allowed.')
 
         try:
             self.code_object = compile(self.code_string, '<string>', 'eval')

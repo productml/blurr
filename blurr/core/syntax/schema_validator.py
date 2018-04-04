@@ -27,10 +27,7 @@ def is_identifier(s: str) -> bool:
 class DataType(Validator):
     TAG = 'data_type'
 
-    VALUES = [
-        'integer', 'boolean', 'string', 'datetime', 'float', 'map', 'list',
-        'set'
-    ]
+    VALUES = ['integer', 'boolean', 'string', 'datetime', 'float', 'map', 'list', 'set']
 
     def _is_valid(self, value: str) -> bool:
         return value in self.VALUES
@@ -67,8 +64,7 @@ VALIDATORS = {
 
 PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
 STREAMING_SCHEMA = yamale.make_schema(
-    os.path.join(PACKAGE_DIR, 'dtc_streaming_schema.yml'),
-    validators=VALIDATORS)
+    os.path.join(PACKAGE_DIR, 'dtc_streaming_schema.yml'), validators=VALIDATORS)
 
 WINDOW_SCHEMA = yamale.make_schema(
     os.path.join(PACKAGE_DIR, 'dtc_window_schema.yml'), validators=VALIDATORS)

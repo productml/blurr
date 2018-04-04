@@ -18,8 +18,7 @@ class BaseSchema(ABC):
     ATTRIBUTE_TYPE = 'Type'
     ATTRIBUTE_WHEN = 'When'
 
-    def __init__(self, fully_qualified_name: str,
-                 schema_loader: SchemaLoader) -> None:
+    def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         """
         Initializes a schema by providing the path to the schema and the schema loader resource
         :param fully_qualified_name: Fully qualified path to the schema
@@ -33,8 +32,7 @@ class BaseSchema(ABC):
         self.name: str = self._spec[self.ATTRIBUTE_NAME]
         self.type: str = self._spec[self.ATTRIBUTE_TYPE]
         self.when: Expression = Expression(
-            self._spec[self.ATTRIBUTE_WHEN]
-        ) if self.ATTRIBUTE_WHEN in self._spec else None
+            self._spec[self.ATTRIBUTE_WHEN]) if self.ATTRIBUTE_WHEN in self._spec else None
 
     def extend_schema(self, spec: Dict[str, Any]) -> Dict[str, Any]:
         """ Extends the defined schema specifications at runtime with defaults """
@@ -59,9 +57,8 @@ class BaseSchemaCollection(BaseSchema, ABC):
         self._nested_item_attribute = nested_schema_attribute
         # Load nested schema items
         self.nested_schema: Dict[str, Type[BaseSchema]] = {
-            schema_spec[self.ATTRIBUTE_NAME]:
-                self.schema_loader.get_nested_schema_object(
-                    self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
+            schema_spec[self.ATTRIBUTE_NAME]: self.schema_loader.get_nested_schema_object(
+                self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
             for schema_spec in self._spec[self._nested_item_attribute]
         }
 
@@ -74,8 +71,7 @@ class BaseItem(ABC):
     Base class for for all leaf items that do not contain sub-items
     """
 
-    def __init__(self, schema: BaseSchema,
-                 evaluation_context: EvaluationContext) -> None:
+    def __init__(self, schema: BaseSchema, evaluation_context: EvaluationContext) -> None:
         """
         Initializes an item with the schema and execution context
         :param schema: Schema of the item
@@ -92,8 +88,7 @@ class BaseItem(ABC):
             2. Where WHERE clause is specified and it evaluates to True
         Returns false if a where clause is specified and it evaluates to False
         """
-        return self.schema.when is None or self.schema.when.evaluate(
-            self.evaluation_context)
+        return self.schema.when is None or self.schema.when.evaluate(self.evaluation_context)
 
     @property
     def name(self) -> str:
@@ -131,8 +126,7 @@ class BaseItemCollection(BaseItem):
     Base class for items that contain sub-items within them
     """
 
-    def __init__(self, schema: BaseSchemaCollection,
-                 evaluation_context: EvaluationContext) -> None:
+    def __init__(self, schema: BaseSchemaCollection, evaluation_context: EvaluationContext) -> None:
         """
         Loads nested items to the 'items' collection
         :param schema: Schema that conforms to the item
@@ -158,10 +152,7 @@ class BaseItemCollection(BaseItem):
         """
         try:
 
-            return {
-                name: item.snapshot
-                for name, item in self.nested_items.items()
-            }
+            return {name: item.snapshot for name, item in self.nested_items.items()}
 
         except Exception as e:
             print('Error while creating snapshot for {}', self.name)
