@@ -1,7 +1,7 @@
 """
 Usage:
     blurr validate [<DTC> ...]
-    blurr transform [--streaming-dtc=<file>] [--window-dtc=<file>] <raw-json-files> ...
+    blurr transform [--streaming-dtc=<dtc-file>] [--window-dtc=<dtc-file>] (--source=<raw-json-files> | <raw-json-files>)
     blurr -h | --help
 
 Commands:
@@ -21,8 +21,9 @@ Commands:
 Options:
     -h --help                   Show this screen.
     --version                   Show version.
-    --streaming-dtc=<file>      Streaming DTC file to use.
-    --window-dtc=<file>         Window DTC file to use.
+    --streaming-dtc=<dtc-file>  Streaming DTC file to use.
+    --window-dtc=<dtc-file>     Window DTC file to use.
+    --source=<raw-json-files>   List of source files separated by comma
 """
 import sys
 
