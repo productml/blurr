@@ -170,7 +170,7 @@ class BaseItemCollection(BaseItem, ABC):
         Restores the state of a collection from a snapshot
         """
         try:
-            print("Here")
+
             for name, snap in snapshot.items():
                 self.nested_items[name].restore(snap)
             return self
