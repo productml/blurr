@@ -37,18 +37,18 @@ PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
 VERSION_PATH = os.path.join(PACKAGE_DIR, 'VERSION')
 
 
-def read_version():
-    if os.path.exists(VERSION_PATH) and os.path.isfile(VERSION_PATH):
-        version_file = open(VERSION_PATH, 'r')
-        version = version_file.readline()
-        version_file.close()
+def read_version(version_file: str) -> str:
+    if os.path.exists(version_file) and os.path.isfile(version_file):
+        with open(version_file, 'r') as file:
+            version = file.readline()
+            file.close()
         return version
     else:
         return 'LOCAL'
 
 
 def main():
-    arguments = docopt(__doc__, version=read_version())
+    arguments = docopt(__doc__, version=read_version(VERSION_PATH))
     result = cli(arguments, Out())
     sys.exit(result)
 
