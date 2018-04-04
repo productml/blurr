@@ -68,9 +68,11 @@ def test_data_group_nested_items(data_group_schema_with_store):
         identity="12345",
         evaluation_context=EvaluationContext())
     nested_items = data_group.nested_items
-    assert len(nested_items) == 1
+    assert len(nested_items) == 2
     assert "event_count" in nested_items
     assert isinstance(nested_items["event_count"], Field)
+    assert "identity" in nested_items
+    assert isinstance(nested_items["identity"], Field)
 
 
 def test_data_group_persist_without_store(data_group_schema_without_store):

@@ -23,6 +23,10 @@ def block_data_group_schema_spec() -> Dict[str, Any]:
 
 def match_fields(fields):
     expected_fields = [{
+        'Name': 'identity',
+        'Type': 'string',
+        'Value': 'identity'
+    }, {
         'Name': 'start_time',
         'Type': 'datetime',
         'Value': 'time if user.start_time is None else time if time < '

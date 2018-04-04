@@ -15,6 +15,7 @@ def test_local_runner_stream_only():
 
     # Stream DTC output
     assert local_runner._block_data[Key('userA', 'session')] == {
+        'identity': 'userA',
         'start_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()),
         'end_time': datetime(2018, 3, 7, 23, 35, 32, tzinfo=tzutc()),
         'events': 2,
@@ -24,6 +25,7 @@ def test_local_runner_stream_only():
 
     assert local_runner._block_data[Key('userA', 'session',
                                         datetime(2018, 3, 7, 22, 35, 31))] == {
+        'identity': 'userA',
         'start_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=tzutc()),
         'end_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=tzutc()),
         'events': 1,
@@ -32,11 +34,13 @@ def test_local_runner_stream_only():
     }  # yapf: disable
 
     assert local_runner._block_data[Key('userA', 'state')] == {
+        'identity': 'userA',
         'country': 'IN',
         'continent': 'World'
     }
 
     assert local_runner._block_data[Key('userB', 'session')] == {
+        'identity': 'userB',
         'start_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=tzutc()),
         'end_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=tzutc()),
         'events': 1,
@@ -68,6 +72,8 @@ def test_local_runner_with_window():
     # Window DTC output
     assert local_runner._window_data['userA'] == [{
         'last_session.events': 1,
-        'last_day.total_events': 1
+        'last_session.identity': 'userA',
+        'last_day.total_events': 1,
+        'last_day.identity': 'userA'
     }]
     assert local_runner._window_data['userB'] == []

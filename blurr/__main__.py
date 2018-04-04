@@ -1,7 +1,7 @@
 """
 Usage:
     blurr validate [<DTC> ...]
-    blurr transform [--streaming-dtc=<file>] [--window-dtc=<file>] <raw-json-files> ...
+    blurr transform [--streaming-dtc=<dtc-file>] [--window-dtc=<dtc-file>] (--source=<raw-json-files> | <raw-json-files>)
     blurr -h | --help
 
 Commands:
@@ -21,8 +21,9 @@ Commands:
 Options:
     -h --help                   Show this screen.
     --version                   Show version.
-    --streaming-dtc=<file>      Streaming DTC file to use.
-    --window-dtc=<file>         Window DTC file to use.
+    --streaming-dtc=<dtc-file>  Streaming DTC file to use.
+    --window-dtc=<dtc-file>     Window DTC file to use.
+    --source=<raw-json-files>   List of source files separated by comma
 """
 import sys
 
@@ -32,21 +33,22 @@ from docopt import docopt
 from blurr.cli.cli import cli
 from blurr.cli.out import Out
 
-VERSION_PATH = "blurr/VERSION"
+PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
+VERSION_PATH = os.path.join(PACKAGE_DIR, 'VERSION')
 
 
-def read_version():
-    if os.path.exists(VERSION_PATH) and os.path.isfile(VERSION_PATH):
-        version_file = open("blurr/VERSION", "r")
-        version = version_file.readline()
-        version_file.close()
+def read_version(version_file: str) -> str:
+    if os.path.exists(version_file) and os.path.isfile(version_file):
+        with open(version_file, 'r') as file:
+            version = file.readline()
+            file.close()
         return version
     else:
-        return "LOCAL"
+        return 'LOCAL'
 
 
 def main():
-    arguments = docopt(__doc__, version=read_version())
+    arguments = docopt(__doc__, version=read_version(VERSION_PATH))
     result = cli(arguments, Out())
     sys.exit(result)
 

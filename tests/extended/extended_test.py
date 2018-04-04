@@ -13,6 +13,7 @@ def test_extended_runner():
 
     result_state = local_runner._block_data[Key('user-1', 'state')]
     expected_state = {
+        'identity': 'user-1',
         'country': 'US',
         'build': 245,
         'is_paid': True,
@@ -30,6 +31,7 @@ def test_extended_runner():
 
     result_session = local_runner._block_data[Key('user-1', 'session')]
     expected_session = {
+        'identity': 'user-1',
         'start_time': datetime(2016, 2, 13, 0, 0, 58),
         'end_time': datetime(2016, 2, 13, 0, 1, 25),
         'session_id': 'session-3',
@@ -48,6 +50,7 @@ def test_extended_runner():
                                                      datetime(
                                                          2016, 2, 10, 0, 0))]
     expected_session_10 = {
+        'identity': 'user-1',
         'start_time': datetime(2016, 2, 10, 0, 0),
         'end_time': datetime(2016, 2, 10, 0, 1, 47),
         'session_id': 'session-1',
@@ -67,6 +70,7 @@ def test_extended_runner():
                                                      datetime(
                                                          2016, 2, 11, 0, 0))]
     expected_session_11 = {
+        'identity': 'user-1',
         'start_time': datetime(2016, 2, 11, 0, 0),
         'end_time': datetime(2016, 2, 11, 0, 0, 28),
         'session_id': 'session-2',
@@ -86,6 +90,7 @@ def test_extended_runner():
                                                      datetime(
                                                          2016, 2, 12, 0, 0))]
     expected_session_12 = {
+        'identity': 'user-1',
         'start_time': datetime(2016, 2, 12, 0, 0),
         'end_time': datetime(2016, 2, 12, 0, 0, 56),
         'session_id': 'session-3',
