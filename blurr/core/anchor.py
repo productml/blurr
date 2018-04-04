@@ -46,12 +46,12 @@ class Anchor(BaseItem):
         self.condition_met[self.anchor_block.start_time.date()] += 1
 
     def evaluate(self) -> bool:
-        return self.schema.condition.evaluate(self.evaluation_context)
+        return self._schema.condition.evaluate(self._evaluation_context)
 
     def max_condition_met(self, block: BlockDataGroup) -> bool:
-        if self.schema.max is None:
+        if self._schema.max is None:
             return False
-        return self.condition_met[block.start_time.date()] >= self.schema.max
+        return self.condition_met[block.start_time.date()] >= self._schema.max
 
     def restore(self, snapshot: Dict[str, Any]) -> BaseItem:
         pass

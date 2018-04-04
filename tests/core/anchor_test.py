@@ -97,7 +97,7 @@ def test_anchor_condition(anchor_schema_max_one: AnchorSchema,
     anchor_schema_max_one.condition = Expression('session.events > 3')
     eval_context = EvaluationContext()
     anchor = Anchor(anchor_schema_max_one, eval_context)
-    eval_context.local_context.add(block_item.schema.fully_qualified_name,
+    eval_context.local_context.add(block_item._schema.fully_qualified_name,
                                    block_item)
     assert anchor.evaluate_anchor(block_item) is False
 

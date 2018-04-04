@@ -73,12 +73,12 @@ class DataGroup(BaseItemCollection, ABC):
         :param evaluation_context: Context dictionary for evaluation
         """
         super().__init__(schema, evaluation_context)
-        self.identity = identity
+        self._identity = identity
 
         self._fields: Dict[str, Type[BaseItem]] = {
             name: TypeLoader.load_item(item_schema.type)(
-                item_schema, self.evaluation_context)
-            for name, item_schema in self.schema.nested_schema.items()
+                item_schema, self._evaluation_context)
+            for name, item_schema in self._schema.nested_schema.items()
         }
 
     @property
@@ -99,6 +99,6 @@ class DataGroup(BaseItemCollection, ABC):
         Persists the current data group
         :param timestamp: Optional timestamp to include in the Key construction
         """
-        if self.schema.store:
-            self.schema.store.save(
-                Key(self.identity, self.name, timestamp), self.snapshot)
+        if self._schema.store:
+            self._schema.store.save(
+                Key(self._identity, self._name, timestamp), self.snapshot)

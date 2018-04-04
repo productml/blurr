@@ -46,7 +46,7 @@ class StreamingTransformer(Transformer):
     def __init__(self, schema: TransformerSchema, identity: str,
                  context: Context) -> None:
         super().__init__(schema, identity, context)
-        self.evaluation_context.global_add('identity', self.identity)
+        self._evaluation_context.global_add('identity', self.identity)
 
     def evaluate_record(self, record: Record):
         """
@@ -56,13 +56,13 @@ class StreamingTransformer(Transformer):
         initialization.
         """
         # Add source record and time to the global context
-        self.evaluation_context.global_add('source', record)
-        self.evaluation_context.global_add('time',
-                                           self.schema.time.evaluate(
-                                               self.evaluation_context))
+        self._evaluation_context.global_add('source', record)
+        self._evaluation_context.global_add('time',
+                                            self._schema.time.evaluate(
+                                               self._evaluation_context))
 
-        record_identity = self.schema.get_identity(
-            self.evaluation_context.global_context)
+        record_identity = self._schema.get_identity(
+            self._evaluation_context.global_context)
         if self.identity != record_identity:
             raise IdentityError('Identity in transformer (', self.identity,
                                 ') and new record (', record_identity,
@@ -71,5 +71,5 @@ class StreamingTransformer(Transformer):
         self.evaluate()
 
         # Cleanup source and time form the context
-        del self.evaluation_context.global_context['source']
-        del self.evaluation_context.global_context['time']
+        del self._evaluation_context.global_context['source']
+        del self._evaluation_context.global_context['time']

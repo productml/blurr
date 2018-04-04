@@ -81,8 +81,8 @@ class BaseItem(ABC):
         :param schema: Schema of the item
         :param evaluation_context: Context dictionary for evaluation
         """
-        self.schema = schema
-        self.evaluation_context = evaluation_context
+        self._schema = schema
+        self._evaluation_context = evaluation_context
 
     @property
     def needs_evaluation(self) -> bool:
@@ -92,15 +92,15 @@ class BaseItem(ABC):
             2. Where WHERE clause is specified and it evaluates to True
         Returns false if a where clause is specified and it evaluates to False
         """
-        return self.schema.when is None or self.schema.when.evaluate(
-            self.evaluation_context)
+        return self._schema.when is None or self._schema.when.evaluate(
+            self._evaluation_context)
 
     @property
-    def name(self) -> str:
+    def _name(self) -> str:
         """
         Returns the name of the base item
         """
-        return self.schema.name
+        return self._schema.name
 
     @abstractmethod
     def evaluate(self) -> None:
@@ -164,7 +164,7 @@ class BaseItemCollection(BaseItem):
             }
 
         except Exception as e:
-            print('Error while creating snapshot for {}', self.name)
+            print('Error while creating snapshot for {}', self._name)
             raise SnapshotError(e)
 
     def restore(self, snapshot: Dict[str, Any]) -> 'BaseItemCollection':
@@ -199,7 +199,7 @@ class BaseItemCollection(BaseItem):
         :raises KeyError: When a requested item is not found in nested items
         """
         if item not in self.nested_items:
-            raise KeyError('{item} not defined in {name}'.format(item=item, name=self.name))
+            raise KeyError('{item} not defined in {name}'.format(item=item, name=self._name))
 
         return self.nested_items[item].snapshot
 

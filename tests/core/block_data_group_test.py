@@ -86,8 +86,8 @@ def test_block_data_group_schema_evaluate_without_split(
 
     # aggregate snapshot should not exist in store
     assert block_data_group_schema.store.get(
-        Key(identity=block_data_group.identity,
-            group=block_data_group.name,
+        Key(identity=block_data_group._identity,
+            group=block_data_group._name,
             timestamp=block_data_group.start_time)) is None
 
 
@@ -127,6 +127,6 @@ def test_block_data_group_schema_evaluate_with_split(
 
     # Check aggregate snapshot present in store
     assert block_data_group_schema.store.get(
-        Key(identity=block_data_group.identity,
-            group=block_data_group.name,
+        Key(identity=block_data_group._identity,
+            group=block_data_group._name,
             timestamp=time)) == current_snapshot

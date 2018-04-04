@@ -51,24 +51,24 @@ class WindowTransformer(Transformer):
         :return: True, if the anchor condition is met, otherwise, False.
         """
         # Set up context so that anchor can process the block
-        self.evaluation_context.local_context.add(
-            block.schema.fully_qualified_name, block)
+        self._evaluation_context.local_context.add(
+            block._schema.fully_qualified_name, block)
         if self.anchor.evaluate_anchor(block):
 
             try:
-                self.evaluation_context.global_add('anchor', block)
+                self._evaluation_context.global_add('anchor', block)
                 self.evaluate()
                 self.anchor.add_condition_met()
                 return True
             except PrepareWindowMissingBlocksError:
                 return False
             finally:
-                del self.evaluation_context.global_context['anchor']
+                del self._evaluation_context.global_context['anchor']
 
         return False
 
     def evaluate(self):
-        if 'anchor' not in self.evaluation_context.global_context or self.anchor.anchor_block is None:
+        if 'anchor' not in self._evaluation_context.global_context or self.anchor.anchor_block is None:
             raise AnchorBlockNotDefinedError()
 
         if not self.needs_evaluation:

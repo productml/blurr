@@ -66,7 +66,7 @@ class Field(BaseItem, ABC):
         super().__init__(schema, evaluation_context)
 
         # When the field is created, the value is set to the field type default
-        self.value = self.schema.default
+        self.value = self._schema.default
 
     def evaluate(self) -> None:
         """
@@ -75,14 +75,14 @@ class Field(BaseItem, ABC):
         """
         new_value = None
         if self.needs_evaluation:
-            new_value = self.schema.value.evaluate(self.evaluation_context)
+            new_value = self._schema.value.evaluate(self._evaluation_context)
 
         if new_value is None:
             return
 
         # Only set the value if it conforms to the field type
-        if not self.schema.is_type_of(new_value):
-            new_value = self.schema.type_object(new_value)
+        if not self._schema.is_type_of(new_value):
+            new_value = self._schema.type_object(new_value)
             # TODO Resolve what to do in case of type cast failures
 
         self.value = new_value
