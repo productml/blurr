@@ -54,19 +54,23 @@ using this DTC
 ```yaml
 
 Type: Blurr:Streaming
-Version: '2018-03-07'
+Version: '2018-03-01'
+Name : sessions
 
-Store:
+Stores:
    - Type: Blurr:Store:MemoryStore
      Name: hello_world_store
 
 Identity: source.user_id
+
+Time: parser.parse(source.timestamp)
 
 DataGroups:
 
  - Type: Blurr:DataGroup:BlockAggregate
    Name: session_stats
    Store: hello_world_store
+
    Split: source.session_id != session_stats.session_id
 
    Fields:
@@ -77,13 +81,13 @@ DataGroups:
 
      - Name: games_played
        Type: integer
-       Value: session_stats.games_played + 1
        When: source.event_id == 'game_start'
+       Value: session_stats.games_played + 1
 
      - Name: games_won
        Type: integer
-       Value: session_stats.games_won + 1
        When: source.event_id == 'game_end' and source.won == '1'
+       Value: session_stats.games_won + 1
 
 ```
 
