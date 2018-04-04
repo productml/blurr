@@ -71,7 +71,7 @@ class WindowTransformer(Transformer):
         if 'anchor' not in self._evaluation_context.global_context or self.anchor.anchor_block is None:
             raise AnchorBlockNotDefinedError()
 
-        if not self.needs_evaluation:
+        if not self._needs_evaluation:
             return
 
         for item in self.nested_items.values():

@@ -74,7 +74,7 @@ class Field(BaseItem, ABC):
         expression in the schema
         """
         new_value = None
-        if self.needs_evaluation:
+        if self._needs_evaluation:
             new_value = self._schema.value.evaluate(self._evaluation_context)
 
         if new_value is None:

@@ -85,7 +85,7 @@ class BaseItem(ABC):
         self._evaluation_context = evaluation_context
 
     @property
-    def needs_evaluation(self) -> bool:
+    def _needs_evaluation(self) -> bool:
         """
         Returns True when:
             1. Where clause is not specified
@@ -147,7 +147,7 @@ class BaseItemCollection(BaseItem):
         :returns An evaluation result object containing the result, or reasons why
         evaluation failed
         """
-        if self.needs_evaluation:
+        if self._needs_evaluation:
             for _, item in self.nested_items.items():
                 item.evaluate()
 
