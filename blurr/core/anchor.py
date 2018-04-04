@@ -57,5 +57,5 @@ class Anchor(BaseItem):
         pass
 
     @property
-    def snapshot(self):
+    def _snapshot(self):
         pass

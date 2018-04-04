@@ -101,4 +101,4 @@ class DataGroup(BaseItemCollection, ABC):
         """
         if self._schema.store:
             self._schema.store.save(
-                Key(self._identity, self._name, timestamp), self.snapshot)
+                Key(self._identity, self._name, timestamp), self._snapshot)

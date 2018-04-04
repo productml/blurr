@@ -111,7 +111,7 @@ class BaseItem(ABC):
 
     @property
     @abstractmethod
-    def snapshot(self):
+    def _snapshot(self):
         """
         Gets a dictionary representation of the current state items in the current hierarchy
         :return: Name, Value map of the current tree
@@ -152,14 +152,14 @@ class BaseItemCollection(BaseItem):
                 item.evaluate()
 
     @property
-    def snapshot(self) -> Dict[str, Any]:
+    def _snapshot(self) -> Dict[str, Any]:
         """
         Implements snapshot for collections by recursively invoking snapshot of all child items
         """
         try:
 
             return {
-                name: item.snapshot
+                name: item._snapshot
                 for name, item in self.nested_items.items()
             }
 
@@ -178,7 +178,7 @@ class BaseItemCollection(BaseItem):
             return self
 
         except Exception as e:
-            print('Error while restoring snapshot: {}', self.snapshot)
+            print('Error while restoring snapshot: {}', self._snapshot)
             raise SnapshotError(e)
 
     def __getattr__(self, item: str) -> Any:
@@ -189,7 +189,7 @@ class BaseItemCollection(BaseItem):
         :param item: Field requested
         """
         if item in self.nested_items:
-            return self.nested_items[item].snapshot
+            return self.nested_items[item]._snapshot
 
         return self.__getattribute__(item)
 
@@ -201,7 +201,7 @@ class BaseItemCollection(BaseItem):
         if item not in self.nested_items:
             raise KeyError('{item} not defined in {name}'.format(item=item, name=self._name))
 
-        return self.nested_items[item].snapshot
+        return self.nested_items[item]._snapshot
 
     @abstractmethod
     def finalize(self) -> None:

@@ -86,7 +86,7 @@ class WindowTransformer(Transformer):
         Generates a flattened snapshot where the final key for a field is <data_group_name>.<field_name>.
         :return: The flattened snapshot.
         """
-        snapshot_dict = super().snapshot
+        snapshot_dict = super()._snapshot
 
         # Flatten to feature dict
         return self._flatten_snapshot(None, snapshot_dict)

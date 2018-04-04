@@ -94,7 +94,7 @@ def test_data_group_persist_with_store(data_group_schema_with_store):
     snapshot_data_group = data_group._schema.store.get(
         Key(identity="12345", group="user", timestamp=dt))
     assert snapshot_data_group is not None
-    assert snapshot_data_group == data_group.snapshot
+    assert snapshot_data_group == data_group._snapshot
 
 
 def test_data_group_finalize(data_group_schema_with_store):
@@ -106,4 +106,4 @@ def test_data_group_finalize(data_group_schema_with_store):
     snapshot_data_group = data_group._schema.store.get(
         Key(identity="12345", group="user"))
     assert snapshot_data_group is not None
-    assert snapshot_data_group == data_group.snapshot
+    assert snapshot_data_group == data_group._snapshot

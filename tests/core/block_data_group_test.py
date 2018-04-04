@@ -113,7 +113,7 @@ def test_block_data_group_schema_evaluate_with_split(
             'end_time': time
         })
 
-    current_snapshot = block_data_group.snapshot
+    current_snapshot = block_data_group._snapshot
     block_data_group.evaluate()
 
     # Check eval results of various fields

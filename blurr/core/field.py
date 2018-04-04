@@ -88,7 +88,7 @@ class Field(BaseItem, ABC):
         self.value = new_value
 
     @property
-    def snapshot(self) -> Any:
+    def _snapshot(self) -> Any:
         """
         Snapshots the current value of the field
         """
