@@ -267,7 +267,7 @@ Previously we defined `source.user_id` as the __Identity__ of the DTC:
 Identity: source.user_id
 ```
 
-Here we introduce one of the roles of the Identity: every time an event is received with a nonexisting value for the Identity (every time a new user plays the game) __a new record is added to the store__:
+Here we introduce one of the roles of the Identity: whenever an event is received and the Identity value doesn't exist in the store (like when a new user plays a game), a new record is added:
 
 | session_id  | user_id    | games_played | games_won |
 | ----------- | ---------- | ------------ | --------- |
@@ -365,4 +365,4 @@ Each entry consists of an array with 2 items:
 * A `session_id/datagroup_name/timestamp` string. This represents the __Identity__ (`user_id`) in the tables.
 * An object with the remaining values of the record.
 
-As we can see, not all the Identity representations have a timestamp. A "session end" timestamp is added after a new record is added for an Identity (after fulfilling the `Split` condition is fulfilled), so only the last session of a user will not have a timestamp.
+As we can see, not all the Identity representations have a timestamp. A "session end" timestamp is added after a new record is added for an Identity (after the `Split` condition is fulfilled), so only the last session of a user will not have a timestamp.

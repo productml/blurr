@@ -1,13 +1,13 @@
 # Tutorial 2: Window Aggregation
 
-In this tutorial we'll introduce a new type of DTC: the __Window DTC__, and will learn how a Window DTC consumes session data produced in the first tutorial in order generate __time aggregated data__.
+In this tutorial we'll introduce a new type of DTC: the __Window DTC__, and will learn how a Window DTC consumes session data produced in the first tutorial in order to generate __time aggregated data__.
 
 
 ## 1. Game Boosts
 
 For this second tutorial we'll introduce the concept of __boosts__ to the game we defined previously.
 
-In order to make the game more exciting a user can now activate a __boost__ when starting a play session. While the boost is active, games will become easier. Chances of winning a game will increase.
+In order to make the game more exciting a user can now activate a __boost__ when starting a play session. While the boost is active, games become easier. Chances of winning a game are increased.
 
 When the player activates a boost, the `game_start` event will include a `"boost": true` property:
 
@@ -27,12 +27,12 @@ The goal of this tutorial is to __collect aggregated session data__ that __valid
 
 ## 2. Aggregation Result
 
-In order to confirm our hypothesis We're interested in comparing two figures:
+In order to confirm our hypothesis we're interested in comparing two figures:
 
 1. The average number of games played by session __before activating the boost__
 1. The average number of games played by session __while the boost is active__
 
-We will obtain this data by aggregating the __original session data__ obtained in the fist tutorial into an series of records containing the desired information:
+We will obtain this data by aggregating the __original session data__ obtained in the first tutorial into an series of records containing the desired information:
 
 | user_id  | last_7_days.avg_games_per_session | next_3_days.avg_games_per_session |
 | -------- | --------------------------------- | --------------------------------- |
@@ -41,8 +41,7 @@ We will obtain this data by aggregating the __original session data__ obtained i
 | NV9T     | 8.11                              | 12.52                             |
 | 6CF3     | 9.89                              | 14.74                             |
 
-A result like this would be pretty conclusive: activating a boost increases engagement. All our players have increased the games played per session after activating the boost.
-
+This result shows our players have increased the games played per session after activating the boost.
 
 ## 3. Window DTC
 
