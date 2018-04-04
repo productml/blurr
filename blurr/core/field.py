@@ -73,19 +73,23 @@ class Field(BaseItem, ABC):
         Overrides the base evaluation to set the value to the evaluation result of the value
         expression in the schema
         """
-        new_value = None
+        result = None
         if self.needs_evaluation:
-            new_value = self.schema.value.evaluate(self.evaluation_context)
+            result = self.schema.value.evaluate(self.evaluation_context)
 
-        if new_value is None:
+        if result is None:
             return
 
         # Only set the value if it conforms to the field type
-        if not self.schema.is_type_of(new_value):
-            new_value = self.schema.type_object(new_value)
-            # TODO Resolve what to do in case of type cast failures
+        if not self.schema.is_type_of(result):
+            try:
+                result = self.schema.type_object(result)
+            except:
+                # Silently skip setting value if type-casting errors out
+                # TODO Log type cast exception
+                return
 
-        self.value = new_value
+        self.value = result
 
     @property
     def snapshot(self) -> Any:
