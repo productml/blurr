@@ -21,11 +21,11 @@ class BlockDataGroupSchema(DataGroupSchema):
             self._spec[self.ATTRIBUTE_SPLIT]
         ) if self.ATTRIBUTE_SPLIT in self._spec else None
 
-    def extend_schema(self, spec: Dict[str, Any]):
+    def extend_schema(self, spec: Dict[str, Any]) -> Dict[str, Any]:
         """ Injects the block start and end times """
 
         # Add new fields to the schema spec
-        predefined_field = self._build_block_start_end_fields_spec(
+        predefined_field = self._build_time_fields_spec(
             spec[self.ATTRIBUTE_NAME])
         spec[self.ATTRIBUTE_FIELDS][0:0] = predefined_field
 
