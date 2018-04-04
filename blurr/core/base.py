@@ -1,6 +1,6 @@
 from typing import Dict, Any, Type, TypeVar
 
-from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod, abstractproperty
 
 from blurr.core.errors import SnapshotError
 from blurr.core.evaluation import Expression, EvaluationContext
@@ -125,7 +125,7 @@ class BaseItem(ABC):
         raise NotImplementedError('restore() must be implemented')
 
 
-class BaseItemCollection(BaseItem):
+class BaseItemCollection(BaseItem, ABC):
     """
     Base class for items that contain sub-items within them
     """
@@ -137,7 +137,6 @@ class BaseItemCollection(BaseItem):
         :param schema: Schema that conforms to the item
         :param evaluation_context: Context dictionary for evaluation
         """
-
         super().__init__(schema, evaluation_context)
 
     def evaluate(self) -> None:
@@ -163,7 +162,7 @@ class BaseItemCollection(BaseItem):
             }
 
         except Exception as e:
-            print('Error while creating snapshot for {}', self.name)
+            print('Error while creating snapshot')
             raise SnapshotError(e)
 
     def restore(self, snapshot: Dict[str, Any]) -> 'BaseItemCollection':
@@ -171,13 +170,13 @@ class BaseItemCollection(BaseItem):
         Restores the state of a collection from a snapshot
         """
         try:
-
+            print("Here")
             for name, snap in snapshot.items():
                 self.nested_items[name].restore(snap)
             return self
 
         except Exception as e:
-            print('Error while restoring snapshot: {}', self.snapshot)
+            print('Error while restoring snapshot: {}', snapshot)
             raise SnapshotError(e)
 
     def __getattr__(self, item: str) -> Any:
@@ -199,10 +198,9 @@ class BaseItemCollection(BaseItem):
         """
         raise NotImplementedError('finalize() must be implemented')
 
-    @property
-    @abstractmethod
+    @abstractproperty
     def nested_items(self) -> Dict[str, Type[BaseItem]]:
         """
         Dictionary of the name and item in the collection
         """
-        pass
+        raise NotImplementedError('nested_items() must be implemented')
