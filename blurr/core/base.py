@@ -36,7 +36,7 @@ class BaseSchema(ABC):
             self._spec[self.ATTRIBUTE_WHEN]
         ) if self.ATTRIBUTE_WHEN in self._spec else None
 
-    def extend_schema(self, spec: Dict[str, Any]):
+    def extend_schema(self, spec: Dict[str, Any]) -> Dict[str, Any]:
         """ Extends the defined schema specifications at runtime with defaults """
         return spec
 

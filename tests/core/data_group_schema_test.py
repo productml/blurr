@@ -31,7 +31,7 @@ class MockDataGroupSchema(DataGroupSchema):
     pass
 
 
-def test_data_group_identity_field(data_group_schema_spec):
+def test_data_group_schema_contains_identity_field(data_group_schema_spec):
     schema_loader = SchemaLoader()
     del data_group_schema_spec['Store']
     name = schema_loader.add_schema(data_group_schema_spec)

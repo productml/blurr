@@ -37,7 +37,7 @@ class BlockDataGroupSchema(DataGroupSchema):
         return super().extend_schema(spec)
 
     @staticmethod
-    def _build_block_start_end_fields_spec(
+    def _build_time_fields_spec(
             name_in_context: str) -> List[Dict[str, Any]]:
         """
         Constructs the spec for predefined fields that are to be included in the master spec prior to schema load
