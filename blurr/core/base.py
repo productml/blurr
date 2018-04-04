@@ -148,7 +148,7 @@ class BaseItemCollection(BaseItem):
         evaluation failed
         """
         if self._needs_evaluation:
-            for _, item in self.nested_items.items():
+            for _, item in self._nested_items.items():
                 item.evaluate()
 
     @property
@@ -160,7 +160,7 @@ class BaseItemCollection(BaseItem):
 
             return {
                 name: item._snapshot
-                for name, item in self.nested_items.items()
+                for name, item in self._nested_items.items()
             }
 
         except Exception as e:
@@ -174,7 +174,7 @@ class BaseItemCollection(BaseItem):
         try:
 
             for name, snap in snapshot.items():
-                self.nested_items[name].restore(snap)
+                self._nested_items[name].restore(snap)
             return self
 
         except Exception as e:
@@ -188,8 +188,8 @@ class BaseItemCollection(BaseItem):
         for dynamic execution.
         :param item: Field requested
         """
-        if item in self.nested_items:
-            return self.nested_items[item]._snapshot
+        if item in self._nested_items:
+            return self._nested_items[item]._snapshot
 
         return self.__getattribute__(item)
 
@@ -198,10 +198,10 @@ class BaseItemCollection(BaseItem):
         Makes the nested items available though the square bracket notation.
         :raises KeyError: When a requested item is not found in nested items
         """
-        if item not in self.nested_items:
+        if item not in self._nested_items:
             raise KeyError('{item} not defined in {name}'.format(item=item, name=self._name))
 
-        return self.nested_items[item]._snapshot
+        return self._nested_items[item]._snapshot
 
     @abstractmethod
     def finalize(self) -> None:
@@ -212,7 +212,7 @@ class BaseItemCollection(BaseItem):
 
     @property
     @abstractmethod
-    def nested_items(self) -> Dict[str, Type[BaseItem]]:
+    def _nested_items(self) -> Dict[str, Type[BaseItem]]:
         """
         Dictionary of the name and item in the collection
         """

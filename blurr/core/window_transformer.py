@@ -74,7 +74,7 @@ class WindowTransformer(Transformer):
         if not self._needs_evaluation:
             return
 
-        for item in self.nested_items.values():
+        for item in self._nested_items.values():
             if isinstance(item, WindowDataGroup):
                 item.prepare_window(self.anchor.anchor_block.start_time)
 

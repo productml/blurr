@@ -66,10 +66,10 @@ class Transformer(BaseItemCollection, ABC):
         }
         self.identity = identity
         self._evaluation_context.global_add('identity', self.identity)
-        self._evaluation_context.global_context.merge(self.nested_items)
+        self._evaluation_context.global_context.merge(self._nested_items)
 
     @property
-    def nested_items(self) -> Dict[str, Type[BaseItem]]:
+    def _nested_items(self) -> Dict[str, Type[BaseItem]]:
         """
         Dictionary of nested data groups
         """
@@ -79,5 +79,5 @@ class Transformer(BaseItemCollection, ABC):
         """
         Iteratively finalizes all data groups in its transformer
         """
-        for item in self.nested_items.values():
+        for item in self._nested_items.values():
             item.finalize()

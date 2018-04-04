@@ -82,7 +82,7 @@ class DataGroup(BaseItemCollection, ABC):
         }
 
     @property
-    def nested_items(self) -> Dict[str, Type[BaseItem]]:
+    def _nested_items(self) -> Dict[str, Type[BaseItem]]:
         """
         Returns the dictionary of fields the DataGroup contains
         """
