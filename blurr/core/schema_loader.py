@@ -103,7 +103,8 @@ class SchemaLoader:
         :param type: Schema type.
         :return: List of fully qualified names and schema dictionary tuples.
         """
-        return [(fq_name, schema) for fq_name, schema in self._spec.items()
+        return [(fq_name, schema)
+                for fq_name, schema in self._spec.items()
                 if schema.get(self.ATTRIBUTE_TYPE, '') == type]
 
     @staticmethod
