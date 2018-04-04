@@ -64,8 +64,8 @@ class Transformer(BaseItemCollection, ABC):
                 item_schema, identity, self._evaluation_context)
             for name, item_schema in schema.nested_schema.items()
         }
-        self.identity = identity
-        self._evaluation_context.global_add('identity', self.identity)
+        self._identity = identity
+        self._evaluation_context.global_add('identity', self._identity)
         self._evaluation_context.global_context.merge(self._nested_items)
 
     @property

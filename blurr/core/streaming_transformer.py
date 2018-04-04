@@ -46,7 +46,7 @@ class StreamingTransformer(Transformer):
     def __init__(self, schema: TransformerSchema, identity: str,
                  context: Context) -> None:
         super().__init__(schema, identity, context)
-        self._evaluation_context.global_add('identity', self.identity)
+        self._evaluation_context.global_add('identity', self._identity)
 
     def evaluate_record(self, record: Record):
         """
@@ -63,8 +63,8 @@ class StreamingTransformer(Transformer):
 
         record_identity = self._schema.get_identity(
             self._evaluation_context.global_context)
-        if self.identity != record_identity:
-            raise IdentityError('Identity in transformer (', self.identity,
+        if self._identity != record_identity:
+            raise IdentityError('Identity in transformer (', self._identity,
                                 ') and new record (', record_identity,
                                 ') do not match')
 
