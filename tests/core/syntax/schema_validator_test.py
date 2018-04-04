@@ -88,7 +88,7 @@ def test_invalid_datagroup_has_no_fields():
     assert 'DataGroups.0.Fields: Required field missing' in str(err.value)
 
 
-def test_invalid_field_name_reserved_keywords():
+def test_reserved_keywords_as_field_names_raises_invalid_schema_error():
     with raises(InvalidSchemaError) as err:
         dtc_dict = load_example('invalid_field_name.yml')
         validate(dtc_dict)
