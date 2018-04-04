@@ -6,7 +6,7 @@
 # The Window DTC periodically applies windows operations on top of sessionized data
 Type: Blurr:Window
 
-Version: '2018-03-23'
+Version: '2018-03-01'
 Description: Second Level processing for feature generation
 
 Name: ProductMLExample
