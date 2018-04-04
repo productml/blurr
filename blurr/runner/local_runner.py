@@ -37,7 +37,6 @@ class LocalRunner:
         self._stream_transformer_schema = self._schema_loader.get_schema_object(
             self._stream_dtc_name)
 
-
         self._user_events = defaultdict(list)
         self._block_data = {}
         self._window_data = {}

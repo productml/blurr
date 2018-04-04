@@ -95,7 +95,8 @@ def test_invalid_incorrect_expression():
     with raises(InvalidSchemaError) as err:
         dtc_dict = load_example('invalid_incorrect_expression.yml')
         validate(dtc_dict)
-    assert "When: 'x == senor roy' is an invalid python expression." in str(err.value)
+    assert "When: 'x == senor roy' is an invalid python expression." in str(
+        err.value)
 
 
 def test_invalid_datagroup_has_no_fields():
@@ -109,4 +110,5 @@ def test_reserved_keywords_as_field_names_raises_invalid_schema_error():
     with raises(InvalidSchemaError) as err:
         dtc_dict = load_example('invalid_field_name.yml')
         validate(dtc_dict)
-    assert "Name: '_name' starts with _ or containing whitespace characters." in str(err.value)
+    assert "Name: '_name' starts with _ or containing whitespace characters." in str(
+        err.value)

@@ -76,8 +76,8 @@ class WindowDataGroup(DataGroup):
                 self.window_source.view) != abs(self._schema.window_value):
             raise PrepareWindowMissingBlocksError(
                 'Expecting {} but not found {} blocks'.format(
-                    abs(self._schema.window_value),
-                    len(self.window_source.view)))
+                    abs(self._schema.window_value), len(
+                        self.window_source.view)))
 
         if len(self.window_source.view) == 0:
             raise PrepareWindowMissingBlocksError('No matching blocks found')
@@ -110,5 +110,6 @@ class WindowDataGroup(DataGroup):
         ]
 
     def evaluate(self) -> None:
-        self._evaluation_context.local_context.add('source', self.window_source)
+        self._evaluation_context.local_context.add('source',
+                                                   self.window_source)
         super().evaluate()

@@ -59,7 +59,7 @@ class StreamingTransformer(Transformer):
         self._evaluation_context.global_add('source', record)
         self._evaluation_context.global_add('time',
                                             self._schema.time.evaluate(
-                                               self._evaluation_context))
+                                                self._evaluation_context))
 
         record_identity = self._schema.get_identity(
             self._evaluation_context.global_context)

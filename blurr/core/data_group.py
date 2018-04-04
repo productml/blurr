@@ -44,7 +44,11 @@ class DataGroupSchema(BaseSchemaCollection, ABC):
     def extend_schema(self, spec: Dict[str, Any]) -> Dict[str, Any]:
         """ Injects the identity field """
 
-        identity_field = {'Name': 'identity', 'Type': 'string', 'Value': 'identity'}
+        identity_field = {
+            'Name': 'identity',
+            'Type': 'string',
+            'Value': 'identity'
+        }
         spec[self.ATTRIBUTE_FIELDS].insert(0, identity_field)
 
         self.schema_loader.add_schema(identity_field,
