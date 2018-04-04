@@ -27,7 +27,7 @@ def collection_schema_spec() -> Dict[str, Any]:
 
 
 @fixture
-def mock_nested_items():
+def mock_nested_items() -> contextmanager:
     return mock.patch(
         'base_item_collection_test.MockBaseItemCollection.nested_items',
         new_callable=mock.PropertyMock,
@@ -64,7 +64,8 @@ class MockBaseSchemaCollection(BaseSchemaCollection):
     pass
 
 
-def test_evaluate_needs_evaluation_false(collection_schema_spec) -> None:
+def test_evaluate_needs_evaluation_false(
+        collection_schema_spec: Dict[str, Any]) -> None:
     schema_loader = SchemaLoader()
     collection_schema_spec['When'] = 'False'
     name = schema_loader.add_schema(collection_schema_spec)
@@ -76,7 +77,8 @@ def test_evaluate_needs_evaluation_false(collection_schema_spec) -> None:
     assert item_collection.event_count == 0
 
 
-def test_evaluate_needs_evaluation_true(collection_schema_spec) -> None:
+def test_evaluate_needs_evaluation_true(
+        collection_schema_spec: Dict[str, Any]) -> None:
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(collection_schema_spec)
     schema_collection = MockBaseSchemaCollection(
@@ -87,7 +89,8 @@ def test_evaluate_needs_evaluation_true(collection_schema_spec) -> None:
     assert item_collection.event_count == 5
 
 
-def test_evaluate_invalid(collection_schema_spec, mock_nested_items) -> None:
+def test_evaluate_invalid(collection_schema_spec: Dict[str, Any],
+                          mock_nested_items: contextmanager) -> None:
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(collection_schema_spec)
     schema_collection = MockBaseSchemaCollection(
@@ -101,7 +104,7 @@ def test_evaluate_invalid(collection_schema_spec, mock_nested_items) -> None:
             item_collection.evaluate()
 
 
-def test_snapshot_valid(collection_schema_spec):
+def test_snapshot_valid(collection_schema_spec: Dict[str, Any]) -> None:
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(collection_schema_spec)
     schema_collection = MockBaseSchemaCollection(
@@ -114,7 +117,8 @@ def test_snapshot_valid(collection_schema_spec):
     assert item_collection.snapshot == {'event_count': 5}
 
 
-def test_snapshot_invalid(collection_schema_spec, mock_nested_items):
+def test_snapshot_invalid(collection_schema_spec: Dict[str, Any],
+                          mock_nested_items: contextmanager) -> None:
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(collection_schema_spec)
     schema_collection = MockBaseSchemaCollection(
@@ -128,7 +132,7 @@ def test_snapshot_invalid(collection_schema_spec, mock_nested_items):
             item_collection.snapshot
 
 
-def test_restore_valid(collection_schema_spec):
+def test_restore_valid(collection_schema_spec: Dict[str, Any]) -> None:
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(collection_schema_spec)
     schema_collection = MockBaseSchemaCollection(
@@ -139,7 +143,8 @@ def test_restore_valid(collection_schema_spec):
     assert item_collection.snapshot == {'event_count': 5}
 
 
-def test_restore_invalid(collection_schema_spec, mock_nested_items):
+def test_restore_invalid(collection_schema_spec: Dict[str, Any],
+                         mock_nested_items: contextmanager) -> None:
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(collection_schema_spec)
     schema_collection = MockBaseSchemaCollection(
@@ -160,7 +165,7 @@ def test_restore_invalid(collection_schema_spec, mock_nested_items):
             item_collection.restore(snapshot)
 
 
-def test_get_attribute(collection_schema_spec):
+def test_get_attribute(collection_schema_spec: Dict[str, Any]) -> None:
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(collection_schema_spec)
     schema_collection = MockBaseSchemaCollection(
@@ -173,7 +178,8 @@ def test_get_attribute(collection_schema_spec):
     assert item_collection.schema == schema_collection
 
 
-def test_get_attribute_invalid(collection_schema_spec, mock_nested_items):
+def test_get_attribute_invalid(collection_schema_spec: Dict[str, Any],
+                               mock_nested_items: contextmanager) -> None:
 
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(collection_schema_spec)
