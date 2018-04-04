@@ -95,8 +95,8 @@ DataGroups:
 
 [Read the docs](http://productml-blurr.readthedocs.io/en/latest/)
 
-[Streaming DTC Tutorial](http://productml-blurr.readthedocs.io/en/latest/Streaming%20dtc%20tutorial/) |
-[Window DTC Tutorial](http://productml-blurr.readthedocs.io/en/latest/Window%20dtc%20tutorial/)
+[Streaming DTC Tutorial](http://productml-blurr.readthedocs.io/en/latest/Streaming%20DTC%20Tutorial/) |
+[Window DTC Tutorial](http://productml-blurr.readthedocs.io/en/latest/Window%20DTC%20Tutorial/)
 
 Preparing data for specific use cases using Blurr
 
