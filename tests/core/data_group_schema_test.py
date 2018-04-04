@@ -13,7 +13,6 @@ def data_group_schema_spec() -> Dict[str, Any]:
     return {
         'Type': 'Blurr:DataGroup:BlockAggregate',
         'Name': 'user',
-        'Store': 'memory',
         'Fields': [{
             'Name': 'event_count',
             'Type': 'integer',
@@ -36,7 +35,6 @@ class MockDataGroupSchema(DataGroupSchema):
 
 def test_data_group_identity_field(data_group_schema_spec):
     schema_loader = SchemaLoader()
-    del data_group_schema_spec['Store']
     name = schema_loader.add_schema(data_group_schema_spec)
 
     data_group_schema = MockDataGroupSchema(name, schema_loader)
@@ -46,6 +44,7 @@ def test_data_group_identity_field(data_group_schema_spec):
 
 def test_data_group_schema_initialization_with_store(data_group_schema_spec,
                                                      store_spec):
+    data_group_schema_spec['Store'] = 'memory'
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(data_group_schema_spec)
     with pytest.raises(
@@ -61,7 +60,6 @@ def test_data_group_schema_initialization_with_store(data_group_schema_spec,
 def test_data_group_schema_initialization_without_store(
         data_group_schema_spec):
     schema_loader = SchemaLoader()
-    del data_group_schema_spec['Store']
     name = schema_loader.add_schema(data_group_schema_spec)
     data_group_schema = MockDataGroupSchema(name, schema_loader)
     assert data_group_schema.store is None
@@ -69,7 +67,6 @@ def test_data_group_schema_initialization_without_store(
 
 def test_field_without_type_defaults_to_string(data_group_schema_spec):
     schema_loader = SchemaLoader()
-    del data_group_schema_spec['Store']
     name = schema_loader.add_schema(data_group_schema_spec)
     data_group_schema = MockDataGroupSchema(name, schema_loader)
     missing_type_field = data_group_schema.nested_schema['missing_type']
