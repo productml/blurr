@@ -4,7 +4,7 @@ Description: Example
 Name: example_name
 Identity: source.user_id
 Time: source.timestamp
-When: source.package_version = '1.0'
+When: source.package_version == '1.0'
 Stores:
  - Type: Blurr:Store:MemoryStore
    Name: memory_store
@@ -13,9 +13,9 @@ DataGroups:
    Name: user
    Store: offer_ai_dynamo
    Fields:
-     - Name: name
+     - Name: _name
        Value: source.customer_identifier
        Atomic: true
      - Name: type
        Value: source.country
-       When: last_session = None
+       When: last_session == None

@@ -1,8 +1,8 @@
 import ast
-from typing import Dict
-
 import os
 import re
+from typing import Dict
+
 from yamale import yamale
 from yamale.schema import Data
 from yamale.validators import DefaultValidators, Validator
@@ -10,21 +10,8 @@ from yamale.validators.constraints import Constraint
 
 from blurr.core.errors import InvalidSchemaError
 
-
-def is_expression(s: str) -> bool:
-    try:
-        ast.parse(s)
-    except SyntaxError:
-        return False
-    except TypeError:
-        return False
-    return True
-
-
-def is_identifier(s: str) -> bool:
-    return len(re.findall(r'[^\S]', s)) == 0
-
-
+EQUAL_OPERATOR_EXISTS_REGEX = re.compile(r'(?:^|[^!=]+)=(?:[^=]+|$)')
+IDENTITY_VALIDATOR_REGEX = re.compile(r'^_|[^\S]')
 
 
 class StringExclude(Constraint):
@@ -58,20 +45,47 @@ class Identifier(Validator):
     constraints = [StringExclude]
 
     def _is_valid(self, value: str) -> bool:
-        return is_identifier(value)
+        return not IDENTITY_VALIDATOR_REGEX.findall(value)
 
     def get_name(self) -> str:
         return 'Identifier'
+
+    def fail(self, value):
+        return '\'%s\' starts with _ or containing whitespace characters.' % value
 
 
 class Expression(Validator):
     TAG = 'expression'
 
+    set_not_allowed = '\'%s\' sets value using `=`.'
+    invalid_python_expression = '\'%s\' is an invalid python expression.'
+    failure_reason = None
+
     def _is_valid(self, value: str) -> bool:
-        return is_expression(str(value))
+        value = str(value)
+        if EQUAL_OPERATOR_EXISTS_REGEX.findall(value):
+            self.failure_reason = self.set_not_allowed
+            return False
+        elif not self.is_valid_python_expression(value):
+            self.failure_reason = self.invalid_python_expression
+            return False
+        return True
 
     def get_name(self) -> str:
         return 'Expression'
+
+    def fail(self, value):
+        return self.failure_reason % value
+
+    @staticmethod
+    def is_valid_python_expression(expression):
+        try:
+            ast.parse(expression)
+        except SyntaxError:
+            return False
+        except TypeError:
+            return False
+        return True
 
 
 VALIDATORS = {

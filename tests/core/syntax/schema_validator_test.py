@@ -2,27 +2,44 @@ import yaml
 from pytest import raises
 
 from blurr.core.errors import InvalidSchemaError
-from blurr.core.syntax.schema_validator import is_identifier, is_expression, \
-    validate
+from blurr.core.syntax.schema_validator import validate, Identifier, Expression
 
 
 def test_valid_identifier():
-    assert is_identifier('valid_string_with_numbers_and_!@£$$%%^&*()')
+    validator = Identifier(None, None)
+    assert validator._is_valid('valid_string_with_numbers_and_!@£$$%%^&*()')
 
 
 def test_invalid_identifiers():
-    assert not is_identifier('identifier with spaces')
-    assert not is_identifier('identifier_with\t_tabs')
-    assert not is_identifier('identifier_with\n_new_lines')
+    validator = Identifier(None, None)
+    assert not validator._is_valid('identifier with spaces')
+    assert not validator._is_valid('identifier_with\t_tabs')
+    assert not validator._is_valid('identifier_with\n_new_lines')
 
 
 def test_valid_expression():
-    assert is_expression("is_valid_python('1 // 2')")
+    validator = Expression(None, None)
+    assert validator._is_valid("is_valid_python('1 // 2')")
+    assert validator._is_valid('a==b')
+    assert validator._is_valid('a == c')
+    assert validator._is_valid('a==b == c')
+    assert validator._is_valid('a!=b')
+    assert validator._is_valid('a != c')
+    assert validator._is_valid('a!=b != c')
 
 
 def test_invalid_expression():
-    assert not is_expression('regular text')
-    assert not is_expression('is_invalid_python(1 /// 2)')
+    validator = Expression(None, None)
+    assert not validator._is_valid('regular text')
+    assert not validator._is_valid('is_invalid_python(1 /// 2)')
+    assert not validator._is_valid('a= b')
+    assert not validator._is_valid('a!=b = ')
+    assert not validator._is_valid(' =a')
+    assert not validator._is_valid('b =')
+    assert not validator._is_valid('b &= c')
+    assert not validator._is_valid('b += c')
+    assert not validator._is_valid('b |= c')
+    assert not validator._is_valid('b /= c')
 
 
 def load_example(file):
@@ -78,7 +95,7 @@ def test_invalid_incorrect_expression():
     with raises(InvalidSchemaError) as err:
         dtc_dict = load_example('invalid_incorrect_expression.yml')
         validate(dtc_dict)
-    assert "When: 'x == senor roy' is not a Expression." in str(err.value)
+    assert "When: 'x == senor roy' is an invalid python expression." in str(err.value)
 
 
 def test_invalid_datagroup_has_no_fields():
@@ -92,4 +109,4 @@ def test_reserved_keywords_as_field_names_raises_invalid_schema_error():
     with raises(InvalidSchemaError) as err:
         dtc_dict = load_example('invalid_field_name.yml')
         validate(dtc_dict)
-    assert "Name: 'name' is a reserved keyword." in str(err.value)
+    assert "Name: '_name' starts with _ or containing whitespace characters." in str(err.value)

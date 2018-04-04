@@ -2,6 +2,7 @@ Type: Blurr:Streaming
 Version: '2018-03-01'
 Description: Example
 Name: example_name
+Time: time
 Identity: source.user_id
 
 
