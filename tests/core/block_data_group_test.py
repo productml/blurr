@@ -51,12 +51,15 @@ def check_fields(fields: Dict[str, Field],
     return True
 
 
-def create_block_data_group(schema, time) -> BlockDataGroup:
+def create_block_data_group(schema, time, identity) -> BlockDataGroup:
     evaluation_context = EvaluationContext()
     block_data_group = BlockDataGroup(
-        schema=schema, identity='12345', evaluation_context=evaluation_context)
+        schema=schema,
+        identity=identity,
+        evaluation_context=evaluation_context)
     evaluation_context.global_add('time', time)
     evaluation_context.global_add('user', block_data_group)
+    evaluation_context.global_add('identity', identity)
     return block_data_group
 
 
@@ -65,17 +68,21 @@ def test_block_data_group_schema_evaluate_without_split(
     name = schema_loader.add_schema(block_data_group_schema_spec)
     block_data_group_schema = BlockDataGroupSchema(name, schema_loader)
 
+    identity = 'userA'
     time = datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc)
-    block_data_group = create_block_data_group(block_data_group_schema, time)
+    block_data_group = create_block_data_group(block_data_group_schema, time,
+                                               identity)
     block_data_group.evaluate()
 
     # Check eval results of various fields
-    assert len(block_data_group.nested_items) == 3
-    assert check_fields(block_data_group.nested_items, {
-        'event_count': 1,
-        'start_time': time,
-        'end_time': time
-    })
+    assert len(block_data_group.nested_items) == 4
+    assert check_fields(
+        block_data_group.nested_items, {
+            'identity': identity,
+            'event_count': 1,
+            'start_time': time,
+            'end_time': time
+        })
 
     # aggregate snapshot should not exist in store
     assert block_data_group_schema.store.get(
@@ -90,27 +97,33 @@ def test_block_data_group_schema_evaluate_with_split(
     name = schema_loader.add_schema(block_data_group_schema_spec)
     block_data_group_schema = BlockDataGroupSchema(name, schema_loader)
 
+    identity = 'userA'
     time = datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc)
-    block_data_group = create_block_data_group(block_data_group_schema, time)
+    block_data_group = create_block_data_group(block_data_group_schema, time,
+                                               identity)
     block_data_group.evaluate()
     block_data_group.evaluate()
 
     # Check eval results of various fields before split
-    assert check_fields(block_data_group.nested_items, {
-        'event_count': 2,
-        'start_time': time,
-        'end_time': time
-    })
+    assert check_fields(
+        block_data_group.nested_items, {
+            'identity': identity,
+            'event_count': 2,
+            'start_time': time,
+            'end_time': time
+        })
 
     current_snapshot = block_data_group.snapshot
     block_data_group.evaluate()
 
     # Check eval results of various fields
-    assert check_fields(block_data_group.nested_items, {
-        'event_count': 1,
-        'start_time': time,
-        'end_time': time
-    })
+    assert check_fields(
+        block_data_group.nested_items, {
+            'identity': identity,
+            'event_count': 1,
+            'start_time': time,
+            'end_time': time
+        })
 
     # Check aggregate snapshot present in store
     assert block_data_group_schema.store.get(
