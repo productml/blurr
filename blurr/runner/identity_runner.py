@@ -64,11 +64,17 @@ def execute_window_dtc(identity: str, schema_loader: SchemaLoader,
     exec_context.add(stream_transformer.schema.name, stream_transformer)
 
     block_obj = None
-    for _, data_group in stream_transformer.nested_items.items():
-        if isinstance(data_group, BlockDataGroup):
-            block_obj = data_group
+    for data_group in stream_transformer.nested_items.values():
+        if not isinstance(data_group, BlockDataGroup):
+            continue
+        if block_obj is not None:
+            raise Exception(
+                ('Window operation is supported against Streaming ',
+                 'DTC with only one BlockAggregate'))
+        block_obj = data_group
+
     if block_obj is None:
-        return []
+        raise Exception('No BlockAggregate found in the Streaming DTC file')
 
     window_data = []
 

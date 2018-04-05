@@ -51,7 +51,7 @@ def window_transformer(schema_loader, stream_transformer, window_schema_spec):
 @fixture
 def block_aggregate(stream_transformer):
     block = None
-    for _, data_group in stream_transformer.nested_items.items():
+    for data_group in stream_transformer.nested_items.values():
         if isinstance(data_group, BlockDataGroup):
             block = data_group
 
@@ -106,41 +106,22 @@ def test_evaluate_anchor_false(schema_loader, window_transformer,
 def test_evaluate_error(window_transformer):
     with pytest.raises(
             AnchorBlockNotDefinedError,
-            match=
-            'WindowTransformer does not support evaluate directly. Call evaluate_anchor instead.'
-    ):
+            match=('WindowTransformer does not support evaluate directly.'
+                   ' Call evaluate_anchor instead.')):
         window_transformer.evaluate()
 
 
-def test_window_transformer(stream_schema_spec, window_schema_spec):
-    schema_loader = SchemaLoader()
-    stream_dtc_name = schema_loader.add_schema(stream_schema_spec)
-    window_dtc_name = schema_loader.add_schema(window_schema_spec)
+def test_window_transformer(schema_loader, window_transformer,
+                            block_aggregate):
     init_memory_store(schema_loader.get_schema_object('Sessions.memory'))
 
-    stream_transformer = StreamingTransformer(
-        schema_loader.get_schema_object(stream_dtc_name), 'user1', Context())
-
-    block = None
-    for _, data_group in stream_transformer.nested_items.items():
-        if isinstance(data_group, BlockDataGroup):
-            block = data_group
-    if block is None:
-        return []
-
-    window_transformer = WindowTransformer(
-        WindowTransformerSchema(window_dtc_name, schema_loader), 'user1',
-        Context({
-            stream_transformer.schema.name: stream_transformer
-        }))
-
-    block.restore({
+    block_aggregate.restore({
         'events': 3,
         'start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc),
         'end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc)
     })
 
-    assert window_transformer.evaluate_anchor(block) is True
+    assert window_transformer.evaluate_anchor(block_aggregate) is True
 
     snapshot = window_transformer.snapshot
     assert snapshot['last_session'] == {'identity': 'user1', 'events': 2}
