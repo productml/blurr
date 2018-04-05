@@ -59,7 +59,7 @@ class Transformer(BaseItemCollection, ABC):
                  context: Context) -> None:
         super().__init__(schema, EvaluationContext(global_context=context))
         # Load the nested items into the item
-        self._data_groups: Dict[str, Type[BaseItem]] = {
+        self._data_groups: Dict[str, DataGroup] = {
             name: TypeLoader.load_item(item_schema.type)(
                 item_schema, identity, self.evaluation_context)
             for name, item_schema in schema.nested_schema.items()
@@ -69,7 +69,7 @@ class Transformer(BaseItemCollection, ABC):
         self.evaluation_context.global_context.merge(self.nested_items)
 
     @property
-    def nested_items(self) -> Dict[str, Type[BaseItem]]:
+    def nested_items(self) -> Dict[str, DataGroup]:
         """
         Dictionary of nested data groups
         """
@@ -81,3 +81,26 @@ class Transformer(BaseItemCollection, ABC):
         """
         for item in self.nested_items.values():
             item.finalize()
+
+    def __getattr__(self, item: str) -> DataGroup:
+        """
+        Makes the value of the nested items available as properties
+        of the collection object.  This is used for retrieving field values
+        for dynamic execution.
+        :param item: Field requested
+        """
+        if item in self.nested_items:
+            return self.nested_items[item]
+
+        return self.__getattribute__(item)
+
+    def __getitem__(self, item) -> DataGroup:
+        """
+        Makes the nested items available though the square bracket notation.
+        :raises KeyError: When a requested item is not found in nested items
+        """
+        if item not in self.nested_items:
+            raise KeyError('{item} not defined in {name}'.format(
+                item=item, name=self.name))
+
+        return self.nested_items[item]

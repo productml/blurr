@@ -6,7 +6,7 @@ from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.block_data_group import BlockDataGroup
-from blurr.core.store import Key
+from blurr.core.store_key import Key
 from blurr.core.base import BaseItem
 
 

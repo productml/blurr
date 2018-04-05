@@ -6,7 +6,7 @@ from blurr.core.base import BaseSchemaCollection, BaseItemCollection, BaseItem
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.loader import TypeLoader
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.store import Key
+from blurr.core.store_key import Key
 
 
 class DataGroupSchema(BaseSchemaCollection, ABC):
@@ -44,7 +44,11 @@ class DataGroupSchema(BaseSchemaCollection, ABC):
     def extend_schema(self, spec: Dict[str, Any]) -> Dict[str, Any]:
         """ Injects the identity field """
 
-        identity_field = {'Name': 'identity', 'Type': 'string', 'Value': 'identity'}
+        identity_field = {
+            'Name': 'identity',
+            'Type': 'string',
+            'Value': 'identity'
+        }
         spec[self.ATTRIBUTE_FIELDS].insert(0, identity_field)
 
         self.schema_loader.add_schema(identity_field,
@@ -102,3 +106,26 @@ class DataGroup(BaseItemCollection, ABC):
         if self.schema.store:
             self.schema.store.save(
                 Key(self.identity, self.name, timestamp), self.snapshot)
+
+    def __getattr__(self, item: str) -> Any:
+        """
+        Makes the value of the nested items available as properties
+        of the collection object.  This is used for retrieving field values
+        for dynamic execution.
+        :param item: Field requested
+        """
+        if item in self.nested_items:
+            return self.nested_items[item].snapshot
+
+        return self.__getattribute__(item)
+
+    def __getitem__(self, item) -> Any:
+        """
+        Makes the nested items available though the square bracket notation.
+        :raises KeyError: When a requested item is not found in nested items
+        """
+        if item not in self.nested_items:
+            raise KeyError('{item} not defined in {name}'.format(
+                item=item, name=self.name))
+
+        return self.nested_items[item].snapshot

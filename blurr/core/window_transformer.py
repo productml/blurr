@@ -50,9 +50,6 @@ class WindowTransformer(Transformer):
         :param block: Block to run the anchor condition against.
         :return: True, if the anchor condition is met, otherwise, False.
         """
-        # Set up context so that anchor can process the block
-        self.evaluation_context.local_context.add(
-            block.schema.fully_qualified_name, block)
         if self.anchor.evaluate_anchor(block):
 
             try:

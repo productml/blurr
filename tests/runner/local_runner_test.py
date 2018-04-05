@@ -2,7 +2,7 @@ from datetime import datetime
 
 from dateutil.tz import tzutc
 
-from blurr.core.store import Key
+from blurr.core.store_key import Key
 from blurr.runner.local_runner import LocalRunner
 
 

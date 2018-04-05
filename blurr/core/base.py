@@ -1,10 +1,11 @@
-from typing import Dict, Any, Type, TypeVar
+from typing import Dict, Any, Type, TypeVar, Union
 
 from abc import ABC, abstractmethod
 
 from blurr.core.errors import SnapshotError
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
+from blurr.core.store_key import Key
 
 
 class BaseSchema(ABC):
@@ -60,8 +61,8 @@ class BaseSchemaCollection(BaseSchema, ABC):
         # Load nested schema items
         self.nested_schema: Dict[str, Type[BaseSchema]] = {
             schema_spec[self.ATTRIBUTE_NAME]:
-                self.schema_loader.get_nested_schema_object(
-                    self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
+            self.schema_loader.get_nested_schema_object(
+                self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
             for schema_spec in self._spec[self._nested_item_attribute]
         }
 
@@ -167,41 +168,23 @@ class BaseItemCollection(BaseItem):
             print('Error while creating snapshot for {}', self.name)
             raise SnapshotError(e)
 
-    def restore(self, snapshot: Dict[str, Any]) -> 'BaseItemCollection':
+    def restore(self,
+                snapshot: Dict[Union[str, Key], Any]) -> 'BaseItemCollection':
         """
         Restores the state of a collection from a snapshot
         """
         try:
 
             for name, snap in snapshot.items():
-                self.nested_items[name].restore(snap)
+                if isinstance(name, Key):
+                    self.nested_items[name.group].restore(snap)
+                else:
+                    self.nested_items[name].restore(snap)
             return self
 
         except Exception as e:
             print('Error while restoring snapshot: {}', self.snapshot)
             raise SnapshotError(e)
-
-    def __getattr__(self, item: str) -> Any:
-        """
-        Makes the value of the nested items available as properties
-        of the collection object.  This is used for retrieving field values
-        for dynamic execution.
-        :param item: Field requested
-        """
-        if item in self.nested_items:
-            return self.nested_items[item].snapshot
-
-        return self.__getattribute__(item)
-
-    def __getitem__(self, item):
-        """
-        Makes the nested items available though the square bracket notation.
-        :raises KeyError: When a requested item is not found in nested items
-        """
-        if item not in self.nested_items:
-            raise KeyError('{item} not defined in {name}'.format(item=item, name=self.name))
-
-        return self.nested_items[item].snapshot
 
     @abstractmethod
     def finalize(self) -> None:
