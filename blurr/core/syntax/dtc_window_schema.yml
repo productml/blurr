@@ -32,7 +32,7 @@ data_group_window:
 
 
 field:
-  Name: identifier(exclude=['name', 'identity', 'needs_evaluation', 'schema', 'snapshot', 'nested_items', 'evaluation_context', 'window_source'])
+  Name: identifier()
   Type: data_type(required=False)
   Value: expression()
   When: expression(required=False)

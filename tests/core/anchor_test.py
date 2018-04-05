@@ -57,8 +57,8 @@ def block_item(block_schema: BlockDataGroupSchema) -> BlockDataGroup:
     block = BlockDataGroup(block_schema, 'user1', EvaluationContext())
     block.restore({
         'events': 3,
-        'start_time': datetime(2018, 3, 7, 22, 36, 31, 0, timezone.utc),
-        'end_time': datetime(2018, 3, 7, 22, 37, 31, 0, timezone.utc)
+        '_start_time': datetime(2018, 3, 7, 22, 36, 31, 0, timezone.utc),
+        '_end_time': datetime(2018, 3, 7, 22, 37, 31, 0, timezone.utc)
     })
     return block
 
@@ -103,8 +103,8 @@ def test_anchor_condition(anchor_schema_max_one: AnchorSchema,
 
     block_item.restore({
         'events': 4,
-        'start_time': datetime(2018, 3, 7, 22, 36, 31, 0, timezone.utc),
-        'end_time': datetime(2018, 3, 7, 22, 37, 31, 0, timezone.utc)
+        '_start_time': datetime(2018, 3, 7, 22, 36, 31, 0, timezone.utc),
+        '_end_time': datetime(2018, 3, 7, 22, 37, 31, 0, timezone.utc)
     })
     assert anchor.evaluate_anchor(block_item) is True
     anchor.add_condition_met()

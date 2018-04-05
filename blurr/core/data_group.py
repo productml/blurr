@@ -45,7 +45,7 @@ class DataGroupSchema(BaseSchemaCollection, ABC):
         """ Injects the identity field """
 
         identity_field = {
-            'Name': 'identity',
+            'Name': '_identity',
             'Type': 'string',
             'Value': 'identity'
         }

@@ -36,19 +36,19 @@ def test_window_transformer(test_stream_schema_spec, test_window_schema_spec):
         'user1', EvaluationContext())
     block.restore({
         'events': 3,
-        'start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc),
-        'end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc)
+        '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc),
+        '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc)
     })
 
     assert window_transformer.evaluate_anchor(block) is True
 
     snapshot = window_transformer._snapshot
-    assert snapshot['last_session'] == {'identity': 'user1', 'events': 2}
-    assert snapshot['last_day'] == {'identity': 'user1', 'total_events': 3}
+    assert snapshot['last_session'] == {'_identity': 'user1', 'events': 2}
+    assert snapshot['last_day'] == {'_identity': 'user1', 'total_events': 3}
 
     assert window_transformer.flattened_snapshot == {
         'last_session.events': 2,
-        'last_session.identity': 'user1',
+        'last_session._identity': 'user1',
         'last_day.total_events': 3,
-        'last_day.identity': 'user1'
+        'last_day._identity': 'user1'
     }
