@@ -57,13 +57,13 @@ def test_field_evaluate_without_needs_evaluation():
     assert field.value == 0
 
 
-def test_field_evaluate_incorrect_typecast():
+def test_field_evaluate_incorrect_typecast_to_type_default():
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': 'integer', 'Value': '"Hi"'})
     field_schema = IntegerFieldSchema(name, schema_loader)
     field = SimpleField(field_schema, EvaluationContext())
-    with pytest.raises(ValueError):
-        field.evaluate()
+
+    assert field.value == 0
 
 
 def test_field_evaluate_implicit_typecast_integer():
