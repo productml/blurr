@@ -21,8 +21,7 @@ class FieldSchema(BaseSchema, ABC):
     # Field Name Definitions
     ATTRIBUTE_VALUE = 'Value'
 
-    def __init__(self, fully_qualified_name: str,
-                 schema_loader: SchemaLoader) -> None:
+    def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
         self.value: Expression = Expression(self._spec[self.ATTRIBUTE_VALUE])
 
@@ -56,8 +55,7 @@ class Field(BaseItem, ABC):
     An individual field object responsible for retaining the field value
     """
 
-    def __init__(self, schema: FieldSchema,
-                 evaluation_context: EvaluationContext) -> None:
+    def __init__(self, schema: FieldSchema, evaluation_context: EvaluationContext) -> None:
         """
         Initializes the Field with the default for the schema
         :param schema: Field schema
@@ -66,7 +64,7 @@ class Field(BaseItem, ABC):
         super().__init__(schema, evaluation_context)
 
         # When the field is created, the value is set to the field type default
-        self.value = self.schema.default
+        self.value = self._schema.default
 
     def evaluate(self) -> None:
         """
@@ -74,16 +72,16 @@ class Field(BaseItem, ABC):
         expression in the schema
         """
         result = None
-        if self.needs_evaluation:
-            result = self.schema.value.evaluate(self.evaluation_context)
+        if self._needs_evaluation:
+            result = self._schema.value.evaluate(self._evaluation_context)
 
         if result is None:
             return
 
         # Only set the value if it conforms to the field type
-        if not self.schema.is_type_of(result):
+        if not self._schema.is_type_of(result):
             try:
-                result = self.schema.type_object(result)
+                result = self._schema.type_object(result)
             except:
                 # Silently skip setting value if type-casting errors out
                 # TODO Log type cast exception
@@ -92,7 +90,7 @@ class Field(BaseItem, ABC):
         self.value = result
 
     @property
-    def snapshot(self) -> Any:
+    def _snapshot(self) -> Any:
         """
         Snapshots the current value of the field
         """
@@ -137,8 +135,7 @@ class ComplexTypeBase(ABC):
 
             # If the method executed is defined in the base type and a base type object is returned
             # (and not the current type), then wrap the base object into an object of the current type
-            if isinstance(result, self_type.__bases__) and not isinstance(
-                    result, self_type):
+            if isinstance(result, self_type.__bases__) and not isinstance(result, self_type):
                 return self_type(result)
                 # TODO This creates a shallow copy of the object - find a way to optimize this
 

@@ -14,5 +14,4 @@ def cli(arguments: Dict[str, Any], out: Out) -> int:
             source = arguments['--source'].split(',')
         elif arguments['<raw-json-files>'] is not None:
             source = arguments['<raw-json-files>'].split(',')
-        return transform(arguments['--streaming-dtc'],
-                         arguments['--window-dtc'], source, out)
+        return transform(arguments['--streaming-dtc'], arguments['--window-dtc'], source, out)

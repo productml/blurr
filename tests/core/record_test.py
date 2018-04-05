@@ -25,12 +25,7 @@ def test_array() -> None:
 
 
 def test_complex_array() -> None:
-    record = Record({
-        'complex_array_field': [{
-            'field_1': 'one',
-            'field_2': 2
-        }, ['one', 'two'], 1]
-    })
+    record = Record({'complex_array_field': [{'field_1': 'one', 'field_2': 2}, ['one', 'two'], 1]})
     assert len(record.complex_array_field) == 3
     assert record.complex_array_field[0].field_1 == 'one'
     assert record.complex_array_field[1][0] == 'one'
@@ -53,6 +48,5 @@ def test_getattr():
     # Defined class attributes work as expected.
     assert record.__class__ == Record
     # Un-defined class attributes throw exception.
-    with pytest.raises(
-            AttributeError, match='Record object has no __test__ attribute.'):
+    with pytest.raises(AttributeError, match='Record object has no __test__ attribute.'):
         record.__test__

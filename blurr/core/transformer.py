@@ -21,29 +21,24 @@ class TransformerSchema(BaseSchemaCollection, ABC):
     ATTRIBUTE_STORES = 'Stores'
     ATTRIBUTE_DATA_GROUPS = 'DataGroups'
 
-    def __init__(self, fully_qualified_name: str,
-                 schema_loader: SchemaLoader) -> None:
-        super().__init__(fully_qualified_name, schema_loader,
-                         self.ATTRIBUTE_DATA_GROUPS)
+    def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
+        super().__init__(fully_qualified_name, schema_loader, self.ATTRIBUTE_DATA_GROUPS)
 
         # Load the schema specific attributes
         self.version = self._spec[self.ATTRIBUTE_VERSION]
         self.description = self._spec[
-            self.
-            ATTRIBUTE_DESCRIPTION] if self.ATTRIBUTE_DESCRIPTION in self._spec else None
+            self.ATTRIBUTE_DESCRIPTION] if self.ATTRIBUTE_DESCRIPTION in self._spec else None
 
         # Load list of stores from the schema
         self.stores: Dict[str, Type[Store]] = {
-            schema_spec[self.ATTRIBUTE_NAME]:
-            self.schema_loader.get_nested_schema_object(
+            schema_spec[self.ATTRIBUTE_NAME]: self.schema_loader.get_nested_schema_object(
                 self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
             for schema_spec in self._spec.get(self.ATTRIBUTE_STORES, [])
         }
 
         # Load nested schema items
         self.nested_schema: Dict[str, Type[DataGroup]] = {
-            schema_spec[self.ATTRIBUTE_NAME]:
-            self.schema_loader.get_nested_schema_object(
+            schema_spec[self.ATTRIBUTE_NAME]: self.schema_loader.get_nested_schema_object(
                 self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
             for schema_spec in self._spec[self._nested_item_attribute]
         }
@@ -55,21 +50,20 @@ class Transformer(BaseItemCollection, ABC):
     to the context
     """
 
-    def __init__(self, schema: TransformerSchema, identity: str,
-                 context: Context) -> None:
+    def __init__(self, schema: TransformerSchema, identity: str, context: Context) -> None:
         super().__init__(schema, EvaluationContext(global_context=context))
         # Load the nested items into the item
-        self._data_groups: Dict[str, Type[BaseItem]] = {
-            name: TypeLoader.load_item(item_schema.type)(
-                item_schema, identity, self.evaluation_context)
+        self._data_groups: Dict[str, DataGroup] = {
+            name: TypeLoader.load_item(item_schema.type)(item_schema, identity,
+                                                         self._evaluation_context)
             for name, item_schema in schema.nested_schema.items()
         }
-        self.identity = identity
-        self.evaluation_context.global_add('identity', self.identity)
-        self.evaluation_context.global_context.merge(self.nested_items)
+        self._identity = identity
+        self._evaluation_context.global_add('identity', self._identity)
+        self._evaluation_context.global_context.merge(self._nested_items)
 
     @property
-    def nested_items(self) -> Dict[str, Type[BaseItem]]:
+    def _nested_items(self) -> Dict[str, DataGroup]:
         """
         Dictionary of nested data groups
         """
@@ -79,5 +73,27 @@ class Transformer(BaseItemCollection, ABC):
         """
         Iteratively finalizes all data groups in its transformer
         """
-        for item in self.nested_items.values():
+        for item in self._nested_items.values():
             item.finalize()
+
+    def __getattr__(self, item: str) -> DataGroup:
+        """
+        Makes the value of the nested items available as properties
+        of the collection object.  This is used for retrieving data groups
+        for dynamic execution.
+        :param item: Data group requested
+        """
+        if item in self._nested_items:
+            return self._nested_items[item]
+
+        return self.__getattribute__(item)
+
+    def __getitem__(self, item) -> DataGroup:
+        """
+        Makes the nested items available though the square bracket notation.
+        :raises KeyError: When a requested item is not found in nested items
+        """
+        if item not in self._nested_items:
+            raise KeyError('{item} not defined in {name}'.format(item=item, name=self._name))
+
+        return self._nested_items[item]

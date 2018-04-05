@@ -23,19 +23,19 @@ def block_data_group_schema_spec() -> Dict[str, Any]:
 
 def match_fields(fields):
     expected_fields = [{
-        'Name': 'identity',
+        'Name': '_identity',
         'Type': 'string',
         'Value': 'identity'
     }, {
-        'Name': 'start_time',
+        'Name': '_start_time',
         'Type': 'datetime',
-        'Value': 'time if user.start_time is None else time if time < '
-        'user.start_time else user.start_time'
+        'Value': 'time if user._start_time is None else time if time < '
+        'user._start_time else user._start_time'
     }, {
-        'Name': 'end_time',
+        'Name': '_end_time',
         'Type': 'datetime',
-        'Value': 'time if user.end_time is None else time if time > '
-        'user.end_time else user.end_time'
+        'Value': 'time if user._end_time is None else time if time > '
+        'user._end_time else user._end_time'
     }, {
         'Name': 'event_count',
         'Type': 'integer',
@@ -55,8 +55,7 @@ def test_block_data_group_schema_initialization(block_data_group_schema_spec):
     assert match_fields(loader_spec['Fields'])
 
 
-def test_block_data_group_schema_with_split_initialization(
-        block_data_group_schema_spec):
+def test_block_data_group_schema_with_split_initialization(block_data_group_schema_spec):
     block_data_group_schema_spec['Split'] = '4 > 2'
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(block_data_group_schema_spec)

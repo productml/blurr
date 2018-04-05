@@ -7,8 +7,7 @@ from blurr.cli.transform import transform
 
 
 def run_command(stream_dtc_file: Optional[str], window_dtc_file: Optional[str],
-                source: Optional[str], raw_json_files: Optional[str],
-                out: Out) -> int:
+                source: Optional[str], raw_json_files: Optional[str], out: Out) -> int:
     return cli({
         'transform': True,
         'validate': False,
@@ -47,26 +46,25 @@ def test_transform_no_raw_data(capsys) -> None:
 
 
 def test_transform_only_stream(capsys) -> None:
-    assert run_command('tests/data/stream.yml', None, 'tests/data/raw.json',
-                       None, Out()) == 0
+    assert run_command('tests/data/stream.yml', None, 'tests/data/raw.json', None, Out()) == 0
     out, err = capsys.readouterr()
     assert_record_in_ouput(('userA/session/2018-03-07T22:35:31+00:00', {
-        'identity': 'userA',
-        'start_time': '2018-03-07 22:35:31+00:00',
-        'end_time': '2018-03-07 22:35:31+00:00',
+        '_identity': 'userA',
+        '_start_time': '2018-03-07 22:35:31+00:00',
+        '_end_time': '2018-03-07 22:35:31+00:00',
         'events': 1,
         'country': 'US',
         'continent': 'North America'
     }), out)
     assert_record_in_ouput(('userA/state', {
-        'identity': 'userA',
+        '_identity': 'userA',
         'country': 'IN',
         'continent': 'World'
     }), out)
     assert_record_in_ouput(('userA/session', {
-        'identity': 'userA',
-        'start_time': '2018-03-07 23:35:31+00:00',
-        'end_time': '2018-03-07 23:35:32+00:00',
+        '_identity': 'userA',
+        '_start_time': '2018-03-07 23:35:31+00:00',
+        '_end_time': '2018-03-07 23:35:32+00:00',
         'events': 2,
         'country': 'IN',
         'continent': 'World'
@@ -76,13 +74,12 @@ def test_transform_only_stream(capsys) -> None:
 
 def test_transform_valid_raw_with_source(capsys) -> None:
     assert run_command('tests/data/stream.yml', 'tests/data/window.yml',
-                       'tests/data/raw.json,tests/data/raw.json', None,
-                       Out()) == 0
+                       'tests/data/raw.json,tests/data/raw.json', None, Out()) == 0
     out, err = capsys.readouterr()
     assert_record_in_ouput(('userA', [{
-        'last_session.identity': 'userA',
+        'last_session._identity': 'userA',
         'last_session.events': 2,
-        'last_day.identity': 'userA',
+        'last_day._identity': 'userA',
         'last_day.total_events': 2
     }]), out)
     assert err == ''
@@ -93,9 +90,9 @@ def test_transform_valid_raw_without_source(capsys) -> None:
                        'tests/data/raw.json,tests/data/raw.json', Out()) == 0
     out, err = capsys.readouterr()
     assert_record_in_ouput(('userA', [{
-        'last_session.identity': 'userA',
+        'last_session._identity': 'userA',
         'last_session.events': 2,
-        'last_day.identity': 'userA',
+        'last_day._identity': 'userA',
         'last_day.total_events': 2
     }]), out)
     assert err == ''

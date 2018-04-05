@@ -38,8 +38,7 @@ def get_test_schema(schema_spec: Dict[str, Any]) -> TestSchema:
     return TestSchema(name, schema_loader)
 
 
-def test_base_schema_with_all_attributes(
-        test_schema_spec: Dict[str, Any]) -> None:
+def test_base_schema_with_all_attributes(test_schema_spec: Dict[str, Any]) -> None:
     test_schema = get_test_schema(test_schema_spec)
     assert test_schema.name == test_schema_spec[BaseSchema.ATTRIBUTE_NAME]
     assert test_schema.type == test_schema_spec[BaseSchema.ATTRIBUTE_TYPE]
@@ -47,8 +46,7 @@ def test_base_schema_with_all_attributes(
     assert test_schema.when.evaluate(EvaluationContext())
 
 
-def test_base_schema_with_no_attribute_when(
-        test_schema_spec: Dict[str, Any]) -> None:
+def test_base_schema_with_no_attribute_when(test_schema_spec: Dict[str, Any]) -> None:
     del test_schema_spec[BaseSchema.ATTRIBUTE_WHEN]
     test_schema = get_test_schema(test_schema_spec)
     assert test_schema.name == test_schema_spec[BaseSchema.ATTRIBUTE_NAME]
