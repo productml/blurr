@@ -57,17 +57,17 @@ class Identifier(Validator):
 class Expression(Validator):
     TAG = 'expression'
 
-    set_not_allowed = '\'%s\' sets value using `=`.'
-    invalid_python_expression = '\'%s\' is an invalid python expression.'
+    ERROR_STRING_SET_NOT_ALLOWED = '\'%s\' sets value using `=`.'
+    ERROR_STRING_INVALID_PYTHON_EXPRESSION = '\'%s\' is an invalid python expression.'
     failure_reason = None
 
     def _is_valid(self, value: str) -> bool:
         value = str(value)
         if EQUAL_OPERATOR_EXISTS_REGEX.findall(value):
-            self.failure_reason = self.set_not_allowed
+            self.failure_reason = self.ERROR_STRING_SET_NOT_ALLOWED
             return False
         elif not self.is_valid_python_expression(value):
-            self.failure_reason = self.invalid_python_expression
+            self.failure_reason = self.ERROR_STRING_INVALID_PYTHON_EXPRESSION
             return False
         return True
 
