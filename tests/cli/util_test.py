@@ -40,13 +40,10 @@ def override_listdir(path: str) -> Any:
 @mock.patch('os.listdir', new=override_listdir)
 def test_get_yml_files():
     assert get_yml_files() == []
-    assert sorted(get_yml_files('path1')) == sorted([
-        os.path.join('path1', 'file1.yml'),
-        os.path.join('path1', 'file3.yaml')
-    ])
-    assert get_yml_files('path/inner_path') == [
-        os.path.join('path/inner_path', 'file1.yml')
-    ]
+    assert sorted(get_yml_files('path1')) == sorted(
+        [os.path.join('path1', 'file1.yml'),
+         os.path.join('path1', 'file3.yaml')])
+    assert get_yml_files('path/inner_path') == [os.path.join('path/inner_path', 'file1.yml')]
 
 
 @mock.patch('builtins.open', new=override_open)
@@ -57,18 +54,15 @@ def test_get_stream_window_dtc_files_bad_files():
 
 @mock.patch('builtins.open', new=override_open)
 def test_get_stream_window_dtc_files_missing_stream():
-    assert get_stream_window_dtc_files(
-        ['invalid.yml', 'stream1.yml']) == ('stream1.yml', None)
+    assert get_stream_window_dtc_files(['invalid.yml', 'stream1.yml']) == ('stream1.yml', None)
 
 
 @mock.patch('builtins.open', new=override_open)
 def test_get_stream_window_dtc_files_missing_window():
-    assert get_stream_window_dtc_files(
-        ['invalid.yml', 'window2.yml']) == (None, 'window2.yml')
+    assert get_stream_window_dtc_files(['invalid.yml', 'window2.yml']) == (None, 'window2.yml')
 
 
 @mock.patch('builtins.open', new=override_open)
 def test_get_stream_window_dtc_files_valid():
-    assert get_stream_window_dtc_files(
-        ['stream1.yml', 'stream2.yml', 'window1.yml']) == ('stream1.yml',
-                                                           'window1.yml')
+    assert get_stream_window_dtc_files(['stream1.yml', 'stream2.yml',
+                                        'window1.yml']) == ('stream1.yml', 'window1.yml')

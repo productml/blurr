@@ -15,32 +15,28 @@ from blurr.store.memory_store import MemoryStore
 
 
 def execute_dtc(identity_events: List[Tuple[datetime, Record]], identity: str,
-                stream_dtc_spec: Dict,
-                window_dtc_spec: Dict) -> Tuple[Dict[Key, Any], List[Dict]]:
+                stream_dtc_spec: Dict, window_dtc_spec: Dict) -> Tuple[Dict[Key, Any], List[Dict]]:
     schema_loader = SchemaLoader()
     identity_events.sort(key=lambda x: x[0])
 
-    block_data = execute_stream_dtc(identity_events, identity, schema_loader,
-                                    stream_dtc_spec)
+    block_data = execute_stream_dtc(identity_events, identity, schema_loader, stream_dtc_spec)
     window_data = execute_window_dtc(identity, schema_loader, window_dtc_spec)
 
     return block_data, window_data
 
 
-def execute_stream_dtc(identity_events: List[Tuple[datetime, Record]],
-                       identity: str, schema_loader: SchemaLoader,
+def execute_stream_dtc(identity_events: List[Tuple[datetime, Record]], identity: str,
+                       schema_loader: SchemaLoader,
                        stream_dtc_spec: Optional[Dict]) -> Dict[Key, Any]:
     if stream_dtc_spec is None:
         return {}
 
     stream_dtc_name = schema_loader.add_schema(stream_dtc_spec)
-    stream_transformer_schema = schema_loader.get_schema_object(
-        stream_dtc_name)
+    stream_transformer_schema = schema_loader.get_schema_object(stream_dtc_name)
     exec_context = Context()
     exec_context.add('parser', parser)
 
-    stream_transformer = StreamingTransformer(stream_transformer_schema,
-                                              identity, exec_context)
+    stream_transformer = StreamingTransformer(stream_transformer_schema, identity, exec_context)
     for time, event in identity_events:
         stream_transformer.evaluate_record(event)
     stream_transformer.finalize()
@@ -68,9 +64,8 @@ def execute_window_dtc(identity: str, schema_loader: SchemaLoader,
         if not isinstance(data_group, BlockDataGroup):
             continue
         if block_obj is not None:
-            raise Exception(
-                ('Window operation is supported against Streaming ',
-                 'DTC with only one BlockAggregate'))
+            raise Exception(('Window operation is supported against Streaming ',
+                             'DTC with only one BlockAggregate'))
         block_obj = data_group
 
     if block_obj is None:
@@ -79,10 +74,8 @@ def execute_window_dtc(identity: str, schema_loader: SchemaLoader,
     window_data = []
 
     window_dtc_name = schema_loader.add_schema(window_dtc_spec)
-    window_transformer_schema = schema_loader.get_schema_object(
-        window_dtc_name)
-    window_transformer = WindowTransformer(window_transformer_schema, identity,
-                                           exec_context)
+    window_transformer_schema = schema_loader.get_schema_object(window_dtc_name)
+    window_transformer = WindowTransformer(window_transformer_schema, identity, exec_context)
 
     for key, data in all_data.items():
         if key.group != block_obj._schema.name:
@@ -94,13 +87,10 @@ def execute_window_dtc(identity: str, schema_loader: SchemaLoader,
 
 
 def get_memory_store(schema_loader: SchemaLoader) -> MemoryStore:
-    store_schemas = schema_loader.get_schemas_of_type(
-        'Blurr:Store:MemoryStore')
+    store_schemas = schema_loader.get_schemas_of_type('Blurr:Store:MemoryStore')
     return schema_loader.get_schema_object(store_schemas[0][0])
 
 
-def get_streaming_transformer_schema(
-        schema_loader: SchemaLoader) -> StreamingTransformerSchema:
-    streaming_transformer_schema = schema_loader.get_schemas_of_type(
-        'Blurr:Streaming')
+def get_streaming_transformer_schema(schema_loader: SchemaLoader) -> StreamingTransformerSchema:
+    streaming_transformer_schema = schema_loader.get_schemas_of_type('Blurr:Streaming')
     return schema_loader.get_schema_object(streaming_transformer_schema[0][0])

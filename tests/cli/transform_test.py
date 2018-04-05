@@ -7,8 +7,7 @@ from blurr.cli.transform import transform
 
 
 def run_command(stream_dtc_file: Optional[str], window_dtc_file: Optional[str],
-                source: Optional[str], raw_json_files: Optional[str],
-                out: Out) -> int:
+                source: Optional[str], raw_json_files: Optional[str], out: Out) -> int:
     return cli({
         'transform': True,
         'validate': False,
@@ -47,8 +46,7 @@ def test_transform_no_raw_data(capsys) -> None:
 
 
 def test_transform_only_stream(capsys) -> None:
-    assert run_command('tests/data/stream.yml', None, 'tests/data/raw.json',
-                       None, Out()) == 0
+    assert run_command('tests/data/stream.yml', None, 'tests/data/raw.json', None, Out()) == 0
     out, err = capsys.readouterr()
     assert_record_in_ouput(('userA/session/2018-03-07T22:35:31+00:00', {
         '_identity': 'userA',
@@ -76,8 +74,7 @@ def test_transform_only_stream(capsys) -> None:
 
 def test_transform_valid_raw_with_source(capsys) -> None:
     assert run_command('tests/data/stream.yml', 'tests/data/window.yml',
-                       'tests/data/raw.json,tests/data/raw.json', None,
-                       Out()) == 0
+                       'tests/data/raw.json,tests/data/raw.json', None, Out()) == 0
     out, err = capsys.readouterr()
     assert_record_in_ouput(('userA', [{
         'last_session._identity': 'userA',

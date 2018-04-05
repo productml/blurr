@@ -17,8 +17,7 @@ class Store(BaseSchema):
         raise NotImplementedError()
 
     @abstractmethod
-    def get_range(self, start: Key, end: Key = None,
-                  count: int = 0) -> List[Tuple[Key, Any]]:
+    def get_range(self, start: Key, end: Key = None, count: int = 0) -> List[Tuple[Key, Any]]:
         raise NotImplementedError()
 
     @abstractmethod
