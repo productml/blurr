@@ -31,5 +31,5 @@ DataGroups:
 
      - Name: games_won
        Type: integer
-       When: source.event_id == 'game_end' and source.won == '1'
+       When: source.event_id == 'game_end' and source.won == 1
        Value: session_stats.games_won + 1
