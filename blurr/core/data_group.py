@@ -44,7 +44,11 @@ class DataGroupSchema(BaseSchemaCollection, ABC):
     def extend_schema(self, spec: Dict[str, Any]) -> Dict[str, Any]:
         """ Injects the identity field """
 
-        identity_field = {'Name': 'identity', 'Type': 'string', 'Value': 'identity'}
+        identity_field = {
+            'Name': '_identity',
+            'Type': 'string',
+            'Value': 'identity'
+        }
         spec[self.ATTRIBUTE_FIELDS].insert(0, identity_field)
 
         self.schema_loader.add_schema(identity_field,
@@ -73,16 +77,16 @@ class DataGroup(BaseItemCollection, ABC):
         :param evaluation_context: Context dictionary for evaluation
         """
         super().__init__(schema, evaluation_context)
-        self.identity = identity
+        self._identity = identity
 
         self._fields: Dict[str, Type[BaseItem]] = {
             name: TypeLoader.load_item(item_schema.type)(
-                item_schema, self.evaluation_context)
-            for name, item_schema in self.schema.nested_schema.items()
+                item_schema, self._evaluation_context)
+            for name, item_schema in self._schema.nested_schema.items()
         }
 
     @property
-    def nested_items(self) -> Dict[str, Type[BaseItem]]:
+    def _nested_items(self) -> Dict[str, Type[BaseItem]]:
         """
         Returns the dictionary of fields the DataGroup contains
         """
@@ -99,6 +103,6 @@ class DataGroup(BaseItemCollection, ABC):
         Persists the current data group
         :param timestamp: Optional timestamp to include in the Key construction
         """
-        if self.schema.store:
-            self.schema.store.save(
-                Key(self.identity, self.name, timestamp), self.snapshot)
+        if self._schema.store:
+            self._schema.store.save(
+                Key(self._identity, self._name, timestamp), self._snapshot)

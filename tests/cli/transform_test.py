@@ -51,22 +51,22 @@ def test_transform_only_stream(capsys) -> None:
                        None, Out()) == 0
     out, err = capsys.readouterr()
     assert_record_in_ouput(('userA/session/2018-03-07T22:35:31+00:00', {
-        'identity': 'userA',
-        'start_time': '2018-03-07 22:35:31+00:00',
-        'end_time': '2018-03-07 22:35:31+00:00',
+        '_identity': 'userA',
+        '_start_time': '2018-03-07 22:35:31+00:00',
+        '_end_time': '2018-03-07 22:35:31+00:00',
         'events': 1,
         'country': 'US',
         'continent': 'North America'
     }), out)
     assert_record_in_ouput(('userA/state', {
-        'identity': 'userA',
+        '_identity': 'userA',
         'country': 'IN',
         'continent': 'World'
     }), out)
     assert_record_in_ouput(('userA/session', {
-        'identity': 'userA',
-        'start_time': '2018-03-07 23:35:31+00:00',
-        'end_time': '2018-03-07 23:35:32+00:00',
+        '_identity': 'userA',
+        '_start_time': '2018-03-07 23:35:31+00:00',
+        '_end_time': '2018-03-07 23:35:32+00:00',
         'events': 2,
         'country': 'IN',
         'continent': 'World'
@@ -80,9 +80,9 @@ def test_transform_valid_raw_with_source(capsys) -> None:
                        Out()) == 0
     out, err = capsys.readouterr()
     assert_record_in_ouput(('userA', [{
-        'last_session.identity': 'userA',
+        'last_session._identity': 'userA',
         'last_session.events': 2,
-        'last_day.identity': 'userA',
+        'last_day._identity': 'userA',
         'last_day.total_events': 2
     }]), out)
     assert err == ''
@@ -93,9 +93,9 @@ def test_transform_valid_raw_without_source(capsys) -> None:
                        'tests/data/raw.json,tests/data/raw.json', Out()) == 0
     out, err = capsys.readouterr()
     assert_record_in_ouput(('userA', [{
-        'last_session.identity': 'userA',
+        'last_session._identity': 'userA',
         'last_session.events': 2,
-        'last_day.identity': 'userA',
+        'last_day._identity': 'userA',
         'last_day.total_events': 2
     }]), out)
     assert err == ''

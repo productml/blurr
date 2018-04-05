@@ -39,7 +39,7 @@ def test_data_group_schema_contains_identity_field(data_group_schema_spec):
 
     data_group_schema = MockDataGroupSchema(name, schema_loader)
     assert len(data_group_schema.nested_schema) == 3
-    assert 'identity' in data_group_schema.nested_schema
+    assert '_identity' in data_group_schema.nested_schema
 
 
 def test_data_group_schema_initialization_with_store(data_group_schema_spec,

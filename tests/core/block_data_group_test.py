@@ -75,20 +75,20 @@ def test_block_data_group_schema_evaluate_without_split(
     block_data_group.evaluate()
 
     # Check eval results of various fields
-    assert len(block_data_group.nested_items) == 4
+    assert len(block_data_group._nested_items) == 4
     assert check_fields(
-        block_data_group.nested_items, {
-            'identity': identity,
+        block_data_group._nested_items, {
+            '_identity': identity,
             'event_count': 1,
-            'start_time': time,
-            'end_time': time
+            '_start_time': time,
+            '_end_time': time
         })
 
     # aggregate snapshot should not exist in store
     assert block_data_group_schema.store.get(
-        Key(identity=block_data_group.identity,
-            group=block_data_group.name,
-            timestamp=block_data_group.start_time)) is None
+        Key(identity=block_data_group._identity,
+            group=block_data_group._name,
+            timestamp=block_data_group._start_time)) is None
 
 
 def test_block_data_group_schema_evaluate_with_split(
@@ -106,27 +106,27 @@ def test_block_data_group_schema_evaluate_with_split(
 
     # Check eval results of various fields before split
     assert check_fields(
-        block_data_group.nested_items, {
-            'identity': identity,
+        block_data_group._nested_items, {
+            '_identity': identity,
             'event_count': 2,
-            'start_time': time,
-            'end_time': time
+            '_start_time': time,
+            '_end_time': time
         })
 
-    current_snapshot = block_data_group.snapshot
+    current_snapshot = block_data_group._snapshot
     block_data_group.evaluate()
 
     # Check eval results of various fields
     assert check_fields(
-        block_data_group.nested_items, {
-            'identity': identity,
+        block_data_group._nested_items, {
+            '_identity': identity,
             'event_count': 1,
-            'start_time': time,
-            'end_time': time
+            '_start_time': time,
+            '_end_time': time
         })
 
     # Check aggregate snapshot present in store
     assert block_data_group_schema.store.get(
-        Key(identity=block_data_group.identity,
-            group=block_data_group.name,
+        Key(identity=block_data_group._identity,
+            group=block_data_group._name,
             timestamp=time)) == current_snapshot
