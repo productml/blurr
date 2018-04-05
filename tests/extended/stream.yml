@@ -20,7 +20,8 @@ DataGroups:
 
       # Checks for exception handling in cases where os-version is not specified
       # Checks for using the bracket notation to access fields that do not have python valid fieldnames
-      - { Name: os_version_parts, Type: list, Value: "source['os-version'].split('-')" }
+      #
+      - { Name: os-version-parts, Type: list, Value: "source['os-version'].split('-')" }
   -
     Type: Blurr:DataGroup:IdentityAggregate
     Name: state
@@ -36,8 +37,8 @@ DataGroups:
       - { Name: is_paid, Type: boolean, Value: state.is_paid or vars.is_paid }
       # Tests accessing variables.
       # Tests exceptional cases when variables don't exist
-      - { Name: os_name, Type: string, Value: "vars.os_version_parts[0]" }
-      - { Name: os_version, Type: string, Value: "vars.os_version_parts[1]" }
+      - { Name: os_name, Type: string, Value: "vars['os-version-parts'][0]" }
+      - { Name: os_version, Type: string, Value: "vars['os-version-parts'][1]" }
       # Tests usage of max functions and conditional executions
       - Name: max_level_completed
         Type: integer

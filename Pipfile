@@ -11,6 +11,7 @@ pyyaml = "*"
 python-dateutil = "*"
 docopt = "*"
 yamale = "*"
+python-coveralls = "*"
 
 
 [dev-packages]
@@ -20,6 +21,7 @@ mypy = "*"
 yapf = "*"
 pipenv = "*"
 twine = "*"
+pytest-cov = "*"
 
 
 [requires]

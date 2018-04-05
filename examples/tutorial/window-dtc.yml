@@ -1,0 +1,31 @@
+Type: Blurr:Window
+Version: '2018-03-01'
+Name: boost_data
+
+SourceDTC: streaming-dtc.yml
+
+Anchor:
+  Condition: source.event_id == "game_start" and source.boost == True
+
+DataGroups:
+  - Type: Blurr:DataGroup:WindowAggregate
+    Name: last_7_days
+    WindowType: day
+    WindowValue: -7
+    Source: sessions.session_stats
+
+    Fields:
+     - Name: avg_games_per_session
+       Type: float
+       Value: sum(source.games_played) / len(source.session_id)
+
+  - Type: Blurr:DataGroup:WindowAggregate
+    Name: next_3_days
+    WindowType: day
+    WindowValue: +3
+    Source: sessions.session_stats
+
+    Fields:
+     - Name: avg_games_per_session
+       Type: float
+       Value: sum(source.games_played) / len(source.session_id)
