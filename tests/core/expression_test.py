@@ -1,3 +1,4 @@
+import pytest
 from pytest import raises
 
 from blurr.core.base import Expression
@@ -36,7 +37,8 @@ def test_expression_globals_locals() -> None:
     code_string = 'a + b + 1'
     expr = Expression(code_string)
 
-    assert expr.evaluate(EvaluationContext()) is None
+    with pytest.raises(NameError, match='name \'a\' is not defined'):
+        expr.evaluate(EvaluationContext())
 
     assert expr.evaluate(EvaluationContext(Context({'a': 2, 'b': 3}))) == 6
     assert expr.evaluate(

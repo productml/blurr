@@ -25,13 +25,19 @@ Options:
     --window-dtc=<dtc-file>     Window DTC file to use.
     --source=<raw-json-files>   List of source files separated by comma
 """
+import logging
 import sys
 
 import os
 from docopt import docopt
 
 from blurr.cli.cli import cli
-from blurr.cli.out import Out
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+_handler = logging.StreamHandler(sys.stdout)
+_handler.setFormatter(logging.Formatter('%(levelname)s - %(message)s'))
+logger.addHandler(_handler)
 
 PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
 VERSION_PATH = os.path.join(PACKAGE_DIR, 'VERSION')
@@ -49,7 +55,7 @@ def read_version(version_file: str) -> str:
 
 def main():
     arguments = docopt(__doc__, version=read_version(VERSION_PATH))
-    result = cli(arguments, Out())
+    result = cli(arguments)
     sys.exit(result)
 
 

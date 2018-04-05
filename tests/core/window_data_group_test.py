@@ -4,7 +4,7 @@ import pytest
 from pytest import fixture
 
 from blurr.core.errors import PrepareWindowMissingBlocksError
-from blurr.core.evaluation import EvaluationContext
+from blurr.core.evaluation import EvaluationContext, Context
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.window_data_group import WindowDataGroupSchema, WindowDataGroup
 
@@ -45,7 +45,9 @@ def window_data_group_schema(schema_loader_with_mem_store: SchemaLoader,
 def window_data_group(
         window_data_group_schema: WindowDataGroupSchema) -> WindowDataGroup:
     return WindowDataGroup(window_data_group_schema, "user1",
-                           EvaluationContext())
+                           EvaluationContext(Context({
+                               'identity': 'user1'
+                           })))
 
 
 def test_window_type_day_positive(window_data_group: WindowDataGroup) -> None:

@@ -1,13 +1,12 @@
 from typing import Dict, Any
 
-from blurr.cli.out import Out
 from blurr.cli.transform import transform
 from blurr.cli.validate import validate_command
 
 
-def cli(arguments: Dict[str, Any], out: Out) -> int:
+def cli(arguments: Dict[str, Any]) -> int:
     if arguments['validate']:
-        return validate_command(arguments['<DTC>'], out)
+        return validate_command(arguments['<DTC>'])
     elif arguments['transform']:
         source = []
         if arguments['--source'] is not None:
@@ -15,4 +14,4 @@ def cli(arguments: Dict[str, Any], out: Out) -> int:
         elif arguments['<raw-json-files>'] is not None:
             source = arguments['<raw-json-files>'].split(',')
         return transform(arguments['--streaming-dtc'],
-                         arguments['--window-dtc'], source, out)
+                         arguments['--window-dtc'], source)

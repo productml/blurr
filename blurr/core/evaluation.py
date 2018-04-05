@@ -3,6 +3,7 @@ from typing import Any, Dict
 import re
 from copy import copy
 
+from blurr.core import logging
 from blurr.core.errors import ExpressionEvaluationError, InvalidExpressionError
 
 
@@ -114,6 +115,9 @@ class Expression:
         try:
             return eval(self.code_object, evaluation_context.global_context,
                         evaluation_context.local_context)
-        except:
-            # TODO Log exception
+        except Exception as err:
+            logging.error('{} in evaluating expression {}. Error: {}'.format(
+                type(err).__name__, self.code_string, err))
+            if isinstance(err, NameError):
+                raise err
             return None
