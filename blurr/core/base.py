@@ -1,10 +1,11 @@
-from typing import Dict, Any, Type, TypeVar
+from typing import Dict, Any, Type, TypeVar, Union
 
 from abc import ABC, abstractmethod
 
 from blurr.core.errors import SnapshotError
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
+from blurr.core.store_key import Key
 
 
 class BaseSchema(ABC):
@@ -81,26 +82,26 @@ class BaseItem(ABC):
         :param schema: Schema of the item
         :param evaluation_context: Context dictionary for evaluation
         """
-        self.schema = schema
-        self.evaluation_context = evaluation_context
+        self._schema = schema
+        self._evaluation_context = evaluation_context
 
     @property
-    def needs_evaluation(self) -> bool:
+    def _needs_evaluation(self) -> bool:
         """
         Returns True when:
             1. Where clause is not specified
             2. Where WHERE clause is specified and it evaluates to True
         Returns false if a where clause is specified and it evaluates to False
         """
-        return self.schema.when is None or self.schema.when.evaluate(
-            self.evaluation_context)
+        return self._schema.when is None or self._schema.when.evaluate(
+            self._evaluation_context)
 
     @property
-    def name(self) -> str:
+    def _name(self) -> str:
         """
         Returns the name of the base item
         """
-        return self.schema.name
+        return self._schema.name
 
     @abstractmethod
     def evaluate(self) -> None:
@@ -111,7 +112,7 @@ class BaseItem(ABC):
 
     @property
     @abstractmethod
-    def snapshot(self):
+    def _snapshot(self):
         """
         Gets a dictionary representation of the current state items in the current hierarchy
         :return: Name, Value map of the current tree
@@ -147,62 +148,43 @@ class BaseItemCollection(BaseItem):
         :returns An evaluation result object containing the result, or reasons why
         evaluation failed
         """
-        if self.needs_evaluation:
-            for _, item in self.nested_items.items():
+        if self._needs_evaluation:
+            for _, item in self._nested_items.items():
                 item.evaluate()
 
     @property
-    def snapshot(self) -> Dict[str, Any]:
+    def _snapshot(self) -> Dict[str, Any]:
         """
         Implements snapshot for collections by recursively invoking snapshot of all child items
         """
         try:
 
             return {
-                name: item.snapshot
-                for name, item in self.nested_items.items()
+                name: item._snapshot
+                for name, item in self._nested_items.items()
             }
 
         except Exception as e:
-            print('Error while creating snapshot for {}', self.name)
+            print('Error while creating snapshot for {}', self._name)
             raise SnapshotError(e)
 
-    def restore(self, snapshot: Dict[str, Any]) -> 'BaseItemCollection':
+    def restore(self,
+                snapshot: Dict[Union[str, Key], Any]) -> 'BaseItemCollection':
         """
         Restores the state of a collection from a snapshot
         """
         try:
 
             for name, snap in snapshot.items():
-                self.nested_items[name].restore(snap)
+                if isinstance(name, Key):
+                    self._nested_items[name.group].restore(snap)
+                else:
+                    self._nested_items[name].restore(snap)
             return self
 
         except Exception as e:
-            print('Error while restoring snapshot: {}', self.snapshot)
+            print('Error while restoring snapshot: {}', self._snapshot)
             raise SnapshotError(e)
-
-    def __getattr__(self, item: str) -> Any:
-        """
-        Makes the value of the nested items available as properties
-        of the collection object.  This is used for retrieving field values
-        for dynamic execution.
-        :param item: Field requested
-        """
-        if item in self.nested_items:
-            return self.nested_items[item].snapshot
-
-        return self.__getattribute__(item)
-
-    def __getitem__(self, item):
-        """
-        Makes the nested items available though the square bracket notation.
-        :raises KeyError: When a requested item is not found in nested items
-        """
-        if item not in self.nested_items:
-            raise KeyError('{item} not defined in {name}'.format(
-                item=item, name=self.name))
-
-        return self.nested_items[item].snapshot
 
     @abstractmethod
     def finalize(self) -> None:
@@ -213,7 +195,7 @@ class BaseItemCollection(BaseItem):
 
     @property
     @abstractmethod
-    def nested_items(self) -> Dict[str, Type[BaseItem]]:
+    def _nested_items(self) -> Dict[str, Type[BaseItem]]:
         """
         Dictionary of the name and item in the collection
         """

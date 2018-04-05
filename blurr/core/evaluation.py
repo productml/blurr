@@ -76,10 +76,6 @@ class EvaluationContext:
         self.global_context[key] = value
 
 
-VALIDATION_INVALID_EQUALS_REGULAR_EXPRESSION = re.compile(
-    '(?:^|[^!=]+)=(?:[^=]+|$)')
-
-
 class Expression:
     """ Encapsulates a python code statement in string and in compilable expression"""
 
@@ -94,11 +90,6 @@ class Expression:
 
         # For None / empty code strings
         self.code_string = 'None' if code_string.isspace() else code_string
-
-        # Validate the expression for errors / unsupported expressions
-        if VALIDATION_INVALID_EQUALS_REGULAR_EXPRESSION.findall(code_string):
-            raise InvalidExpressionError(
-                'Modifying value using `=` is not allowed.')
 
         try:
             self.code_object = compile(self.code_string, '<string>', 'eval')

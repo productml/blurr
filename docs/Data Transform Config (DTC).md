@@ -31,11 +31,7 @@ When: source.package_version = '1.0'
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
 Type | The type of DTC - Streaming or Window | `Blurr:Streaming` or `Blurr:Window` | Required
-<<<<<<< HEAD:docs/Data Transform Config (DTC).md
-Version | Version number of the DTC, used by the Data Transformer Library to parse the template | Any `string` | Required
-=======
-Version | Version number of the DTC, used by the Data Transformer Library to parse the template | Specific DTC versions only `2018-03-07` | Required
->>>>>>> master:docs/Data Transform Config (DTC).md
+Version | Version number of the DTC, used by the Data Transformer Library to parse the template | Specific DTC versions only `2018-03-01` | Required
 Description | Text description for the DTC | Any `string`  | Optional
 Name | Unique name for the DTC | Any `string` | Required
 Identity | The dimension in the raw data around which data is aggregated | `source.<field>` | Required
@@ -47,7 +43,7 @@ When | Boolean expression that defines which raw data should be processed | Any 
 At the end of a transform, data is persisted in the store. The Data Transform Library (DTL) works with an abstraction of storage which isolates the actual storage tier from how it works with the DTL.
 
 ```YAML
-Store:
+Stores:
    - Type: Blurr:Store:MemoryStore
      Name: hello_world_store
 ```
@@ -190,7 +186,7 @@ SourceDTC: offer_ai_v1
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
 Type | The type of DTC - Streaming or Window | `Blurr:Streaming` or `Blurr:Window` | Required
-Version | Version number of the DTC, used by the Data Transformer Library to parse the template | Any `string` | Required
+Version | Version number of the DTC, used by the Data Transformer Library to parse the template | Specific DTC versions only `2018-03-01` | Required
 Description | Text description for the DTC | Any `string` | Optional
 Name | Unique name for the Window DTC | Any `string` | Required
 SourceDTC | The name of the streaming DTC upon which this window DTC will be executed | Valid streaming DTC | Required
@@ -203,7 +199,6 @@ This is a vital concept to align the way data processing is done for training da
 
 ```yaml
 Anchor:
-
   Condition:  offer_ai_v1.game_stats.offer_type != ''
   Max: 1
 ```
@@ -218,7 +213,7 @@ When the number of blocks that satisfy the anchor condition is more than the max
 
 
 ```YAML
-Store:
+Stores:
    - Type: Blurr:Store:MemoryStore
      Name: hello_world_store
 ```
@@ -237,46 +232,43 @@ All DataGroup operations that are performed in a window DTC can only use the fol
 2. IdentityAggregate - Identity aggregates available from the source Streaming DTC. The fields from an IdentityAggregate can be accessed as `StreamingDTCName.IdentityAggregateName.Field Name`.
 3. A window of blocks around the anchor block - A list of blocks from a BlockAggregate DataGroup before or after the anchor block based on the window defined. A field from the list of blocks is referenced as `WindowName.FieldName`.
 
-### AnchorAggregate
+### WindowAggregate
 
 ```yaml
 
 DataGroups:
 
- - Type: Blurr:DataGroup:AnchorAggregate
-   Name: last_session
+  DataGroups:
+   - Type: Blurr:DataGroup:WindowAggregate
+     Name: last_session
+        # Defines a processing window for the rollup. Supported window types are Day, Hour and Count
+     WindowType: count
+        # Negative values are backward from the Anchor
+     WindowValue: -1
+     Source: offer_ai_v1.game_stats
 
-   Window:
+     Fields:
 
-    - Type: count
-      Value: -1
-      Source: offer_ai_v1.game_stats
-
-   Fields:
-
-       # The output will contain a column for last_session.games_played
-     - Name: games_played
-       Type: integer
-       # source.games_played is a list containing the games_played information from the
-       # sessions that fall in the window defined above. In this case, because of a count
-       # window of 1, the source.games_played list only contains a single data point.
-       # Python indices start from 0 so games_played[0] is the 1st item in the list
-       Value: source.games_played[0]
-       # Represents the games played in the last session, relative to the anchor point
-
+         # The output will contain a column for last_session.games_played
+      - Name: games_played
+        Type: integer
+         # source.games_played is a list containing the games_played information from the
+         # sessions that fall in the window defined above. In this case, because of a count
+         # window of 1 the source.games_played list only contains a single data point.
+        Value: source.games_played[0]
 ```
 
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
-Type | Type of DataGroup | `Blurr:DataGroup:AnchorAggregate`, `Blurr:DataGroup:Variable` | Required
+Type | Type of DataGroup | `Blurr:DataGroup:WindowAggregate`, `Blurr:DataGroup:Variable` | Required
 Name | Name of the DataGroup | Any `string`, unique within the DTC | Required
-(Window) Type | The type of window to use around the anchor block | `day`, `hour`, `count` | Optional. An AnchorAggregate can be defined without a Window
-(Window) Value | The number of days, hours or blocks to window around the anchor block | Integer | Optional. An AnchorAggregate can be defined without a Window
+WindowType | The type of window to use around the anchor block | `day`, `hour`, `count` | Optional. A WindowAggregate can be defined without a Window
+WindowValue | The number of days, hours or blocks to window around the anchor block | Integer | Optional. A WindowAggregate can be defined without a Window
 Source | The BlockAggregate DataGroup (defined in the Streaming DTC) on which the window operations should be performed | Valid BlockAggregate DataGroup | Required
 
 All functions defined on windows work on a list of values. For e.g. if a session contains a `games_played` field and a `last_week` window is defined on it, then `last_week.games_played` represents the list of values from last week's sessions.
 
-Each field in an AnchorAggregate DataGroup has 3 properties.
+Each field in a WindowAggregate DataGroup has 3 properties.
 
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------

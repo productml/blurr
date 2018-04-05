@@ -85,7 +85,7 @@ def test_field_evaluate_implicit_typecast_integer():
     field = SimpleField(field_schema, EvaluationContext())
     field.evaluate()
 
-    assert field.snapshot == 23
+    assert field._snapshot == 23
 
 
 def test_field_evaluate_implicit_typecast_float():
@@ -99,7 +99,7 @@ def test_field_evaluate_implicit_typecast_float():
     field = SimpleField(field_schema, EvaluationContext())
     field.evaluate()
 
-    assert field.snapshot == 23.0
+    assert field._snapshot == 23.0
 
 
 def test_field_evaluate_implicit_typecast_bool():
@@ -113,15 +113,15 @@ def test_field_evaluate_implicit_typecast_bool():
     field = SimpleField(field_schema, EvaluationContext())
     field.evaluate()
 
-    assert field.snapshot is True
+    assert field._snapshot is True
 
 
 def test_field_snapshot(test_field_schema):
     field = MockField(test_field_schema, EvaluationContext())
-    assert field.snapshot == 0
+    assert field._snapshot == 0
 
     field.evaluate()
-    assert field.snapshot == 5
+    assert field._snapshot == 5
 
 
 def test_field_restore(test_field_schema):

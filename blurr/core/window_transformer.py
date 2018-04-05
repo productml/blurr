@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 
 from blurr.core.anchor import Anchor
 from blurr.core.window_data_group import WindowDataGroup
@@ -22,14 +22,18 @@ class WindowTransformerSchema(TransformerSchema):
                  schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
 
-        # Inject name and type as expected by BaseSchema
-        self._spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_NAME] = 'anchor'
-        self._spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_TYPE] = 'anchor'
-        self.schema_loader.add_schema(self._spec[self.ATTRIBUTE_ANCHOR],
-                                      self.fully_qualified_name)
-
         self.anchor = self.schema_loader.get_schema_object(
             self.fully_qualified_name + '.anchor')
+
+    def extend_schema(self, spec: Dict[str, Any]) -> Dict[str, Any]:
+        # Inject name and type for Anchor as expected by BaseSchema
+        spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_NAME] = 'anchor'
+        spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_TYPE] = 'anchor'
+
+        self.schema_loader.add_schema(spec[self.ATTRIBUTE_ANCHOR],
+                                      self.fully_qualified_name)
+
+        return super().extend_schema(spec)
 
 
 class WindowTransformer(Transformer):
@@ -41,7 +45,7 @@ class WindowTransformer(Transformer):
     def __init__(self, schema: WindowTransformerSchema, identity: str,
                  context: Context) -> None:
         super().__init__(schema, identity, context)
-        self.anchor = Anchor(
+        self._anchor = Anchor(
             schema.anchor, EvaluationContext(global_context=context))
 
     def evaluate_anchor(self, block: BlockDataGroup) -> bool:
@@ -50,35 +54,37 @@ class WindowTransformer(Transformer):
         :param block: Block to run the anchor condition against.
         :return: True, if the anchor condition is met, otherwise, False.
         """
-        # Set up context so that anchor can process the block
-        self.evaluation_context.local_context.add(
-            block.schema.fully_qualified_name, block)
-        if self.anchor.evaluate_anchor(block):
+        if self._anchor.evaluate_anchor(block):
 
             try:
-                self.evaluation_context.global_add('anchor', block)
-                self.evaluate()
-                self.anchor.add_condition_met()
+                self._evaluation_context.global_add('anchor', block)
+                self._evaluate()
+                self._anchor.add_condition_met()
                 return True
             except PrepareWindowMissingBlocksError:
                 return False
             finally:
-                del self.evaluation_context.global_context['anchor']
+                del self._evaluation_context.global_context['anchor']
 
         return False
 
-    def evaluate(self):
-        if 'anchor' not in self.evaluation_context.global_context or self.anchor.anchor_block is None:
+    def _evaluate(self):
+        if 'anchor' not in self._evaluation_context.global_context or self._anchor.anchor_block is None:
             raise AnchorBlockNotDefinedError()
 
-        if not self.needs_evaluation:
+        if not self._needs_evaluation:
             return
 
-        for item in self.nested_items.values():
+        for item in self._nested_items.values():
             if isinstance(item, WindowDataGroup):
-                item.prepare_window(self.anchor.anchor_block.start_time)
+                item.prepare_window(self._anchor.anchor_block._start_time)
 
         super().evaluate()
+
+    def evaluate(self):
+        raise AnchorBlockNotDefinedError(
+            ('WindowTransformer does not support evaluate directly. '
+             'Call evaluate_anchor instead.'))
 
     @property
     def flattened_snapshot(self) -> Dict:
@@ -86,7 +92,7 @@ class WindowTransformer(Transformer):
         Generates a flattened snapshot where the final key for a field is <data_group_name>.<field_name>.
         :return: The flattened snapshot.
         """
-        snapshot_dict = super().snapshot
+        snapshot_dict = super()._snapshot
 
         # Flatten to feature dict
         return self._flatten_snapshot(None, snapshot_dict)

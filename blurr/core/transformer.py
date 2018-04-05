@@ -59,17 +59,17 @@ class Transformer(BaseItemCollection, ABC):
                  context: Context) -> None:
         super().__init__(schema, EvaluationContext(global_context=context))
         # Load the nested items into the item
-        self._data_groups: Dict[str, Type[BaseItem]] = {
+        self._data_groups: Dict[str, DataGroup] = {
             name: TypeLoader.load_item(item_schema.type)(
-                item_schema, identity, self.evaluation_context)
+                item_schema, identity, self._evaluation_context)
             for name, item_schema in schema.nested_schema.items()
         }
-        self.identity = identity
-        self.evaluation_context.global_add('identity', self.identity)
-        self.evaluation_context.global_context.merge(self.nested_items)
+        self._identity = identity
+        self._evaluation_context.global_add('identity', self._identity)
+        self._evaluation_context.global_context.merge(self._nested_items)
 
     @property
-    def nested_items(self) -> Dict[str, Type[BaseItem]]:
+    def _nested_items(self) -> Dict[str, DataGroup]:
         """
         Dictionary of nested data groups
         """
@@ -79,5 +79,28 @@ class Transformer(BaseItemCollection, ABC):
         """
         Iteratively finalizes all data groups in its transformer
         """
-        for item in self.nested_items.values():
+        for item in self._nested_items.values():
             item.finalize()
+
+    def __getattr__(self, item: str) -> DataGroup:
+        """
+        Makes the value of the nested items available as properties
+        of the collection object.  This is used for retrieving data groups
+        for dynamic execution.
+        :param item: Data group requested
+        """
+        if item in self._nested_items:
+            return self._nested_items[item]
+
+        return self.__getattribute__(item)
+
+    def __getitem__(self, item) -> DataGroup:
+        """
+        Makes the nested items available though the square bracket notation.
+        :raises KeyError: When a requested item is not found in nested items
+        """
+        if item not in self._nested_items:
+            raise KeyError('{item} not defined in {name}'.format(
+                item=item, name=self._name))
+
+        return self._nested_items[item]
