@@ -41,17 +41,8 @@ def test_expression_globals_locals() -> None:
         expr.evaluate(EvaluationContext())
 
     assert expr.evaluate(EvaluationContext(Context({'a': 2, 'b': 3}))) == 6
-    assert expr.evaluate(
-        EvaluationContext(local_context=Context({
-            'a': 2,
-            'b': 3
-        }))) == 6
-    assert expr.evaluate(
-        EvaluationContext(Context({
-            'a': 2
-        }), Context({
-            'b': 3
-        }))) == 6
+    assert expr.evaluate(EvaluationContext(local_context=Context({'a': 2, 'b': 3}))) == 6
+    assert expr.evaluate(EvaluationContext(Context({'a': 2}), Context({'b': 3}))) == 6
 
 
 def test_expression_conditional() -> None:
@@ -67,10 +58,7 @@ def test_expression_user_function() -> None:
         return 3 > 4
 
     expr = Expression(code_string)
-    assert expr.evaluate(
-        EvaluationContext(Context({
-            'test_function': test_function
-        }))) == 3
+    assert expr.evaluate(EvaluationContext(Context({'test_function': test_function}))) == 3
 
 
 def test_invalid_expression() -> None:

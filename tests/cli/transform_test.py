@@ -41,8 +41,7 @@ def test_transform_no_raw_data(caplog) -> None:
 
 
 def test_transform_only_stream(capsys) -> None:
-    assert run_command('tests/data/stream.yml', None, 'tests/data/raw.json',
-                       None) == 0
+    assert run_command('tests/data/stream.yml', None, 'tests/data/raw.json', None) == 0
     out, err = capsys.readouterr()
     assert_record_in_ouput(('userA/session/2018-03-07T22:35:31+00:00', {
         '_identity': 'userA',

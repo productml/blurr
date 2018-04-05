@@ -12,11 +12,7 @@ from blurr.core.simple_fields import SimpleField, BooleanFieldSchema, IntegerFie
 @fixture
 def test_field_schema() -> Dict[str, Any]:
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema({
-        'Name': 'max_attempts',
-        'Type': 'integer',
-        'Value': 5
-    })
+    name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': 'integer', 'Value': 5})
     return MockFieldSchema(name, schema_loader)
 
 
@@ -63,11 +59,7 @@ def test_field_evaluate_without_needs_evaluation():
 
 def test_field_evaluate_incorrect_typecast():
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema({
-        'Name': 'max_attempts',
-        'Type': 'integer',
-        'Value': '"Hi"'
-    })
+    name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': 'integer', 'Value': '"Hi"'})
     field_schema = IntegerFieldSchema(name, schema_loader)
     field = SimpleField(field_schema, EvaluationContext())
     with pytest.raises(ValueError):
@@ -76,11 +68,7 @@ def test_field_evaluate_incorrect_typecast():
 
 def test_field_evaluate_implicit_typecast_integer():
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema({
-        'Name': 'max_attempts',
-        'Type': 'integer',
-        'Value': '23.45'
-    })
+    name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': 'integer', 'Value': '23.45'})
     field_schema = IntegerFieldSchema(name, schema_loader)
     field = SimpleField(field_schema, EvaluationContext())
     field.evaluate()
@@ -90,11 +78,7 @@ def test_field_evaluate_implicit_typecast_integer():
 
 def test_field_evaluate_implicit_typecast_float():
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema({
-        'Name': 'max_attempts',
-        'Type': 'float',
-        'Value': '23'
-    })
+    name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': 'float', 'Value': '23'})
     field_schema = FloatFieldSchema(name, schema_loader)
     field = SimpleField(field_schema, EvaluationContext())
     field.evaluate()
@@ -104,11 +88,7 @@ def test_field_evaluate_implicit_typecast_float():
 
 def test_field_evaluate_implicit_typecast_bool():
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema({
-        'Name': 'max_attempts',
-        'Type': 'boolean',
-        'Value': '1+2'
-    })
+    name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': 'boolean', 'Value': '1+2'})
     field_schema = BooleanFieldSchema(name, schema_loader)
     field = SimpleField(field_schema, EvaluationContext())
     field.evaluate()

@@ -58,12 +58,10 @@ def block_aggregate(stream_transformer):
     return block
 
 
-def test_window_transformer_schema_init(schema_loader, stream_schema_spec,
-                                        window_schema_spec):
+def test_window_transformer_schema_init(schema_loader, stream_schema_spec, window_schema_spec):
     schema_loader.add_schema(stream_schema_spec)
     window_dtc_name = schema_loader.add_schema(window_schema_spec)
-    window_transformer_schema = WindowTransformerSchema(
-        window_dtc_name, schema_loader)
+    window_transformer_schema = WindowTransformerSchema(window_dtc_name, schema_loader)
     anchor_spec = schema_loader.get_schema_spec('ProductMLExample.anchor')
     assert anchor_spec == window_schema_spec['Anchor']
     assert anchor_spec['Name'] == 'anchor'
@@ -71,8 +69,7 @@ def test_window_transformer_schema_init(schema_loader, stream_schema_spec,
     assert isinstance(window_transformer_schema.anchor, AnchorSchema)
 
 
-def test_evaluate_anchor_prepare_window_error(window_transformer,
-                                              block_aggregate):
+def test_evaluate_anchor_prepare_window_error(window_transformer, block_aggregate):
     block_aggregate.restore({
         'events': 3,
         '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc),
@@ -81,8 +78,7 @@ def test_evaluate_anchor_prepare_window_error(window_transformer,
     assert window_transformer.evaluate_anchor(block_aggregate) is False
 
 
-def test_evaluate_anchor_prepare_window(schema_loader, window_transformer,
-                                        block_aggregate):
+def test_evaluate_anchor_prepare_window(schema_loader, window_transformer, block_aggregate):
     init_memory_store(schema_loader.get_schema_object('Sessions.memory'))
     block_aggregate.restore({
         'events': 3,
@@ -92,8 +88,7 @@ def test_evaluate_anchor_prepare_window(schema_loader, window_transformer,
     assert window_transformer.evaluate_anchor(block_aggregate) is True
 
 
-def test_evaluate_anchor_false(schema_loader, window_transformer,
-                               block_aggregate):
+def test_evaluate_anchor_false(schema_loader, window_transformer, block_aggregate):
     init_memory_store(schema_loader.get_schema_object('Sessions.memory'))
     block_aggregate.restore({
         'events': 0,
@@ -111,8 +106,7 @@ def test_evaluate_error(window_transformer):
         window_transformer.evaluate()
 
 
-def test_window_transformer(schema_loader, window_transformer,
-                            block_aggregate):
+def test_window_transformer(schema_loader, window_transformer, block_aggregate):
     init_memory_store(schema_loader.get_schema_object('Sessions.memory'))
 
     block_aggregate.restore({

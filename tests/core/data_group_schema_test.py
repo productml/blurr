@@ -42,13 +42,11 @@ def test_data_group_schema_contains_identity_field(data_group_schema_spec):
     assert '_identity' in data_group_schema.nested_schema
 
 
-def test_data_group_schema_initialization_with_store(data_group_schema_spec,
-                                                     store_spec):
+def test_data_group_schema_initialization_with_store(data_group_schema_spec, store_spec):
     data_group_schema_spec['Store'] = 'memory'
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(data_group_schema_spec)
-    with pytest.raises(
-            InvalidSchemaError, match="user.memory not declared in schema"):
+    with pytest.raises(InvalidSchemaError, match="user.memory not declared in schema"):
         MockDataGroupSchema(name, schema_loader)
 
     schema_loader.add_schema(store_spec, 'user')
@@ -57,8 +55,7 @@ def test_data_group_schema_initialization_with_store(data_group_schema_spec,
     assert data_group_schema.store.name == 'memory'
 
 
-def test_data_group_schema_initialization_without_store(
-        data_group_schema_spec):
+def test_data_group_schema_initialization_without_store(data_group_schema_spec):
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(data_group_schema_spec)
     data_group_schema = MockDataGroupSchema(name, schema_loader)

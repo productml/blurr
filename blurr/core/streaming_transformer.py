@@ -16,8 +16,7 @@ class StreamingTransformerSchema(TransformerSchema):
     ATTRIBUTE_IDENTITY = 'Identity'
     ATTRIBUTE_TIME = 'Time'
 
-    def __init__(self, fully_qualified_name: str,
-                 schema_loader: SchemaLoader) -> None:
+    def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
 
         self.identity = Expression(self._spec[self.ATTRIBUTE_IDENTITY])
@@ -34,8 +33,8 @@ class StreamingTransformerSchema(TransformerSchema):
         identity = self.identity.evaluate(EvaluationContext(None, context))
         if not identity:
             raise IdentityError(
-                'Could not determine identity using {}. Evaluation context is {}'.
-                format(self.identity.code_string, context))
+                'Could not determine identity using {}. Evaluation context is {}'.format(
+                    self.identity.code_string, context))
         return identity
 
     def get_time(self, context: Context) -> datetime:
@@ -43,8 +42,7 @@ class StreamingTransformerSchema(TransformerSchema):
 
 
 class StreamingTransformer(Transformer):
-    def __init__(self, schema: TransformerSchema, identity: str,
-                 context: Context) -> None:
+    def __init__(self, schema: TransformerSchema, identity: str, context: Context) -> None:
         super().__init__(schema, identity, context)
         self._evaluation_context.global_add('identity', self._identity)
 
@@ -58,15 +56,12 @@ class StreamingTransformer(Transformer):
         # Add source record and time to the global context
         self._evaluation_context.global_add('source', record)
         self._evaluation_context.global_add('time',
-                                            self._schema.time.evaluate(
-                                                self._evaluation_context))
+                                            self._schema.time.evaluate(self._evaluation_context))
 
-        record_identity = self._schema.get_identity(
-            self._evaluation_context.global_context)
+        record_identity = self._schema.get_identity(self._evaluation_context.global_context)
         if self._identity != record_identity:
-            raise IdentityError('Identity in transformer (', self._identity,
-                                ') and new record (', record_identity,
-                                ') do not match')
+            raise IdentityError('Identity in transformer (', self._identity, ') and new record (',
+                                record_identity, ') do not match')
 
         self.evaluate()
 

@@ -32,8 +32,7 @@ class LocalRunner:
             open(window_dtc_file))
         self._validate_dtc_syntax()
 
-        self._stream_dtc_name = self._schema_loader.add_schema(
-            self._stream_dtc)
+        self._stream_dtc_name = self._schema_loader.add_schema(self._stream_dtc)
         self._stream_transformer_schema = self._schema_loader.get_schema_object(
             self._stream_dtc_name)
 
@@ -61,8 +60,8 @@ class LocalRunner:
 
     def execute_for_all_users(self) -> None:
         for identity, events in self._user_events.items():
-            block_data, window_data = execute_dtc(
-                events, identity, self._stream_dtc, self._window_dtc)
+            block_data, window_data = execute_dtc(events, identity, self._stream_dtc,
+                                                  self._window_dtc)
 
             self._block_data.update(block_data)
             self._window_data[identity] = window_data
@@ -95,8 +94,7 @@ class LocalRunner:
 
 def main():
     arguments = docopt(__doc__, version='pre-alpha')
-    local_runner = LocalRunner(arguments['--raw-data'].split(','),
-                               arguments['--streaming-dtc'],
+    local_runner = LocalRunner(arguments['--raw-data'].split(','), arguments['--streaming-dtc'],
                                arguments['--window-dtc'])
     local_runner.execute()
     if arguments['--output-file'] is None:
