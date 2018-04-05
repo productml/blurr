@@ -37,4 +37,18 @@ Fields:
     Type: list
     Value: item_stats.products_bought.extend(list(zip([val.strip() for val in source.item_id.split(',')], [float(val.strip()) for val in source.value.split(',')])))
     # This creates a list of tuples [(item_id1, value1), (item_id2, value2)...]
+    When: source.event_name = 'ecommerce_purchase' and source.currency = 'usd'
+```
+
+# Data cleansing
+
+## Convert strings in raw data to a float
+
+If the raw data has a field `"txn_amount": "9.99"`, which is a float but formatted as a string, it can be converted to a float to perform operations in a field value
+
+```
+- Name: purchase_amount
+  Type: float
+  Value: float(source.txn_amount) + game_stats.purchase_amount
+  When: source.event_id == 'purchase' and source.purchase_source == 'offer'
 ```
