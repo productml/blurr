@@ -45,7 +45,7 @@ class WindowTransformer(Transformer):
     def __init__(self, schema: WindowTransformerSchema, identity: str,
                  context: Context) -> None:
         super().__init__(schema, identity, context)
-        self.anchor = Anchor(
+        self._anchor = Anchor(
             schema.anchor, EvaluationContext(global_context=context))
 
     def evaluate_anchor(self, block: BlockDataGroup) -> bool:
@@ -54,37 +54,37 @@ class WindowTransformer(Transformer):
         :param block: Block to run the anchor condition against.
         :return: True, if the anchor condition is met, otherwise, False.
         """
-        if self.anchor.evaluate_anchor(block):
+        if self._anchor.evaluate_anchor(block):
 
             try:
-                self.evaluation_context.global_add('anchor', block)
+                self._evaluation_context.global_add('anchor', block)
                 self._evaluate()
-                self.anchor.add_condition_met()
+                self._anchor.add_condition_met()
                 return True
             except PrepareWindowMissingBlocksError:
                 return False
             finally:
-                del self.evaluation_context.global_context['anchor']
+                del self._evaluation_context.global_context['anchor']
 
         return False
 
     def _evaluate(self):
-        if 'anchor' not in self.evaluation_context.global_context or self.anchor.anchor_block is None:
+        if 'anchor' not in self._evaluation_context.global_context or self._anchor.anchor_block is None:
             raise AnchorBlockNotDefinedError()
 
-        if not self.needs_evaluation:
+        if not self._needs_evaluation:
             return
 
-        for item in self.nested_items.values():
+        for item in self._nested_items.values():
             if isinstance(item, WindowDataGroup):
-                item.prepare_window(self.anchor.anchor_block.start_time)
+                item.prepare_window(self._anchor.anchor_block._start_time)
 
         super().evaluate()
 
     def evaluate(self):
         raise AnchorBlockNotDefinedError(
-            'WindowTransformer does not support evaluate directly. Call evaluate_anchor instead.'
-        )
+            ('WindowTransformer does not support evaluate directly. '
+             'Call evaluate_anchor instead.'))
 
     @property
     def flattened_snapshot(self) -> Dict:
@@ -92,7 +92,7 @@ class WindowTransformer(Transformer):
         Generates a flattened snapshot where the final key for a field is <data_group_name>.<field_name>.
         :return: The flattened snapshot.
         """
-        snapshot_dict = super().snapshot
+        snapshot_dict = super()._snapshot
 
         # Flatten to feature dict
         return self._flatten_snapshot(None, snapshot_dict)

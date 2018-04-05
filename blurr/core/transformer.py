@@ -61,15 +61,15 @@ class Transformer(BaseItemCollection, ABC):
         # Load the nested items into the item
         self._data_groups: Dict[str, DataGroup] = {
             name: TypeLoader.load_item(item_schema.type)(
-                item_schema, identity, self.evaluation_context)
+                item_schema, identity, self._evaluation_context)
             for name, item_schema in schema.nested_schema.items()
         }
-        self.identity = identity
-        self.evaluation_context.global_add('identity', self.identity)
-        self.evaluation_context.global_context.merge(self.nested_items)
+        self._identity = identity
+        self._evaluation_context.global_add('identity', self._identity)
+        self._evaluation_context.global_context.merge(self._nested_items)
 
     @property
-    def nested_items(self) -> Dict[str, DataGroup]:
+    def _nested_items(self) -> Dict[str, DataGroup]:
         """
         Dictionary of nested data groups
         """
@@ -79,7 +79,7 @@ class Transformer(BaseItemCollection, ABC):
         """
         Iteratively finalizes all data groups in its transformer
         """
-        for item in self.nested_items.values():
+        for item in self._nested_items.values():
             item.finalize()
 
     def __getattr__(self, item: str) -> DataGroup:
@@ -89,8 +89,8 @@ class Transformer(BaseItemCollection, ABC):
         for dynamic execution.
         :param item: Data group requested
         """
-        if item in self.nested_items:
-            return self.nested_items[item]
+        if item in self._nested_items:
+            return self._nested_items[item]
 
         return self.__getattribute__(item)
 
@@ -99,8 +99,8 @@ class Transformer(BaseItemCollection, ABC):
         Makes the nested items available though the square bracket notation.
         :raises KeyError: When a requested item is not found in nested items
         """
-        if item not in self.nested_items:
+        if item not in self._nested_items:
             raise KeyError('{item} not defined in {name}'.format(
-                item=item, name=self.name))
+                item=item, name=self._name))
 
-        return self.nested_items[item]
+        return self._nested_items[item]

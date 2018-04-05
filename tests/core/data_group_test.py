@@ -59,7 +59,7 @@ def test_data_group_initialization(data_group_schema_with_store):
         schema=data_group_schema_with_store,
         identity="12345",
         evaluation_context=EvaluationContext())
-    assert data_group.identity == "12345"
+    assert data_group._identity == "12345"
 
 
 def test_data_group_nested_items(data_group_schema_with_store):
@@ -67,12 +67,12 @@ def test_data_group_nested_items(data_group_schema_with_store):
         schema=data_group_schema_with_store,
         identity="12345",
         evaluation_context=EvaluationContext())
-    nested_items = data_group.nested_items
+    nested_items = data_group._nested_items
     assert len(nested_items) == 2
     assert "event_count" in nested_items
     assert isinstance(nested_items["event_count"], Field)
-    assert "identity" in nested_items
-    assert isinstance(nested_items["identity"], Field)
+    assert "_identity" in nested_items
+    assert isinstance(nested_items["_identity"], Field)
 
 
 def test_data_group_persist_without_store(data_group_schema_without_store):
@@ -91,10 +91,10 @@ def test_data_group_persist_with_store(data_group_schema_with_store):
     dt = datetime.now()
     dt.replace(tzinfo=timezone.utc)
     data_group.persist(dt)
-    snapshot_data_group = data_group.schema.store.get(
+    snapshot_data_group = data_group._schema.store.get(
         Key(identity="12345", group="user", timestamp=dt))
     assert snapshot_data_group is not None
-    assert snapshot_data_group == data_group.snapshot
+    assert snapshot_data_group == data_group._snapshot
 
 
 def test_data_group_finalize(data_group_schema_with_store):
@@ -103,7 +103,7 @@ def test_data_group_finalize(data_group_schema_with_store):
         identity="12345",
         evaluation_context=EvaluationContext())
     data_group.finalize()
-    snapshot_data_group = data_group.schema.store.get(
+    snapshot_data_group = data_group._schema.store.get(
         Key(identity="12345", group="user"))
     assert snapshot_data_group is not None
-    assert snapshot_data_group == data_group.snapshot
+    assert snapshot_data_group == data_group._snapshot

@@ -45,19 +45,19 @@ class BlockDataGroupSchema(DataGroupSchema):
         """
         return [
             {
-                'Name': 'start_time',
+                'Name': '_start_time',
                 'Type': 'datetime',
                 'Value': (
-                    'time if {data_group}.start_time is None else time '
-                    'if time < {data_group}.start_time else {data_group}.start_time'
+                    'time if {data_group}._start_time is None else time '
+                    'if time < {data_group}._start_time else {data_group}._start_time'
                 ).format(data_group=name_in_context)
             },
             {
-                'Name': 'end_time',
+                'Name': '_end_time',
                 'Type': 'datetime',
                 'Value': (
-                    'time if {data_group}.end_time is None else time '
-                    'if time > {data_group}.end_time else {data_group}.end_time'
+                    'time if {data_group}._end_time is None else time '
+                    'if time > {data_group}._end_time else {data_group}._end_time'
                 ).format(data_group=name_in_context)
             },
         ]
@@ -74,15 +74,16 @@ class BlockDataGroup(DataGroup):
         """
 
         # If a split is imminent, save the current block snapshot with the timestamp
-        split_should_be_evaluated = not (self.schema.split is None
-                                         or self.start_time is None
-                                         or self.end_time is None)
+        split_should_be_evaluated = not (self._schema.split is None
+                                         or self._start_time is None
+                                         or self._end_time is None)
 
-        if split_should_be_evaluated and self.schema.split.evaluate(
-                self.evaluation_context) is True:
+        if split_should_be_evaluated and self._schema.split.evaluate(
+                self._evaluation_context) is True:
             # Save the current snapshot with the current timestamp
-            self.persist(self.start_time)
+            self.persist(self._start_time)
             # Reset the state of the contents
-            self.__init__(self.schema, self.identity, self.evaluation_context)
+            self.__init__(self._schema, self._identity,
+                          self._evaluation_context)
 
         super().evaluate()

@@ -44,14 +44,14 @@ def window_transformer(schema_loader, stream_transformer, window_schema_spec):
     return WindowTransformer(
         schema_loader.get_schema_object(window_dtc_name), 'user1',
         Context({
-            stream_transformer.schema.name: stream_transformer
+            stream_transformer._schema.name: stream_transformer
         }))
 
 
 @fixture
 def block_aggregate(stream_transformer):
     block = None
-    for data_group in stream_transformer.nested_items.values():
+    for data_group in stream_transformer._nested_items.values():
         if isinstance(data_group, BlockDataGroup):
             block = data_group
 
@@ -75,8 +75,8 @@ def test_evaluate_anchor_prepare_window_error(window_transformer,
                                               block_aggregate):
     block_aggregate.restore({
         'events': 3,
-        'start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc),
-        'end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc)
+        '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc),
+        '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc)
     })
     assert window_transformer.evaluate_anchor(block_aggregate) is False
 
@@ -86,8 +86,8 @@ def test_evaluate_anchor_prepare_window(schema_loader, window_transformer,
     init_memory_store(schema_loader.get_schema_object('Sessions.memory'))
     block_aggregate.restore({
         'events': 3,
-        'start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc),
-        'end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc)
+        '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc),
+        '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc)
     })
     assert window_transformer.evaluate_anchor(block_aggregate) is True
 
@@ -97,8 +97,8 @@ def test_evaluate_anchor_false(schema_loader, window_transformer,
     init_memory_store(schema_loader.get_schema_object('Sessions.memory'))
     block_aggregate.restore({
         'events': 0,
-        'start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc),
-        'end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc)
+        '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc),
+        '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc)
     })
     assert window_transformer.evaluate_anchor(block_aggregate) is False
 
@@ -117,19 +117,19 @@ def test_window_transformer(schema_loader, window_transformer,
 
     block_aggregate.restore({
         'events': 3,
-        'start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc),
-        'end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc)
+        '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc),
+        '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc)
     })
 
     assert window_transformer.evaluate_anchor(block_aggregate) is True
 
-    snapshot = window_transformer.snapshot
-    assert snapshot['last_session'] == {'identity': 'user1', 'events': 2}
-    assert snapshot['last_day'] == {'identity': 'user1', 'total_events': 3}
+    snapshot = window_transformer._snapshot
+    assert snapshot['last_session'] == {'_identity': 'user1', 'events': 2}
+    assert snapshot['last_day'] == {'_identity': 'user1', 'total_events': 3}
 
     assert window_transformer.flattened_snapshot == {
         'last_session.events': 2,
-        'last_session.identity': 'user1',
+        'last_session._identity': 'user1',
         'last_day.total_events': 3,
-        'last_day.identity': 'user1'
+        'last_day._identity': 'user1'
     }

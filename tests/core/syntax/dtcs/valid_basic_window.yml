@@ -17,7 +17,7 @@ DataGroups:
       - Name: games_played_last_session
         Type: integer
         Value: prev_session.games_played[0]
-        When: last_session = None
+        When: last_session == None
       - Name: win_ratio_last_session
         Type: float
         Value: prev_session.win_ratio[0]

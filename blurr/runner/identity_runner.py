@@ -61,10 +61,10 @@ def execute_window_dtc(identity: str, schema_loader: SchemaLoader,
     all_data = get_memory_store(schema_loader).get_all()
     stream_transformer.restore(all_data)
 
-    exec_context.add(stream_transformer.schema.name, stream_transformer)
+    exec_context.add(stream_transformer._schema.name, stream_transformer)
 
     block_obj = None
-    for data_group in stream_transformer.nested_items.values():
+    for data_group in stream_transformer._nested_items.values():
         if not isinstance(data_group, BlockDataGroup):
             continue
         if block_obj is not None:
@@ -85,7 +85,7 @@ def execute_window_dtc(identity: str, schema_loader: SchemaLoader,
                                            exec_context)
 
     for key, data in all_data.items():
-        if key.group != block_obj.schema.name:
+        if key.group != block_obj._schema.name:
             continue
         if window_transformer.evaluate_anchor(block_obj.restore(data)):
             window_data.append(window_transformer.flattened_snapshot)
