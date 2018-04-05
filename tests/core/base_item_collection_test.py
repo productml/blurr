@@ -89,6 +89,21 @@ def test_evaluate_needs_evaluation_true(
     assert item_collection.event_count == 5
 
 
+def test_evaluate_needs_evaluation_error(
+        collection_schema_spec: Dict[str, Any]) -> None:
+    schema_loader = SchemaLoader()
+    collection_schema_spec['When'] = '1/0'
+    name = schema_loader.add_schema(collection_schema_spec)
+    schema_collection = MockBaseSchemaCollection(
+        name, schema_loader, DataGroupSchema.ATTRIBUTE_FIELDS)
+    item_collection = MockBaseItemCollection(schema_collection,
+                                             EvaluationContext())
+    with raises(Exception):
+        item_collection = MockBaseItemCollection(schema_collection,
+                                                 EvaluationContext())
+        item_collection.evaluate()
+
+
 def test_evaluate_invalid(collection_schema_spec: Dict[str, Any],
                           mock_nested_items: contextmanager) -> None:
     schema_loader = SchemaLoader()
