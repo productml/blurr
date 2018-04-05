@@ -7,7 +7,7 @@ from blurr.core.data_group import DataGroupSchema, DataGroup
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.field import Field
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.store import Key
+from blurr.core.store_key import Key
 
 
 def get_data_group_schema_spec() -> Dict[str, Any]:

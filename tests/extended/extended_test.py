@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from blurr.core.store import Key
+from blurr.core.store_key import Key
 from blurr.runner.local_runner import LocalRunner
 
 

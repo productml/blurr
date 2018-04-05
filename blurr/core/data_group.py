@@ -6,7 +6,7 @@ from blurr.core.base import BaseSchemaCollection, BaseItemCollection, BaseItem
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.loader import TypeLoader
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.store import Key
+from blurr.core.store_key import Key
 
 
 class DataGroupSchema(BaseSchemaCollection, ABC):
@@ -106,3 +106,26 @@ class DataGroup(BaseItemCollection, ABC):
         if self._schema.store:
             self._schema.store.save(
                 Key(self._identity, self._name, timestamp), self._snapshot)
+
+    def __getattr__(self, item: str) -> Any:
+        """
+        Makes the value of the nested items available as properties
+        of the collection object.  This is used for retrieving field values
+        for dynamic execution.
+        :param item: Field requested
+        """
+        if item in self._nested_items:
+            return self._nested_items[item]._snapshot
+
+        return self.__getattribute__(item)
+
+    def __getitem__(self, item) -> Any:
+        """
+        Makes the nested items available though the square bracket notation.
+        :raises KeyError: When a requested item is not found in nested items
+        """
+        if item not in self._nested_items:
+            raise KeyError('{item} not defined in {name}'.format(
+                item=item, name=self._name))
+
+        return self._nested_items[item]._snapshot

@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from pytest import fixture
 
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.store import Key
+from blurr.core.store_key import Key
 from blurr.store.memory_store import MemoryStore
 
 

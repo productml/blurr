@@ -6,7 +6,7 @@ from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.block_data_group import BlockDataGroup
-from blurr.core.store import Key
+from blurr.core.store_key import Key
 from blurr.core.base import BaseItem
 
 
@@ -76,8 +76,8 @@ class WindowDataGroup(DataGroup):
                 self._window_source.view) != abs(self._schema.window_value):
             raise PrepareWindowMissingBlocksError(
                 'Expecting {} but not found {} blocks'.format(
-                    abs(self._schema.window_value), len(
-                        self._window_source.view)))
+                    abs(self._schema.window_value),
+                    len(self._window_source.view)))
 
         if len(self._window_source.view) == 0:
             raise PrepareWindowMissingBlocksError('No matching blocks found')
