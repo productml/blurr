@@ -29,20 +29,12 @@ Split: (time - end_time).minutes > 30
     Value: BlockAggregateName.id_to_value.set(source.id, source.value)
 ```
 
-<<<<<<< HEAD
-## Merge 2 lists in source data to create a list of tuples
-=======
 ## Merge 2 strings with comma separated values in source data to create a list of tuples
->>>>>>> master
 
 ```yaml
 Fields:
   - Name: products_bought
     Type: list
-<<<<<<< HEAD
-    Value: zip(BlockAggregateName.products_bought.append(source.item_id), BlockAggregateName.products_bought.append(source.value))
-=======
     Value: item_stats.products_bought.extend(list(zip([val.strip() for val in source.item_id.split(',')], [float(val.strip()) for val in source.value.split(',')])))
->>>>>>> master
     # This creates a list of tuples [(item_id1, value1), (item_id2, value2)...]
 ```
