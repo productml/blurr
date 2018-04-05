@@ -85,9 +85,9 @@ class Transformer(BaseItemCollection, ABC):
     def __getattr__(self, item: str) -> DataGroup:
         """
         Makes the value of the nested items available as properties
-        of the collection object.  This is used for retrieving field values
+        of the collection object.  This is used for retrieving data groups
         for dynamic execution.
-        :param item: Field requested
+        :param item: Data group requested
         """
         if item in self.nested_items:
             return self.nested_items[item]

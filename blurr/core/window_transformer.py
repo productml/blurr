@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 
 from blurr.core.anchor import Anchor
 from blurr.core.window_data_group import WindowDataGroup
@@ -22,14 +22,18 @@ class WindowTransformerSchema(TransformerSchema):
                  schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
 
-        # Inject name and type as expected by BaseSchema
-        self._spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_NAME] = 'anchor'
-        self._spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_TYPE] = 'anchor'
-        self.schema_loader.add_schema(self._spec[self.ATTRIBUTE_ANCHOR],
-                                      self.fully_qualified_name)
-
         self.anchor = self.schema_loader.get_schema_object(
             self.fully_qualified_name + '.anchor')
+
+    def extend_schema(self, spec: Dict[str, Any]) -> Dict[str, Any]:
+        # Inject name and type for Anchor as expected by BaseSchema
+        spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_NAME] = 'anchor'
+        spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_TYPE] = 'anchor'
+
+        self.schema_loader.add_schema(spec[self.ATTRIBUTE_ANCHOR],
+                                      self.fully_qualified_name)
+
+        return super().extend_schema(spec)
 
 
 class WindowTransformer(Transformer):
@@ -54,7 +58,7 @@ class WindowTransformer(Transformer):
 
             try:
                 self.evaluation_context.global_add('anchor', block)
-                self.evaluate()
+                self._evaluate()
                 self.anchor.add_condition_met()
                 return True
             except PrepareWindowMissingBlocksError:
@@ -64,7 +68,7 @@ class WindowTransformer(Transformer):
 
         return False
 
-    def evaluate(self):
+    def _evaluate(self):
         if 'anchor' not in self.evaluation_context.global_context or self.anchor.anchor_block is None:
             raise AnchorBlockNotDefinedError()
 
@@ -76,6 +80,11 @@ class WindowTransformer(Transformer):
                 item.prepare_window(self.anchor.anchor_block.start_time)
 
         super().evaluate()
+
+    def evaluate(self):
+        raise AnchorBlockNotDefinedError(
+            'WindowTransformer does not support evaluate directly. Call evaluate_anchor instead.'
+        )
 
     @property
     def flattened_snapshot(self) -> Dict:
