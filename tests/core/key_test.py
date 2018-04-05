@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pytest
 
-from blurr.core.store import Key
+from blurr.core.store_key import Key
 
 
 def test_invalid_identity():

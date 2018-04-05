@@ -63,7 +63,7 @@ In order to obtain this transformation, Blurr will process the events sequential
 
 ```yaml
 Type: Blurr:DTC:Streaming
-Version: '2018-03-07'
+Version: '2018-03-01'
 Name : sessions
 
 Store:

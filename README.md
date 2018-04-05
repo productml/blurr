@@ -1,5 +1,7 @@
 ![Blurr](logo.png)
 
+>We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer. The lines are blurred (*cough*). Just like development and operations became DevOps over time
+
 >--- Blurr authors
 
 [![CircleCI](https://circleci.com/gh/productml/blurr/tree/master.svg?style=svg)](https://circleci.com/gh/productml/blurr/tree/master)
@@ -54,19 +56,23 @@ using this DTC
 ```yaml
 
 Type: Blurr:Streaming
-Version: '2018-03-07'
+Version: '2018-03-01'
+Name : sessions
 
-Store:
+Stores:
    - Type: Blurr:Store:MemoryStore
      Name: hello_world_store
 
 Identity: source.user_id
+
+Time: parser.parse(source.timestamp)
 
 DataGroups:
 
  - Type: Blurr:DataGroup:BlockAggregate
    Name: session_stats
    Store: hello_world_store
+
    Split: source.session_id != session_stats.session_id
 
    Fields:
@@ -77,13 +83,13 @@ DataGroups:
 
      - Name: games_played
        Type: integer
-       Value: session_stats.games_played + 1
        When: source.event_id == 'game_start'
+       Value: session_stats.games_played + 1
 
      - Name: games_won
        Type: integer
-       Value: session_stats.games_won + 1
        When: source.event_id == 'game_end' and source.won == '1'
+       Value: session_stats.games_won + 1
 
 ```
 
@@ -91,8 +97,8 @@ DataGroups:
 
 [Read the docs](http://productml-blurr.readthedocs.io/en/latest/)
 
-[Streaming DTC Tutorial](http://productml-blurr.readthedocs.io/en/latest/Streaming%20dtc%20tutorial/) |
-[Window DTC Tutorial](http://productml-blurr.readthedocs.io/en/latest/Window%20dtc%20tutorial/)
+[Streaming DTC Tutorial](http://productml-blurr.readthedocs.io/en/latest/Streaming%20DTC%20Tutorial/) |
+[Window DTC Tutorial](http://productml-blurr.readthedocs.io/en/latest/Window%20DTC%20Tutorial/)
 
 Preparing data for specific use cases using Blurr
 

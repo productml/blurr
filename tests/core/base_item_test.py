@@ -24,7 +24,7 @@ class TestItem(BaseItem):
     This class is to test abstract behavior, and thus, adds no functionality
     """
 
-    def snapshot(self):
+    def _snapshot(self):
         pass
 
     def evaluate(self) -> None:
@@ -43,23 +43,23 @@ def get_test_item(schema_spec: Dict[str, Any]) -> TestItem:
 
 def test_base_item_valid(schema_spec: Dict[str, Any]) -> None:
     test_item = get_test_item(schema_spec)
-    assert test_item.schema.name == 'TestField'
-    assert test_item.schema.type == 'integer'
-    assert len(test_item.evaluation_context.global_context) == 0
-    assert len(test_item.evaluation_context.local_context) == 0
+    assert test_item._schema.name == 'TestField'
+    assert test_item._schema.type == 'integer'
+    assert len(test_item._evaluation_context.global_context) == 0
+    assert len(test_item._evaluation_context.local_context) == 0
 
-    assert test_item.needs_evaluation
+    assert test_item._needs_evaluation
 
 
 def test_base_item_filter_false(schema_spec: Dict[str, Any]) -> None:
     schema_spec[BaseSchema.ATTRIBUTE_WHEN] = 'False'
     test_item = get_test_item(schema_spec)
 
-    assert not test_item.needs_evaluation
+    assert not test_item._needs_evaluation
 
 
 def test_base_item_filter_missing(schema_spec: Dict[str, Any]) -> None:
     del schema_spec[BaseSchema.ATTRIBUTE_WHEN]
     test_item = get_test_item(schema_spec)
 
-    assert test_item.needs_evaluation
+    assert test_item._needs_evaluation

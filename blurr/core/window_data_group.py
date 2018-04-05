@@ -6,7 +6,7 @@ from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.block_data_group import BlockDataGroup
-from blurr.core.store import Key
+from blurr.core.store_key import Key
 from blurr.core.base import BaseItem
 
 
@@ -45,7 +45,7 @@ class WindowDataGroup(DataGroup):
     def __init__(self, schema: WindowDataGroupSchema, identity: str,
                  evaluation_context: EvaluationContext) -> None:
         super().__init__(schema, identity, evaluation_context)
-        self.window_source = _WindowSource()
+        self._window_source = _WindowSource()
 
     def prepare_window(self, start_time: datetime) -> None:
         """
@@ -54,27 +54,27 @@ class WindowDataGroup(DataGroup):
         should be generated.
         """
         # evaluate window first which sets the correct window in the store
-        store = self.schema.source.store
-        if self.schema.window_type == 'day' or self.schema.window_type == 'hour':
-            self.window_source.view = self._load_blocks(
+        store = self._schema.source.store
+        if self._schema.window_type == 'day' or self._schema.window_type == 'hour':
+            self._window_source.view = self._load_blocks(
                 store.get_range(
-                    Key(self.identity, self.schema.source.name, start_time),
-                    Key(self.identity, self.schema.source.name, self._get_end_time(start_time))))
+                    Key(self._identity, self._schema.source.name, start_time),
+                    Key(self._identity, self._schema.source.name, self._get_end_time(start_time))))
         else:
-            self.window_source.view = self._load_blocks(
+            self._window_source.view = self._load_blocks(
                 store.get_range(
-                    Key(self.identity, self.schema.source.name, start_time), None,
-                    self.schema.window_value))
+                    Key(self._identity, self._schema.source.name, start_time), None,
+                    self._schema.window_value))
 
         self._validate_view()
 
     def _validate_view(self):
-        if self.schema.window_type == 'count' and len(self.window_source.view) != abs(
-                self.schema.window_value):
+        if self._schema.window_type == 'count' and len(self._window_source.view) != abs(
+                self._schema.window_value):
             raise PrepareWindowMissingBlocksError('Expecting {} but not found {} blocks'.format(
-                abs(self.schema.window_value), len(self.window_source.view)))
+                abs(self._schema.window_value), len(self._window_source.view)))
 
-        if len(self.window_source.view) == 0:
+        if len(self._window_source.view) == 0:
             raise PrepareWindowMissingBlocksError('No matching blocks found')
 
     # TODO: Handle end time which is beyond the expected range of data being
@@ -87,10 +87,10 @@ class WindowDataGroup(DataGroup):
         based on the window type in the schema.
         :return:
         """
-        if self.schema.window_type == 'day':
-            return start_time + timedelta(days=self.schema.window_value)
-        elif self.schema.window_type == 'hour':
-            return start_time + timedelta(hours=self.schema.window_value)
+        if self._schema.window_type == 'day':
+            return start_time + timedelta(days=self._schema.window_value)
+        elif self._schema.window_type == 'hour':
+            return start_time + timedelta(hours=self._schema.window_value)
 
     def _load_blocks(self, blocks: List[Tuple[Key, Any]]) -> List[BaseItem]:
         """
@@ -99,10 +99,10 @@ class WindowDataGroup(DataGroup):
         :return: List of BlockDataGroup
         """
         return [
-            BlockDataGroup(self.schema.source, self.identity, EvaluationContext()).restore(block)
+            BlockDataGroup(self._schema.source, self._identity, EvaluationContext()).restore(block)
             for (_, block) in blocks
         ]
 
     def evaluate(self) -> None:
-        self.evaluation_context.local_context.add('source', self.window_source)
+        self._evaluation_context.local_context.add('source', self._window_source)
         super().evaluate()

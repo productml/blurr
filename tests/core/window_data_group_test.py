@@ -46,81 +46,81 @@ def window_data_group(window_data_group_schema: WindowDataGroupSchema) -> Window
 
 
 def test_window_type_day_positive(window_data_group: WindowDataGroup) -> None:
-    window_data_group.schema.window_type = 'day'
-    window_data_group.schema.window_value = 1
+    window_data_group._schema.window_type = 'day'
+    window_data_group._schema.window_value = 1
     window_data_group.prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
-    assert window_data_group.window_source.events == [4, 5]
+    assert window_data_group._window_source.events == [4, 5]
 
 
 def test_window_type_day_negative(window_data_group: WindowDataGroup) -> None:
-    window_data_group.schema.window_type = 'day'
-    window_data_group.schema.window_value = -1
+    window_data_group._schema.window_type = 'day'
+    window_data_group._schema.window_value = -1
     window_data_group.prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
-    assert window_data_group.window_source.events == [1, 2]
+    assert window_data_group._window_source.events == [1, 2]
 
 
 def test_window_type_day_zero_value(window_data_group: WindowDataGroup) -> None:
-    window_data_group.schema.window_type = 'day'
-    window_data_group.schema.window_value = 0
+    window_data_group._schema.window_type = 'day'
+    window_data_group._schema.window_value = 0
     with pytest.raises(PrepareWindowMissingBlocksError, match='No matching blocks found'):
         window_data_group.prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
-    assert window_data_group.window_source.events == []
+    assert window_data_group._window_source.events == []
 
 
 def test_window_type_hour_positive(window_data_group: WindowDataGroup) -> None:
-    window_data_group.schema.window_type = 'hour'
-    window_data_group.schema.window_value = 1
+    window_data_group._schema.window_type = 'hour'
+    window_data_group._schema.window_value = 1
     with pytest.raises(PrepareWindowMissingBlocksError, match='No matching blocks found'):
         window_data_group.prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
-    assert window_data_group.window_source.events == []
+    assert window_data_group._window_source.events == []
 
-    window_data_group.schema.window_type = 'hour'
-    window_data_group.schema.window_value = 2
+    window_data_group._schema.window_type = 'hour'
+    window_data_group._schema.window_value = 2
     window_data_group.prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
-    assert window_data_group.window_source.events == [4]
+    assert window_data_group._window_source.events == [4]
 
 
 def test_window_type_hour_negative(window_data_group: WindowDataGroup) -> None:
-    window_data_group.schema.window_type = 'hour'
-    window_data_group.schema.window_value = -24
+    window_data_group._schema.window_type = 'hour'
+    window_data_group._schema.window_value = -24
     window_data_group.prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
-    assert window_data_group.window_source.events == [1, 2]
+    assert window_data_group._window_source.events == [1, 2]
 
 
 def test_window_type_hour_zero_value(window_data_group: WindowDataGroup) -> None:
-    window_data_group.schema.window_type = 'hour'
-    window_data_group.schema.window_value = 0
+    window_data_group._schema.window_type = 'hour'
+    window_data_group._schema.window_value = 0
     with pytest.raises(PrepareWindowMissingBlocksError, match='No matching blocks found'):
         window_data_group.prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
-    assert window_data_group.window_source.events == []
+    assert window_data_group._window_source.events == []
 
 
 def test_window_type_count_positive(window_data_group: WindowDataGroup) -> None:
-    window_data_group.schema.window_type = 'count'
-    window_data_group.schema.window_value = -1
+    window_data_group._schema.window_type = 'count'
+    window_data_group._schema.window_value = -1
     window_data_group.prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
-    assert window_data_group.window_source.events == [2]
+    assert window_data_group._window_source.events == [2]
 
 
 def test_window_type_count_negative(window_data_group: WindowDataGroup) -> None:
-    window_data_group.schema.window_type = 'count'
-    window_data_group.schema.window_value = 1
+    window_data_group._schema.window_type = 'count'
+    window_data_group._schema.window_value = 1
     window_data_group.prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
-    assert window_data_group.window_source.events == [4]
+    assert window_data_group._window_source.events == [4]
 
 
 def test_window_type_count_missing_sesssions(window_data_group: WindowDataGroup) -> None:
-    window_data_group.schema.window_type = 'count'
-    window_data_group.schema.window_value = 20
+    window_data_group._schema.window_type = 'count'
+    window_data_group._schema.window_value = 20
     with pytest.raises(
             PrepareWindowMissingBlocksError, match='Expecting 20 but not found 3 blocks'):
         window_data_group.prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
-    assert window_data_group.window_source.events == [4, 5, 6]
+    assert window_data_group._window_source.events == [4, 5, 6]
 
 
 def test_evaluate(window_data_group):
-    window_data_group.schema.window_type = 'day'
-    window_data_group.schema.window_value = 1
+    window_data_group._schema.window_type = 'day'
+    window_data_group._schema.window_value = 1
     window_data_group.prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
     window_data_group.evaluate()
     assert window_data_group.total_events == 9

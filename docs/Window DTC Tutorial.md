@@ -58,7 +58,7 @@ Anchor:
   Condition: source.event_id == "game_start" and source.boost == True
 
 DataGroups:
-  - Type: Blurr:DTC:DataGroup:AnchorAggregate
+  - Type: Blurr:DTC:DataGroup:WindowAggregate
     Name: last_7_days
     Window:
       Type: day
@@ -70,7 +70,7 @@ DataGroups:
        Type: float
        Value: sum(source.games_played) / len(source.session_id)
 
-  - Type: Blurr:DTC:DataGroup:AnchorAggregate
+  - Type: Blurr:DTC:DataGroup:WindowAggregate
     Name: next_3_days
     Window:
       Type: day
@@ -128,18 +128,18 @@ So far, we've thought of the Identity as a mandatory field that is part of both 
 In a Window DTC the Identity also has a role: __grouping data__ that is aggregated around Anchor Points. The Identity ensures that our output has __one record per user__.
 
 
-### 3.4. Anchor Aggregates
+### 3.4. Window Aggregates
 
 Our Window DTC performs 2 different aggregations:
 
 * Over all sessions 7 days __before__ the Anchor Point.
 * Over all sessions 3 days __before__ the Anchor Point.
 
-How each aggregated is calculated is defined by `AnchorAggregate` DataGroups:
+How each aggregated is calculated is defined by `WindowAggregate` DataGroups:
 
 
 ```yaml
-- Type: Blurr:DTC:DataGroup:AnchorAggregate
+- Type: Blurr:DTC:DataGroup:WindowAggregate
     Name: last_7_days
     Window:
       Type: day
@@ -152,7 +152,7 @@ How each aggregated is calculated is defined by `AnchorAggregate` DataGroups:
        Value: sum(source.games_played) / len(source.session_id)
 ```
 
-This `AnchorAggregate` is responsible of aggregating data for the __previous 7 days__ before the boost activation.
+This `WindowAggregate` is responsible of aggregating data for the __previous 7 days__ before the boost activation.
 
 #### Window
 
