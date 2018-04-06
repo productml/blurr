@@ -1,6 +1,5 @@
+from abc import ABC, abstractmethod
 from typing import Dict, Any, Type, TypeVar, Union
-
-from abc import ABC, abstractmethod, abstractproperty
 
 from blurr.core.errors import SnapshotError
 from blurr.core.evaluation import Expression, EvaluationContext
@@ -154,7 +153,7 @@ class BaseItemCollection(BaseItem, ABC):
         try:
             return {name: item._snapshot for name, item in self._nested_items.items()}
         except Exception as e:
-            print('Error while creating snapshot')
+            print('Error while creating snapshot for {}', self._name)
             raise SnapshotError(e)
 
     def restore(self, snapshot: Dict[Union[str, Key], Any]) -> 'BaseItemCollection':
