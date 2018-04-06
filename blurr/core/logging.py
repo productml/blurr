@@ -49,8 +49,7 @@ def _get_logger() -> logging.Logger:
 
             # Add the output handler.
             _handler = logging.StreamHandler(_logging_target)
-            _handler.setFormatter(
-                logging.Formatter(logging.BASIC_FORMAT, None))
+            _handler.setFormatter(logging.Formatter(logging.BASIC_FORMAT, None))
             logger.addHandler(_handler)
 
         _logger = logger

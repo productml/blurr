@@ -156,8 +156,7 @@ class BaseItemCollection(BaseItem):
             return {name: item._snapshot for name, item in self._nested_items.items()}
 
         except Exception as e:
-            print('Error while creating snapshot for {}', self._name)
-            raise SnapshotError(e)
+            raise SnapshotError('Error while creating snapshot for {}'.format(self._name)) from e
 
     def restore(self, snapshot: Dict[Union[str, Key], Any]) -> 'BaseItemCollection':
         """
@@ -173,8 +172,7 @@ class BaseItemCollection(BaseItem):
             return self
 
         except Exception as e:
-            print('Error while restoring snapshot: {}', self._snapshot)
-            raise SnapshotError(e)
+            raise SnapshotError('Error while restoring snapshot: {}'.format(self._snapshot)) from e
 
     @abstractmethod
     def finalize(self) -> None:

@@ -5,7 +5,7 @@ import yaml
 from pytest import fixture
 
 from blurr.core.anchor import AnchorSchema
-from blurr.core.errors import AnchorBlockNotDefinedError
+from blurr.core.errors import AnchorBlockNotDefinedError, PrepareWindowMissingBlocksError
 from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.block_data_group import BlockDataGroup, \
@@ -75,7 +75,10 @@ def test_evaluate_anchor_prepare_window_error(window_transformer, block_aggregat
         '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc),
         '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc)
     })
-    assert window_transformer.evaluate_anchor(block_aggregate) is False
+    with pytest.raises(
+            PrepareWindowMissingBlocksError,
+            match='last_session WindowAggregate: Expecting 1 but found 0 blocks'):
+        window_transformer.evaluate_anchor(block_aggregate)
 
 
 def test_evaluate_anchor_prepare_window(schema_loader, window_transformer, block_aggregate):
