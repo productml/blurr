@@ -1,6 +1,6 @@
 Type: Blurr:Streaming
 Version: '2018-03-01'
-Name : sessions
+Name: sessions
 
 Stores:
    - Type: Blurr:Store:MemoryStore
@@ -33,3 +33,7 @@ DataGroups:
        Type: integer
        When: source.event_id == 'game_end' and source.won == '1'
        Value: session_stats.games_won + 1
+
+     - Name: boost
+       Type: boolean
+       Value: source.boost
