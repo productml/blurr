@@ -21,23 +21,27 @@ def assert_record_in_ouput(record: Any, out_text: str) -> None:
     assert json.dumps(record) in out_text
 
 
-def test_transform_invalid(caplog) -> None:
-    caplog.set_level(logging.INFO)
+def test_transform_invalid(capsys) -> None:
     assert run_command(None, None, None, None) == 1
+    out, err = capsys.readouterr()
+    assert out == ''
     assert ('Streaming DTC file not provided and could not be found in '
-            'the current directory.') in caplog.text
+            'the current directory.') in err
 
 
-def test_transform_only_window(caplog) -> None:
-    caplog.set_level(logging.INFO)
+def test_transform_only_window(capsys) -> None:
     assert run_command(None, 'tests/data/window.yml', None, None) == 1
+    out, err = capsys.readouterr()
+    assert out == ''
     assert ('Streaming DTC file not provided and could not be found in '
-            'the current directory.') in caplog.text
+            'the current directory.') in err
 
 
-def test_transform_no_raw_data(caplog) -> None:
-    caplog.set_level(logging.INFO)
+def test_transform_no_raw_data(capsys) -> None:
     assert run_command('tests/data/stream.yml', None, None, None) == 0
+    out, err = capsys.readouterr()
+    assert out == ''
+    assert err == ''
 
 
 def test_transform_only_stream(capsys) -> None:

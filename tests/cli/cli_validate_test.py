@@ -16,35 +16,36 @@ def get_running_validation_str(file_name: str) -> str:
     return 'Running syntax validation on tests/core/syntax/dtcs/' + file_name
 
 
-def test_valid_dtc(caplog):
-    caplog.set_level(logging.INFO)
+def test_valid_dtc(capsys):
     code = run_command(['valid_basic_streaming.yml'])
+    out, err = capsys.readouterr()
     assert code == 0
-    assert 'Document is valid' in caplog.text
+    assert 'Document is valid' in out
+    assert err == ''
 
 
-def test_invalid_yaml(caplog):
-    caplog.set_level(logging.INFO)
+def test_invalid_yaml(capsys):
     code = run_command(['invalid_yaml.yml'])
+    out, err = capsys.readouterr()
     assert code == 1
-    assert get_running_validation_str('invalid_yaml.yml') in caplog.text
-    assert 'Invalid yaml' in caplog.text
+    assert get_running_validation_str('invalid_yaml.yml') in out
+    assert 'Invalid yaml' in err
 
 
-def test_multiple_dtc_files(caplog):
-    caplog.set_level(logging.INFO)
+def test_multiple_dtc_files(capsys):
     code = run_command(['valid_basic_streaming.yml', 'invalid_yaml.yml'])
+    out, err = capsys.readouterr()
     assert code == 1
-    assert get_running_validation_str('invalid_yaml.yml') in caplog.text
-    assert 'Document is valid' in caplog.text
-    assert get_running_validation_str('valid_basic_streaming.yml') in caplog.text
-    assert 'Invalid yaml' in caplog.text
+    assert get_running_validation_str('invalid_yaml.yml') in out
+    assert 'Document is valid' in out
+    assert get_running_validation_str('valid_basic_streaming.yml') in out
+    assert 'Invalid yaml' in err
 
 
-def test_invalid_dtc(caplog):
-    caplog.set_level(logging.INFO)
+def test_invalid_dtc(capsys):
     code = run_command(['invalid_wrong_version.yml'])
+    out, err = capsys.readouterr()
     assert code == 1
-    assert 'Error validating data dtc with schema' in caplog.text
-    assert 'Version: \'2088-03-01\' not in (\'2018-03-01\',)' in caplog.text
-    assert get_running_validation_str('invalid_wrong_version.yml') in caplog.text
+    assert 'Error validating data dtc with schema' in err
+    assert 'Version: \'2088-03-01\' not in (\'2018-03-01\',)' in err
+    assert get_running_validation_str('invalid_wrong_version.yml') in out

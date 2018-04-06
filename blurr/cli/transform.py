@@ -1,8 +1,7 @@
 from typing import List, Optional
 
-from blurr.cli.util import get_stream_window_dtc_files, get_yml_files
+from blurr.cli.util import get_stream_window_dtc_files, get_yml_files, eprint
 from blurr.cli.validate import get_valid_yml_files
-from blurr.core import logging
 from blurr.runner.local_runner import LocalRunner
 
 
@@ -13,8 +12,8 @@ def transform(stream_dtc_file: Optional[str], window_dtc_file: Optional[str],
             get_valid_yml_files(get_yml_files()))
 
     if stream_dtc_file is None:
-        logging.error('Streaming DTC file not provided and could not be found in '
-                      'the current directory.')
+        eprint('Streaming DTC file not provided and could not be found in '
+               'the current directory.')
         return 1
 
     local_runner = LocalRunner(raw_json_files, stream_dtc_file, window_dtc_file)

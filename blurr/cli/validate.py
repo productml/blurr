@@ -2,7 +2,7 @@ from typing import List
 
 import yaml
 
-from blurr.cli.util import get_yml_files
+from blurr.cli.util import get_yml_files, eprint
 from blurr.core import logging
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.syntax.schema_validator import validate
@@ -13,7 +13,7 @@ def validate_command(dtc_files: List[str]) -> int:
     if len(dtc_files) == 0:
         dtc_files = get_yml_files()
     for dtc_file in dtc_files:
-        logging.info('Running syntax validation on {}'.format(dtc_file))
+        print('Running syntax validation on {}'.format(dtc_file))
         if validate_file(dtc_file) == 1:
             all_files_valid = False
 
@@ -24,16 +24,16 @@ def validate_file(dtc_file: str) -> int:
     try:
         dtc_dict = yaml.safe_load(open(dtc_file))
         validate(dtc_dict)
-        logging.info('Document is valid')
+        print('Document is valid')
         return 0
     except yaml.YAMLError:
-        logging.error('Invalid yaml')
+        eprint('Invalid yaml')
         return 1
     except InvalidSchemaError as err:
-        logging.error(str(err))
+        eprint(str(err))
         return 1
     except:
-        logging.error('There was an error parsing the document')
+        eprint('There was an error parsing the document')
         return 1
 
 
