@@ -24,7 +24,6 @@ def assert_record_in_ouput(record: Any, out_text: str) -> None:
 def test_transform_invalid(capsys) -> None:
     assert run_command(None, None, None, None) == 1
     out, err = capsys.readouterr()
-    assert out == ''
     assert ('Streaming DTC file not provided and could not be found in '
             'the current directory.') in err
 
