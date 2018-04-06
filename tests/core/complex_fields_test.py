@@ -92,20 +92,18 @@ def schema_loader() -> SchemaLoader:
 
 
 @fixture(scope='module')
-def data_group_schema(
-        schema_loader: SchemaLoader,
-        data_group_schema_spec: Dict[str, Any]) -> DataGroupSchema:
-    return VariableDataGroupSchema(
-        schema_loader.add_schema(data_group_schema_spec), schema_loader)
+def data_group_schema(schema_loader: SchemaLoader,
+                      data_group_schema_spec: Dict[str, Any]) -> DataGroupSchema:
+    return VariableDataGroupSchema(schema_loader.add_schema(data_group_schema_spec), schema_loader)
 
 
 @fixture
 def data_group(data_group_schema: DataGroupSchema) -> DataGroup:
     context = EvaluationContext()
 
-    dg = VariableDataGroup(
-        schema=data_group_schema, identity="12345", evaluation_context=context)
+    dg = VariableDataGroup(schema=data_group_schema, identity="12345", evaluation_context=context)
     context.global_add('test', dg)
+    context.global_add('identity', "12345")
 
     return dg
 

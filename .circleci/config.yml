@@ -23,9 +23,9 @@ jobs:
           name: deploy pypi
           command: |
             pipenv install --dev --ignore-pipfile
-            pipenv run python setup.py sdist
-            pipenv run python setup.py bdist_wheel
-            pipenv run twine upload dist/*
+            pipenv run python setup.py sdist bdist_wheel
+            pipenv run twine upload dist/*.gz
+            pipenv run twine upload dist/*.whl
 workflows:
   version: 2
   build_and_deploy:

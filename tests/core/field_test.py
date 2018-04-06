@@ -1,3 +1,4 @@
+import logging
 from typing import Dict, Any
 
 import pytest
@@ -12,11 +13,7 @@ from blurr.core.simple_fields import SimpleField, BooleanFieldSchema, IntegerFie
 @fixture
 def test_field_schema() -> Dict[str, Any]:
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema({
-        'Name': 'max_attempts',
-        'Type': 'integer',
-        'Value': 5
-    })
+    name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': 'integer', 'Value': 5})
     return MockFieldSchema(name, schema_loader)
 
 
@@ -61,67 +58,56 @@ def test_field_evaluate_without_needs_evaluation():
     assert field.value == 0
 
 
-def test_field_evaluate_incorrect_typecast():
+def test_field_evaluate_incorrect_typecast_to_type_default(caplog):
+    caplog.set_level(logging.DEBUG)
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema({
-        'Name': 'max_attempts',
-        'Type': 'integer',
-        'Value': '"Hi"'
-    })
+    name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': 'integer', 'Value': '"Hi"'})
     field_schema = IntegerFieldSchema(name, schema_loader)
     field = SimpleField(field_schema, EvaluationContext())
-    with pytest.raises(ValueError):
-        field.evaluate()
+    field.evaluate()
+
+    assert field.value == 0
+    assert ('ValueError in casting Hi to integer for field max_attempts. Error: invalid '
+            'literal for int() with base 10: \'Hi\'') in caplog.records[0].message
+    assert caplog.records[0].levelno == logging.DEBUG
 
 
 def test_field_evaluate_implicit_typecast_integer():
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema({
-        'Name': 'max_attempts',
-        'Type': 'integer',
-        'Value': '23.45'
-    })
+    name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': 'integer', 'Value': '23.45'})
     field_schema = IntegerFieldSchema(name, schema_loader)
     field = SimpleField(field_schema, EvaluationContext())
     field.evaluate()
 
-    assert field.snapshot == 23
+    assert field._snapshot == 23
 
 
 def test_field_evaluate_implicit_typecast_float():
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema({
-        'Name': 'max_attempts',
-        'Type': 'float',
-        'Value': '23'
-    })
+    name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': 'float', 'Value': '23'})
     field_schema = FloatFieldSchema(name, schema_loader)
     field = SimpleField(field_schema, EvaluationContext())
     field.evaluate()
 
-    assert field.snapshot == 23.0
+    assert field._snapshot == 23.0
 
 
 def test_field_evaluate_implicit_typecast_bool():
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema({
-        'Name': 'max_attempts',
-        'Type': 'boolean',
-        'Value': '1+2'
-    })
+    name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': 'boolean', 'Value': '1+2'})
     field_schema = BooleanFieldSchema(name, schema_loader)
     field = SimpleField(field_schema, EvaluationContext())
     field.evaluate()
 
-    assert field.snapshot is True
+    assert field._snapshot is True
 
 
 def test_field_snapshot(test_field_schema):
     field = MockField(test_field_schema, EvaluationContext())
-    assert field.snapshot == 0
+    assert field._snapshot == 0
 
     field.evaluate()
-    assert field.snapshot == 5
+    assert field._snapshot == 5
 
 
 def test_field_restore(test_field_schema):

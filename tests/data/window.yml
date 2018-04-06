@@ -7,7 +7,7 @@ Name: ProductMLExample
 SourceDTC: Sessions
 
 Anchor:
-  Condition: 'True'
+  Condition: Sessions.session.events > 0
   Max: 1
 
 
