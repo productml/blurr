@@ -107,6 +107,13 @@ def test_execution_error(caplog) -> None:
     assert 'ZeroDivisionError in evaluating expression 1/0. Error: division by zero' in caplog.text
 
 
+def test_execution_key_error(caplog) -> None:
+    caplog.set_level(logging.DEBUG)
+    code_string = 'test_dict[\'missing_key\'] + 1'
+    assert Expression(code_string).evaluate(EvaluationContext(Context({'test_dict': {}}))) is None
+    assert 'KeyError in evaluating expression test_dict[\'missing_key\'] + 1. Error: \'missing_key\'' in caplog.text
+
+
 def test_execution_error_missing_data_group(caplog, schema_loader: SchemaLoader) -> None:
     caplog.set_level(logging.DEBUG)
     context = Context({
@@ -116,6 +123,9 @@ def test_execution_error_missing_data_group(caplog, schema_loader: SchemaLoader)
         Expression('test.missing_data_group + 1').evaluate(EvaluationContext(context))
     assert ('MissingAttributeError in evaluating expression test.missing_data_group + 1. '
             'Error: missing_data_group not defined in test') in caplog.text
+
+    with raises(MissingAttributeError, match='missing_data_group not defined in test'):
+        Expression('test[\'missing_data_group\'] + 1').evaluate(EvaluationContext(context))
 
 
 def test_execution_error_missing_field(caplog, schema_loader: SchemaLoader) -> None:
@@ -127,3 +137,6 @@ def test_execution_error_missing_field(caplog, schema_loader: SchemaLoader) -> N
         Expression('test.test_group.missing_field').evaluate(EvaluationContext(context))
     assert ('MissingAttributeError in evaluating expression test.test_group.missing_field. '
             'Error: missing_field not defined in test_group') in caplog.text
+
+    with raises(MissingAttributeError, match='missing_field not defined in test_group'):
+        Expression('test.test_group[\'missing_field\']').evaluate(EvaluationContext(context))
