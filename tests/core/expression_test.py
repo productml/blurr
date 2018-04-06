@@ -111,7 +111,9 @@ def test_execution_key_error(caplog) -> None:
     caplog.set_level(logging.DEBUG)
     code_string = 'test_dict[\'missing_key\'] + 1'
     assert Expression(code_string).evaluate(EvaluationContext(Context({'test_dict': {}}))) is None
-    assert 'KeyError in evaluating expression test_dict[\'missing_key\'] + 1. Error: \'missing_key\'' in caplog.text
+    assert 'KeyError in evaluating expression test_dict[\'missing_key\'] + 1. Error: \'missing_key\'' in caplog.records[
+        0].message
+    assert caplog.records[0].levelno == logging.DEBUG
 
 
 def test_execution_error_missing_data_group(caplog, schema_loader: SchemaLoader) -> None:
