@@ -2,6 +2,7 @@ from typing import Any
 
 from abc import ABC, abstractmethod
 
+from blurr.core import logging
 from blurr.core.base import BaseSchema, BaseItem
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
@@ -82,9 +83,10 @@ class Field(BaseItem, ABC):
         if not self._schema.is_type_of(result):
             try:
                 result = self._schema.type_object(result)
-            except:
-                # Silently skip setting value if type-casting errors out
-                # TODO Log type cast exception
+            except Exception as err:
+                logging.debug('{} in casting {} to {} for field {}. Error: {}'.format(
+                    type(err).__name__, result, self._schema.type,
+                    self._schema.fully_qualified_name, err))
                 return
 
         self.value = result

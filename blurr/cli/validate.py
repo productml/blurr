@@ -1,44 +1,39 @@
-from typing import List, Optional
+from typing import List
 
 import yaml
 
-from blurr.cli.out import Out
-from blurr.cli.util import get_yml_files
+from blurr.cli.util import get_yml_files, eprint
+from blurr.core import logging
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.syntax.schema_validator import validate
 
 
-def validate_command(dtc_files: List[str], out: Optional[Out] = None) -> int:
+def validate_command(dtc_files: List[str]) -> int:
     all_files_valid = True
     if len(dtc_files) == 0:
         dtc_files = get_yml_files()
     for dtc_file in dtc_files:
-        if out:
-            out.print('Running syntax validation on', dtc_file)
-        if validate_file(dtc_file, out) == 1:
+        print('Running syntax validation on {}'.format(dtc_file))
+        if validate_file(dtc_file) == 1:
             all_files_valid = False
 
     return 0 if all_files_valid else 1
 
 
-def validate_file(dtc_file: str, out: Optional[Out] = None) -> int:
+def validate_file(dtc_file: str) -> int:
     try:
         dtc_dict = yaml.safe_load(open(dtc_file))
         validate(dtc_dict)
-        if out:
-            out.print('document is valid')
+        print('Document is valid')
         return 0
     except yaml.YAMLError:
-        if out:
-            out.eprint('invalid yaml')
+        eprint('Invalid yaml')
         return 1
     except InvalidSchemaError as err:
-        if out:
-            out.eprint(str(err))
+        eprint(str(err))
         return 1
     except:
-        if out:
-            out.eprint('there was an error parsing the document')
+        eprint('There was an error parsing the document')
         return 1
 
 

@@ -66,3 +66,10 @@ class PrepareWindowMissingBlocksError(Exception):
     Raised when the window view generated is insufficient as per the window specification.
     """
     pass
+
+
+class MissingAttributeError(Exception):
+    """
+    Raised when the name of the item being retrieved does not exist in the nested items.
+    """
+    pass

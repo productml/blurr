@@ -3,7 +3,9 @@ from typing import Any, Dict
 import re
 from copy import copy
 
-from blurr.core.errors import ExpressionEvaluationError, InvalidExpressionError
+from blurr.core import logging
+from blurr.core.errors import ExpressionEvaluationError, InvalidExpressionError, \
+    MissingAttributeError
 
 
 class Context(dict):
@@ -102,5 +104,14 @@ class Expression:
             return eval(self.code_object, evaluation_context.global_context,
                         evaluation_context.local_context)
         except Exception as err:
-            # TODO Log exception
+            # Evaluation exceptions are expected because of missing fields in the source 'Record'.
+            logging.debug('{} in evaluating expression {}. Error: {}'.format(
+                type(err).__name__, self.code_string, err))
+            # These should result in an exception being raised:
+            # NameError - Exceptions thrown because of using names in the expression which are not
+            #   present in EvaluationContext. A common cause for this is typos in the DTC.
+            # MissingAttributeError - Exception thrown when a DTC nested item is used which does not
+            #   exist. Should only happen for erroneous DTCs.
+            if isinstance(err, NameError) or isinstance(err, MissingAttributeError):
+                raise err
             return None

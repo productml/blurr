@@ -71,11 +71,14 @@ class WindowDataGroup(DataGroup):
     def _validate_view(self):
         if self._schema.window_type == 'count' and len(self._window_source.view) != abs(
                 self._schema.window_value):
-            raise PrepareWindowMissingBlocksError('Expecting {} but not found {} blocks'.format(
-                abs(self._schema.window_value), len(self._window_source.view)))
+            raise PrepareWindowMissingBlocksError(
+                '{} WindowAggregate: Expecting {} but found {} blocks'.format(
+                    self._schema.name, abs(self._schema.window_value), len(
+                        self._window_source.view)))
 
         if len(self._window_source.view) == 0:
-            raise PrepareWindowMissingBlocksError('No matching blocks found')
+            raise PrepareWindowMissingBlocksError(
+                '{} WindowAggregate: No matching blocks found'.format(self._schema.name))
 
     # TODO: Handle end time which is beyond the expected range of data being
     # processed. In this case a PrepareWindowMissingBlocksError error should

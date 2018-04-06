@@ -1,6 +1,7 @@
 from typing import List, Tuple
 
 import os
+import sys
 import yaml
 
 from blurr.core.syntax.schema_validator import is_streaming_dtc, is_window_dtc
@@ -29,3 +30,7 @@ def get_stream_window_dtc_files(dtc_files: List[str]) -> Tuple[str, str]:
             window_dtc_file = dtc_file
 
     return stream_dtc_file, window_dtc_file
+
+
+def eprint(*args):
+    print(*args, file=sys.stderr)

@@ -3,7 +3,9 @@ from typing import List, Dict, Tuple, Any, Optional
 
 from dateutil import parser
 
+from blurr.core import logging
 from blurr.core.block_data_group import BlockDataGroup
+from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import Context
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
@@ -47,6 +49,7 @@ def execute_stream_dtc(identity_events: List[Tuple[datetime, Record]], identity:
 def execute_window_dtc(identity: str, schema_loader: SchemaLoader,
                        window_dtc_spec: Optional[Dict]) -> List[Dict]:
     if window_dtc_spec is None:
+        logging.debug('Window DTC not provided')
         return []
 
     exec_context = Context()
@@ -77,11 +80,23 @@ def execute_window_dtc(identity: str, schema_loader: SchemaLoader,
     window_transformer_schema = schema_loader.get_schema_object(window_dtc_name)
     window_transformer = WindowTransformer(window_transformer_schema, identity, exec_context)
 
+    logging.debug('Running Window DTC for identity {}'.format(identity))
+
+    anchors = 0
+    blocks = 0
     for key, data in all_data.items():
         if key.group != block_obj._schema.name:
             continue
-        if window_transformer.evaluate_anchor(block_obj.restore(data)):
-            window_data.append(window_transformer.flattened_snapshot)
+        try:
+            blocks += 1
+            if window_transformer.evaluate_anchor(block_obj.restore(data)):
+                anchors += 1
+                window_data.append(window_transformer.flattened_snapshot)
+        except PrepareWindowMissingBlocksError as err:
+            logging.debug('{} with {}'.format(err, key))
+
+    if anchors == 0:
+        logging.debug('No anchors found for identity {} out of {} blocks'.format(identity, blocks))
 
     return window_data
 

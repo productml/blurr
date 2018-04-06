@@ -103,6 +103,7 @@ def data_group(data_group_schema: DataGroupSchema) -> DataGroup:
 
     dg = VariableDataGroup(schema=data_group_schema, identity="12345", evaluation_context=context)
     context.global_add('test', dg)
+    context.global_add('identity', "12345")
 
     return dg
 
