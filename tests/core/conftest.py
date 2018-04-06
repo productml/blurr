@@ -48,4 +48,4 @@ def init_memory_store(store: MemoryStore) -> None:
     store.save(Key('user1', 'session', date), {'events': 5, '_start_time': date})
 
     date = datetime(2018, 3, 8, 23, 40, 31, 0, timezone.utc)
-    store.save(Key('user1', 'session', date), {'events': 6, '_start_time': date})
+    store.save(Key('user1', 'session'), {'events': 6, '_start_time': date})
