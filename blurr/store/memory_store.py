@@ -40,8 +40,7 @@ class MemoryStore(Store):
                     items_in_range.append((key, item))
                 elif key.timestamp is None:
                     item_ts = item.get('_start_time', datetime.min)
-                    item_ts = item_ts if  item_ts.tzinfo else item_ts.replace(
-                        tzinfo=timezone.utc)
+                    item_ts = item_ts if item_ts.tzinfo else item_ts.replace(tzinfo=timezone.utc)
                     if start.timestamp < item_ts < end.timestamp:
                         items_in_range.append((key, item))
                         continue
