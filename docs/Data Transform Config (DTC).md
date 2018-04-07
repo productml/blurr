@@ -268,6 +268,8 @@ Source | The BlockAggregate DataGroup (defined in the Streaming DTC) on which th
 
 All functions defined on windows work on a list of values. For e.g. if a session contains a `games_played` field and a `last_week` window is defined on it, then `last_week.games_played` represents the list of values from last week's sessions.
 
+**Important: Window operations using `WindowAggregate` do not include the Anchor block itself.**
+
 Each field in a WindowAggregate DataGroup has 3 properties.
 
 Key |  Description | Allowed values | Required
