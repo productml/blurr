@@ -35,6 +35,12 @@ $ blurr transform \
      --source file://path
 ```
 
+## Debug
+
+Print logs for debugging using the `--debug` option
+
+`blurr transform --streaming-dtc=streaming-dtc.yml --window-dtc=window-dtc.yml raw-data-window.json --debug`
+
 ## Supported data sources
 
 Valid sources of data are:
