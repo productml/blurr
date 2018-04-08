@@ -5,42 +5,44 @@ import importlib
 from blurr.core.errors import InvalidSchemaError
 
 ITEM_MAP = {
-    'Blurr:Aggregate:BlockAggregate': 'blurr.core.block_aggregate.BlockAggregate',
-    'Blurr:Aggregate:CumulativeAggregate': 'blurr.core.cumulative_aggregate.CumulativeAggregate',
-    'Blurr:Aggregate:WindowAggregate': 'blurr.core.window_aggregate.WindowAggregate',
+    'Blurr:Transform:Simple': 'blurr.core.transformer_simple.SimpleTransformer',
+    'Blurr:Aggregate:BlockAggregate': 'blurr.core.aggregate_block.BlockAggregate',
+    'Blurr:Aggregate:CumulativeAggregate': 'blurr.core.aggregate_cumulative.CumulativeAggregate',
+    'Blurr:Aggregate:WindowAggregate': 'blurr.core.aggregate_window.WindowAggregate',
     'day': 'blurr.core.window.Window',
     'hour': 'blurr.core.window.Window',
     'count': 'blurr.core.window.Window',
-    'string': 'blurr.core.simple_fields.SimpleField',
-    'integer': 'blurr.core.simple_fields.SimpleField',
-    'boolean': 'blurr.core.simple_fields.SimpleField',
-    'datetime': 'blurr.core.simple_fields.SimpleField',
-    'float': 'blurr.core.simple_fields.SimpleField',
-    'map': 'blurr.core.simple_fields.SimpleField',
-    'list': 'blurr.core.simple_fields.SimpleField',
-    'set': 'blurr.core.simple_fields.SimpleField',
+    'string': 'blurr.core.field_simple.SimpleField',
+    'integer': 'blurr.core.field_simple.SimpleField',
+    'boolean': 'blurr.core.field_simple.SimpleField',
+    'datetime': 'blurr.core.field_simple.SimpleField',
+    'float': 'blurr.core.field_simple.SimpleField',
+    'map': 'blurr.core.field_simple.SimpleField',
+    'list': 'blurr.core.field_simple.SimpleField',
+    'set': 'blurr.core.field_simple.SimpleField',
 }
 ITEM_MAP_LOWER_CASE = {k.lower(): v for k, v in ITEM_MAP.items()}
 
 SCHEMA_MAP = {
+    'Blurr:Transform:Simple': 'blurr.core.streaming_transformer.StreamingTransformerSchema',
     'Blurr:Streaming': 'blurr.core.streaming_transformer.StreamingTransformerSchema',
     'Blurr:Window': 'blurr.core.window_transformer.WindowTransformerSchema',
-    'Blurr:Aggregate:BlockAggregate': 'blurr.core.block_aggregate.BlockAggregateSchema',
-    'Blurr:Aggregate:CumulativeAggregate': 'blurr.core.cumulative_aggregate.CumulativeAggregateSchema',
-    'Blurr:Aggregate:WindowAggregate': 'blurr.core.window_aggregate.WindowAggregateSchema',
+    'Blurr:Aggregate:BlockAggregate': 'blurr.core.aggregate_block.BlockAggregateSchema',
+    'Blurr:Aggregate:CumulativeAggregate': 'blurr.core.aggregate_cumulative.CumulativeAggregateSchema',
+    'Blurr:Aggregate:WindowAggregate': 'blurr.core.aggregate_window.WindowAggregateSchema',
     'Blurr:Store:MemoryStore': 'blurr.store.memory_store.MemoryStore',
     'anchor': 'blurr.core.anchor.AnchorSchema',
     'day': 'blurr.core.window.WindowSchema',
     'hour': 'blurr.core.window.WindowSchema',
     'count': 'blurr.core.window.WindowSchema',
-    'string': 'blurr.core.simple_fields.StringFieldSchema',
-    'integer': 'blurr.core.simple_fields.IntegerFieldSchema',
-    'boolean': 'blurr.core.simple_fields.BooleanFieldSchema',
-    'datetime': 'blurr.core.simple_fields.DateTimeFieldSchema',
-    'float': 'blurr.core.simple_fields.FloatFieldSchema',
-    'map': 'blurr.core.complex_fields.MapFieldSchema',
-    'list': 'blurr.core.complex_fields.ListFieldSchema',
-    'set': 'blurr.core.complex_fields.SetFieldSchema'
+    'string': 'blurr.core.field_simple.StringFieldSchema',
+    'integer': 'blurr.core.field_simple.IntegerFieldSchema',
+    'boolean': 'blurr.core.field_simple.BooleanFieldSchema',
+    'datetime': 'blurr.core.field_simple.DateTimeFieldSchema',
+    'float': 'blurr.core.field_simple.FloatFieldSchema',
+    'map': 'blurr.core.field_complex.MapFieldSchema',
+    'list': 'blurr.core.field_complex.ListFieldSchema',
+    'set': 'blurr.core.field_complex.SetFieldSchema'
 }
 SCHEMA_MAP_LOWER_CASE = {k.lower(): v for k, v in SCHEMA_MAP.items()}
 

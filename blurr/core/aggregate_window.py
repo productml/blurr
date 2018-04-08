@@ -5,7 +5,7 @@ from blurr.core.aggregate import Aggregate, AggregateSchema
 from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.block_aggregate import BlockAggregate
+from blurr.core.aggregate_block import BlockAggregate
 from blurr.core.store_key import Key
 from blurr.core.base import BaseItem
 

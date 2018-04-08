@@ -4,7 +4,7 @@ from typing import List, Dict, Tuple, Any, Optional
 from dateutil import parser
 
 from blurr.core import logging
-from blurr.core.block_aggregate import BlockAggregate
+from blurr.core.aggregate_block import BlockAggregate
 from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import Context
 from blurr.core.record import Record

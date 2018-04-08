@@ -16,13 +16,13 @@ from blurr.core.streaming_transformer import StreamingTransformer
 def schema_spec() -> Dict:
     return {
         'Name': 'test',
-        'Type': 'Blurr:Streaming',
+        'Type': 'Blurr:Transform:Simple',
         "Version": "2018-03-01",
         "Time": "parser.parse(source.event_time)",
         "Identity": "source.user_id",
-        'DataGroups': [{
+        'Aggregates': [{
             'Name': 'test_group',
-            'Type': 'Blurr:Aggregate:IdentityAggregate',
+            'Type': 'Blurr:Aggregate:CumulativeAggregate',
             'Fields': [{
                 "Type": "integer",
                 "Name": "events",

@@ -2,7 +2,7 @@ from typing import Dict, Any
 
 from pytest import fixture
 
-from blurr.core.complex_fields import Map, List, Set
+from blurr.core.field_complex import Map, List, Set
 from blurr.core.aggregate import Aggregate, AggregateSchema
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader

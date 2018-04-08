@@ -8,7 +8,7 @@ from blurr.core.anchor import AnchorSchema
 from blurr.core.errors import AnchorBlockNotDefinedError, PrepareWindowMissingBlocksError
 from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.block_aggregate import BlockAggregate, \
+from blurr.core.aggregate_block import BlockAggregate, \
     BlockAggregateSchema
 from blurr.core.streaming_transformer import StreamingTransformer
 from blurr.core.window_transformer import WindowTransformer, \

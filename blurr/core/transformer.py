@@ -4,8 +4,8 @@ from abc import ABC
 
 from blurr.core.base import BaseItemCollection, BaseSchemaCollection, BaseItem
 from blurr.core.aggregate import Aggregate
-from blurr.core.errors import MissingAttributeError
-from blurr.core.evaluation import Context, EvaluationContext
+from blurr.core.errors import MissingAttributeError, IdentityError
+from blurr.core.evaluation import Context, EvaluationContext, Expression
 from blurr.core.loader import TypeLoader
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store import Store
@@ -17,18 +17,17 @@ class TransformerSchema(BaseSchemaCollection, ABC):
     the required attributes of a schema.
     """
 
+    ATTRIBUTE_IDENTITY = 'Identity'
     ATTRIBUTE_VERSION = 'Version'
-    ATTRIBUTE_DESCRIPTION = 'Description'
     ATTRIBUTE_STORES = 'Stores'
-    ATTRIBUTE_DATA_GROUPS = 'DataGroups'
+    ATTRIBUTE_AGGREGATES = 'Aggregates'
 
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
-        super().__init__(fully_qualified_name, schema_loader, self.ATTRIBUTE_DATA_GROUPS)
+        super().__init__(fully_qualified_name, schema_loader, self.ATTRIBUTE_AGGREGATES)
 
         # Load the schema specific attributes
+        self.identity = Expression(self._spec[self.ATTRIBUTE_IDENTITY])
         self.version = self._spec[self.ATTRIBUTE_VERSION]
-        self.description = self._spec[
-            self.ATTRIBUTE_DESCRIPTION] if self.ATTRIBUTE_DESCRIPTION in self._spec else None
 
         # Load list of stores from the schema
         self.stores: Dict[str, Type[Store]] = {
@@ -43,6 +42,21 @@ class TransformerSchema(BaseSchemaCollection, ABC):
                 self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
             for schema_spec in self._spec[self._nested_item_attribute]
         }
+
+    def get_identity(self, context: Context) -> str:
+        """
+        Evaluates and returns the identity as specified in the schema.
+        :param context: Context with the 'source' record set which is used to
+        determine the identity.
+        :return: The evaluated identity
+        :raises: IdentityError if identity cannot be determined.
+        """
+        identity = self.identity.evaluate(EvaluationContext(None, context))
+        if not identity:
+            raise IdentityError(
+                'Could not determine identity using {}. Evaluation context is {}'.format(
+                    self.identity.code_string, context))
+        return identity
 
 
 class Transformer(BaseItemCollection, ABC):

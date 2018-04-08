@@ -4,7 +4,7 @@ from pytest import fixture
 
 from blurr.core.evaluation import Expression
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.block_aggregate import BlockAggregateSchema
+from blurr.core.aggregate_block import BlockAggregateSchema
 
 
 @fixture
