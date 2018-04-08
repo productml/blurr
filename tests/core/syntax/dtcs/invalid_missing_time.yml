@@ -8,7 +8,7 @@ Stores:
  - Type: Blurr:Store:MemoryStore
    Name: memory_store
 DataGroups:
- - Type: Blurr:DataGroup:IdentityAggregate
+ - Type: Blurr:Aggregate:IdentityAggregate
    Name: user
    Store: offer_ai_dynamo
    Fields:

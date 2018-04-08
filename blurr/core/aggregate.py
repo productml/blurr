@@ -10,7 +10,7 @@ from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
 
 
-class DataGroupSchema(BaseSchemaCollection, ABC):
+class AggregateSchema(BaseSchemaCollection, ABC):
     """
     Group Schema must inherit from this base.  Data Group schema provides the
     abstraction for managing the 'Fields' in the group.
@@ -55,13 +55,13 @@ class DataGroupSchema(BaseSchemaCollection, ABC):
         return super().extend_schema(spec)
 
 
-class DataGroup(BaseItemCollection, ABC):
+class Aggregate(BaseItemCollection, ABC):
     """
     All Data Groups inherit from this base.  Provides an abstraction for 'value' of the encapsulated
     to be called as properties of the data group itself.
     """
 
-    def __init__(self, schema: DataGroupSchema, identity: str,
+    def __init__(self, schema: AggregateSchema, identity: str,
                  evaluation_context: EvaluationContext) -> None:
         """
         Initializes the data group with the inherited context and adds

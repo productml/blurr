@@ -1,15 +1,15 @@
 from pytest import raises
 
-from blurr.core.block_data_group import BlockDataGroupSchema
+from blurr.core.block_aggregate import BlockAggregateSchema
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.window_data_group import WindowDataGroupSchema
+from blurr.core.window_aggregate import WindowAggregateSchema
 
 
 def test_initialization_with_valid_source(schema_loader_with_mem_store: SchemaLoader,
                                           mem_store_name: str, stream_dtc_name: str):
     schema_loader_with_mem_store.add_schema({
-        'Type': 'Blurr:DataGroup:BlockAggregate',
+        'Type': 'Blurr:Aggregate:BlockAggregate',
         'Name': 'session',
         'Store': mem_store_name,
         'Fields': [
@@ -33,10 +33,10 @@ def test_initialization_with_valid_source(schema_loader_with_mem_store: SchemaLo
         }]
     })
 
-    window_data_group_schema = WindowDataGroupSchema(name, schema_loader_with_mem_store)
+    window_data_group_schema = WindowAggregateSchema(name, schema_loader_with_mem_store)
     assert window_data_group_schema.window_type == 'day'
     assert window_data_group_schema.window_value == 1
-    assert isinstance(window_data_group_schema.source, BlockDataGroupSchema)
+    assert isinstance(window_data_group_schema.source, BlockAggregateSchema)
     assert window_data_group_schema.source.name == 'session'
 
 
@@ -57,4 +57,4 @@ def test_initialization_with_invalid_source(schema_loader_with_mem_store: Schema
     })
 
     with raises(InvalidSchemaError, match=stream_dtc_name + '.session not declared in schema'):
-        WindowDataGroupSchema(name, schema_loader_with_mem_store)
+        WindowAggregateSchema(name, schema_loader_with_mem_store)

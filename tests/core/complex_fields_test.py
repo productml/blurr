@@ -3,7 +3,7 @@ from typing import Dict, Any
 from pytest import fixture
 
 from blurr.core.complex_fields import Map, List, Set
-from blurr.core.data_group import DataGroup, DataGroupSchema
+from blurr.core.aggregate import Aggregate, AggregateSchema
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.variable_data_group import VariableDataGroup, \
@@ -68,7 +68,7 @@ def test_set_add() -> None:
 @fixture(scope='module')
 def data_group_schema_spec() -> Dict[str, Any]:
     return {
-        'Type': 'Blurr:DataGroup:VariableAggregate',
+        'Type': 'Blurr:Aggregate:VariableAggregate',
         'Name': 'test',
         'Fields': [{
             'Name': 'map_field',
@@ -93,12 +93,12 @@ def schema_loader() -> SchemaLoader:
 
 @fixture(scope='module')
 def data_group_schema(schema_loader: SchemaLoader,
-                      data_group_schema_spec: Dict[str, Any]) -> DataGroupSchema:
+                      data_group_schema_spec: Dict[str, Any]) -> AggregateSchema:
     return VariableDataGroupSchema(schema_loader.add_schema(data_group_schema_spec), schema_loader)
 
 
 @fixture
-def data_group(data_group_schema: DataGroupSchema) -> DataGroup:
+def data_group(data_group_schema: AggregateSchema) -> Aggregate:
     context = EvaluationContext()
 
     dg = VariableDataGroup(schema=data_group_schema, identity="12345", evaluation_context=context)
@@ -108,7 +108,7 @@ def data_group(data_group_schema: DataGroupSchema) -> DataGroup:
     return dg
 
 
-def test_field_evaluation(data_group: DataGroup) -> None:
+def test_field_evaluation(data_group: Aggregate) -> None:
     assert len(data_group.map_field) == 0
     assert len(data_group.set_field) == 0
     assert len(data_group.list_field) == 0

@@ -4,7 +4,7 @@ from typing import List, Dict, Tuple, Any, Optional
 from dateutil import parser
 
 from blurr.core import logging
-from blurr.core.block_data_group import BlockDataGroup
+from blurr.core.block_aggregate import BlockAggregate
 from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import Context
 from blurr.core.record import Record
@@ -64,7 +64,7 @@ def execute_window_dtc(identity: str, schema_loader: SchemaLoader,
 
     block_obj = None
     for data_group in stream_transformer._nested_items.values():
-        if not isinstance(data_group, BlockDataGroup):
+        if not isinstance(data_group, BlockAggregate):
             continue
         if block_obj is not None:
             raise Exception(('Window operation is supported against Streaming ',

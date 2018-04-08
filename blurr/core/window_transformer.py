@@ -1,12 +1,12 @@
 from typing import Dict, Optional, Any
 
 from blurr.core.anchor import Anchor
-from blurr.core.window_data_group import WindowDataGroup
+from blurr.core.window_aggregate import WindowAggregate
 from blurr.core.errors import AnchorBlockNotDefinedError, \
     PrepareWindowMissingBlocksError
 from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.block_data_group import BlockDataGroup
+from blurr.core.block_aggregate import BlockAggregate
 from blurr.core.transformer import Transformer, TransformerSchema
 
 
@@ -43,7 +43,7 @@ class WindowTransformer(Transformer):
         super().__init__(schema, identity, context)
         self._anchor = Anchor(schema.anchor, EvaluationContext(global_context=context))
 
-    def evaluate_anchor(self, block: BlockDataGroup) -> bool:
+    def evaluate_anchor(self, block: BlockAggregate) -> bool:
         """
         Evaluates the anchor condition against the specified block.
         :param block: Block to run the anchor condition against.
@@ -69,7 +69,7 @@ class WindowTransformer(Transformer):
             return
 
         for item in self._nested_items.values():
-            if isinstance(item, WindowDataGroup):
+            if isinstance(item, WindowAggregate):
                 item.prepare_window(self._anchor.anchor_block._start_time)
 
         super().evaluate()

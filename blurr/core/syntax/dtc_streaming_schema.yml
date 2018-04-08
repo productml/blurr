@@ -12,21 +12,21 @@ DataGroups: list(any(include('data_group_variable'), include('data_group_identit
 
 data_group_variable:
   Name: identifier()
-  Type: enum('Blurr:DataGroup:VariableAggregate')
+  Type: enum('Blurr:Aggregate:VariableAggregate')
   Store: identifier(required=False)
   When: expression(required=False)
   Fields: list(include('field'), min=1)
 
 data_group_identity:
   Name: identifier()
-  Type: enum('Blurr:DataGroup:IdentityAggregate')
+  Type: enum('Blurr:Aggregate:IdentityAggregate')
   Store: identifier(required=False)
   When: expression(required=False)
   Fields: list(include('field'), min=1)
 
 data_group_block:
   Name: identifier()
-  Type: enum('Blurr:DataGroup:BlockAggregate')
+  Type: enum('Blurr:Aggregate:BlockAggregate')
   Store: identifier(required=False)
   When: expression(required=False)
   Split: expression(required=False)

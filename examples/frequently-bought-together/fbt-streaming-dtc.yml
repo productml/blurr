@@ -26,7 +26,7 @@ Stores:
 
 DataGroups:
 
- - Type: Blurr:DataGroup:IdentityAggregate
+ - Type: Blurr:Aggregate:IdentityAggregate
    Name: user
    Store: fbt_v1_dynamo
    When: source.event_name = 'session_start'
@@ -66,7 +66,7 @@ DataGroups:
 # Session aggregates definition
 ##
 
- - Type: Blurr:DataGroup:BlockAggregate
+ - Type: Blurr:Aggregate:BlockAggregate
    Name: item_stats
    Store: fbt_v1_dynamo
    Split: source.session_id != session_id

@@ -5,10 +5,9 @@ import importlib
 from blurr.core.errors import InvalidSchemaError
 
 ITEM_MAP = {
-    'Blurr:DataGroup:BlockAggregate': 'blurr.core.block_data_group.BlockDataGroup',
-    'Blurr:DataGroup:IdentityAggregate': 'blurr.core.identity_data_group.IdentityDataGroup',
-    'Blurr:DataGroup:VariableAggregate': 'blurr.core.variable_data_group.VariableDataGroup',
-    'Blurr:DataGroup:WindowAggregate': 'blurr.core.window_data_group.WindowDataGroup',
+    'Blurr:Aggregate:BlockAggregate': 'blurr.core.block_aggregate.BlockAggregate',
+    'Blurr:Aggregate:CumulativeAggregate': 'blurr.core.cumulative_aggregate.CumulativeAggregate',
+    'Blurr:Aggregate:WindowAggregate': 'blurr.core.window_aggregate.WindowAggregate',
     'day': 'blurr.core.window.Window',
     'hour': 'blurr.core.window.Window',
     'count': 'blurr.core.window.Window',
@@ -26,10 +25,9 @@ ITEM_MAP_LOWER_CASE = {k.lower(): v for k, v in ITEM_MAP.items()}
 SCHEMA_MAP = {
     'Blurr:Streaming': 'blurr.core.streaming_transformer.StreamingTransformerSchema',
     'Blurr:Window': 'blurr.core.window_transformer.WindowTransformerSchema',
-    'Blurr:DataGroup:BlockAggregate': 'blurr.core.block_data_group.BlockDataGroupSchema',
-    'Blurr:DataGroup:IdentityAggregate': 'blurr.core.identity_data_group.IdentityDataGroupSchema',
-    'Blurr:DataGroup:VariableAggregate': 'blurr.core.variable_data_group.VariableDataGroupSchema',
-    'Blurr:DataGroup:WindowAggregate': 'blurr.core.window_data_group.WindowDataGroupSchema',
+    'Blurr:Aggregate:BlockAggregate': 'blurr.core.block_aggregate.BlockAggregateSchema',
+    'Blurr:Aggregate:CumulativeAggregate': 'blurr.core.cumulative_aggregate.CumulativeAggregateSchema',
+    'Blurr:Aggregate:WindowAggregate': 'blurr.core.window_aggregate.WindowAggregateSchema',
     'Blurr:Store:MemoryStore': 'blurr.store.memory_store.MemoryStore',
     'anchor': 'blurr.core.anchor.AnchorSchema',
     'day': 'blurr.core.window.WindowSchema',

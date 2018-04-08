@@ -1,16 +1,16 @@
 from datetime import datetime, timedelta
 from typing import Any, List, Tuple
 
-from blurr.core.data_group import DataGroup, DataGroupSchema
+from blurr.core.aggregate import Aggregate, AggregateSchema
 from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.block_data_group import BlockDataGroup
+from blurr.core.block_aggregate import BlockAggregate
 from blurr.core.store_key import Key
 from blurr.core.base import BaseItem
 
 
-class WindowDataGroupSchema(DataGroupSchema):
+class WindowAggregateSchema(AggregateSchema):
     """
     Schema for WindowAggregate DataGroup.
     """
@@ -31,18 +31,18 @@ class _WindowSource:
     """
 
     def __init__(self):
-        self.view: List[BlockDataGroup] = []
+        self.view: List[BlockAggregate] = []
 
     def __getattr__(self, item: str) -> List[Any]:
         return [getattr(block, item) for block in self.view]
 
 
-class WindowDataGroup(DataGroup):
+class WindowAggregate(Aggregate):
     """
     Manages the generation of WindowAggregate as defined in the schema.
     """
 
-    def __init__(self, schema: WindowDataGroupSchema, identity: str,
+    def __init__(self, schema: WindowAggregateSchema, identity: str,
                  evaluation_context: EvaluationContext) -> None:
         super().__init__(schema, identity, evaluation_context)
         self._window_source = _WindowSource()
@@ -102,7 +102,7 @@ class WindowDataGroup(DataGroup):
         :return: List of BlockDataGroup
         """
         return [
-            BlockDataGroup(self._schema.source, self._identity, EvaluationContext()).restore(block)
+            BlockAggregate(self._schema.source, self._identity, EvaluationContext()).restore(block)
             for (_, block) in blocks
         ]
 

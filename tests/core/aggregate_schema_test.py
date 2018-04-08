@@ -3,7 +3,7 @@ from typing import Dict, Any
 import pytest
 from pytest import fixture
 
-from blurr.core.data_group import DataGroupSchema
+from blurr.core.aggregate import AggregateSchema
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.schema_loader import SchemaLoader
 
@@ -11,7 +11,7 @@ from blurr.core.schema_loader import SchemaLoader
 @fixture
 def data_group_schema_spec() -> Dict[str, Any]:
     return {
-        'Type': 'Blurr:DataGroup:BlockAggregate',
+        'Type': 'Blurr:Aggregate:BlockAggregate',
         'Name': 'user',
         'Fields': [{
             'Name': 'event_count',
@@ -29,7 +29,7 @@ def store_spec() -> Dict[str, Any]:
     return {'Type': 'Blurr:Store:MemoryStore', 'Name': 'memory'}
 
 
-class MockDataGroupSchema(DataGroupSchema):
+class MockDataGroupSchema(AggregateSchema):
     pass
 
 

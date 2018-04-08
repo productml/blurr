@@ -34,7 +34,7 @@ Store:
 
 
 DataGroups:
- - Type: Blurr:DataGroup:WindowAggregate
+ - Type: Blurr:Aggregate:WindowAggregate
    Name: last_session
       # Defines a processing window for the rollup. Supported window types are Day, Hour and Count
    WindowType: count
@@ -56,7 +56,7 @@ DataGroups:
       Type: float
       Value: source.win_ratio[0]
 
- - Type: Blurr:DataGroup:WindowAggregate
+ - Type: Blurr:Aggregate:WindowAggregate
    Name: last_week
    WindowType: day
    WindowValue: -7
@@ -71,7 +71,7 @@ DataGroups:
       Value: sum(source.purchase_amount)
 
 
- - Type: Blurr:DataGroup:WindowAggregate
+ - Type: Blurr:Aggregate:WindowAggregate
    Name: next_week
    WindowType: day
    WindowValue: 7

@@ -12,7 +12,7 @@ Store:
    ReadWriteUnits: 5
    Table: ProductML_Test_Win_Ratios
 DataGroups:
-- Type: Blurr:DataGroup:IdentityAggregate
+- Type: Blurr:Aggregate:IdentityAggregate
    Name: user
  Store: offer_ai_dynamo
    Fields:

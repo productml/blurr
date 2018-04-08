@@ -69,7 +69,7 @@ Time: parser.parse(source.timestamp)
 
 DataGroups:
 
- - Type: Blurr:DataGroup:BlockAggregate
+ - Type: Blurr:Aggregate:BlockAggregate
    Name: session_stats
    Store: hello_world_store
 

@@ -41,7 +41,7 @@ Store:
 
 DataGroups:
 
- - Type: Blurr:DataGroup:AnchorAggregate
+ - Type: Blurr:Aggregate:AnchorAggregate
    Name: lifetime
 
    Window:
@@ -63,7 +63,7 @@ DataGroups:
        Type: float
        Value: sum(session_stats.transaction_value_this_session)
 
- - Type: Blurr:DataGroup:AnchorAggregate
+ - Type: Blurr:Aggregate:AnchorAggregate
    Name: last_24_hours
 
    Window:
@@ -77,7 +77,7 @@ DataGroups:
        Value: [item for sublist in source.products_bought for item in sublist]
        # Flattens the list of list of tuples of products_bought
 
- - Type: Blurr:DataGroup:AnchorAggregate
+ - Type: Blurr:Aggregate:AnchorAggregate
    Name: next_24_hours
 
    Window:
@@ -91,7 +91,7 @@ DataGroups:
        Value: [item for sublist in source.products_bought for item in sublist]
       # Flattens the list of list of tuples of products_bought
 
- - Type: Blurr:DataGroup:AnchorAggregate
+ - Type: Blurr:Aggregate:AnchorAggregate
    Name: 48_hours_around_transaction
 
    Fields:

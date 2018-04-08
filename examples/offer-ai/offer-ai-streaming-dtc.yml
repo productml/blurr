@@ -25,7 +25,7 @@ DataGroups:
 
    # IdentityAggregate is meant for user profile information that is rarely updated. This is processed first
    # These are things like country, install source and whether user is logged in to Facebook
- - Type: Blurr:DataGroup:IdentityAggregate
+ - Type: Blurr:Aggregate:IdentityAggregate
    Name: user
    Store: offer_ai
    When: source.event_id in ['app_launched', 'user_updated']
@@ -46,7 +46,7 @@ DataGroups:
 
 
    # BlockAggregates definition
- - Type: Blurr:DataGroup:BlockAggregate
+ - Type: Blurr:Aggregate:BlockAggregate
    Name: game_stats
    # We defined this store earlier
    Store: offer_ai

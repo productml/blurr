@@ -1,9 +1,9 @@
-from blurr.core.data_group import DataGroup, DataGroupSchema
+from blurr.core.aggregate import Aggregate, AggregateSchema
 
 
-class VariableDataGroupSchema(DataGroupSchema):
+class VariableDataGroupSchema(AggregateSchema):
     pass
 
 
-class VariableDataGroup(DataGroup):
+class VariableDataGroup(Aggregate):
     pass

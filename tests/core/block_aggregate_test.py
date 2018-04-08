@@ -6,15 +6,15 @@ from pytest import fixture
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.field import Field
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.block_data_group import BlockDataGroupSchema, \
-    BlockDataGroup
+from blurr.core.block_aggregate import BlockAggregateSchema, \
+    BlockAggregate
 from blurr.core.store_key import Key
 
 
 @fixture
 def block_data_group_schema_spec() -> Dict[str, Any]:
     return {
-        'Type': 'Blurr:DataGroup:BlockAggregate',
+        'Type': 'Blurr:Aggregate:BlockAggregate',
         'Name': 'user',
         'Store': 'memstore',
         'Fields': [{
@@ -50,9 +50,9 @@ def check_fields(fields: Dict[str, Field], expected_field_values: Dict[str, Any]
     return True
 
 
-def create_block_data_group(schema, time, identity) -> BlockDataGroup:
+def create_block_data_group(schema, time, identity) -> BlockAggregate:
     evaluation_context = EvaluationContext()
-    block_data_group = BlockDataGroup(
+    block_data_group = BlockAggregate(
         schema=schema, identity=identity, evaluation_context=evaluation_context)
     evaluation_context.global_add('time', time)
     evaluation_context.global_add('user', block_data_group)
@@ -63,7 +63,7 @@ def create_block_data_group(schema, time, identity) -> BlockDataGroup:
 def test_block_data_group_schema_evaluate_without_split(block_data_group_schema_spec,
                                                         schema_loader):
     name = schema_loader.add_schema(block_data_group_schema_spec)
-    block_data_group_schema = BlockDataGroupSchema(name, schema_loader)
+    block_data_group_schema = BlockAggregateSchema(name, schema_loader)
 
     identity = 'userA'
     time = datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc)
@@ -89,7 +89,7 @@ def test_block_data_group_schema_evaluate_without_split(block_data_group_schema_
 def test_block_data_group_schema_evaluate_with_split(block_data_group_schema_spec, schema_loader):
     block_data_group_schema_spec['Split'] = 'user.event_count == 2'
     name = schema_loader.add_schema(block_data_group_schema_spec)
-    block_data_group_schema = BlockDataGroupSchema(name, schema_loader)
+    block_data_group_schema = BlockAggregateSchema(name, schema_loader)
 
     identity = 'userA'
     time = datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc)

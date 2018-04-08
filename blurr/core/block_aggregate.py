@@ -1,11 +1,11 @@
 from typing import Dict, Any, List
 
-from blurr.core.data_group import DataGroup, DataGroupSchema
+from blurr.core.aggregate import Aggregate, AggregateSchema
 from blurr.core.evaluation import Expression
 from blurr.core.schema_loader import SchemaLoader
 
 
-class BlockDataGroupSchema(DataGroupSchema):
+class BlockAggregateSchema(AggregateSchema):
     """
     Data group that handles the block rollup aggregation
     """
@@ -57,7 +57,7 @@ class BlockDataGroupSchema(DataGroupSchema):
         ]
 
 
-class BlockDataGroup(DataGroup):
+class BlockAggregate(Aggregate):
     """
     Manages the aggregates for block based roll-ups of streaming data
     """

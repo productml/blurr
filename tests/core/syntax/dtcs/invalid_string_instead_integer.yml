@@ -10,7 +10,7 @@ Anchor:
   Max: one
 
 DataGroups:
- - Type: Blurr:DataGroup:VariableAggregate
+ - Type: Blurr:Aggregate:VariableAggregate
    Name: user
    Store: offer_ai_dynamo
    Fields:

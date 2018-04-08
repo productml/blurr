@@ -62,12 +62,12 @@ There are 3 types of DataGroups in a Streaming DTC.
 
 ### IdentityAggregate
 
-`Blurr:DataGroup:IdentityAggregate`. Fields in the IdentityAggregate DataGroups are in a one-to-one relationship with the identity.  There is a single record that stores these fields and change to these fields overwrite the previous value.  There are no historical records kept for state changes.
+`Blurr:Aggregate:IdentityAggregate`. Fields in the IdentityAggregate DataGroups are in a one-to-one relationship with the identity.  There is a single record that stores these fields and change to these fields overwrite the previous value.  There are no historical records kept for state changes.
 
 ```yaml
 DataGroups:
 
-  - Type: Blurr:DataGroup:IdentityAggregate
+  - Type: Blurr:Aggregate:IdentityAggregate
     Name: user
     Store: offer_ai_dynamo
     When: source.event_id in ['app_launched', 'user_updated']
@@ -84,7 +84,7 @@ DataGroups:
 
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
-Type | Type of DataGroup | `Blurr:DataGroup:IdentityAggregate`, `Blurr:DataGroup:BlockAggregate`, `Blurr:DataGroup:Variable` | Required
+Type | Type of DataGroup | `Blurr:Aggregate:IdentityAggregate`, `Blurr:Aggregate:BlockAggregate`, `Blurr:Aggregate:Variable` | Required
 Name | Name of the DataGroup | Any `string`, unique within the DTC | Required
 Store | Name of the Store in which to create the DataGroup  | Stores defined in the DTC | Required
 When | Boolean expression that defines which raw events to process | Any `boolean` expression | Optional
@@ -104,11 +104,11 @@ A `DataGroup` contains `fields` for the information being stored. IdentityAggreg
 
 ### BlockAggregate
 
-`Blurr:DataGroup:BlockAggregate`. Fields in the BlockAggregate DataGroups are in a one-to-many relationship with the identity.  These fields are aggregated together in blocks based on the split condition specified.
+`Blurr:Aggregate:BlockAggregate`. Fields in the BlockAggregate DataGroups are in a one-to-many relationship with the identity.  These fields are aggregated together in blocks based on the split condition specified.
 
 ```YAML
 
-- Type: Blurr:DataGroup:BlockAggregate
+- Type: Blurr:Aggregate:BlockAggregate
   Name: session
   When: source.app_version > '3.7'
   Split: source.session_id != session.id
@@ -123,7 +123,7 @@ A `DataGroup` contains `fields` for the information being stored. IdentityAggreg
 
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
-Type | Type of DataGroup | `Blurr:DataGroup:IdentityAggregate`, `Blurr:DataGroup:BlockAggregate`, `Blurr:DataGroup:Variable` | Required
+Type | Type of DataGroup | `Blurr:Aggregate:IdentityAggregate`, `Blurr:Aggregate:BlockAggregate`, `Blurr:Aggregate:Variable` | Required
 Name | Name of the DataGroup | Any, unique within the DTC | Required
 When | Boolean expression that defines which raw events to process | Any `boolean` expression | Optional
 Split | Boolean expression that defines when a new block should be created | Any `boolean` expression | Required
@@ -141,10 +141,10 @@ When | Boolean expression that defines which raw events to process | Any `boolea
 
 ### Variable
 
-`Blurr:DataGroup:Variable`. Variable DataGroups are temporary variables that can be used in other data blocks. Variables aim to reduce code duplication and improve readability. They are useful for cleansing / modifying / typecasting source elements and representing complex filter conditions that evaluate to a binary value.
+`Blurr:Aggregate:Variable`. Variable DataGroups are temporary variables that can be used in other data blocks. Variables aim to reduce code duplication and improve readability. They are useful for cleansing / modifying / typecasting source elements and representing complex filter conditions that evaluate to a binary value.
 
 ```yaml
-- Type: Blurr:DataGroup:Variable
+- Type: Blurr:Aggregate:Variable
   Name: vars
   Fields:
     - Name: item_price_micro
@@ -239,7 +239,7 @@ All DataGroup operations that are performed in a window DTC can only use the fol
 DataGroups:
 
   DataGroups:
-   - Type: Blurr:DataGroup:WindowAggregate
+   - Type: Blurr:Aggregate:WindowAggregate
      Name: last_session
         # Defines a processing window for the rollup. Supported window types are Day, Hour and Count
      WindowType: count
@@ -260,7 +260,7 @@ DataGroups:
 
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
-Type | Type of DataGroup | `Blurr:DataGroup:WindowAggregate`, `Blurr:DataGroup:Variable` | Required
+Type | Type of DataGroup | `Blurr:Aggregate:WindowAggregate`, `Blurr:Aggregate:Variable` | Required
 Name | Name of the DataGroup | Any `string`, unique within the DTC | Required
 WindowType | The type of window to use around the anchor block | `day`, `hour`, `count` | Optional. A WindowAggregate can be defined without a Window
 WindowValue | The number of days, hours or blocks to window around the anchor block | Integer | Optional. A WindowAggregate can be defined without a Window
