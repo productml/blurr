@@ -8,12 +8,8 @@ from blurr.core.store_key import Key
 
 
 class BaseSchema(ABC):
-    """
-    The Base Schema encapsulates the common functionality of all schema
-    elements
-    """
+    """ Encapsulates the common functionality of all schema elements """
 
-    # Field Name Definitions
     ATTRIBUTE_NAME = 'Name'
     ATTRIBUTE_DESCRIPTION = 'Description'
     ATTRIBUTE_TYPE = 'Type'
