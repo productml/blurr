@@ -47,7 +47,7 @@ def load_example(file):
 
 
 def test_validation_errors_contain_dtc_name_and_schema_location():
-    with raises(InvalidSchemaError, match='Error validating data dtc_name with schema') as err:
+    with raises(InvalidSchemaError, match='Error validating data dtc_name with schema'):
         dtc_dict = load_example('invalid_wrong_version.yml')
         validate(dtc_dict, 'dtc_name')
 
@@ -63,40 +63,44 @@ def test_valid_basic_window_dtc():
 
 
 def test_invalid_wrong_version():
-    with raises(InvalidSchemaError) as err:
+    with raises(InvalidSchemaError, match='Version: \'2088-03-01\' not in \(\'2018-03-01\',\)'):
         dtc_dict = load_example('invalid_wrong_version.yml')
         validate(dtc_dict)
-    assert "Version: '2088-03-01' not in ('2018-03-01',)" in str(err.value)
 
 
 def test_invalid_missing_time():
-    with raises(InvalidSchemaError, match='Time: Required field missing') as err:
+    with raises(InvalidSchemaError, match='Time: Required field missing'):
         dtc_dict = load_example('invalid_missing_time.yml')
         validate(dtc_dict)
 
 
 def test_invalid_string_instead_of_integer():
-    with raises(InvalidSchemaError, match="Anchor.Max: 'one' is not a int.") as err:
+    with raises(InvalidSchemaError, match="Anchor.Max: 'one' is not a int."):
         dtc_dict = load_example('invalid_string_instead_integer.yml')
         validate(dtc_dict)
 
 
 def test_invalid_non_existing_data_type():
-    with raises(InvalidSchemaError, match="Type: 'foo' is not a DTC Valid Data Type.") as err:
+    with raises(InvalidSchemaError, match="Type: 'foo' is not a DTC Valid Data Type."):
         dtc_dict = load_example('invalid_non_existing_data_type.yml')
         validate(dtc_dict)
 
 
 def test_invalid_incorrect_expression():
     with raises(
-            InvalidSchemaError,
-            match="When: 'x == senor roy' is an invalid python expression.") as err:
+            InvalidSchemaError, match="When: 'x == senor roy' is an invalid python expression."):
         dtc_dict = load_example('invalid_incorrect_expression.yml')
         validate(dtc_dict)
 
 
+def test_invalid_set_expression():
+    with raises(InvalidSchemaError, match='When: \'x = \'test\'\' is an invalid python expression'):
+        dtc_dict = load_example('invalid_set_expression.yml')
+        validate(dtc_dict)
+
+
 def test_invalid_datagroup_has_no_fields():
-    with raises(InvalidSchemaError, match='DataGroups.0.Fields: Required field missing') as err:
+    with raises(InvalidSchemaError, match='DataGroups.0.Fields: Required field missing'):
         dtc_dict = load_example('invalid_datagroup_has_no_fields.yml')
         validate(dtc_dict)
 
@@ -104,6 +108,6 @@ def test_invalid_datagroup_has_no_fields():
 def test_reserved_keywords_as_field_names_raises_invalid_schema_error():
     with raises(
             InvalidSchemaError,
-            match="Name: '_name' starts with _ or containing whitespace characters.") as err:
+            match="Name: '_name' starts with _ or containing whitespace characters."):
         dtc_dict = load_example('invalid_field_name.yml')
         validate(dtc_dict)

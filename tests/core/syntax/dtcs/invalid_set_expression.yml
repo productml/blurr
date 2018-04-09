@@ -1,0 +1,22 @@
+Type: Blurr:Streaming
+Version: '2018-03-01'
+Description: Example
+Name: example_name
+Time: time
+Identity: source.user_id
+
+
+# SHOULD BE A CORRECT PYTHON EXPRESSION
+When: x = 'test'
+
+
+Stores:
+ - Type: Blurr:Store:MemoryStore
+   Name: memory_store
+DataGroups:
+ - Type: Blurr:DataGroup:IdentityAggregate
+   Name: user
+   Store: offer_ai_dynamo
+   Fields:
+     - Name: user_id
+       Value: source.customer_identifier
