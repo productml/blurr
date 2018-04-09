@@ -3,7 +3,7 @@ Version: '2018-03-01'
 Description: Example
 Name: example_name
 Identity: source.user_id
-When: source.package_version = '1.0'
+When: source.package_version == '1.0'
 Stores:
  - Type: Blurr:Store:MemoryStore
    Name: memory_store
@@ -17,4 +17,4 @@ DataGroups:
        Atomic: true
      - Name: country
        Value: source.country
-       When: last_session = None
+       When: last_session == None
