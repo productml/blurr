@@ -22,7 +22,7 @@ def schema_spec() -> Dict:
         "Identity": "source.user_id",
         'Aggregates': [{
             'Name': 'test_group',
-            'Type': 'Blurr:Aggregate:CumulativeAggregate',
+            'Type': 'Blurr:Aggregate:IdentityAggregate',
             'Fields': [{
                 "Type": "integer",
                 "Name": "events",

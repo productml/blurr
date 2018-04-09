@@ -13,7 +13,7 @@ When: source.package_version == '1.0'
 Stores:
  - Type: Blurr:Store:MemoryStore
    Name: memory_store
-DataGroups:
+Aggregates:
  - Type: Blurr:Aggregate:IdentityAggregate
    Name: user
    Store: offer_ai_dynamo

@@ -6,8 +6,8 @@ from blurr.core.field_complex import Map, List, Set
 from blurr.core.aggregate import Aggregate, AggregateSchema
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.variable_data_group import VariableDataGroup, \
-    VariableDataGroupSchema
+from blurr.core.aggregate_variable import VariableAggregate, \
+    VariableAggregateSchema
 
 # Test custom functions implemented for complex fields
 
@@ -94,14 +94,14 @@ def schema_loader() -> SchemaLoader:
 @fixture(scope='module')
 def data_group_schema(schema_loader: SchemaLoader,
                       data_group_schema_spec: Dict[str, Any]) -> AggregateSchema:
-    return VariableDataGroupSchema(schema_loader.add_schema(data_group_schema_spec), schema_loader)
+    return VariableAggregateSchema(schema_loader.add_schema(data_group_schema_spec), schema_loader)
 
 
 @fixture
 def data_group(data_group_schema: AggregateSchema) -> Aggregate:
     context = EvaluationContext()
 
-    dg = VariableDataGroup(schema=data_group_schema, identity="12345", evaluation_context=context)
+    dg = VariableAggregate(schema=data_group_schema, identity="12345", evaluation_context=context)
     context.global_add('test', dg)
     context.global_add('identity', "12345")
 

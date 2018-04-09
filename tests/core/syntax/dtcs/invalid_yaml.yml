@@ -11,7 +11,7 @@ Store:
    RetentionDays: 180
    ReadWriteUnits: 5
    Table: ProductML_Test_Win_Ratios
-DataGroups:
+Aggregates:
 - Type: Blurr:Aggregate:IdentityAggregate
    Name: user
  Store: offer_ai_dynamo

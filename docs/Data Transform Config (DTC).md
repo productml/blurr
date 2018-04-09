@@ -65,7 +65,7 @@ There are 3 types of DataGroups in a Streaming DTC.
 `Blurr:Aggregate:IdentityAggregate`. Fields in the IdentityAggregate DataGroups are in a one-to-one relationship with the identity.  There is a single record that stores these fields and change to these fields overwrite the previous value.  There are no historical records kept for state changes.
 
 ```yaml
-DataGroups:
+Aggregates:
 
   - Type: Blurr:Aggregate:IdentityAggregate
     Name: user
@@ -236,9 +236,9 @@ All DataGroup operations that are performed in a window DTC can only use the fol
 
 ```yaml
 
-DataGroups:
+Aggregates:
 
-  DataGroups:
+  Aggregates:
    - Type: Blurr:Aggregate:WindowAggregate
      Name: last_session
         # Defines a processing window for the rollup. Supported window types are Day, Hour and Count

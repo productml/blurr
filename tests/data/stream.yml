@@ -3,11 +3,13 @@ Version: '2018-03-01'
 Description: 'Level 1 trasnformation from streaming Raw Data'
 Name: Sessions
 Identity: source.user_id
+Time: parser.parse(source.event_time)
+
 Stores:
   -
     Type: 'Blurr:Store:MemoryStore'
     Name: memory
-DataGroups:
+Aggregates:
   -
     Type: 'Blurr:Aggregate:VariableAggregate'
     Name: vars

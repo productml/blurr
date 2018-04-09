@@ -33,7 +33,7 @@ Store:
    Name: offer-ai
 
 
-DataGroups:
+Aggregates:
  - Type: Blurr:Aggregate:WindowAggregate
    Name: last_session
       # Defines a processing window for the rollup. Supported window types are Day, Hour and Count

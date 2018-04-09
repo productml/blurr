@@ -7,7 +7,7 @@ SourceDTC: streaming-dtc.yml
 Anchor:
   Condition: sessions.session_stats.boost == True
 
-DataGroups:
+Aggregates:
   - Type: Blurr:Aggregate:WindowAggregate
     Name: last_7_days
     WindowType: day

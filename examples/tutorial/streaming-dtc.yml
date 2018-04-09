@@ -10,7 +10,7 @@ Identity: source.user_id
 
 Time: parser.parse(source.timestamp)
 
-DataGroups:
+Aggregates:
 
  - Type: Blurr:Aggregate:BlockAggregate
    Name: session_stats

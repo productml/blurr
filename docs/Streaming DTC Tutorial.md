@@ -74,7 +74,7 @@ Identity: source.user_id
 
 Time: parser.parse(source.timestamp)
 
-DataGroups:
+Aggregates:
 
  - Type: Blurr:DTC:DataGroup:BlockAggregate
    Name: session_stats
@@ -158,7 +158,7 @@ We'll learn how the transformation happens in the next section by examining the 
 Events are processed one by one, and then aggregated as defined in the `BlockAggregate` DataGroup:
 
 ```yaml
-DataGroups:
+Aggregates:
  - Type: ProductML:DTC:DataGroup:BlockAggregate
    Name: session_stats
    Store: hello_world_store

@@ -9,7 +9,7 @@ Stores:
     Type: Blurr:Store:MemoryStore
     Name: memory
 
-DataGroups:
+Aggregates:
   -
     Type: Blurr:Aggregate:VariableAggregate
     Name: vars

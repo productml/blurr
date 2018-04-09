@@ -9,7 +9,7 @@ Anchor:
   Condition: True==True
   Max: one
 
-DataGroups:
+Aggregates:
  - Type: Blurr:Aggregate:VariableAggregate
    Name: user
    Store: offer_ai_dynamo

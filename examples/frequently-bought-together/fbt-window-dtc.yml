@@ -39,7 +39,7 @@ Store:
      Prefix: /dtc-test/window/
 
 
-DataGroups:
+Aggregates:
 
  - Type: Blurr:Aggregate:AnchorAggregate
    Name: lifetime

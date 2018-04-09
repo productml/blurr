@@ -57,7 +57,7 @@ SourceDTC: sessions
 Anchor:
   Condition: source.event_id == "game_start" and source.boost == True
 
-DataGroups:
+Aggregates:
   - Type: Blurr:DTC:DataGroup:WindowAggregate
     Name: last_7_days
     Window:
@@ -135,7 +135,7 @@ Our Window DTC performs 2 different aggregations:
 * Over all sessions 7 days __before__ the Anchor Point.
 * Over all sessions 3 days __before__ the Anchor Point.
 
-How each aggregated is calculated is defined by `WindowAggregate` DataGroups:
+How each aggregated is calculated is defined by `WindowAggregate` Aggregates:
 
 
 ```yaml
@@ -172,7 +172,7 @@ In this case the input is session data produced in `session_stats` DataGroup in 
 
 ```yaml
 # excerpt from Streaming DTC
-DataGroups:
+Aggregates:
  - Type: Blurr:DTC:DataGroup:BlockAggregate
    Name: session_stats
 ```

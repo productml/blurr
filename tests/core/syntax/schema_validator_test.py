@@ -96,7 +96,7 @@ def test_invalid_incorrect_expression():
 
 
 def test_invalid_datagroup_has_no_fields():
-    with raises(InvalidSchemaError, match='DataGroups.0.Fields: Required field missing') as err:
+    with raises(InvalidSchemaError, match='Aggregates.0.Fields: Required field missing') as err:
         dtc_dict = load_example('invalid_datagroup_has_no_fields.yml')
         validate(dtc_dict)
 

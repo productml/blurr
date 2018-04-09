@@ -3,14 +3,15 @@ Version: enum('2018-04-15')
 Description: str(min=1, required=False)
 Name: identifier()
 Identity: expression()
+Time: expression(required=False)
 When: expression(required=False)
-Aggregates: list(any(include('cumulative_aggregate'), include('block_aggregate'), include('window_aggregate')), min=1)
+Aggregates: list(any(include('identity_aggregate'), include('block_aggregate'), include('window_aggregate')), min=1)
 
 ---
 
-cumulative_aggregate:
+identity_aggregate:
   Name: identifier()
-  Type: enum('Blurr:Aggregate:CumulativeAggregate')
+  Type: enum('Blurr:Aggregate:IdentityAggregate')
   Store: identifier(required=False)
   When: expression(required=False)
   Fields: list(include('field'), min=1)

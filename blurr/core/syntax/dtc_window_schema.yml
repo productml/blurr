@@ -6,7 +6,7 @@ SourceDTC: identifier()
 Time: expression(required=False)
 When: expression(required=False)
 Anchor: include('anchor')
-DataGroups: list(any(include('data_group_variable'), include('data_group_window')), min=1)
+Aggregates: list(any(include('data_group_variable'), include('data_group_window')), min=1)
 
 ---
 

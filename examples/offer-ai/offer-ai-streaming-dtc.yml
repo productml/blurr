@@ -21,7 +21,7 @@ Stores:
  - Type: Blurr:Store:MemoryStore
    Name: offer_ai
 
-DataGroups:
+Aggregates:
 
    # IdentityAggregate is meant for user profile information that is rarely updated. This is processed first
    # These are things like country, install source and whether user is logged in to Facebook

@@ -24,7 +24,7 @@ Stores:
    - Type: Blurr:Store:MemoryStore
      Name: 
 
-DataGroups:
+Aggregates:
 
  - Type: Blurr:Aggregate:IdentityAggregate
    Name: user

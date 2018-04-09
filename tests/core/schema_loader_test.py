@@ -41,7 +41,7 @@ def nested_schema_spec() -> Dict:
         'Ignored': 2,
         'Aggregates': [{
             'Name': 'test_group',
-            'Type': 'Blurr:Aggregate:CumulativeAggregate',
+            'Type': 'Blurr:Aggregate:IdentityAggregate',
             'Fields': [{
                 "Type": "string",
                 "Name": "country",

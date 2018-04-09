@@ -11,7 +11,7 @@ Anchor:
   Max: 1
 
 
-DataGroups:
+Aggregates:
   - Type: Blurr:Aggregate:WindowAggregate
     Name: last_session
     WindowType: count
