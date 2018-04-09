@@ -8,7 +8,7 @@ jobs:
       - run:
           name: build
           command: |
-            chmod +x deploy.sh
+            chmod +x build.sh
             ./build.sh
   deploy:
     docker:
