@@ -17,20 +17,12 @@ SourceDTC: offer_ai_v1
 # If an offer is shown to the user in this session, the session
 # in which the offer is shown is the anchor
 Anchor:
-  Condition:  offer_ai_v1.game_stats.offer_type != ''
+  Condition:  source.game_stats.offer_type != ''
   # Max defines the maximum number of output rows to be generated every time the Window DTC is run
   # We expect the Window DTC is run periodically (perhaps daily) to generate training data
   # By setting max = 1, we're making sure that we are only selecting one session for each user
   # in each period the Window DTC is run. This is to avoid over-sampling more active users
   Max: 1
-
-
-# Window aggregations are stored in a Store
-# Defines the Store properties
-Store:
-
- - Type: Blurr:Store:MemoryStore
-   Name: offer-ai
 
 
 Aggregates:
@@ -56,7 +48,7 @@ Aggregates:
       Type: float
       Value: source.win_ratio[0]
 
- - Type: Blurr:Aggregate:WindowAggregate
+ - Type: Blurr:DataGroup:WindowAggregate
    Name: last_week
    WindowType: day
    WindowValue: -7
@@ -71,7 +63,7 @@ Aggregates:
       Value: sum(source.purchase_amount)
 
 
- - Type: Blurr:Aggregate:WindowAggregate
+ - Type: Blurr:DataGroup:WindowAggregate
    Name: next_week
    WindowType: day
    WindowValue: 7

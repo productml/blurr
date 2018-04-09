@@ -42,7 +42,7 @@ Aggregates:
 
      - Name: fb_connected
        Type: boolean
-       Value: true if source.signin_method == 'fb' else false
+       Value: True if source.signin_method == 'fb' else False
 
 
    # BlockAggregates definition
@@ -68,7 +68,7 @@ Aggregates:
      - Name: games_won
        Type: integer
        Value: game_stats.games_won + 1
-       When: source.event_id == 'game_end' and source.won == '1'
+       When: source.event_id == 'game_end' and source.won == True
 
      - Name: win_ratio
        Type: float
