@@ -7,7 +7,9 @@ jobs:
       - checkout
       - run:
           name: build
-          command: ./build.sh
+          command: |
+            chmod +x deploy.sh
+            ./build.sh
   deploy:
     docker:
       - image: productml/build-image:fb9ba7674b2590ff5abbd45516b9a27e9dfc5f6d
