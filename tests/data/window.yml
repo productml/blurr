@@ -32,4 +32,6 @@ DataGroups:
     Fields:
      - Name: total_events
        Type: integer
-       Value: sum(source.events)
+       # Should be similar to just sum(source.events) as Window DTC is not
+       # supposed to run with state.
+       Value: last_day.total_events + sum(source.events)

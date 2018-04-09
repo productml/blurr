@@ -196,5 +196,3 @@ class BaseItemCollection(BaseItem, ABC):
         Dictionary of the name and item in the collection
         """
         raise NotImplementedError('nested_items() must be implemented')
-
-
