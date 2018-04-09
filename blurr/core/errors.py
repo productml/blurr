@@ -61,6 +61,13 @@ class IdentityError(Exception):
     pass
 
 
+class TimeError(Exception):
+    """
+    Raised when there is an error in determining the time of the record.
+    """
+    pass
+
+
 class PrepareWindowMissingBlocksError(Exception):
     """
     Raised when the window view generated is insufficient as per the window specification.
