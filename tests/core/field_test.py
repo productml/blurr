@@ -1,3 +1,4 @@
+import logging
 from typing import Dict, Any
 
 import pytest
@@ -57,13 +58,18 @@ def test_field_evaluate_without_needs_evaluation():
     assert field.value == 0
 
 
-def test_field_evaluate_incorrect_typecast_to_type_default():
+def test_field_evaluate_incorrect_typecast_to_type_default(caplog):
+    caplog.set_level(logging.DEBUG)
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': 'integer', 'Value': '"Hi"'})
     field_schema = IntegerFieldSchema(name, schema_loader)
     field = SimpleField(field_schema, EvaluationContext())
+    field.evaluate()
 
     assert field.value == 0
+    assert ('ValueError in casting Hi to integer for field max_attempts. Error: invalid '
+            'literal for int() with base 10: \'Hi\'') in caplog.records[0].message
+    assert caplog.records[0].levelno == logging.DEBUG
 
 
 def test_field_evaluate_implicit_typecast_integer():

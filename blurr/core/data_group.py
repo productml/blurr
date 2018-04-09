@@ -3,6 +3,7 @@ from typing import Dict, Type, Any
 from abc import ABC
 
 from blurr.core.base import BaseSchemaCollection, BaseItemCollection, BaseItem
+from blurr.core.errors import MissingAttributeError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.loader import TypeLoader
 from blurr.core.schema_loader import SchemaLoader
@@ -104,17 +105,15 @@ class DataGroup(BaseItemCollection, ABC):
         for dynamic execution.
         :param item: Field requested
         """
-        if item in self._nested_items:
-            return self._nested_items[item]._snapshot
+        return self.__getitem__(item)
 
-        return self.__getattribute__(item)
-
-    def __getitem__(self, item) -> Any:
+    def __getitem__(self, item: str) -> Any:
         """
         Makes the nested items available though the square bracket notation.
         :raises KeyError: When a requested item is not found in nested items
         """
         if item not in self._nested_items:
-            raise KeyError('{item} not defined in {name}'.format(item=item, name=self._name))
+            raise MissingAttributeError('{item} not defined in {name}'.format(
+                item=item, name=self._name))
 
         return self._nested_items[item]._snapshot

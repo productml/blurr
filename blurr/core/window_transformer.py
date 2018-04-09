@@ -56,8 +56,6 @@ class WindowTransformer(Transformer):
                 self._evaluate()
                 self._anchor.add_condition_met()
                 return True
-            except PrepareWindowMissingBlocksError:
-                return False
             finally:
                 del self._evaluation_context.global_context['anchor']
 

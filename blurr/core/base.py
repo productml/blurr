@@ -1,6 +1,5 @@
-from typing import Dict, Any, Type, TypeVar, Union
-
 from abc import ABC, abstractmethod
+from typing import Dict, Any, Type, TypeVar, Union
 
 from blurr.core.errors import SnapshotError
 from blurr.core.evaluation import Expression, EvaluationContext
@@ -122,7 +121,7 @@ class BaseItem(ABC):
         raise NotImplementedError('restore() must be implemented')
 
 
-class BaseItemCollection(BaseItem):
+class BaseItemCollection(BaseItem, ABC):
     """
     Base class for items that contain sub-items within them
     """
@@ -152,12 +151,9 @@ class BaseItemCollection(BaseItem):
         Implements snapshot for collections by recursively invoking snapshot of all child items
         """
         try:
-
             return {name: item._snapshot for name, item in self._nested_items.items()}
-
         except Exception as e:
-            print('Error while creating snapshot for {}', self._name)
-            raise SnapshotError(e)
+            raise SnapshotError('Error while creating snapshot for {}'.format(self._name)) from e
 
     def restore(self, snapshot: Dict[Union[str, Key], Any]) -> 'BaseItemCollection':
         """
@@ -173,8 +169,7 @@ class BaseItemCollection(BaseItem):
             return self
 
         except Exception as e:
-            print('Error while restoring snapshot: {}', self._snapshot)
-            raise SnapshotError(e)
+            raise SnapshotError('Error while restoring snapshot: {}'.format(self._snapshot)) from e
 
     @abstractmethod
     def finalize(self) -> None:
@@ -189,4 +184,4 @@ class BaseItemCollection(BaseItem):
         """
         Dictionary of the name and item in the collection
         """
-        pass
+        raise NotImplementedError('nested_items() must be implemented')

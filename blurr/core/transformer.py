@@ -4,6 +4,7 @@ from abc import ABC
 
 from blurr.core.base import BaseItemCollection, BaseSchemaCollection, BaseItem
 from blurr.core.data_group import DataGroup
+from blurr.core.errors import MissingAttributeError
 from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.loader import TypeLoader
 from blurr.core.schema_loader import SchemaLoader
@@ -83,10 +84,7 @@ class Transformer(BaseItemCollection, ABC):
         for dynamic execution.
         :param item: Data group requested
         """
-        if item in self._nested_items:
-            return self._nested_items[item]
-
-        return self.__getattribute__(item)
+        return self.__getitem__(item)
 
     def __getitem__(self, item) -> DataGroup:
         """
@@ -94,6 +92,7 @@ class Transformer(BaseItemCollection, ABC):
         :raises KeyError: When a requested item is not found in nested items
         """
         if item not in self._nested_items:
-            raise KeyError('{item} not defined in {name}'.format(item=item, name=self._name))
+            raise MissingAttributeError('{item} not defined in {name}'.format(
+                item=item, name=self._name))
 
         return self._nested_items[item]
