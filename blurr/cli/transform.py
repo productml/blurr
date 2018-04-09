@@ -17,8 +17,7 @@ def transform(stream_dtc_file: Optional[str], window_dtc_file: Optional[str],
                    'the current directory.')
         return 1
 
-    local_runner = LocalRunner(raw_json_files, stream_dtc_file,
-                               window_dtc_file)
+    local_runner = LocalRunner(raw_json_files, stream_dtc_file, window_dtc_file)
     local_runner.execute()
     local_runner.print_output()
 

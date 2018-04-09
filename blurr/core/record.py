@@ -21,8 +21,7 @@ class Record(dict):
         When attributes are not found, None is returned
         """
         if name.startswith('__') and name.endswith('__'):
-            raise AttributeError(
-                'Record object has no {} attribute.'.format(name))
+            raise AttributeError('Record object has no {} attribute.'.format(name))
         return wrap(self[name]) if name in self else None
 
     def __getitem__(self, item):

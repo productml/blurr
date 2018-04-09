@@ -39,17 +39,8 @@ def test_expression_globals_locals() -> None:
     assert expr.evaluate(EvaluationContext()) is None
 
     assert expr.evaluate(EvaluationContext(Context({'a': 2, 'b': 3}))) == 6
-    assert expr.evaluate(
-        EvaluationContext(local_context=Context({
-            'a': 2,
-            'b': 3
-        }))) == 6
-    assert expr.evaluate(
-        EvaluationContext(Context({
-            'a': 2
-        }), Context({
-            'b': 3
-        }))) == 6
+    assert expr.evaluate(EvaluationContext(local_context=Context({'a': 2, 'b': 3}))) == 6
+    assert expr.evaluate(EvaluationContext(Context({'a': 2}), Context({'b': 3}))) == 6
 
 
 def test_expression_conditional() -> None:
@@ -65,10 +56,7 @@ def test_expression_user_function() -> None:
         return 3 > 4
 
     expr = Expression(code_string)
-    assert expr.evaluate(
-        EvaluationContext(Context({
-            'test_function': test_function
-        }))) == 3
+    assert expr.evaluate(EvaluationContext(Context({'test_function': test_function}))) == 3
 
 
 def test_invalid_expression() -> None:
@@ -80,79 +68,3 @@ def test_invalid_expression() -> None:
 def test_execution_error() -> None:
     code_string = '1/0'
     assert Expression(code_string).evaluate(EvaluationContext()) is None
-
-
-def test_validate_valid() -> None:
-    Expression('a==b')
-    Expression('a == c')
-    Expression('a==b == c')
-
-    Expression('a!=b')
-    Expression('a != c')
-    Expression('a!=b != c')
-
-    with raises(InvalidExpressionError, message='invalid syntax'):
-        Expression('==a ==b== c==')
-
-    with raises(InvalidExpressionError, message='invalid syntax'):
-        Expression('!=a !=b!= c!=')
-
-    with raises(InvalidExpressionError, message='invalid syntax'):
-        Expression('!= ')
-
-    with raises(InvalidExpressionError, message='invalid syntax'):
-        Expression('!=b')
-
-    with raises(InvalidExpressionError, message='invalid syntax'):
-        Expression('c !=')
-
-    with raises(InvalidExpressionError, message='invalid syntax'):
-        Expression('== ')
-
-    with raises(InvalidExpressionError, message='invalid syntax'):
-        Expression('==b')
-
-    with raises(InvalidExpressionError, message='invalid syntax'):
-        Expression('c ==')
-
-
-def test_validate_invalid() -> None:
-    with raises(
-            InvalidExpressionError,
-            message='Modifying value using `=` is not allowed.'):
-        Expression('a= b')
-
-    with raises(
-            InvalidExpressionError,
-            message='Modifying value using `=` is not allowed.'):
-        Expression('a!=b = ')
-
-    with raises(
-            InvalidExpressionError,
-            message='Modifying value using `=` is not allowed.'):
-        Expression(' =a')
-
-    with raises(
-            InvalidExpressionError,
-            message='Modifying value using `=` is not allowed.'):
-        Expression('b =')
-
-    with raises(
-            InvalidExpressionError,
-            message='Modifying value using `=` is not allowed.'):
-        Expression('b &= c')
-
-    with raises(
-            InvalidExpressionError,
-            message='Modifying value using `=` is not allowed.'):
-        Expression('b += c')
-
-    with raises(
-            InvalidExpressionError,
-            message='Modifying value using `=` is not allowed.'):
-        Expression('b |= c')
-
-    with raises(
-            InvalidExpressionError,
-            message='Modifying value using `=` is not allowed.'):
-        Expression('b /= c')

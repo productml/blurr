@@ -1,0 +1,29 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[packages]
+
+pyyaml = "*"
+python-dateutil = "*"
+docopt = "*"
+yamale = "*"
+
+
+[dev-packages]
+
+pytest = "*"
+mypy = "*"
+yapf = "*"
+pipenv = "*"
+twine = "*"
+pytest-cov = "*"
+python-coveralls = "*"
+
+
+[requires]
+
+python_version = "3.6"

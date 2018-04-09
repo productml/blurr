@@ -16,18 +16,15 @@ class AnchorSchema(BaseSchema):
     ATTRIBUTE_CONDITION = 'Condition'
     ATTRIBUTE_MAX = 'Max'
 
-    def __init__(self, fully_qualified_name: str,
-                 schema_loader: SchemaLoader) -> None:
+    def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
 
         self.condition = Expression(self._spec[self.ATTRIBUTE_CONDITION])
-        self.max = self._spec[
-            self.ATTRIBUTE_MAX] if self.ATTRIBUTE_MAX in self._spec else None
+        self.max = self._spec[self.ATTRIBUTE_MAX] if self.ATTRIBUTE_MAX in self._spec else None
 
 
 class Anchor(BaseItem):
-    def __init__(self, schema: AnchorSchema,
-                 evaluation_context: EvaluationContext):
+    def __init__(self, schema: AnchorSchema, evaluation_context: EvaluationContext):
         super().__init__(schema, evaluation_context)
         self.condition_met: Dict[datetime, int] = defaultdict(int)
         self.anchor_block = None
@@ -43,19 +40,19 @@ class Anchor(BaseItem):
         return False
 
     def add_condition_met(self):
-        self.condition_met[self.anchor_block.start_time.date()] += 1
+        self.condition_met[self.anchor_block._start_time.date()] += 1
 
     def evaluate(self) -> bool:
-        return self.schema.condition.evaluate(self.evaluation_context)
+        return self._schema.condition.evaluate(self._evaluation_context)
 
     def max_condition_met(self, block: BlockDataGroup) -> bool:
-        if self.schema.max is None:
+        if self._schema.max is None:
             return False
-        return self.condition_met[block.start_time.date()] >= self.schema.max
+        return self.condition_met[block._start_time.date()] >= self._schema.max
 
     def restore(self, snapshot: Dict[str, Any]) -> BaseItem:
         pass
 
     @property
-    def snapshot(self):
+    def _snapshot(self):
         pass

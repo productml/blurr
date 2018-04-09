@@ -57,22 +57,20 @@ def block_item(block_schema: BlockDataGroupSchema) -> BlockDataGroup:
     block = BlockDataGroup(block_schema, 'user1', EvaluationContext())
     block.restore({
         'events': 3,
-        'start_time': datetime(2018, 3, 7, 22, 36, 31, 0, timezone.utc),
-        'end_time': datetime(2018, 3, 7, 22, 37, 31, 0, timezone.utc)
+        '_start_time': datetime(2018, 3, 7, 22, 36, 31, 0, timezone.utc),
+        '_end_time': datetime(2018, 3, 7, 22, 37, 31, 0, timezone.utc)
     })
     return block
 
 
-def test_anchor_max_one(anchor_schema_max_one: AnchorSchema,
-                        block_item: BlockDataGroup) -> None:
+def test_anchor_max_one(anchor_schema_max_one: AnchorSchema, block_item: BlockDataGroup) -> None:
     anchor = Anchor(anchor_schema_max_one, EvaluationContext())
     assert anchor.evaluate_anchor(block_item) is True
     anchor.add_condition_met()
     assert anchor.evaluate_anchor(block_item) is False
 
 
-def test_anchor_max_two(anchor_schema_max_two: AnchorSchema,
-                        block_item: BlockDataGroup) -> None:
+def test_anchor_max_two(anchor_schema_max_two: AnchorSchema, block_item: BlockDataGroup) -> None:
     anchor = Anchor(anchor_schema_max_two, EvaluationContext())
     assert anchor.evaluate_anchor(block_item) is True
     anchor.add_condition_met()
@@ -92,19 +90,17 @@ def test_anchor_max_not_specified(anchor_schema_max_one: AnchorSchema,
     assert anchor.evaluate_anchor(block_item) is True
 
 
-def test_anchor_condition(anchor_schema_max_one: AnchorSchema,
-                          block_item: BlockDataGroup) -> None:
+def test_anchor_condition(anchor_schema_max_one: AnchorSchema, block_item: BlockDataGroup) -> None:
     anchor_schema_max_one.condition = Expression('session.events > 3')
     eval_context = EvaluationContext()
     anchor = Anchor(anchor_schema_max_one, eval_context)
-    eval_context.local_context.add(block_item.schema.fully_qualified_name,
-                                   block_item)
+    eval_context.local_context.add(block_item._schema.fully_qualified_name, block_item)
     assert anchor.evaluate_anchor(block_item) is False
 
     block_item.restore({
         'events': 4,
-        'start_time': datetime(2018, 3, 7, 22, 36, 31, 0, timezone.utc),
-        'end_time': datetime(2018, 3, 7, 22, 37, 31, 0, timezone.utc)
+        '_start_time': datetime(2018, 3, 7, 22, 36, 31, 0, timezone.utc),
+        '_end_time': datetime(2018, 3, 7, 22, 37, 31, 0, timezone.utc)
     })
     assert anchor.evaluate_anchor(block_item) is True
     anchor.add_condition_met()
