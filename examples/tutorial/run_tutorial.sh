@@ -11,7 +11,7 @@ echo "checking requirements..."
 pip  --version > /dev/null
 
 echo "installing blurr..."
-pipenv install blurr
+pip install blurr
 
 echo "validating streaming template..."
 blurr validate streaming-dtc.yml
@@ -30,7 +30,6 @@ blurr transform \
 echo "generating session_data_tutorial_2_streaming.log..."
 blurr transform \
     --streaming-dtc=streaming-dtc.yml \
-    --window-dtc=window-dtc.yml \
     tutorial2-data.log > session_data_tutorial_2_streaming.log
     
 

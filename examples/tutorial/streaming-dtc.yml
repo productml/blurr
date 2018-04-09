@@ -19,6 +19,9 @@ DataGroups:
    Split: source.session_id != session_stats.session_id
 
    Fields:
+     - Name: boost
+       Type: boolean
+       Value: source.boost
 
      - Name: session_id
        Type: string
@@ -31,9 +34,5 @@ DataGroups:
 
      - Name: games_won
        Type: integer
-<<<<<<< HEAD
-       When: source.event_id == 'game_end' and source.won == 1
-=======
        When: source.event_id == 'game_end' and source.won == '1'
->>>>>>> master
        Value: session_stats.games_won + 1

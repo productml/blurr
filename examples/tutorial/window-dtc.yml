@@ -2,10 +2,10 @@ Type: Blurr:Window
 Version: '2018-03-01'
 Name: boost_data
 
-SourceDTC: streaming-dtc.yml
+SourceDTC: sessions
 
 Anchor:
-  Condition: source.event_id == "game_start" and source.boost == True
+  Condition: sessions.session_stats.boost == True
 
 DataGroups:
   - Type: Blurr:DataGroup:WindowAggregate

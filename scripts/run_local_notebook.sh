@@ -1,20 +1,7 @@
 #!/usr/bin/env bash
-#
-# Loads the tutorials in a local Jupyter Notebook.
-
 
 set -e
 
-cd ../examples/tutorial
+ROOT=$(pwd)/../
 
-PWD=$(pwd)
-
-echo "checking requirements..."
-pipenv  --version > /dev/null
-
-echo "running jupyter"
-pipenv install jupyterlab
-pipenv run jupyter lab
-
-
-echo "Done."
+docker run -it --rm -p 8888:8888  -v ${ROOT}:/home/jovyan jupyter/datascience-notebook
