@@ -164,7 +164,7 @@ def test_field_multiple_evaluation_type_cast_list(data_group: DataGroup) -> None
     data_group.evaluate()
 
     assert len(data_group.list_field_cast) == 3
-    assert data_group.list_field_cast == [0,1,1]
+    assert data_group.list_field_cast == [0, 1, 1]
 
 
 def test_field_multiple_evaluation_type_cast_set(data_group: DataGroup) -> None:
@@ -178,5 +178,4 @@ def test_field_multiple_evaluation_type_cast_set(data_group: DataGroup) -> None:
     data_group.evaluate()
 
     assert len(data_group.set_field_cast) == 3
-    assert data_group.set_field_cast == {0,1,2}
-
+    assert data_group.set_field_cast == {0, 1, 2}
