@@ -116,6 +116,14 @@ def test_execution_key_error(caplog) -> None:
     assert caplog.records[0].levelno == logging.DEBUG
 
 
+def test_execution_error_type_mismatch(caplog) -> None:
+    caplog.set_level(logging.DEBUG)
+    code_string = '1 + \'a\''
+    assert Expression(code_string).evaluate(EvaluationContext(Context({'test_dict': {}}))) is None
+    assert 'TypeError in evaluating expression 1 + \'a\'' in caplog.records[0].message
+    assert caplog.records[0].levelno == logging.DEBUG
+
+
 def test_execution_error_missing_data_group(caplog, schema_loader: SchemaLoader) -> None:
     caplog.set_level(logging.DEBUG)
     context = Context({

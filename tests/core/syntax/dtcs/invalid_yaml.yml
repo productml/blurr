@@ -4,7 +4,7 @@ Type: Blurr:Streaming
       Description: Example
 Name: example_name
 Identity: source.user_id
-When: source.package_version = '1.0'
+When: source.package_version == '1.0'
 Store:
             Type: Blurr:Storage:DynamoDB
    Name: offer_ai_dynamo

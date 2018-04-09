@@ -59,7 +59,7 @@ class BaseSchemaCollection(BaseSchema, ABC):
         self.nested_schema: Dict[str, Type[BaseSchema]] = {
             schema_spec[self.ATTRIBUTE_NAME]: self.schema_loader.get_nested_schema_object(
                 self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
-            for schema_spec in self._spec[self._nested_item_attribute]
+            for schema_spec in self._spec.get(self._nested_item_attribute, [])
         }
 
 
