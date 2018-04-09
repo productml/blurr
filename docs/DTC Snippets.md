@@ -9,7 +9,7 @@ Split: datetime.strptime('source.start_time', "%d %m %Y") != datetime.strptime('
 ## One block per session_id
 
 ```yaml
-Split: source.session_id != session_id
+Split: source.session_id != BlockAggregateName.session_id
 ```
 
 ## Inactivity based split
@@ -42,13 +42,31 @@ Fields:
 
 # Data cleansing
 
+## Create a boolean value from a condition on a text field in raw data
+
+```yaml
+- Name: fb_connected
+  Type: boolean
+  Value: True if source.signin_method == 'fb' else False
+```
+
 ## Convert strings in raw data to a float
 
 If the raw data has a field `"txn_amount": "9.99"`, which is a float but formatted as a string, it can be converted to a float to perform operations in a field value
 
-```
+```yaml
 - Name: purchase_amount
   Type: float
   Value: float(source.txn_amount) + game_stats.purchase_amount
   When: source.event_id == 'purchase' and source.purchase_source == 'offer'
+```
+
+## Flatten a list of list of tuples
+
+```yaml
+Fields:
+  - Name: products_bought
+    Type: list
+    Value: [item for sublist in source.products_bought for item in sublist]
+    # Flattens the list of list of tuples of products_bought
 ```

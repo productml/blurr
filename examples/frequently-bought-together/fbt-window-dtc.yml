@@ -9,7 +9,7 @@ Type: Blurr:Window
 Version: '2018-03-01'
 Description: Second Level processing for feature generation
 
-Name: ProductMLExample
+Name: fbt_window
 
 # The DTC used in Step 1
 SourceDTC: fbt_v1
@@ -38,31 +38,29 @@ Store:
      Bucket: fbt-example
      Prefix: "/dtc-test/window/"
 
-
 DataGroups:
 
  - Type: Blurr:DataGroup:WindowAggregate
    Name: lifetime
 
    WindowType: day
-   # Negative values are backward from the Anchor
+   # Defines a processing window for the rollup. Supported window types are Day, Hour and Count
    WindowValue: -10000
    # Use large negative values to calculate lifetime stats
-   Source: fbt_v1.session_stats
+   Source: fbt_v1.item_stats
 
    Fields:
 
      - Name: session_index
        Type: integer
-       Value: count(session_stats.session_id)
+       Value: count(source.session_id)
 
      - Name: spend_to_date
        Type: float
-       Value: sum(session_stats.transaction_value_this_session)
+       Value: sum(source.transaction_value_this_session)
 
  - Type: Blurr:DataGroup:WindowAggregate
    Name: last_24_hours
-
    WindowType: hour
    WindowValue: -24
    Source: fbt_v1.item_stats
@@ -75,7 +73,6 @@ DataGroups:
 
  - Type: Blurr:DataGroup:WindowAggregate
    Name: next_24_hours
-
    WindowType: hour
    WindowValue: 24
    Source: fbt_v1.item_stats
@@ -84,4 +81,3 @@ DataGroups:
      - Name: products_bought
        Type: list
        Value: [item for sublist in source.products_bought for item in sublist]
-      # Flattens the list of list of tuples of products_bought
