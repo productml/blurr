@@ -22,14 +22,14 @@ Time: parser.parse(source.start_time) #This tells the DTC that source.start_time
 
 Stores:
    - Type: Blurr:Store:MemoryStore
-     Name: 
+     Name: fbt
 
 DataGroups:
 
  - Type: Blurr:DataGroup:IdentityAggregate
    Name: user
-   Store: fbt_v1_dynamo
-   When: source.event_name = 'session_start'
+   Store: fbt
+   When: source.event_name == 'session_start'
 
    Fields:
      - Name: appInstanceId
@@ -39,15 +39,15 @@ DataGroups:
      - Name: age
        Value: source.age
 
-    Fields:
+   Fields:
      - Name: gender
        Value: source.gender
 
-    Fields:
+   Fields:
      - Name: country
        Value: source.country
 
-    Fields:
+   Fields:
      - Name: install_date
        Type: datetime
        Value: time
@@ -58,7 +58,7 @@ DataGroups:
        # always be the first event that was seen for the user
 
 
-    Fields:
+   Fields:
      - Name: days_since_install
        Value: (time - user.time).days
 
@@ -68,8 +68,8 @@ DataGroups:
 
  - Type: Blurr:DataGroup:BlockAggregate
    Name: item_stats
-   Store: fbt_v1_dynamo
-   Split: source.session_id != session_id
+   Store: fbt
+   Split: source.session_id != item_stats.session_id
 
    Fields:
 
@@ -83,11 +83,11 @@ DataGroups:
        Type: float
        Value: sum([float(val.strip()) for val in source.value.split(',')])
        #This also sums all the values in the list if multiple items were bought in one transaction
-       When: source.event_name = 'ecommerce_purchase' and source.currency = 'usd'
+       When: source.event_name == 'ecommerce_purchase' and source.currency == 'usd'
 
    Fields:
      - Name: products_bought
        Type: list
        Value: item_stats.products_bought.extend(list(zip([val.strip() for val in source.item_id.split(',')], [float(val.strip()) for val in source.value.split(',')])))
        # This creates a list of tuples [(item_id1, value1), (item_id2, value2)...]
-       When: source.event_name = 'ecommerce_purchase' and source.currency = 'usd'
+       When: source.event_name == 'ecommerce_purchase' and source.currency == 'usd'
