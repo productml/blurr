@@ -104,7 +104,7 @@ To train the model, we are looking for data to be organized like this.
 Unique user_id (appInstanceId) | product_primary | fbt_1 | fbt_2 | fbt_3 | session_index | days_since_install | age | gender | country | spend_to_date | transaction_value_this_session
 ------- | ------- | ------------------ | ------------------------- | ------------------------- | ---------------------- | ----- | ----- | ----- | ----- | ----- | -------
 
-We assume that we want to look at the products that were bought together in a specific transaction, and any other transactions that were made 24 hours on either side.
+Since user may not buy everything in one transaction, `fbt_1`, `fbt_2`, `fbt_3` are the top 3 products bought by the user in a 48 hour window (+- 24 hours) from the `product_primary`
 
 ![Anchor](images/fbt-anchor.png)
 

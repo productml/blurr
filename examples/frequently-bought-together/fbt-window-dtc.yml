@@ -9,7 +9,7 @@ Type: Blurr:Window
 Version: '2018-03-01'
 Description: Second Level processing for feature generation
 
-Name: ProductMLExample
+Name: fbt_window
 
 # The DTC used in Step 1
 SourceDTC: fbt_v1
@@ -28,48 +28,32 @@ Anchor:
   # We're free to change this the max value to whatever we want, of course
   Max: 1
 
-
-# Window aggregations are stored in S3 (a Store)
-# Defines the Store properties
-Store:
-
-   - Type: Blurr:Storage:S3
-     Name: s3
-     Bucket: fbt-example
-     Prefix: /dtc-test/window/
-
-
 DataGroups:
 
- - Type: Blurr:DataGroup:AnchorAggregate
+ - Type: Blurr:DataGroup:WindowAggregate
    Name: lifetime
 
-   Window:
-
-      # Defines a processing window for the rollup. Supported window types are Day, Hour and Count
-    - Type: Day
-      # Negative values are backward from the Anchor
-      Value: -10000
-      # Use large negative values to calculate lifetime stats
-      Source: fbt_v1.session_stats
+   WindowType: day
+   # Defines a processing window for the rollup. Supported window types are Day, Hour and Count
+   WindowValue: -10000
+   # Use large negative values to calculate lifetime stats
+   Source: fbt_v1.item_stats
 
    Fields:
 
      - Name: session_index
        Type: integer
-       Value: count(session_stats.session_id)
+       Value: count(source.session_id)
 
      - Name: spend_to_date
        Type: float
-       Value: sum(session_stats.transaction_value_this_session)
+       Value: sum(source.transaction_value_this_session)
 
- - Type: Blurr:DataGroup:AnchorAggregate
+ - Type: Blurr:DataGroup:WindowAggregate
    Name: last_24_hours
-
-   Window:
-    - Type: Hour
-      Value: -24
-      Source: fbt_v1.item_stats
+   WindowType: hour
+   WindowValue: -24
+   Source: fbt_v1.item_stats
 
    Fields:
      - Name: products_bought
@@ -77,13 +61,11 @@ DataGroups:
        Value: [item for sublist in source.products_bought for item in sublist]
        # Flattens the list of list of tuples of products_bought
 
- - Type: Blurr:DataGroup:AnchorAggregate
+ - Type: Blurr:DataGroup:WindowAggregate
    Name: next_24_hours
-
-   Window:
-    - Type: Hour
-      Value: 24
-      Source: fbt_v1.item_stats
+   WindowType: hour
+   WindowValue: 24
+   Source: fbt_v1.item_stats
 
    Fields:
      - Name: products_bought
@@ -91,11 +73,11 @@ DataGroups:
        Value: [item for sublist in source.products_bought for item in sublist]
       # Flattens the list of list of tuples of products_bought
 
- - Type: Blurr:DataGroup:AnchorAggregate
+ - Type: Blurr:DataGroup:WindowAggregate
    Name: 48_hours_around_transaction
-
+   #A Window Aggregate can be defined without a window
    Fields:
      - Name: products_bought
        Type: list
-       Value: sorted(last_24_hours.products_bought.extend(next_24_hours.products_bought), key=lambda x: x[1], reverse=True)[:3]
+       Value: sorted(last_24_hours.products_bought.extend(next_24_hours.products_bought), key=lambda x: x[1], reverse==True)[:3]
        # combining the 2 lists, sorting by descending order of value (most expensive items first) and then picking the top 3
