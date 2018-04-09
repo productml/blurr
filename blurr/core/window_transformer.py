@@ -52,6 +52,7 @@ class WindowTransformer(Transformer):
         if self._anchor.evaluate_anchor(block):
 
             try:
+                self.reset()
                 self._evaluation_context.global_add('anchor', block)
                 self._evaluate()
                 self._anchor.add_condition_met()

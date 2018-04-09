@@ -53,6 +53,10 @@ class Anchor(BaseItem):
     def restore(self, snapshot: Dict[str, Any]) -> BaseItem:
         pass
 
+    def reset(self) -> None:
+        self.condition_met: Dict[datetime, int] = defaultdict(int)
+        self.anchor_block = None
+
     @property
     def _snapshot(self):
         pass
