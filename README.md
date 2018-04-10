@@ -8,6 +8,7 @@
 [![Documentation Status](https://readthedocs.org/projects/productml-blurr/badge/?version=latest)](http://productml-blurr.readthedocs.io/en/latest/?badge=latest)
 [![Coverage Status](https://coveralls.io/repos/github/productml/blurr/badge.svg?branch=master)](https://coveralls.io/github/productml/blurr?branch=master)
 [![PyPI version](https://badge.fury.io/py/blurr.svg)](https://badge.fury.io/py/blurr)
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/productml/blurr/master?filepath=examples%2Ftutorial)
 
 Blurr transforms `raw data` into `features` for model training and prediction using a `high-level expressive YAML-based language` called the Data Transform Configuration (DTC).
 

@@ -2,7 +2,7 @@ Type: Blurr:Window
 Version: '2018-03-01'
 Name: boost_data
 
-SourceDTC: streaming-dtc.yml
+SourceDTC: sessions
 
 Anchor:
   Condition: sessions.session_stats.boost == True
