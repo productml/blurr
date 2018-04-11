@@ -40,7 +40,6 @@ class MockBaseItemCollection(BaseItemCollection):
     """
 
     def __init__(self, schema: BaseSchemaCollection, evaluation_context: EvaluationContext) -> None:
-        super().__init__(schema, evaluation_context)
         self._fields: Dict[str, Type[BaseItem]] = {
             name: TypeLoader.load_item(item_schema.type)(item_schema, self._evaluation_context)
             for name, item_schema in self._schema.nested_schema.items()

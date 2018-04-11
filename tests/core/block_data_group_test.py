@@ -97,7 +97,7 @@ def test_block_data_group_schema_evaluate_with_split(block_data_group_schema_spe
     block_data_group.evaluate()
     print(block_data_group)
     block_data_group.evaluate()
-    
+
     # Check eval results of various fields before split
     assert check_fields(block_data_group._nested_items, {
         '_identity': identity,
