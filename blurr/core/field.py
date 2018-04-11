@@ -56,16 +56,17 @@ class Field(BaseItem, ABC):
     An individual field object responsible for retaining the field value
     """
 
-    def __init__(self, schema: FieldSchema, evaluation_context: EvaluationContext) -> None:
+    def __new__(cls, schema: FieldSchema, evaluation_context: EvaluationContext) -> None:
         """
         Initializes the Field with the default for the schema
         :param schema: Field schema
         :param evaluation_context: Context dictionary for evaluation
         """
-        super().__init__(schema, evaluation_context)
+        self = super(Field, cls).__new__(cls, schema, evaluation_context)
 
         # When the field is created, the value is set to the field type default
         self.value = self._schema.default
+        return self
 
     def evaluate(self) -> None:
         """

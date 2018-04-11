@@ -61,17 +61,20 @@ class DataGroup(BaseItemCollection, ABC):
     to be called as properties of the data group itself.
     """
 
-    def __init__(self, schema: DataGroupSchema, identity: str,
-                 evaluation_context: EvaluationContext) -> None:
+    def __new__(cls, schema: DataGroupSchema, identity: str, evaluation_context: EvaluationContext,
+                *args, **kwargs) -> None:
         """
         Initializes the data group with the inherited context and adds
         its own nested items into the local context for execution
         :param schema: Schema for initializing the data group
         :param evaluation_context: Context dictionary for evaluation
         """
-        super().__init__(schema, evaluation_context)
+        self = super(DataGroup, cls).__new__(cls, schema, evaluation_context, *args, **kwargs)
         self._identity = identity
+        return self
 
+    def __init__(self, schema: DataGroupSchema, identity: str,
+                 evaluation_context: EvaluationContext, *args, **kwargs):
         self._fields: Dict[str, Type[BaseItem]] = {
             name: TypeLoader.load_item(item_schema.type)(item_schema, self._evaluation_context)
             for name, item_schema in self._schema.nested_schema.items()
