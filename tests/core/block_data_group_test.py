@@ -95,7 +95,6 @@ def test_block_data_group_schema_evaluate_with_split(block_data_group_schema_spe
     time = datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc)
     block_data_group = create_block_data_group(block_data_group_schema, time, identity)
     block_data_group.evaluate()
-    print(block_data_group)
     block_data_group.evaluate()
 
     # Check eval results of various fields before split
