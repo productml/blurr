@@ -49,7 +49,7 @@ class TransformerSchema(BaseSchemaCollection, ABC):
 
         for custom_import in self.import_list:
             module = custom_import['Module']
-            module_obj = TypeLoader.import_class_by_full_name(module)
+            module_obj = TypeLoader.import_by_full_name(module)
             if 'Identifier' not in custom_import:
                 self.schema_context.global_add(module, module_obj)
                 return
