@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import re
 from copy import copy
@@ -6,6 +6,7 @@ from copy import copy
 from blurr.core import logging
 from blurr.core.errors import ExpressionEvaluationError, InvalidExpressionError, \
     MissingAttributeError
+from blurr.core.record import Record
 
 
 class Context(dict):
@@ -66,11 +67,30 @@ class EvaluationContext:
         """
         self.local_context.merge(context)
 
-    def global_add(self, key: str, value: Any) -> Any:
+    def global_add(self, key: str, value: Any) -> None:
         """
         Adds a key and value to the global dictionary
         """
         self.global_context[key] = value
+
+    def global_remove(self, key: str) -> None:
+        """
+        Removes the key and its value from the global dictionary
+        """
+        del self.global_context[key]
+
+    def add_record(self, record: Record) -> None:
+        self.global_add('source', record)
+
+    def remove_record(self) -> None:
+        del self.global_context['source']
+
+    def merge(self, evaluation_context: 'EvaluationContext') -> None:
+        self.global_context.merge(evaluation_context.global_context)
+        self.local_context.merge(evaluation_context.local_context)
+
+    def merge_context(self, context: Context) -> None:
+        self.global_context.merge(context)
 
 
 class Expression:

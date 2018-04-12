@@ -55,7 +55,7 @@ def schema_loader() -> SchemaLoader:
 @fixture
 def test_transformer(schema_loader: SchemaLoader, schema_spec: Dict[str, Any]) -> MockTransformer:
     name = schema_loader.add_schema(schema_spec)
-    return MockTransformer(MockTransformerSchema(name, schema_loader), 'user1', Context())
+    return MockTransformer(MockTransformerSchema(name, schema_loader), 'user1')
 
 
 def test_transformer_schema_init(schema_loader: SchemaLoader, schema_spec: Dict[str, Any]) -> None:

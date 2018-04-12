@@ -2,8 +2,13 @@ Type: 'Blurr:Streaming'
 Version: '2018-03-01'
 Description: 'Level 1 trasnformation from streaming Raw Data'
 Name: Sessions
+
+Import:
+  - { Module: dateutil.parser, Identifier: [ parse ]}
+
 Identity: source.user_id
-Time: parser.parse(source.event_time)
+Time: parse(source.event_time)
+
 Stores:
   -
     Type: 'Blurr:Store:MemoryStore'

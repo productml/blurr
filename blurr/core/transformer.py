@@ -21,6 +21,7 @@ class TransformerSchema(BaseSchemaCollection, ABC):
     ATTRIBUTE_DESCRIPTION = 'Description'
     ATTRIBUTE_STORES = 'Stores'
     ATTRIBUTE_DATA_GROUPS = 'DataGroups'
+    ATTRIBUTE_IMPORT = 'Import'
 
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader, self.ATTRIBUTE_DATA_GROUPS)
@@ -37,6 +38,25 @@ class TransformerSchema(BaseSchemaCollection, ABC):
             for schema_spec in self._spec.get(self.ATTRIBUTE_STORES, [])
         }
 
+        self.import_list = self._spec[
+            self.ATTRIBUTE_IMPORT] if self.ATTRIBUTE_IMPORT in self._spec else None
+        self.schema_context = EvaluationContext()
+        self.import_modules()
+
+    def import_modules(self) -> None:
+        if self.import_list is None:
+            return
+
+        for custom_import in self.import_list:
+            module = custom_import['Module']
+            module_obj = TypeLoader.import_class_by_full_name(module)
+            if 'Identifier' not in custom_import:
+                self.schema_context.global_add(module, module_obj)
+                return
+
+            for identifier in custom_import['Identifier']:
+                self.schema_context.global_add(identifier, getattr(module_obj, identifier))
+
 
 class Transformer(BaseItemCollection, ABC):
     """
@@ -44,8 +64,8 @@ class Transformer(BaseItemCollection, ABC):
     to the context
     """
 
-    def __init__(self, schema: TransformerSchema, identity: str, context: Context) -> None:
-        super().__init__(schema, EvaluationContext(global_context=context))
+    def __init__(self, schema: TransformerSchema, identity: str) -> None:
+        super().__init__(schema, schema.schema_context)
         # Load the nested items into the item
         self._data_groups: Dict[str, DataGroup] = {
             name: TypeLoader.load_item(item_schema.type)(item_schema, identity,
