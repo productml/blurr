@@ -44,8 +44,9 @@ class Transformer(BaseItemCollection, ABC):
     to the context
     """
 
-    def __init__(self, schema: TransformerSchema, identity: str, context: Context) -> None:
-        super().__init__(schema, EvaluationContext(global_context=context))
+    def __new__(cls, schema: TransformerSchema, identity: str, context: Context) -> None:
+        self = super(Transformer, cls).__new__(
+            cls, schema, EvaluationContext(global_context=context))
         # Load the nested items into the item
         self._data_groups: Dict[str, DataGroup] = {
             name: TypeLoader.load_item(item_schema.type)(item_schema, identity,
@@ -55,6 +56,7 @@ class Transformer(BaseItemCollection, ABC):
         self._identity = identity
         self._evaluation_context.global_add('identity', self._identity)
         self._evaluation_context.global_context.merge(self._nested_items)
+        return self
 
     @property
     def _nested_items(self) -> Dict[str, DataGroup]:

@@ -39,9 +39,10 @@ class WindowTransformer(Transformer):
     block data.
     """
 
-    def __init__(self, schema: WindowTransformerSchema, identity: str, context: Context) -> None:
-        super().__init__(schema, identity, context)
+    def __new__(cls, schema: WindowTransformerSchema, identity: str, context: Context) -> None:
+        self = super(WindowTransformer, cls).__new__(cls, schema, identity, context)
         self._anchor = Anchor(schema.anchor, EvaluationContext(global_context=context))
+        return self
 
     def evaluate_anchor(self, block: BlockDataGroup) -> bool:
         """

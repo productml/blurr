@@ -42,10 +42,11 @@ class WindowDataGroup(DataGroup):
     Manages the generation of WindowAggregate as defined in the schema.
     """
 
-    def __init__(self, schema: WindowDataGroupSchema, identity: str,
-                 evaluation_context: EvaluationContext) -> None:
-        super().__init__(schema, identity, evaluation_context)
+    def __new__(cls, schema: WindowDataGroupSchema, identity: str,
+                evaluation_context: EvaluationContext) -> None:
+        self = super(WindowDataGroup, cls).__new__(cls, schema, identity, evaluation_context)
         self._window_source = _WindowSource()
+        return self
 
     def prepare_window(self, start_time: datetime) -> None:
         """

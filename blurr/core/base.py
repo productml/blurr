@@ -71,14 +71,17 @@ class BaseItem(ABC):
     Base class for for all leaf items that do not contain sub-items
     """
 
-    def __init__(self, schema: BaseSchema, evaluation_context: EvaluationContext) -> None:
+    def __new__(cls, schema: BaseSchema, evaluation_context: EvaluationContext, *args,
+                **kwargs) -> None:
         """
         Initializes an item with the schema and execution context
         :param schema: Schema of the item
         :param evaluation_context: Context dictionary for evaluation
         """
+        self = super(BaseItem, cls).__new__(cls)
         self._schema = schema
         self._evaluation_context = evaluation_context
+        return self
 
     @property
     def _needs_evaluation(self) -> bool:
@@ -126,14 +129,16 @@ class BaseItemCollection(BaseItem, ABC):
     Base class for items that contain sub-items within them
     """
 
-    def __init__(self, schema: BaseSchemaCollection, evaluation_context: EvaluationContext) -> None:
+    def __new__(cls, schema: BaseSchemaCollection, evaluation_context: EvaluationContext, *args,
+                **kwargs) -> None:
         """
         Loads nested items to the 'items' collection
         :param schema: Schema that conforms to the item
         :param evaluation_context: Context dictionary for evaluation
         """
 
-        super().__init__(schema, evaluation_context)
+        return super(BaseItemCollection, cls).__new__(cls, schema, evaluation_context, *args,
+                                                      **kwargs)
 
     def evaluate(self) -> None:
         """

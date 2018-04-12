@@ -3,6 +3,7 @@ from typing import Dict, Any, List
 from blurr.core.data_group import DataGroup, DataGroupSchema
 from blurr.core.evaluation import Expression
 from blurr.core.schema_loader import SchemaLoader
+from blurr.core.evaluation import EvaluationContext
 
 
 class BlockDataGroupSchema(DataGroupSchema):
@@ -76,6 +77,9 @@ class BlockDataGroup(DataGroup):
             # Save the current snapshot with the current timestamp
             self.persist(self._start_time)
             # Reset the state of the contents
-            self.__init__(self._schema, self._identity, self._evaluation_context)
+            self.__init__(
+                schema=self._schema,
+                identity=self._identity,
+                evaluation_context=self._evaluation_context)
 
         super().evaluate()

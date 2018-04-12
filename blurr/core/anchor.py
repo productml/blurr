@@ -24,10 +24,11 @@ class AnchorSchema(BaseSchema):
 
 
 class Anchor(BaseItem):
-    def __init__(self, schema: AnchorSchema, evaluation_context: EvaluationContext):
-        super().__init__(schema, evaluation_context)
+    def __new__(cls, schema: AnchorSchema, evaluation_context: EvaluationContext):
+        self = super(Anchor, cls).__new__(cls, schema, evaluation_context)
         self.condition_met: Dict[datetime, int] = defaultdict(int)
         self.anchor_block = None
+        return self
 
     def evaluate_anchor(self, block: BlockDataGroup) -> bool:
         self.anchor_block = block
