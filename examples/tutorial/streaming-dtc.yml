@@ -19,6 +19,9 @@ DataGroups:
    Split: source.session_id != session_stats.session_id
 
    Fields:
+     - Name: boost
+       Type: boolean
+       Value: source.boost
 
      - Name: session_id
        Type: string
