@@ -130,3 +130,24 @@ def test_window_transformer(schema_loader, window_transformer, block_aggregate):
         'last_day.total_events': 3,
         'last_day._identity': 'user1'
     }
+
+
+def test_window_transformer_internal_reset(schema_loader, window_transformer, block_aggregate):
+    init_memory_store(schema_loader.get_schema_object('Sessions.memory'))
+    window_transformer._anchor._schema.max = None
+
+    block_aggregate.restore({
+        'events': 3,
+        '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc),
+        '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc)
+    })
+
+    assert window_transformer.evaluate_anchor(block_aggregate) is True
+    snapshot = window_transformer._snapshot
+    assert snapshot['last_session'] == {'_identity': 'user1', 'events': 2}
+    assert snapshot['last_day'] == {'_identity': 'user1', 'total_events': 3}
+
+    assert window_transformer.evaluate_anchor(block_aggregate) is True
+    snapshot = window_transformer._snapshot
+    assert snapshot['last_session'] == {'_identity': 'user1', 'events': 2}
+    assert snapshot['last_day'] == {'_identity': 'user1', 'total_events': 3}

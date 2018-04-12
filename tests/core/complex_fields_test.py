@@ -139,6 +139,24 @@ def test_field_evaluation(data_group: DataGroup) -> None:
     assert data_group.list_field == [0, 1, 2]
 
 
+def test_field_reset(data_group: DataGroup) -> None:
+    assert len(data_group.map_field) == 0
+    assert len(data_group.set_field) == 0
+    assert len(data_group.list_field) == 0
+
+    data_group.evaluate()
+
+    assert len(data_group.map_field) == 3
+    assert len(data_group.set_field) == 3
+    assert len(data_group.list_field) == 3
+
+    data_group.reset()
+
+    assert len(data_group.map_field) == 0
+    assert len(data_group.set_field) == 0
+    assert len(data_group.list_field) == 0
+
+
 def test_field_multiple_evaluation_type_cast_map(data_group: DataGroup) -> None:
     assert len(data_group.map_field_cast) == 0
 
