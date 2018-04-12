@@ -137,7 +137,7 @@ def test_snapshot_valid(item_collection: MockBaseItemCollection) -> None:
 
 
 def test_snapshot_invalid(collection_schema_spec: Dict[str, Any],
-                         mock_nested_items: contextmanager) -> None:
+                          mock_nested_items: contextmanager) -> None:
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(collection_schema_spec)
     schema_collection = MockBaseSchemaCollection(name, schema_loader,
@@ -162,7 +162,7 @@ def test_restore_invalid_snapshot_field(item_collection: MockBaseItemCollection)
 
 
 def test_restore_invalid_snapshot_dict(collection_schema_spec: Dict[str, Any],
-                         mock_nested_items: contextmanager) -> None:
+                                       mock_nested_items: contextmanager) -> None:
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(collection_schema_spec)
     schema_collection = MockBaseSchemaCollection(name, schema_loader,
@@ -189,7 +189,7 @@ def test_get_attribute(collection_schema_spec: Dict[str, Any]) -> None:
 
 
 def test_get_attribute_invalid(collection_schema_spec: Dict[str, Any],
-                         mock_nested_items: contextmanager) -> None:
+                               mock_nested_items: contextmanager) -> None:
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(collection_schema_spec)
     schema_collection = MockBaseSchemaCollection(name, schema_loader,
