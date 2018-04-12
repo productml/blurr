@@ -22,6 +22,8 @@ class TransformerSchema(BaseSchemaCollection, ABC):
     ATTRIBUTE_STORES = 'Stores'
     ATTRIBUTE_DATA_GROUPS = 'DataGroups'
     ATTRIBUTE_IMPORT = 'Import'
+    ATTRIBUTE_IMPORT_MODULE = 'Module'
+    ATTRIBUTE_IMPORT_IDENTIFIER = 'Identifier'
 
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader, self.ATTRIBUTE_DATA_GROUPS)
@@ -48,13 +50,13 @@ class TransformerSchema(BaseSchemaCollection, ABC):
             return
 
         for custom_import in self.import_list:
-            module = custom_import['Module']
+            module = custom_import[self.ATTRIBUTE_IMPORT_MODULE]
             module_obj = TypeLoader.import_by_full_name(module)
-            if 'Identifier' not in custom_import:
+            if self.ATTRIBUTE_IMPORT_IDENTIFIER not in custom_import:
                 self.schema_context.global_add(module, module_obj)
                 return
 
-            for identifier in custom_import['Identifier']:
+            for identifier in custom_import[self.ATTRIBUTE_IMPORT_IDENTIFIER]:
                 self.schema_context.global_add(identifier, getattr(module_obj, identifier))
 
 
