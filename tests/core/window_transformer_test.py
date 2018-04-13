@@ -10,6 +10,7 @@ from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.aggregate_block import BlockAggregate, \
     BlockAggregateSchema
+from blurr.core.store_key import Key
 from blurr.core.transformer_streaming import StreamingTransformer
 from blurr.core.transformer_window import WindowTransformer, \
     WindowTransformerSchema
@@ -34,8 +35,10 @@ def schema_loader():
 @fixture
 def stream_transformer(schema_loader, stream_schema_spec):
     stream_dtc_name = schema_loader.add_schema(stream_schema_spec)
-    return StreamingTransformer(
+    stream_transformer = StreamingTransformer(
         schema_loader.get_schema_object(stream_dtc_name), 'user1', Context())
+    stream_transformer.restore({Key('user1', 'state'): {'country': 'US'}})
+    return stream_transformer
 
 
 @fixture

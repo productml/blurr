@@ -60,8 +60,7 @@ def create_block_aggregate(schema, time, identity) -> BlockAggregate:
     return block_aggregate
 
 
-def test_block_aggregate_schema_evaluate_without_split(block_aggregate_schema_spec,
-                                                        schema_loader):
+def test_block_aggregate_schema_evaluate_without_split(block_aggregate_schema_spec, schema_loader):
     name = schema_loader.add_schema(block_aggregate_schema_spec)
     block_aggregate_schema = BlockAggregateSchema(name, schema_loader)
 
