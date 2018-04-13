@@ -117,7 +117,7 @@ Further in this series of tutorials we'll introduce different types of DTCs, suc
 
 ```yaml
 Store:
-   - Type: ProductML:DTC:Store:MemoryStore
+   - Type: Blurr:Store:MemoryStore
      Name: hello_world_store
 ```
 
@@ -159,7 +159,7 @@ Events are processed one by one, and then aggregated as defined in the `BlockAgg
 
 ```yaml
 Aggregates:
- - Type: ProductML:DTC:Aggregate:BlockAggregate
+ - Type: Blurr:Aggregate:BlockAggregate
    Name: session_stats
    Store: hello_world_store
 

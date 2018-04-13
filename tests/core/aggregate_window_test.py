@@ -25,7 +25,7 @@ def window_data_group_schema(schema_loader_with_mem_store: SchemaLoader, mem_sto
         ],
     }, stream_dtc_name)
     name = schema_loader_with_mem_store.add_schema({
-        'Type': 'ProductML:DTC:Aggregate:WindowAggregate',
+        'Type': 'Blurr:Aggregate:WindowAggregate',
         'Name': 'test_window_name',
         'WindowType': 'day',
         'WindowValue': 1,

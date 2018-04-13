@@ -21,7 +21,7 @@ def test_initialization_with_valid_source(schema_loader_with_mem_store: SchemaLo
         ],
     }, stream_dtc_name)
     name = schema_loader_with_mem_store.add_schema({
-        'Type': 'ProductML:DTC:Aggregate:WindowAggregate',
+        'Type': 'Blurr:Aggregate:WindowAggregate',
         'Name': 'test_window_name',
         'WindowType': 'day',
         'WindowValue': 1,
@@ -44,7 +44,7 @@ def test_initialization_with_invalid_source(schema_loader_with_mem_store: Schema
                                             stream_dtc_name: str):
 
     name = schema_loader_with_mem_store.add_schema({
-        'Type': 'ProductML:DTC:Aggregate:WindowAggregate',
+        'Type': 'Blurr:Aggregate:WindowAggregate',
         'Name': 'test_window_name',
         'WindowType': 'day',
         'WindowValue': 1,
