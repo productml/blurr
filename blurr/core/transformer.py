@@ -25,8 +25,6 @@ class TransformerSchema(BaseSchemaCollection, ABC):
         super().__init__(fully_qualified_name, schema_loader, self.ATTRIBUTE_AGGREGATES)
 
         # Load the schema specific attributes
-        self.identity = Expression(self._spec[self.ATTRIBUTE_IDENTITY]) \
-            if self.ATTRIBUTE_IDENTITY in self._spec else None
         self.version = self._spec[self.ATTRIBUTE_VERSION]
 
         # Load list of stores from the schema
