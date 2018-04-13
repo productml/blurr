@@ -17,7 +17,6 @@ class TransformerSchema(BaseSchemaCollection, ABC):
     the required attributes of a schema.
     """
 
-    ATTRIBUTE_IDENTITY = 'Identity'
     ATTRIBUTE_VERSION = 'Version'
     ATTRIBUTE_STORES = 'Stores'
     ATTRIBUTE_AGGREGATES = 'Aggregates'
@@ -43,21 +42,6 @@ class TransformerSchema(BaseSchemaCollection, ABC):
                 self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
             for schema_spec in self._spec[self._nested_item_attribute]
         }
-
-    def get_identity(self, context: Context) -> str:
-        """
-        Evaluates and returns the identity as specified in the schema.
-        :param context: Context with the 'source' record set which is used to
-        determine the identity.
-        :return: The evaluated identity
-        :raises: IdentityError if identity cannot be determined.
-        """
-        identity = self.identity.evaluate(EvaluationContext(None, context))
-        if not identity:
-            raise IdentityError(
-                'Could not determine identity using {}. Evaluation context is {}'.format(
-                    self.identity.code_string, context))
-        return identity
 
 
 class Transformer(BaseItemCollection, ABC):
