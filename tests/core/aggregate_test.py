@@ -10,7 +10,7 @@ from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
 
 
-def get_data_group_schema_spec() -> Dict[str, Any]:
+def get_aggregate_schema_spec() -> Dict[str, Any]:
     return {
         'Type': 'Blurr:Aggregate:BlockAggregate',
         'Name': 'user',
@@ -36,36 +36,36 @@ class MockAggregate(Aggregate):
 
 
 @fixture
-def data_group_schema_with_store():
+def aggregate_schema_with_store():
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(get_data_group_schema_spec())
+    name = schema_loader.add_schema(get_aggregate_schema_spec())
     schema_loader.add_schema(get_store_spec(), 'user')
     return MockAggregateSchema(fully_qualified_name=name, schema_loader=schema_loader)
 
 
 @fixture
-def data_group_schema_without_store():
+def aggregate_schema_without_store():
     schema_loader = SchemaLoader()
-    data_group_schema_spec = get_data_group_schema_spec()
-    del data_group_schema_spec['Store']
-    name = schema_loader.add_schema(data_group_schema_spec)
+    aggregate_schema_spec = get_aggregate_schema_spec()
+    del aggregate_schema_spec['Store']
+    name = schema_loader.add_schema(aggregate_schema_spec)
     return MockAggregateSchema(fully_qualified_name=name, schema_loader=schema_loader)
 
 
-def test_data_group_initialization(data_group_schema_with_store):
-    data_group = MockAggregate(
-        schema=data_group_schema_with_store,
+def test_aggregate_initialization(aggregate_schema_with_store):
+    aggregate = MockAggregate(
+        schema=aggregate_schema_with_store,
         identity="12345",
         evaluation_context=EvaluationContext())
-    assert data_group._identity == "12345"
+    assert aggregate._identity == "12345"
 
 
-def test_data_group_nested_items(data_group_schema_with_store):
-    data_group = MockAggregate(
-        schema=data_group_schema_with_store,
+def test_aggregate_nested_items(aggregate_schema_with_store):
+    aggregate = MockAggregate(
+        schema=aggregate_schema_with_store,
         identity="12345",
         evaluation_context=EvaluationContext())
-    nested_items = data_group._nested_items
+    nested_items = aggregate._nested_items
     assert len(nested_items) == 2
     assert "event_count" in nested_items
     assert isinstance(nested_items["event_count"], Field)
@@ -73,34 +73,34 @@ def test_data_group_nested_items(data_group_schema_with_store):
     assert isinstance(nested_items["_identity"], Field)
 
 
-def test_data_group_persist_without_store(data_group_schema_without_store):
-    data_group = MockAggregate(
-        schema=data_group_schema_without_store,
+def test_aggregate_persist_without_store(aggregate_schema_without_store):
+    aggregate = MockAggregate(
+        schema=aggregate_schema_without_store,
         identity="12345",
         evaluation_context=EvaluationContext())
-    data_group.persist()
+    aggregate.persist()
 
 
-def test_data_group_persist_with_store(data_group_schema_with_store):
-    data_group = MockAggregate(
-        schema=data_group_schema_with_store,
+def test_aggregate_persist_with_store(aggregate_schema_with_store):
+    aggregate = MockAggregate(
+        schema=aggregate_schema_with_store,
         identity="12345",
         evaluation_context=EvaluationContext())
     dt = datetime.now()
     dt.replace(tzinfo=timezone.utc)
-    data_group.persist(dt)
-    snapshot_data_group = data_group._schema.store.get(
+    aggregate.persist(dt)
+    snapshot_aggregate = aggregate._schema.store.get(
         Key(identity="12345", group="user", timestamp=dt))
-    assert snapshot_data_group is not None
-    assert snapshot_data_group == data_group._snapshot
+    assert snapshot_aggregate is not None
+    assert snapshot_aggregate == aggregate._snapshot
 
 
-def test_data_group_finalize(data_group_schema_with_store):
-    data_group = MockAggregate(
-        schema=data_group_schema_with_store,
+def test_aggregate_finalize(aggregate_schema_with_store):
+    aggregate = MockAggregate(
+        schema=aggregate_schema_with_store,
         identity="12345",
         evaluation_context=EvaluationContext())
-    data_group.finalize()
-    snapshot_data_group = data_group._schema.store.get(Key(identity="12345", group="user"))
-    assert snapshot_data_group is not None
-    assert snapshot_data_group == data_group._snapshot
+    aggregate.finalize()
+    snapshot_aggregate = aggregate._schema.store.get(Key(identity="12345", group="user"))
+    assert snapshot_aggregate is not None
+    assert snapshot_aggregate == aggregate._snapshot

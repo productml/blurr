@@ -43,16 +43,16 @@ class BlockAggregateSchema(AggregateSchema):
             {
                 'Name': '_start_time',
                 'Type': 'datetime',
-                'Value': ('time if {data_group}._start_time is None else time '
-                          'if time < {data_group}._start_time else {data_group}._start_time'
-                          ).format(data_group=name_in_context)
+                'Value': ('time if {aggregate}._start_time is None else time '
+                          'if time < {aggregate}._start_time else {aggregate}._start_time'
+                          ).format(aggregate=name_in_context)
             },
             {
                 'Name': '_end_time',
                 'Type': 'datetime',
-                'Value': ('time if {data_group}._end_time is None else time '
-                          'if time > {data_group}._end_time else {data_group}._end_time'
-                          ).format(data_group=name_in_context)
+                'Value': ('time if {aggregate}._end_time is None else time '
+                          'if time > {aggregate}._end_time else {aggregate}._end_time'
+                          ).format(aggregate=name_in_context)
             },
         ]
 

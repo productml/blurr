@@ -66,7 +66,7 @@ def test_set_add() -> None:
 
 
 @fixture(scope='module')
-def data_group_schema_spec() -> Dict[str, Any]:
+def aggregate_schema_spec() -> Dict[str, Any]:
     return {
         'Type': 'Blurr:Aggregate:VariableAggregate',
         'Name': 'test',
@@ -82,6 +82,18 @@ def data_group_schema_spec() -> Dict[str, Any]:
             'Name': 'set_field',
             'Type': 'set',
             'Value': 'test.set_field.add(1).copy().union({2, 3}).update({3, 4, 5}).discard(0).remove(1).intersection({2, 4, 5}).symmetric_difference_update({4, 6})'
+        }, {
+            'Name': 'map_field_cast',
+            'Type': 'map',
+            'Value': '{"incr": 10} if len(test.map_field_cast) == 0 else test.map_field_cast.increment("incr", 10)'
+        }, {
+            'Name': 'list_field_cast',
+            'Type': 'list',
+            'Value': '[0] if len(test.list_field_cast) == 0 else test.list_field_cast.append(1).append(1)'
+        }, {
+            'Name': 'set_field_cast',
+            'Type': 'set',
+            'Value': 'set({0}) if len(test.set_field_cast) == 0 else test.set_field_cast.add(1).add(2)'
         }]
     }
 
@@ -92,36 +104,96 @@ def schema_loader() -> SchemaLoader:
 
 
 @fixture(scope='module')
-def data_group_schema(schema_loader: SchemaLoader,
-                      data_group_schema_spec: Dict[str, Any]) -> AggregateSchema:
-    return VariableAggregateSchema(schema_loader.add_schema(data_group_schema_spec), schema_loader)
+def aggregate_schema(schema_loader: SchemaLoader,
+                      aggregate_schema_spec: Dict[str, Any]) -> AggregateSchema:
+    return VariableAggregateSchema(schema_loader.add_schema(aggregate_schema_spec), schema_loader)
 
 
 @fixture
-def data_group(data_group_schema: AggregateSchema) -> Aggregate:
+def aggregate(aggregate_schema: AggregateSchema) -> Aggregate:
     context = EvaluationContext()
 
-    dg = VariableAggregate(schema=data_group_schema, identity="12345", evaluation_context=context)
+    dg = VariableAggregate(schema=aggregate_schema, identity="12345", evaluation_context=context)
     context.global_add('test', dg)
     context.global_add('identity', "12345")
 
     return dg
 
 
-def test_field_evaluation(data_group: Aggregate) -> None:
-    assert len(data_group.map_field) == 0
-    assert len(data_group.set_field) == 0
-    assert len(data_group.list_field) == 0
+def test_field_evaluation(aggregate: Aggregate) -> None:
+    assert len(aggregate.map_field) == 0
+    assert len(aggregate.set_field) == 0
+    assert len(aggregate.list_field) == 0
 
-    data_group.evaluate()
+    aggregate.evaluate()
 
-    assert len(data_group.map_field) == 3
-    assert data_group.map_field['incr'] == 10
-    assert data_group.map_field['set'] == 'value'
-    assert data_group.map_field['update'] == 'value'
+    assert len(aggregate.map_field) == 3
+    assert aggregate.map_field['incr'] == 10
+    assert aggregate.map_field['set'] == 'value'
+    assert aggregate.map_field['update'] == 'value'
 
-    assert len(data_group.set_field) == 3
-    assert data_group.set_field == {2, 5, 6}
+    assert len(aggregate.set_field) == 3
+    assert aggregate.set_field == {2, 5, 6}
 
-    assert len(data_group.list_field) == 3
-    assert data_group.list_field == [0, 1, 2]
+    assert len(aggregate.list_field) == 3
+    assert aggregate.list_field == [0, 1, 2]
+
+
+def test_field_reset(aggregate: Aggregate) -> None:
+    assert len(aggregate.map_field) == 0
+    assert len(aggregate.set_field) == 0
+    assert len(aggregate.list_field) == 0
+
+    aggregate.evaluate()
+
+    assert len(aggregate.map_field) == 3
+    assert len(aggregate.set_field) == 3
+    assert len(aggregate.list_field) == 3
+
+    aggregate.reset()
+
+    assert len(aggregate.map_field) == 0
+    assert len(aggregate.set_field) == 0
+    assert len(aggregate.list_field) == 0
+
+
+def test_field_multiple_evaluation_type_cast_map(aggregate: Aggregate) -> None:
+    assert len(aggregate.map_field_cast) == 0
+
+    aggregate.evaluate()
+
+    assert len(aggregate.map_field_cast) == 1
+    assert aggregate.map_field_cast['incr'] == 10
+
+    aggregate.evaluate()
+
+    assert len(aggregate.map_field_cast) == 1
+    assert aggregate.map_field_cast['incr'] == 20
+
+
+def test_field_multiple_evaluation_type_cast_list(aggregate: Aggregate) -> None:
+    assert len(aggregate.list_field_cast) == 0
+
+    aggregate.evaluate()
+
+    assert len(aggregate.list_field_cast) == 1
+    assert aggregate.list_field_cast == [0]
+
+    aggregate.evaluate()
+
+    assert len(aggregate.list_field_cast) == 3
+    assert aggregate.list_field_cast == [0, 1, 1]
+
+
+def test_field_multiple_evaluation_type_cast_set(aggregate: Aggregate) -> None:
+    assert len(aggregate.set_field_cast) == 0
+
+    aggregate.evaluate()
+
+    assert len(aggregate.set_field_cast) == 1
+    assert aggregate.set_field_cast == {0}
+
+    aggregate.evaluate()
+
+    assert len(aggregate.set_field_cast) == 3
+    assert aggregate.set_field_cast == {0, 1, 2}

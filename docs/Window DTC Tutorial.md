@@ -2,6 +2,7 @@
 
 In this tutorial we'll introduce a new type of DTC: the __Window DTC__, and will learn how a Window DTC consumes session data produced in the first tutorial in order to generate __time aggregated data__.
 
+Try the code from this example [launching a Jupyter Notebook](https://mybinder.org/v2/gh/productml/blurr/master?filepath=examples%2Ftutorial).
 
 ## 1. Game Boosts
 

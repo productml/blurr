@@ -7,6 +7,8 @@ In this tutorial we'll learn how Blurr performs basic data aggregation. The foll
 * How events are processed and aggregated one by one by a `BlockAggregate` Aggregate
 * How `Identity` and `Split` are used to create new records.
 
+Try the code from this example [launching a Jupyter Notebook](https://mybinder.org/v2/gh/productml/blurr/master?filepath=examples%2Ftutorial).
+
 ## 1. Events
 
 Our sample application is a fairly simple game in which the player can either win or lose.

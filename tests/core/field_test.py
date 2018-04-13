@@ -114,3 +114,11 @@ def test_field_restore(test_field_schema):
     field = MockField(test_field_schema, EvaluationContext())
     field.restore(5)
     assert field.value == 5
+
+
+def test_field_reset(test_field_schema):
+    field = MockField(test_field_schema, EvaluationContext())
+    field.restore(5)
+    assert field.value == 5
+    field.reset()
+    assert field.value == 0

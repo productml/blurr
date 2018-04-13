@@ -52,6 +52,7 @@ class WindowTransformer(Transformer):
         if self._anchor.evaluate_anchor(block):
 
             try:
+                self.reset()
                 self._evaluation_context.global_add('anchor', block)
                 self._evaluate()
                 self._anchor.add_condition_met()
@@ -81,7 +82,7 @@ class WindowTransformer(Transformer):
     @property
     def flattened_snapshot(self) -> Dict:
         """
-        Generates a flattened snapshot where the final key for a field is <data_group_name>.<field_name>.
+        Generates a flattened snapshot where the final key for a field is <aggregate_name>.<field_name>.
         :return: The flattened snapshot.
         """
         snapshot_dict = super()._snapshot

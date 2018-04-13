@@ -70,7 +70,7 @@ def test_transformer_init(test_transformer) -> None:
     assert test_transformer._identity == 'user1'
     assert test_transformer._evaluation_context.global_context == {
         'identity': 'user1',
-        'test_group': test_transformer._data_groups['test_group']
+        'test_group': test_transformer._aggregates['test_group']
     }
     assert test_transformer._evaluation_context.local_context == {}
 
@@ -88,7 +88,7 @@ def test_transformer_finalize(test_transformer: MockTransformer,
 
 
 def test_transformer_get_attr(test_transformer: MockTransformer) -> None:
-    assert test_transformer.test_group == test_transformer._data_groups['test_group']
+    assert test_transformer.test_group == test_transformer._aggregates['test_group']
 
 
 def test_transformer_get_attr_missing(test_transformer: MockTransformer) -> None:
@@ -97,7 +97,7 @@ def test_transformer_get_attr_missing(test_transformer: MockTransformer) -> None
 
 
 def test_transformer_get_item(test_transformer: MockTransformer) -> None:
-    assert test_transformer['test_group'] == test_transformer._data_groups['test_group']
+    assert test_transformer['test_group'] == test_transformer._aggregates['test_group']
 
 
 def test_transformer_get_item_missing(test_transformer: MockTransformer) -> None:

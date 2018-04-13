@@ -118,6 +118,13 @@ class BaseItem(ABC):
         """
         raise NotImplementedError('restore() must be implemented')
 
+    @abstractmethod
+    def reset(self) -> None:
+        """
+        Resets the state of the item.
+        """
+        raise NotImplementedError('reset() must be implemented')
+
 
 class BaseItemCollection(BaseItem, ABC):
     """
@@ -168,6 +175,10 @@ class BaseItemCollection(BaseItem, ABC):
 
         except Exception as e:
             raise SnapshotError('Error while restoring snapshot: {}'.format(self._snapshot)) from e
+
+    def reset(self) -> None:
+        for _, item in self._nested_items.items():
+            item.reset()
 
     @abstractmethod
     def finalize(self) -> None:

@@ -116,18 +116,26 @@ def test_execution_key_error(caplog) -> None:
     assert caplog.records[0].levelno == logging.DEBUG
 
 
-def test_execution_error_missing_data_group(caplog, schema_loader: SchemaLoader) -> None:
+def test_execution_error_type_mismatch(caplog) -> None:
+    caplog.set_level(logging.DEBUG)
+    code_string = '1 + \'a\''
+    assert Expression(code_string).evaluate(EvaluationContext(Context({'test_dict': {}}))) is None
+    assert 'TypeError in evaluating expression 1 + \'a\'' in caplog.records[0].message
+    assert caplog.records[0].levelno == logging.DEBUG
+
+
+def test_execution_error_missing_aggregate(caplog, schema_loader: SchemaLoader) -> None:
     caplog.set_level(logging.DEBUG)
     context = Context({
         'test': StreamingTransformer(schema_loader.get_schema_object('test'), 'user1', Context())
     })
-    with raises(MissingAttributeError, match='missing_data_group not defined in test'):
-        Expression('test.missing_data_group + 1').evaluate(EvaluationContext(context))
-    assert ('MissingAttributeError in evaluating expression test.missing_data_group + 1. '
-            'Error: missing_data_group not defined in test') in caplog.text
+    with raises(MissingAttributeError, match='missing_aggregate not defined in test'):
+        Expression('test.missing_aggregate + 1').evaluate(EvaluationContext(context))
+    assert ('MissingAttributeError in evaluating expression test.missing_aggregate + 1. '
+            'Error: missing_aggregate not defined in test') in caplog.text
 
-    with raises(MissingAttributeError, match='missing_data_group not defined in test'):
-        Expression('test[\'missing_data_group\'] + 1').evaluate(EvaluationContext(context))
+    with raises(MissingAttributeError, match='missing_aggregate not defined in test'):
+        Expression('test[\'missing_aggregate\'] + 1').evaluate(EvaluationContext(context))
 
 
 def test_execution_error_missing_field(caplog, schema_loader: SchemaLoader) -> None:

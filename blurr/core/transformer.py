@@ -69,7 +69,7 @@ class Transformer(BaseItemCollection, ABC):
     def __init__(self, schema: TransformerSchema, identity: str, context: Context) -> None:
         super().__init__(schema, EvaluationContext(global_context=context))
         # Load the nested items into the item
-        self._data_groups: Dict[str, Aggregate] = {
+        self._aggregates: Dict[str, Aggregate] = {
             name: TypeLoader.load_item(item_schema.type)(item_schema, identity,
                                                          self._evaluation_context)
             for name, item_schema in schema.nested_schema.items()
@@ -83,7 +83,7 @@ class Transformer(BaseItemCollection, ABC):
         """
         Dictionary of nested data groups
         """
-        return self._data_groups
+        return self._aggregates
 
     def finalize(self) -> None:
         """

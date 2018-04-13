@@ -1,5 +1,5 @@
 import yaml
-from pytest import raises
+from pytest import raises, mark
 
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.syntax.schema_validator import validate, Identifier, Expression
@@ -47,7 +47,7 @@ def load_example(file):
 
 
 def test_validation_errors_contain_dtc_name_and_schema_location():
-    with raises(InvalidSchemaError, match='Error validating data dtc_name with schema') as err:
+    with raises(InvalidSchemaError, match='Error validating data dtc_name with schema'):
         dtc_dict = load_example('invalid_wrong_version.yml')
         validate(dtc_dict, 'dtc_name')
 
@@ -62,48 +62,16 @@ def test_valid_basic_window_dtc():
     validate(dtc_dict)
 
 
-def test_invalid_wrong_version():
-    with raises(InvalidSchemaError) as err:
-        dtc_dict = load_example('invalid_wrong_version.yml')
-        validate(dtc_dict)
-    assert "Version: '2088-03-01' not in ('2018-03-01',)" in str(err.value)
-
-
-def test_invalid_missing_time():
-    with raises(InvalidSchemaError, match='Time: Required field missing') as err:
-        dtc_dict = load_example('invalid_missing_time.yml')
-        validate(dtc_dict)
-
-
-def test_invalid_string_instead_of_integer():
-    with raises(InvalidSchemaError, match="Anchor.Max: 'one' is not a int.") as err:
-        dtc_dict = load_example('invalid_string_instead_integer.yml')
-        validate(dtc_dict)
-
-
-def test_invalid_non_existing_data_type():
-    with raises(InvalidSchemaError, match="Type: 'foo' is not a DTC Valid Data Type.") as err:
-        dtc_dict = load_example('invalid_non_existing_data_type.yml')
-        validate(dtc_dict)
-
-
-def test_invalid_incorrect_expression():
-    with raises(
-            InvalidSchemaError,
-            match="When: 'x == senor roy' is an invalid python expression.") as err:
-        dtc_dict = load_example('invalid_incorrect_expression.yml')
-        validate(dtc_dict)
-
-
-def test_invalid_aggregate_has_no_fields():
-    with raises(InvalidSchemaError, match='Aggregates.0.Fields: Required field missing') as err:
-        dtc_dict = load_example('invalid_aggregate_has_no_fields.yml')
-        validate(dtc_dict)
-
-
-def test_reserved_keywords_as_field_names_raises_invalid_schema_error():
-    with raises(
-            InvalidSchemaError,
-            match="Name: '_name' starts with _ or containing whitespace characters.") as err:
-        dtc_dict = load_example('invalid_field_name.yml')
-        validate(dtc_dict)
+@mark.parametrize("test_file,err_string", [
+    ('invalid_wrong_version.yml', 'Version: \'2088-03-01\' not in \(\'2018-03-01\',\)'),
+    ('invalid_missing_time.yml', 'Time: Required field missing'),
+    ('invalid_string_instead_integer.yml', "Anchor.Max: 'one' is not a int."),
+    ('invalid_non_existing_data_type.yml', "Type: 'foo' is not a DTC Valid Data Type."),
+    ('invalid_incorrect_expression.yml', "When: 'x == senor roy' is an invalid python expression."),
+    ('invalid_set_expression.yml', 'When: \'x = \'test\'\' is an invalid python expression'),
+    ('invalid_aggregate_has_no_fields.yml', 'Aggregates.0.Fields: Required field missing'),
+    ('invalid_field_name.yml', "Name: '_name' starts with _ or containing whitespace characters."),
+])
+def test_invalid_schema(test_file: str, err_string: str) -> None:
+    with raises(InvalidSchemaError, match=err_string):
+        validate(load_example(test_file))

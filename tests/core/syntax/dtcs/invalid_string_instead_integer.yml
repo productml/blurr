@@ -3,7 +3,7 @@ Version: '2018-03-01'
 Description: Example
 SourceDTC: test
 Name: example_name
-When: source.package_version = '1.0'
+When: source.package_version == '1.0'
 
 Anchor:
   Condition: True==True

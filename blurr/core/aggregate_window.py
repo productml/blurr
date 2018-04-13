@@ -30,8 +30,8 @@ class _WindowSource:
     Represents a window on the pre-aggregated source data.
     """
 
-    def __init__(self):
-        self.view: List[BlockAggregate] = []
+    def __init__(self, block_list: List[BlockAggregate]):
+        self.view: List[BlockAggregate] = block_list
 
     def __getattr__(self, item: str) -> List[Any]:
         return [getattr(block, item) for block in self.view]
@@ -45,7 +45,7 @@ class WindowAggregate(Aggregate):
     def __init__(self, schema: WindowAggregateSchema, identity: str,
                  evaluation_context: EvaluationContext) -> None:
         super().__init__(schema, identity, evaluation_context)
-        self._window_source = _WindowSource()
+        self._window_source = None
 
     def prepare_window(self, start_time: datetime) -> None:
         """
@@ -56,16 +56,17 @@ class WindowAggregate(Aggregate):
         # evaluate window first which sets the correct window in the store
         store = self._schema.source.store
         if self._schema.window_type == 'day' or self._schema.window_type == 'hour':
-            self._window_source.view = self._load_blocks(
+            block_list = self._load_blocks(
                 store.get_range(
                     Key(self._identity, self._schema.source.name, start_time),
                     Key(self._identity, self._schema.source.name, self._get_end_time(start_time))))
         else:
-            self._window_source.view = self._load_blocks(
+            block_list = self._load_blocks(
                 store.get_range(
                     Key(self._identity, self._schema.source.name, start_time), None,
                     self._schema.window_value))
 
+        self._window_source = _WindowSource(block_list)
         self._validate_view()
 
     def _validate_view(self):
@@ -95,7 +96,7 @@ class WindowAggregate(Aggregate):
         elif self._schema.window_type == 'hour':
             return start_time + timedelta(hours=self._schema.window_value)
 
-    def _load_blocks(self, blocks: List[Tuple[Key, Any]]) -> List[BaseItem]:
+    def _load_blocks(self, blocks: List[Tuple[Key, Any]]) -> List[BlockAggregate]:
         """
         Converts [(Key, block)] to [BlockAggregate]
         :param blocks: List of (Key, block) blocks.

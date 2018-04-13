@@ -33,11 +33,11 @@ def test_initialization_with_valid_source(schema_loader_with_mem_store: SchemaLo
         }]
     })
 
-    window_data_group_schema = WindowAggregateSchema(name, schema_loader_with_mem_store)
-    assert window_data_group_schema.window_type == 'day'
-    assert window_data_group_schema.window_value == 1
-    assert isinstance(window_data_group_schema.source, BlockAggregateSchema)
-    assert window_data_group_schema.source.name == 'session'
+    window_aggregate_schema = WindowAggregateSchema(name, schema_loader_with_mem_store)
+    assert window_aggregate_schema.window_type == 'day'
+    assert window_aggregate_schema.window_value == 1
+    assert isinstance(window_aggregate_schema.source, BlockAggregateSchema)
+    assert window_aggregate_schema.source.name == 'session'
 
 
 def test_initialization_with_invalid_source(schema_loader_with_mem_store: SchemaLoader,
