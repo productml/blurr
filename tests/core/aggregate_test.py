@@ -27,11 +27,11 @@ def get_store_spec() -> Dict[str, Any]:
     return {'Type': 'Blurr:Store:MemoryStore', 'Name': 'memory'}
 
 
-class MockDataGroupSchema(AggregateSchema):
+class MockAggregateSchema(AggregateSchema):
     pass
 
 
-class MockDataGroup(Aggregate):
+class MockAggregate(Aggregate):
     pass
 
 
@@ -40,7 +40,7 @@ def data_group_schema_with_store():
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(get_data_group_schema_spec())
     schema_loader.add_schema(get_store_spec(), 'user')
-    return MockDataGroupSchema(fully_qualified_name=name, schema_loader=schema_loader)
+    return MockAggregateSchema(fully_qualified_name=name, schema_loader=schema_loader)
 
 
 @fixture
@@ -49,11 +49,11 @@ def data_group_schema_without_store():
     data_group_schema_spec = get_data_group_schema_spec()
     del data_group_schema_spec['Store']
     name = schema_loader.add_schema(data_group_schema_spec)
-    return MockDataGroupSchema(fully_qualified_name=name, schema_loader=schema_loader)
+    return MockAggregateSchema(fully_qualified_name=name, schema_loader=schema_loader)
 
 
 def test_data_group_initialization(data_group_schema_with_store):
-    data_group = MockDataGroup(
+    data_group = MockAggregate(
         schema=data_group_schema_with_store,
         identity="12345",
         evaluation_context=EvaluationContext())
@@ -61,7 +61,7 @@ def test_data_group_initialization(data_group_schema_with_store):
 
 
 def test_data_group_nested_items(data_group_schema_with_store):
-    data_group = MockDataGroup(
+    data_group = MockAggregate(
         schema=data_group_schema_with_store,
         identity="12345",
         evaluation_context=EvaluationContext())
@@ -74,7 +74,7 @@ def test_data_group_nested_items(data_group_schema_with_store):
 
 
 def test_data_group_persist_without_store(data_group_schema_without_store):
-    data_group = MockDataGroup(
+    data_group = MockAggregate(
         schema=data_group_schema_without_store,
         identity="12345",
         evaluation_context=EvaluationContext())
@@ -82,7 +82,7 @@ def test_data_group_persist_without_store(data_group_schema_without_store):
 
 
 def test_data_group_persist_with_store(data_group_schema_with_store):
-    data_group = MockDataGroup(
+    data_group = MockAggregate(
         schema=data_group_schema_with_store,
         identity="12345",
         evaluation_context=EvaluationContext())
@@ -96,7 +96,7 @@ def test_data_group_persist_with_store(data_group_schema_with_store):
 
 
 def test_data_group_finalize(data_group_schema_with_store):
-    data_group = MockDataGroup(
+    data_group = MockAggregate(
         schema=data_group_schema_with_store,
         identity="12345",
         evaluation_context=EvaluationContext())

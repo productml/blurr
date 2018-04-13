@@ -54,15 +54,15 @@ Type | The destination data store | `Blurr:Store:MemoryStore`. More Stores such 
 Name | Name of the store, used for internal referencing within the DTC | Any `string` | Required
 
 
-## DataGroups
+## Aggregates
 
-DataGroups defines groups of data that are either in a one-to-one relationship with the Identity or a in a many-to-one relationship.
+Aggregates defines groups of data that are either in a one-to-one relationship with the Identity or a in a many-to-one relationship.
 
-There are 3 types of DataGroups in a Streaming DTC.
+There are 3 types of Aggregates in a Streaming DTC.
 
 ### IdentityAggregate
 
-`Blurr:Aggregate:IdentityAggregate`. Fields in the IdentityAggregate DataGroups are in a one-to-one relationship with the identity.  There is a single record that stores these fields and change to these fields overwrite the previous value.  There are no historical records kept for state changes.
+`Blurr:Aggregate:IdentityAggregate`. Fields in the IdentityAggregate Aggregates are in a one-to-one relationship with the identity.  There is a single record that stores these fields and change to these fields overwrite the previous value.  There are no historical records kept for state changes.
 
 ```yaml
 Aggregates:
@@ -84,14 +84,14 @@ Aggregates:
 
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
-Type | Type of DataGroup | `Blurr:Aggregate:IdentityAggregate`, `Blurr:Aggregate:BlockAggregate`, `Blurr:Aggregate:Variable` | Required
-Name | Name of the DataGroup | Any `string`, unique within the DTC | Required
-Store | Name of the Store in which to create the DataGroup  | Stores defined in the DTC | Required
+Type | Type of Aggregate | `Blurr:Aggregate:IdentityAggregate`, `Blurr:Aggregate:BlockAggregate`, `Blurr:Aggregate:VariableAggregate` | Required
+Name | Name of the Aggregate | Any `string`, unique within the DTC | Required
+Store | Name of the Store in which to create the Aggregate  | Stores defined in the DTC | Required
 When | Boolean expression that defines which raw events to process | Any `boolean` expression | Optional
 
-A `DataGroup` contains `fields` for the information being stored. IdentityAggregate DataGroup fields are especially useful for data that is relatively static over time - like a user's country.
+A `Aggregate` contains `fields` for the information being stored. IdentityAggregate Aggregate fields are especially useful for data that is relatively static over time - like a user's country.
 
- Each field in an IdentityAggregate DataGroup has 3 properties.
+ Each field in an IdentityAggregate Aggregate has 3 properties.
 
  Key |  Description | Allowed values | Required
  --- | ------------ | -------------- | --------
@@ -99,12 +99,12 @@ A `DataGroup` contains `fields` for the information being stored. IdentityAggreg
  Type | Type of data being stored | `integer`, `boolean`, `string`, `datetime`, `float`, `map`, `list`, `set` | Optional. If Type is not set, the DTL uses `string` as the default type
  Value | Value of the field | Any python expression, and must match the Type | Required  
 
- All fields in the DataGroup are encapsulated in a DataGroup object. The object is available in the DTL, which is the python environment processing the DTC. Field values can be accessed using `DataGroupName.FieldName`
+ All fields in the Aggregate are encapsulated in a Aggregate object. The object is available in the DTL, which is the python environment processing the DTC. Field values can be accessed using `AggregateName.FieldName`
 
 
 ### BlockAggregate
 
-`Blurr:Aggregate:BlockAggregate`. Fields in the BlockAggregate DataGroups are in a one-to-many relationship with the identity.  These fields are aggregated together in blocks based on the split condition specified.
+`Blurr:Aggregate:BlockAggregate`. Fields in the BlockAggregate Aggregates are in a one-to-many relationship with the identity.  These fields are aggregated together in blocks based on the split condition specified.
 
 ```YAML
 
@@ -123,14 +123,14 @@ A `DataGroup` contains `fields` for the information being stored. IdentityAggreg
 
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
-Type | Type of DataGroup | `Blurr:Aggregate:IdentityAggregate`, `Blurr:Aggregate:BlockAggregate`, `Blurr:Aggregate:Variable` | Required
-Name | Name of the DataGroup | Any, unique within the DTC | Required
+Type | Type of Aggregate | `Blurr:Aggregate:IdentityAggregate`, `Blurr:Aggregate:BlockAggregate`, `Blurr:Aggregate:VariableAggregate` | Required
+Name | Name of the Aggregate | Any, unique within the DTC | Required
 When | Boolean expression that defines which raw events to process | Any `boolean` expression | Optional
 Split | Boolean expression that defines when a new block should be created | Any `boolean` expression | Required
 
-All fields in the DataGroup are encapsulated in a DataGroup object. The object is available in the DTL, which is a python environment processing the DTC. Field values can be accessed using `DataGroupName.FieldName`
+All fields in the Aggregate are encapsulated in a Aggregate object. The object is available in the DTL, which is a python environment processing the DTC. Field values can be accessed using `AggregateName.FieldName`
 
-Each field in an BlockAggregate DataGroup has 4 properties.
+Each field in an BlockAggregate Aggregate has 4 properties.
 
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
@@ -141,10 +141,10 @@ When | Boolean expression that defines which raw events to process | Any `boolea
 
 ### Variable
 
-`Blurr:Aggregate:Variable`. Variable DataGroups are temporary variables that can be used in other data blocks. Variables aim to reduce code duplication and improve readability. They are useful for cleansing / modifying / typecasting source elements and representing complex filter conditions that evaluate to a binary value.
+`Blurr:Aggregate:VariableAggregate`. Variable Aggregates are temporary variables that can be used in other data blocks. Variables aim to reduce code duplication and improve readability. They are useful for cleansing / modifying / typecasting source elements and representing complex filter conditions that evaluate to a binary value.
 
 ```yaml
-- Type: Blurr:Aggregate:Variable
+- Type: Blurr:Aggregate:VariableAggregate
   Name: vars
   Fields:
     - Name: item_price_micro
@@ -203,7 +203,7 @@ Anchor:
   Max: 1
 ```
 
-Condition is a python expression which returns a `boolean` value to determine if an anchor condition exists in the block being processed. Field values in a block are accessed as `StreamingDTCName.DataGroupName.FieldName`.
+Condition is a python expression which returns a `boolean` value to determine if an anchor condition exists in the block being processed. Field values in a block are accessed as `StreamingDTCName.AggregateName.FieldName`.
 
 Max defines the maximum number of output rows to be generated every time the Window DTC is run.
 
@@ -224,13 +224,13 @@ Type | The destination data store | `Blurr:Store:MemoryStore`. More Stores such 
 Name | Name of the store, used for internal referencing within the DTC | Any `string` | Required
 
 
-## DataGroups
+## Aggregates
 
-All DataGroup operations that are performed in a window DTC can only use the following available data:
+All Aggregate operations that are performed in a window DTC can only use the following available data:
 
 1. Anchor block - Block that satisfies the anchor condition. The fields from the anchor block can be accessed as `anchor.FieldName`.
 2. IdentityAggregate - Identity aggregates available from the source Streaming DTC. The fields from an IdentityAggregate can be accessed as `StreamingDTCName.IdentityAggregateName.Field Name`.
-3. A window of blocks around the anchor block - A list of blocks from a BlockAggregate DataGroup before or after the anchor block based on the window defined. A field from the list of blocks is referenced as `WindowName.FieldName`.
+3. A window of blocks around the anchor block - A list of blocks from a BlockAggregate Aggregate before or after the anchor block based on the window defined. A field from the list of blocks is referenced as `WindowName.FieldName`.
 
 ### WindowAggregate
 
@@ -260,17 +260,17 @@ Aggregates:
 
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
-Type | Type of DataGroup | `Blurr:Aggregate:WindowAggregate`, `Blurr:Aggregate:Variable` | Required
-Name | Name of the DataGroup | Any `string`, unique within the DTC | Required
+Type | Type of Aggregate | `Blurr:Aggregate:WindowAggregate`, `Blurr:Aggregate:VariableAggregate` | Required
+Name | Name of the Aggregate | Any `string`, unique within the DTC | Required
 WindowType | The type of window to use around the anchor block | `day`, `hour`, `count` | Optional. A WindowAggregate can be defined without a Window
 WindowValue | The number of days, hours or blocks to window around the anchor block | Integer | Optional. A WindowAggregate can be defined without a Window
-Source | The BlockAggregate DataGroup (defined in the Streaming DTC) on which the window operations should be performed | Valid BlockAggregate DataGroup | Required
+Source | The BlockAggregate Aggregate (defined in the Streaming DTC) on which the window operations should be performed | Valid BlockAggregate Aggregate | Required
 
 All functions defined on windows work on a list of values. For e.g. if a session contains a `games_played` field and a `last_week` window is defined on it, then `last_week.games_played` represents the list of values from last week's sessions.
 
 **Important: Window operations using `WindowAggregate` do not include the Anchor block itself.**
 
-Each field in a WindowAggregate DataGroup has 3 properties.
+Each field in a WindowAggregate Aggregate has 3 properties.
 
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
@@ -280,11 +280,11 @@ Value | Value of the field | Any python expression, and must match the Type | Re
 
 ### Variable
 
-The Variable DataGroup works exactly the same as in the Streaming DTC.
+The Variable Aggregate works exactly the same as in the Streaming DTC.
 
-## Order of DataGroups
+## Order of Aggregates
 
-DataGroups can be defined in any order. However, if field values are referenced within the DTC, they must be defined in the order in which they are referenced. For example, if a `BlockAggregate` uses a `Variable`, then the `Variable` DataGroup should be defined before the `BlockAggregate` so that the `Variable` is processed first and available to the `BlockAggregate` when the `BlockAggregate` is being processed.
+Aggregates can be defined in any order. However, if field values are referenced within the DTC, they must be defined in the order in which they are referenced. For example, if a `BlockAggregate` uses a `Variable`, then the `Variable` Aggregate should be defined before the `BlockAggregate` so that the `Variable` is processed first and available to the `BlockAggregate` when the `BlockAggregate` is being processed.
 
 # Processing field values
 

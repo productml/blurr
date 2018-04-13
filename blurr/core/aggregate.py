@@ -32,7 +32,7 @@ class AggregateSchema(BaseSchemaCollection, ABC):
 
     def _load_store(self, store_name: str) -> 'Store':
         """
-        Load a store into the datagroup
+        Load a store into the Aggregate
         :param store_name: The name of the store
         """
         store_fq_name = self.schema_loader.get_fully_qualified_name(
@@ -80,13 +80,13 @@ class Aggregate(BaseItemCollection, ABC):
     @property
     def _nested_items(self) -> Dict[str, Type[BaseItem]]:
         """
-        Returns the dictionary of fields the DataGroup contains
+        Returns the dictionary of fields the Aggregate contains
         """
         return self._fields
 
     def finalize(self) -> None:
         """
-        Saves the current state of the DataGroup in the store as the final rites
+        Saves the current state of the Aggregate in the store as the final rites
         """
         self.persist()
 

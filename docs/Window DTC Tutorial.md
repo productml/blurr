@@ -48,7 +48,7 @@ This result shows our players have increased the games played per session after 
 In order to obtain the output described before, Blurr will perform __time-based aggregation__ over the historic session data obtained with the Streaming DTC in the first tutorial. This transformation is defined in a __Window DTC__:
 
 ```yaml
-Type: Blurr:DTC:Window
+Type: Blurr:Transform:Window
 Version: '2018-03-01'
 Name: boost_data
 
@@ -58,7 +58,7 @@ Anchor:
   Condition: source.event_id == "game_start" and source.boost == True
 
 Aggregates:
-  - Type: Blurr:DTC:DataGroup:WindowAggregate
+  - Type: Blurr:Aggregate:WindowAggregate
     Name: last_7_days
     Window:
       Type: day
@@ -70,7 +70,7 @@ Aggregates:
        Type: float
        Value: sum(source.games_played) / len(source.session_id)
 
-  - Type: Blurr:DTC:DataGroup:WindowAggregate
+  - Type: Blurr:Aggregate:WindowAggregate
     Name: next_3_days
     Window:
       Type: day
@@ -97,7 +97,7 @@ SourceDTC: sessions
 
 ```yaml
 # excerpt from Streaming DTC
-Type: Blurr:DTC:Streaming
+Type: Blurr:Transform:Streaming
 Version: '2018-03-07'
 Name : sessions
 ```
@@ -139,7 +139,7 @@ How each aggregated is calculated is defined by `WindowAggregate` Aggregates:
 
 
 ```yaml
-- Type: Blurr:DTC:DataGroup:WindowAggregate
+- Type: Blurr:Aggregate:WindowAggregate
     Name: last_7_days
     Window:
       Type: day
@@ -168,12 +168,12 @@ Value: -7
 
 `Source` is used to __lookup input data__ from the Streaming DTC.
 
-In this case the input is session data produced in `session_stats` DataGroup in `sessions` Streaming DTC:
+In this case the input is session data produced in `session_stats` Aggregate in `sessions` Streaming DTC:
 
 ```yaml
 # excerpt from Streaming DTC
 Aggregates:
- - Type: Blurr:DTC:DataGroup:BlockAggregate
+ - Type: Blurr:Aggregate:BlockAggregate
    Name: session_stats
 ```
 

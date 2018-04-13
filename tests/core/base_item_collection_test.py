@@ -15,7 +15,7 @@ from blurr.core.schema_loader import SchemaLoader
 @fixture
 def collection_schema_spec() -> Dict[str, Any]:
     return {
-        'Type': 'ProductML:DTC:DataGroup:MockAggregate',
+        'Type': 'ProductML:DTC:Aggregate:MockAggregate',
         'Name': 'user',
         'When': 'True',
         'Fields': [{

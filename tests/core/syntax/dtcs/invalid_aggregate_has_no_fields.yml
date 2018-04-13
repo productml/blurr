@@ -12,4 +12,4 @@ Aggregates:
    Name: user
    Store: offer_ai_dynamo
 
-   # DATAGROUP SHOULD HAVE FIELDS
+   # Aggregate SHOULD HAVE FIELDS

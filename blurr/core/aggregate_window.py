@@ -12,7 +12,7 @@ from blurr.core.base import BaseItem
 
 class WindowAggregateSchema(AggregateSchema):
     """
-    Schema for WindowAggregate DataGroup.
+    Schema for WindowAggregate Aggregate.
     """
     ATTRIBUTE_WINDOW_VALUE = 'WindowValue'
     ATTRIBUTE_WINDOW_TYPE = 'WindowType'
@@ -97,9 +97,9 @@ class WindowAggregate(Aggregate):
 
     def _load_blocks(self, blocks: List[Tuple[Key, Any]]) -> List[BaseItem]:
         """
-        Converts [(Key, block)] to [BlockDataGroup]
+        Converts [(Key, block)] to [BlockAggregate]
         :param blocks: List of (Key, block) blocks.
-        :return: List of BlockDataGroup
+        :return: List of BlockAggregate
         """
         return [
             BlockAggregate(self._schema.source, self._identity, EvaluationContext()).restore(block)

@@ -48,7 +48,7 @@ Aggregates:
       Type: float
       Value: source.win_ratio[0]
 
- - Type: Blurr:DataGroup:WindowAggregate
+ - Type: Blurr:Aggregate:WindowAggregate
    Name: last_week
    WindowType: day
    WindowValue: -7
@@ -63,7 +63,7 @@ Aggregates:
       Value: sum(source.purchase_amount)
 
 
- - Type: Blurr:DataGroup:WindowAggregate
+ - Type: Blurr:Aggregate:WindowAggregate
    Name: next_week
    WindowType: day
    WindowValue: 7
