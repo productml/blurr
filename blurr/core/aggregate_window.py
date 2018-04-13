@@ -11,9 +11,7 @@ from blurr.core.base import BaseItem
 
 
 class WindowAggregateSchema(AggregateSchema):
-    """
-    Schema for WindowAggregate Aggregate.
-    """
+
     ATTRIBUTE_WINDOW_VALUE = 'WindowValue'
     ATTRIBUTE_WINDOW_TYPE = 'WindowType'
     ATTRIBUTE_SOURCE = 'Source'

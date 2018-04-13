@@ -62,7 +62,7 @@ There are 3 types of Aggregates in a Streaming DTC.
 
 ### IdentityAggregate
 
-`Blurr:Aggregate:IdentityAggregate`. Fields in the IdentityAggregate Aggregates are in a one-to-one relationship with the identity.  There is a single record that stores these fields and change to these fields overwrite the previous value.  There are no historical records kept for state changes.
+`Blurr:Aggregate:IdentityAggregate`. Fields in the IdentityAggregates are in a one-to-one relationship with the identity.  There is a single record that stores these fields and change to these fields overwrite the previous value.  There are no historical records kept for state changes.
 
 ```yaml
 Aggregates:
@@ -89,9 +89,9 @@ Name | Name of the Aggregate | Any `string`, unique within the DTC | Required
 Store | Name of the Store in which to create the Aggregate  | Stores defined in the DTC | Required
 When | Boolean expression that defines which raw events to process | Any `boolean` expression | Optional
 
-A `Aggregate` contains `fields` for the information being stored. IdentityAggregate Aggregate fields are especially useful for data that is relatively static over time - like a user's country.
+A `Aggregate` contains `fields` for the information being stored. IdentityAggregate fields are especially useful for data that is relatively static over time - like a user's country.
 
- Each field in an IdentityAggregate Aggregate has 3 properties.
+ Each field in an IdentityAggregate has 3 properties.
 
  Key |  Description | Allowed values | Required
  --- | ------------ | -------------- | --------
@@ -104,7 +104,7 @@ A `Aggregate` contains `fields` for the information being stored. IdentityAggreg
 
 ### BlockAggregate
 
-`Blurr:Aggregate:BlockAggregate`. Fields in the BlockAggregate Aggregates are in a one-to-many relationship with the identity.  These fields are aggregated together in blocks based on the split condition specified.
+`Blurr:Aggregate:BlockAggregate`. Fields in the BlockAggregates are in a one-to-many relationship with the identity.  These fields are aggregated together in blocks based on the split condition specified.
 
 ```YAML
 
@@ -130,7 +130,7 @@ Split | Boolean expression that defines when a new block should be created | Any
 
 All fields in the Aggregate are encapsulated in a Aggregate object. The object is available in the DTL, which is a python environment processing the DTC. Field values can be accessed using `AggregateName.FieldName`
 
-Each field in an BlockAggregate Aggregate has 4 properties.
+Each field in an BlockAggregate has 4 properties.
 
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
@@ -230,7 +230,7 @@ All Aggregate operations that are performed in a window DTC can only use the fol
 
 1. Anchor block - Block that satisfies the anchor condition. The fields from the anchor block can be accessed as `anchor.FieldName`.
 2. IdentityAggregate - Identity aggregates available from the source Streaming DTC. The fields from an IdentityAggregate can be accessed as `StreamingDTCName.IdentityAggregateName.Field Name`.
-3. A window of blocks around the anchor block - A list of blocks from a BlockAggregate Aggregate before or after the anchor block based on the window defined. A field from the list of blocks is referenced as `WindowName.FieldName`.
+3. A window of blocks around the anchor block - A list of blocks from a BlockAggregate before or after the anchor block based on the window defined. A field from the list of blocks is referenced as `WindowName.FieldName`.
 
 ### WindowAggregate
 
@@ -264,13 +264,13 @@ Type | Type of Aggregate | `Blurr:Aggregate:WindowAggregate`, `Blurr:Aggregate:V
 Name | Name of the Aggregate | Any `string`, unique within the DTC | Required
 WindowType | The type of window to use around the anchor block | `day`, `hour`, `count` | Optional. A WindowAggregate can be defined without a Window
 WindowValue | The number of days, hours or blocks to window around the anchor block | Integer | Optional. A WindowAggregate can be defined without a Window
-Source | The BlockAggregate Aggregate (defined in the Streaming DTC) on which the window operations should be performed | Valid BlockAggregate Aggregate | Required
+Source | The BlockAggregate (defined in the Streaming DTC) on which the window operations should be performed | Valid BlockAggregate | Required
 
 All functions defined on windows work on a list of values. For e.g. if a session contains a `games_played` field and a `last_week` window is defined on it, then `last_week.games_played` represents the list of values from last week's sessions.
 
 **Important: Window operations using `WindowAggregate` do not include the Anchor block itself.**
 
-Each field in a WindowAggregate Aggregate has 3 properties.
+Each field in a WindowAggregate has 3 properties.
 
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
