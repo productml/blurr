@@ -1,11 +1,10 @@
-from enum import Enum
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
-import re
 from copy import copy
+from enum import Enum
 
 from blurr.core import logging
-from blurr.core.errors import ExpressionEvaluationError, InvalidExpressionError, \
+from blurr.core.errors import InvalidExpressionError, \
     MissingAttributeError
 from blurr.core.record import Record
 
@@ -157,6 +156,7 @@ class Expression:
             #   present in EvaluationContext. A common cause for this is typos in the DTC.
             # MissingAttributeError - Exception thrown when a DTC nested item is used which does not
             #   exist. Should only happen for erroneous DTCs.
-            if isinstance(err, NameError) or isinstance(err, MissingAttributeError):
+            # ImportError - Thrown when there is a failure in importing other modules.
+            if isinstance(err, (NameError, MissingAttributeError, ImportError)):
                 raise err
             return None
