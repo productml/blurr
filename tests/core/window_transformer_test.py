@@ -8,10 +8,10 @@ from blurr.core.anchor import AnchorSchema
 from blurr.core.errors import AnchorBlockNotDefinedError, PrepareWindowMissingBlocksError
 from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.block_data_group import BlockDataGroup, \
-    BlockDataGroupSchema
-from blurr.core.streaming_transformer import StreamingTransformer
-from blurr.core.window_transformer import WindowTransformer, \
+from blurr.core.aggregate_block import BlockAggregate, \
+    BlockAggregateSchema
+from blurr.core.transformer_streaming import StreamingTransformer
+from blurr.core.transformer_window import WindowTransformer, \
     WindowTransformerSchema
 from tests.core.conftest import init_memory_store
 
@@ -51,9 +51,9 @@ def window_transformer(schema_loader, stream_transformer, window_schema_spec):
 @fixture
 def block_aggregate(stream_transformer):
     block = None
-    for data_group in stream_transformer._nested_items.values():
-        if isinstance(data_group, BlockDataGroup):
-            block = data_group
+    for aggregate in stream_transformer._nested_items.values():
+        if isinstance(aggregate, BlockAggregate):
+            block = aggregate
 
     return block
 

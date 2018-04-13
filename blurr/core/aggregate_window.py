@@ -1,19 +1,17 @@
 from datetime import datetime, timedelta
 from typing import Any, List, Tuple
 
-from blurr.core.data_group import DataGroup, DataGroupSchema
+from blurr.core.aggregate import Aggregate, AggregateSchema
 from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.block_data_group import BlockDataGroup
+from blurr.core.aggregate_block import BlockAggregate
 from blurr.core.store_key import Key
 from blurr.core.base import BaseItem
 
 
-class WindowDataGroupSchema(DataGroupSchema):
-    """
-    Schema for WindowAggregate DataGroup.
-    """
+class WindowAggregateSchema(AggregateSchema):
+
     ATTRIBUTE_WINDOW_VALUE = 'WindowValue'
     ATTRIBUTE_WINDOW_TYPE = 'WindowType'
     ATTRIBUTE_SOURCE = 'Source'
@@ -30,19 +28,19 @@ class _WindowSource:
     Represents a window on the pre-aggregated source data.
     """
 
-    def __init__(self, block_list: List[BlockDataGroup]):
-        self.view: List[BlockDataGroup] = block_list
+    def __init__(self, block_list: List[BlockAggregate]):
+        self.view: List[BlockAggregate] = block_list
 
     def __getattr__(self, item: str) -> List[Any]:
         return [getattr(block, item) for block in self.view]
 
 
-class WindowDataGroup(DataGroup):
+class WindowAggregate(Aggregate):
     """
     Manages the generation of WindowAggregate as defined in the schema.
     """
 
-    def __init__(self, schema: WindowDataGroupSchema, identity: str,
+    def __init__(self, schema: WindowAggregateSchema, identity: str,
                  evaluation_context: EvaluationContext) -> None:
         super().__init__(schema, identity, evaluation_context)
         self._window_source = None
@@ -96,14 +94,14 @@ class WindowDataGroup(DataGroup):
         elif self._schema.window_type == 'hour':
             return start_time + timedelta(hours=self._schema.window_value)
 
-    def _load_blocks(self, blocks: List[Tuple[Key, Any]]) -> List[BlockDataGroup]:
+    def _load_blocks(self, blocks: List[Tuple[Key, Any]]) -> List[BlockAggregate]:
         """
-        Converts [(Key, block)] to [BlockDataGroup]
+        Converts [(Key, block)] to [BlockAggregate]
         :param blocks: List of (Key, block) blocks.
-        :return: List of BlockDataGroup
+        :return: List of BlockAggregate
         """
         return [
-            BlockDataGroup(self._schema.source, self._identity, EvaluationContext()).restore(block)
+            BlockAggregate(self._schema.source, self._identity, EvaluationContext()).restore(block)
             for (_, block) in blocks
         ]
 

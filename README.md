@@ -56,7 +56,7 @@ using this DTC
 
 ```yaml
 
-Type: Blurr:Streaming
+Type: Blurr:Transform:Streaming
 Version: '2018-03-01'
 Name : sessions
 
@@ -68,9 +68,9 @@ Identity: source.user_id
 
 Time: parser.parse(source.timestamp)
 
-DataGroups:
+Aggregates:
 
- - Type: Blurr:DataGroup:BlockAggregate
+ - Type: Blurr:Aggregate:BlockAggregate
    Name: session_stats
    Store: hello_world_store
 

@@ -3,9 +3,9 @@ from typing import Dict, Type
 from abc import ABC
 
 from blurr.core.base import BaseItemCollection, BaseSchemaCollection, BaseItem
-from blurr.core.data_group import DataGroup
-from blurr.core.errors import MissingAttributeError
-from blurr.core.evaluation import Context, EvaluationContext
+from blurr.core.aggregate import Aggregate
+from blurr.core.errors import MissingAttributeError, IdentityError
+from blurr.core.evaluation import Context, EvaluationContext, Expression
 from blurr.core.loader import TypeLoader
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store import Store
@@ -17,18 +17,18 @@ class TransformerSchema(BaseSchemaCollection, ABC):
     the required attributes of a schema.
     """
 
+    ATTRIBUTE_IDENTITY = 'Identity'
     ATTRIBUTE_VERSION = 'Version'
-    ATTRIBUTE_DESCRIPTION = 'Description'
     ATTRIBUTE_STORES = 'Stores'
-    ATTRIBUTE_DATA_GROUPS = 'DataGroups'
+    ATTRIBUTE_AGGREGATES = 'Aggregates'
 
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
-        super().__init__(fully_qualified_name, schema_loader, self.ATTRIBUTE_DATA_GROUPS)
+        super().__init__(fully_qualified_name, schema_loader, self.ATTRIBUTE_AGGREGATES)
 
         # Load the schema specific attributes
+        self.identity = Expression(self._spec[self.ATTRIBUTE_IDENTITY]) \
+            if self.ATTRIBUTE_IDENTITY in self._spec else None
         self.version = self._spec[self.ATTRIBUTE_VERSION]
-        self.description = self._spec[
-            self.ATTRIBUTE_DESCRIPTION] if self.ATTRIBUTE_DESCRIPTION in self._spec else None
 
         # Load list of stores from the schema
         self.stores: Dict[str, Type[Store]] = {
@@ -36,6 +36,28 @@ class TransformerSchema(BaseSchemaCollection, ABC):
                 self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
             for schema_spec in self._spec.get(self.ATTRIBUTE_STORES, [])
         }
+
+        # Load nested schema items
+        self.nested_schema: Dict[str, Type[Aggregate]] = {
+            schema_spec[self.ATTRIBUTE_NAME]: self.schema_loader.get_nested_schema_object(
+                self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
+            for schema_spec in self._spec[self._nested_item_attribute]
+        }
+
+    def get_identity(self, context: Context) -> str:
+        """
+        Evaluates and returns the identity as specified in the schema.
+        :param context: Context with the 'source' record set which is used to
+        determine the identity.
+        :return: The evaluated identity
+        :raises: IdentityError if identity cannot be determined.
+        """
+        identity = self.identity.evaluate(EvaluationContext(None, context))
+        if not identity:
+            raise IdentityError(
+                'Could not determine identity using {}. Evaluation context is {}'.format(
+                    self.identity.code_string, context))
+        return identity
 
 
 class Transformer(BaseItemCollection, ABC):
@@ -47,7 +69,7 @@ class Transformer(BaseItemCollection, ABC):
     def __init__(self, schema: TransformerSchema, identity: str, context: Context) -> None:
         super().__init__(schema, EvaluationContext(global_context=context))
         # Load the nested items into the item
-        self._data_groups: Dict[str, DataGroup] = {
+        self._aggregates: Dict[str, Aggregate] = {
             name: TypeLoader.load_item(item_schema.type)(item_schema, identity,
                                                          self._evaluation_context)
             for name, item_schema in schema.nested_schema.items()
@@ -57,11 +79,11 @@ class Transformer(BaseItemCollection, ABC):
         self._evaluation_context.global_context.merge(self._nested_items)
 
     @property
-    def _nested_items(self) -> Dict[str, DataGroup]:
+    def _nested_items(self) -> Dict[str, Aggregate]:
         """
         Dictionary of nested data groups
         """
-        return self._data_groups
+        return self._aggregates
 
     def finalize(self) -> None:
         """
@@ -70,7 +92,7 @@ class Transformer(BaseItemCollection, ABC):
         for item in self._nested_items.values():
             item.finalize()
 
-    def __getattr__(self, item: str) -> DataGroup:
+    def __getattr__(self, item: str) -> Aggregate:
         """
         Makes the value of the nested items available as properties
         of the collection object.  This is used for retrieving data groups
@@ -79,7 +101,7 @@ class Transformer(BaseItemCollection, ABC):
         """
         return self.__getitem__(item)
 
-    def __getitem__(self, item) -> DataGroup:
+    def __getitem__(self, item) -> Aggregate:
         """
         Makes the nested items available though the square bracket notation.
         :raises KeyError: When a requested item is not found in nested items

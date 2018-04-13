@@ -1,4 +1,4 @@
-Type: Blurr:Streaming
+Type: Blurr:Transform:Streaming
 
 
       Description: Example
@@ -11,8 +11,8 @@ Store:
    RetentionDays: 180
    ReadWriteUnits: 5
    Table: ProductML_Test_Win_Ratios
-DataGroups:
-- Type: Blurr:DataGroup:IdentityAggregate
+Aggregates:
+- Type: Blurr:Aggregate:IdentityAggregate
    Name: user
  Store: offer_ai_dynamo
    Fields:

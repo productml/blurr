@@ -14,15 +14,15 @@ from blurr.core.transformer import TransformerSchema, Transformer
 def schema_spec() -> Dict[str, Any]:
     return {
         'Name': 'test',
-        'Type': 'Blurr:Streaming',
+        'Type': 'Blurr:Transform:Streaming',
         'Version': '2018-03-01',
         'Stores': [{
             'Name': 'memstore',
             'Type': 'Blurr:Store:MemoryStore'
         }],
-        'DataGroups': [{
+        'Aggregates': [{
             'Name': 'test_group',
-            'Type': 'Blurr:DataGroup:IdentityAggregate',
+            'Type': 'Blurr:Aggregate:IdentityAggregate',
             'Store': 'memstore',
             'Fields': [{
                 "Type": "integer",
@@ -62,7 +62,7 @@ def test_transformer_schema_init(schema_loader: SchemaLoader, schema_spec: Dict[
     name = schema_loader.add_schema(schema_spec)
     test_transformer_schema = MockTransformerSchema(name, schema_loader)
     assert test_transformer_schema.version == '2018-03-01'
-    assert test_transformer_schema.type == 'Blurr:Streaming'
+    assert test_transformer_schema.type == 'Blurr:Transform:Streaming'
     assert test_transformer_schema.stores['memstore'].type == 'Blurr:Store:MemoryStore'
 
 
@@ -70,7 +70,7 @@ def test_transformer_init(test_transformer) -> None:
     assert test_transformer._identity == 'user1'
     assert test_transformer._evaluation_context.global_context == {
         'identity': 'user1',
-        'test_group': test_transformer._data_groups['test_group']
+        'test_group': test_transformer._aggregates['test_group']
     }
     assert test_transformer._evaluation_context.local_context == {}
 
@@ -88,7 +88,7 @@ def test_transformer_finalize(test_transformer: MockTransformer,
 
 
 def test_transformer_get_attr(test_transformer: MockTransformer) -> None:
-    assert test_transformer.test_group == test_transformer._data_groups['test_group']
+    assert test_transformer.test_group == test_transformer._aggregates['test_group']
 
 
 def test_transformer_get_attr_missing(test_transformer: MockTransformer) -> None:
@@ -97,7 +97,7 @@ def test_transformer_get_attr_missing(test_transformer: MockTransformer) -> None
 
 
 def test_transformer_get_item(test_transformer: MockTransformer) -> None:
-    assert test_transformer['test_group'] == test_transformer._data_groups['test_group']
+    assert test_transformer['test_group'] == test_transformer._aggregates['test_group']
 
 
 def test_transformer_get_item_missing(test_transformer: MockTransformer) -> None:

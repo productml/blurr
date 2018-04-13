@@ -1,4 +1,4 @@
-Type: Blurr:Window
+Type: Blurr:Transform:Window
 Version: '2018-03-01'
 Description: Example
 SourceDTC: test
@@ -9,8 +9,8 @@ Anchor:
   Condition: True==True
   Max: one
 
-DataGroups:
- - Type: Blurr:DataGroup:VariableAggregate
+Aggregates:
+ - Type: Blurr:Aggregate:VariableAggregate
    Name: user
    Store: offer_ai_dynamo
    Fields:

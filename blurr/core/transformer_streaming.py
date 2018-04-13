@@ -13,7 +13,6 @@ class StreamingTransformerSchema(TransformerSchema):
     Represents the schema for processing streaming data.  Handles the streaming specific attributes of the schema
     """
 
-    ATTRIBUTE_IDENTITY = 'Identity'
     ATTRIBUTE_TIME = 'Time'
 
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
@@ -21,21 +20,6 @@ class StreamingTransformerSchema(TransformerSchema):
 
         self.identity = Expression(self._spec[self.ATTRIBUTE_IDENTITY])
         self.time = Expression(self._spec[self.ATTRIBUTE_TIME])
-
-    def get_identity(self, context: Context) -> str:
-        """
-        Evaluates and returns the identity as specified in the schema.
-        :param context: Context with the 'source' record set which is used to
-        determine the identity.
-        :return: The evaluated identity
-        :raises: IdentityError if identity cannot be determined.
-        """
-        identity = self.identity.evaluate(EvaluationContext(None, context))
-        if not identity:
-            raise IdentityError(
-                'Could not determine identity using {}. Evaluation context is {}'.format(
-                    self.identity.code_string, context))
-        return identity
 
     def get_time(self, context: Context) -> datetime:
         time = self.time.evaluate(EvaluationContext(None, context))

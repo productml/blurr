@@ -1,4 +1,4 @@
-Type: Blurr:Streaming
+Type: Blurr:Transform:Streaming
 Version: '2018-03-01'
 Name: Sessions
 Description: Streaming Extended Test
@@ -9,9 +9,9 @@ Stores:
     Type: Blurr:Store:MemoryStore
     Name: memory
 
-DataGroups:
+Aggregates:
   -
-    Type: Blurr:DataGroup:VariableAggregate
+    Type: Blurr:Aggregate:VariableAggregate
     Name: vars
     Fields:
 
@@ -23,7 +23,7 @@ DataGroups:
       #
       - { Name: os-version-parts, Type: list, Value: "source['os-version'].split('-')" }
   -
-    Type: Blurr:DataGroup:IdentityAggregate
+    Type: Blurr:Aggregate:IdentityAggregate
     Name: state
     Store: memory
     Fields:
@@ -61,7 +61,7 @@ DataGroups:
         When: state.build > 210 and state.build < 440
 
 
-  - Type: Blurr:DataGroup:BlockAggregate
+  - Type: Blurr:Aggregate:BlockAggregate
     Name: session
     Split: (time - session._end_time).total_seconds() > 1800 or session.session_id != source.session_id
     Store: memory

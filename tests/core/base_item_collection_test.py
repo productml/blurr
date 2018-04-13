@@ -5,7 +5,7 @@ from unittest import mock
 from pytest import fixture, raises
 
 from blurr.core.base import BaseItemCollection, BaseItem, BaseSchemaCollection
-from blurr.core.data_group import DataGroupSchema
+from blurr.core.aggregate import AggregateSchema
 from blurr.core.errors import SnapshotError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.loader import TypeLoader
@@ -15,7 +15,7 @@ from blurr.core.schema_loader import SchemaLoader
 @fixture
 def collection_schema_spec() -> Dict[str, Any]:
     return {
-        'Type': 'Blurr:DataGroup:MockAggregate',
+        'Type': 'Blurr:Aggregate:MockAggregate',
         'Name': 'user',
         'When': 'True',
         'Fields': [{
@@ -78,7 +78,7 @@ class MockBaseSchemaCollection(BaseSchemaCollection):
 def schema_collection(collection_schema_spec: Dict[str, Any]) -> MockBaseSchemaCollection:
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(collection_schema_spec)
-    return MockBaseSchemaCollection(name, schema_loader, DataGroupSchema.ATTRIBUTE_FIELDS)
+    return MockBaseSchemaCollection(name, schema_loader, AggregateSchema.ATTRIBUTE_FIELDS)
 
 
 @fixture
@@ -91,7 +91,7 @@ def test_evaluate_needs_evaluation_false(collection_schema_spec: Dict[str, Any])
     collection_schema_spec['When'] = 'False'
     name = schema_loader.add_schema(collection_schema_spec)
     schema_collection = MockBaseSchemaCollection(name, schema_loader,
-                                                 DataGroupSchema.ATTRIBUTE_FIELDS)
+                                                 AggregateSchema.ATTRIBUTE_FIELDS)
     item_collection = MockBaseItemCollection(schema_collection, EvaluationContext())
     item_collection.evaluate()
     assert item_collection.event_count == 0
@@ -115,7 +115,7 @@ def test_evaluate_needs_evaluation_error_does_not_evaluate(
     collection_schema_spec['When'] = '1/0'
     name = schema_loader.add_schema(collection_schema_spec)
     schema_collection = MockBaseSchemaCollection(name, schema_loader,
-                                                 DataGroupSchema.ATTRIBUTE_FIELDS)
+                                                 AggregateSchema.ATTRIBUTE_FIELDS)
     item_collection = MockBaseItemCollection(schema_collection, EvaluationContext())
     item_collection.evaluate()
     assert item_collection.event_count == 0
@@ -141,7 +141,7 @@ def test_snapshot_invalid(collection_schema_spec: Dict[str, Any],
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(collection_schema_spec)
     schema_collection = MockBaseSchemaCollection(name, schema_loader,
-                                                 DataGroupSchema.ATTRIBUTE_FIELDS)
+                                                 AggregateSchema.ATTRIBUTE_FIELDS)
 
     # Test nested items not specified
     with mock_nested_items:
@@ -166,7 +166,7 @@ def test_restore_invalid_snapshot_dict(collection_schema_spec: Dict[str, Any],
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(collection_schema_spec)
     schema_collection = MockBaseSchemaCollection(name, schema_loader,
-                                                 DataGroupSchema.ATTRIBUTE_FIELDS)
+                                                 AggregateSchema.ATTRIBUTE_FIELDS)
 
     # Test nested items not specified
     with mock_nested_items:
@@ -180,7 +180,7 @@ def test_get_attribute(collection_schema_spec: Dict[str, Any]) -> None:
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(collection_schema_spec)
     schema_collection = MockBaseSchemaCollection(name, schema_loader,
-                                                 DataGroupSchema.ATTRIBUTE_FIELDS)
+                                                 AggregateSchema.ATTRIBUTE_FIELDS)
     item_collection = MockBaseItemCollection(schema_collection, EvaluationContext())
     # Check nested items access
     assert item_collection.event_count == 0
@@ -193,7 +193,7 @@ def test_get_attribute_invalid(collection_schema_spec: Dict[str, Any],
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(collection_schema_spec)
     schema_collection = MockBaseSchemaCollection(name, schema_loader,
-                                                 DataGroupSchema.ATTRIBUTE_FIELDS)
+                                                 AggregateSchema.ATTRIBUTE_FIELDS)
 
     with raises(Exception):
         item_collection = MockBaseItemCollection(schema_collection, EvaluationContext())

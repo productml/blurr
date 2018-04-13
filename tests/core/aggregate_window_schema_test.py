@@ -1,15 +1,15 @@
 from pytest import raises
 
-from blurr.core.block_data_group import BlockDataGroupSchema
+from blurr.core.aggregate_block import BlockAggregateSchema
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.window_data_group import WindowDataGroupSchema
+from blurr.core.aggregate_window import WindowAggregateSchema
 
 
 def test_initialization_with_valid_source(schema_loader_with_mem_store: SchemaLoader,
                                           mem_store_name: str, stream_dtc_name: str):
     schema_loader_with_mem_store.add_schema({
-        'Type': 'Blurr:DataGroup:BlockAggregate',
+        'Type': 'Blurr:Aggregate:BlockAggregate',
         'Name': 'session',
         'Store': mem_store_name,
         'Fields': [
@@ -21,7 +21,7 @@ def test_initialization_with_valid_source(schema_loader_with_mem_store: SchemaLo
         ],
     }, stream_dtc_name)
     name = schema_loader_with_mem_store.add_schema({
-        'Type': 'ProductML:DTC:DataGroup:WindowAggregate',
+        'Type': 'Blurr:Aggregate:WindowAggregate',
         'Name': 'test_window_name',
         'WindowType': 'day',
         'WindowValue': 1,
@@ -33,18 +33,18 @@ def test_initialization_with_valid_source(schema_loader_with_mem_store: SchemaLo
         }]
     })
 
-    window_data_group_schema = WindowDataGroupSchema(name, schema_loader_with_mem_store)
-    assert window_data_group_schema.window_type == 'day'
-    assert window_data_group_schema.window_value == 1
-    assert isinstance(window_data_group_schema.source, BlockDataGroupSchema)
-    assert window_data_group_schema.source.name == 'session'
+    window_aggregate_schema = WindowAggregateSchema(name, schema_loader_with_mem_store)
+    assert window_aggregate_schema.window_type == 'day'
+    assert window_aggregate_schema.window_value == 1
+    assert isinstance(window_aggregate_schema.source, BlockAggregateSchema)
+    assert window_aggregate_schema.source.name == 'session'
 
 
 def test_initialization_with_invalid_source(schema_loader_with_mem_store: SchemaLoader,
                                             stream_dtc_name: str):
 
     name = schema_loader_with_mem_store.add_schema({
-        'Type': 'ProductML:DTC:DataGroup:WindowAggregate',
+        'Type': 'Blurr:Aggregate:WindowAggregate',
         'Name': 'test_window_name',
         'WindowType': 'day',
         'WindowValue': 1,
@@ -57,4 +57,4 @@ def test_initialization_with_invalid_source(schema_loader_with_mem_store: Schema
     })
 
     with raises(InvalidSchemaError, match=stream_dtc_name + '.session not declared in schema'):
-        WindowDataGroupSchema(name, schema_loader_with_mem_store)
+        WindowAggregateSchema(name, schema_loader_with_mem_store)
