@@ -2,11 +2,11 @@ from typing import Dict, Type
 
 from abc import ABC
 
-from blurr.core.base import BaseItemCollection, BaseSchemaCollection, BaseItem
+from blurr.core.base import BaseItemCollection, BaseSchemaCollection
 from blurr.core.data_group import DataGroup
 from blurr.core.errors import MissingAttributeError
-from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.loader import TypeLoader
+from blurr.core.schema_context import SchemaContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store import Store
 
@@ -22,16 +22,13 @@ class TransformerSchema(BaseSchemaCollection, ABC):
     ATTRIBUTE_STORES = 'Stores'
     ATTRIBUTE_DATA_GROUPS = 'DataGroups'
     ATTRIBUTE_IMPORT = 'Import'
-    ATTRIBUTE_IMPORT_MODULE = 'Module'
-    ATTRIBUTE_IMPORT_IDENTIFIER = 'Identifier'
 
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader, self.ATTRIBUTE_DATA_GROUPS)
 
         # Load the schema specific attributes
         self.version = self._spec[self.ATTRIBUTE_VERSION]
-        self.description = self._spec[
-            self.ATTRIBUTE_DESCRIPTION] if self.ATTRIBUTE_DESCRIPTION in self._spec else None
+        self.description = self._spec.get(self.ATTRIBUTE_DESCRIPTION, None)
 
         # Load list of stores from the schema
         self.stores: Dict[str, Type[Store]] = {
@@ -40,24 +37,8 @@ class TransformerSchema(BaseSchemaCollection, ABC):
             for schema_spec in self._spec.get(self.ATTRIBUTE_STORES, [])
         }
 
-        self.import_list = self._spec[
-            self.ATTRIBUTE_IMPORT] if self.ATTRIBUTE_IMPORT in self._spec else None
-        self.schema_context = EvaluationContext()
-        self.import_modules()
-
-    def import_modules(self) -> None:
-        if self.import_list is None:
-            return
-
-        for custom_import in self.import_list:
-            module = custom_import[self.ATTRIBUTE_IMPORT_MODULE]
-            module_obj = TypeLoader.import_by_full_name(module)
-            if self.ATTRIBUTE_IMPORT_IDENTIFIER not in custom_import:
-                self.schema_context.global_add(module, module_obj)
-                return
-
-            for identifier in custom_import[self.ATTRIBUTE_IMPORT_IDENTIFIER]:
-                self.schema_context.global_add(identifier, getattr(module_obj, identifier))
+        self.import_list = self._spec.get(self.ATTRIBUTE_IMPORT, [])
+        self.schema_context = SchemaContext(self.import_list).context
 
 
 class Transformer(BaseItemCollection, ABC):

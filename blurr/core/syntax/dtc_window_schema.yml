@@ -3,6 +3,7 @@ Version: enum('2018-03-01')
 Description: str(min=1, required=False)
 Name: identifier()
 SourceDTC: identifier()
+Import: list(include('import_block'), required=False)
 Time: expression(required=False)
 When: expression(required=False)
 Anchor: include('anchor')
@@ -30,10 +31,13 @@ data_group_window:
   Source: identifier()
   Fields: list(include('field'), min=1)
 
-
 field:
   Name: identifier()
   Type: data_type(required=False)
   Value: expression()
   When: expression(required=False)
   Atomic: bool(required=False)
+
+import_block:
+  Module: str(required=True)
+  Identifier: list(str(), required=False)

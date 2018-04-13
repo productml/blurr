@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Any, Dict, Optional
 
 import re
@@ -80,23 +81,33 @@ class EvaluationContext:
         del self.global_context[key]
 
     def add_record(self, record: Record) -> None:
+        """
+        Adds a record to the evaluation context.
+        :param record: Record to be added
+        """
         self.global_add('source', record)
 
     def remove_record(self) -> None:
+        """Removes any previously added record to the evaluation context."""
         del self.global_context['source']
 
     def merge(self, evaluation_context: 'EvaluationContext') -> None:
+        """
+        Merges the provided evaluation context to the current evaluation context.
+        :param evaluation_context: Evaluation context to merge.
+        """
         self.global_context.merge(evaluation_context.global_context)
         self.local_context.merge(evaluation_context.local_context)
 
-    def merge_context(self, context: Context) -> None:
-        self.global_context.merge(context)
+
+class ExpressionType(Enum):
+    EVAL = 'eval'
+    EXEC = 'exec'
 
 
 class Expression:
     """ Encapsulates a python code statement in string and in compilable expression"""
-
-    def __init__(self, code_string: str) -> None:
+    def __init__(self, code_string: str, expression_type: ExpressionType = ExpressionType.EVAL) -> None:
         """
         An expression must be initialized with a python statement
         :param code_string: Python code statement
@@ -107,9 +118,10 @@ class Expression:
 
         # For None / empty code strings
         self.code_string = 'None' if code_string.isspace() else code_string
+        self.type = expression_type
 
         try:
-            self.code_object = compile(self.code_string, '<string>', 'eval')
+            self.code_object = compile(self.code_string, '<string>', self.type.value)
         except Exception as e:
             raise InvalidExpressionError(e)
 
@@ -121,8 +133,18 @@ class Expression:
         :param evaluation_context: Global and local context dictionary to be passed for evaluation
         """
         try:
-            return eval(self.code_object, evaluation_context.global_context,
-                        evaluation_context.local_context)
+
+            if self.type == ExpressionType.EVAL:
+                return eval(self.code_object, evaluation_context.global_context, evaluation_context.local_context)
+
+            elif self.type == ExpressionType.EXEC:
+                # Passing None as the local context as we want exec to extend the global context
+                # and not the local context. If an empty local context is passed then exec ends up
+                # extending the local context instead.
+                local_context = None if len(
+                    evaluation_context.local_context) == 0 else evaluation_context.local_context
+                return exec(self.code_object, evaluation_context.global_context, local_context)
+
         except Exception as err:
             # Evaluation exceptions are expected because of missing fields in the source 'Record'.
             logging.debug('{} in evaluating expression {}. Error: {}'.format(
