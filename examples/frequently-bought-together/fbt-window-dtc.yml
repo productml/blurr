@@ -4,7 +4,7 @@
 
 # Type of DTC. Streaming or Window
 # The Window DTC periodically applies windows operations on top of sessionized data
-Type: Blurr:Window
+Type: Blurr:Transform:Window
 
 Version: '2018-03-01'
 Description: Second Level processing for feature generation
@@ -28,9 +28,9 @@ Anchor:
   # We're free to change this the max value to whatever we want, of course
   Max: 1
 
-DataGroups:
+Aggregates:
 
- - Type: Blurr:DataGroup:WindowAggregate
+ - Type: Blurr:Aggregate:WindowAggregate
    Name: lifetime
 
    WindowType: day
@@ -49,7 +49,7 @@ DataGroups:
        Type: float
        Value: sum(source.transaction_value_this_session)
 
- - Type: Blurr:DataGroup:WindowAggregate
+ - Type: Blurr:Aggregate:WindowAggregate
    Name: last_24_hours
    WindowType: hour
    WindowValue: -24
@@ -61,7 +61,7 @@ DataGroups:
        Value: [item for sublist in source.products_bought for item in sublist]
        # Flattens the list of list of tuples of products_bought
 
- - Type: Blurr:DataGroup:WindowAggregate
+ - Type: Blurr:Aggregate:WindowAggregate
    Name: next_24_hours
    WindowType: hour
    WindowValue: 24
@@ -73,7 +73,7 @@ DataGroups:
        Value: [item for sublist in source.products_bought for item in sublist]
       # Flattens the list of list of tuples of products_bought
 
- - Type: Blurr:DataGroup:WindowAggregate
+ - Type: Blurr:Aggregate:WindowAggregate
    Name: 48_hours_around_transaction
    #A Window Aggregate can be defined without a window
    Fields:

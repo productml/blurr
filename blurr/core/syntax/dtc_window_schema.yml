@@ -1,4 +1,4 @@
-Type: enum('Blurr:Window')
+Type: enum('Blurr:Transform:Window')
 Version: enum('2018-03-01')
 Description: str(min=1, required=False)
 Name: identifier()
@@ -7,7 +7,7 @@ Import: list(include('import_block'), required=False)
 Time: expression(required=False)
 When: expression(required=False)
 Anchor: include('anchor')
-DataGroups: list(any(include('data_group_variable'), include('data_group_window')), min=1)
+Aggregates: list(any(include('aggregate_variable'), include('aggregate_window')), min=1)
 
 ---
 
@@ -15,16 +15,16 @@ anchor:
   Condition: expression()
   Max: int(min=1, required=False)
 
-data_group_variable:
+aggregate_variable:
   Name: identifier()
-  Type: enum('Blurr:DataGroup:VariableAggregate')
+  Type: enum('Blurr:Aggregate:VariableAggregate')
   Store: identifier(required=False)
   When: expression(required=False)
   Fields: list(include('field'), min=1)
 
-data_group_window:
+aggregate_window:
   Name: identifier()
-  Type: enum('Blurr:DataGroup:WindowAggregate')
+  Type: enum('Blurr:Aggregate:WindowAggregate')
   When: expression(required=False)
   WindowType: enum('day', 'hour', 'count')
   WindowValue: int()

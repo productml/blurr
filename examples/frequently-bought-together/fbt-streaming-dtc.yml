@@ -5,7 +5,7 @@
 # Type of DTC. Streaming or Window
 # The Streaming DTC processes the raw data and converts it into sessions
 
-Type: Blurr:Streaming
+Type: Blurr:Transform:Streaming
 Version: '2018-03-01'
 Description: Level 1 transformation from streaming Raw Data
 Name: fbt_v1
@@ -24,9 +24,9 @@ Stores:
    - Type: Blurr:Store:MemoryStore
      Name: fbt
 
-DataGroups:
+Aggregates:
 
- - Type: Blurr:DataGroup:IdentityAggregate
+ - Type: Blurr:Aggregate:IdentityAggregate
    Name: user
    Store: fbt
    When: source.event_name == 'session_start'
@@ -66,7 +66,7 @@ DataGroups:
 # Session aggregates definition
 ##
 
- - Type: Blurr:DataGroup:BlockAggregate
+ - Type: Blurr:Aggregate:BlockAggregate
    Name: item_stats
    Store: fbt
    Split: source.session_id != item_stats.session_id

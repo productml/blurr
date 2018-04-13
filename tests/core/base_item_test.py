@@ -24,6 +24,9 @@ class TestItem(BaseItem):
     This class is to test abstract behavior, and thus, adds no functionality
     """
 
+    def reset(self) -> None:
+        pass
+
     def _snapshot(self):
         pass
 

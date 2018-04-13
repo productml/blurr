@@ -71,7 +71,7 @@ def test_valid_basic_window_dtc():
      ('invalid_incorrect_expression.yml',
       "When: 'x == senor roy' is an invalid python expression."),
      ('invalid_set_expression.yml', 'When: \'x = \'test\'\' is an invalid python expression'),
-     ('invalid_datagroup_has_no_fields.yml', 'DataGroups.0.Fields: Required field missing'),
+     ('invalid_aggregate_has_no_fields.yml', 'Aggregates.0.Fields: Required field missing'),
      ('invalid_field_name.yml', "Name: '_name' starts with _ or containing whitespace characters."),
      ('invalid_import.yml', 'Import.0.Module: Required field missing')])
 def test_invalid_schema(test_file: str, err_string: str) -> None:

@@ -8,13 +8,10 @@ from blurr.core.store_key import Key
 
 
 class BaseSchema(ABC):
-    """
-    The Base Schema encapsulates the common functionality of all schema
-    elements
-    """
+    """ Encapsulates the common functionality of all schema elements """
 
-    # Field Name Definitions
     ATTRIBUTE_NAME = 'Name'
+    ATTRIBUTE_DESCRIPTION = 'Description'
     ATTRIBUTE_TYPE = 'Type'
     ATTRIBUTE_WHEN = 'When'
 
@@ -33,6 +30,7 @@ class BaseSchema(ABC):
         self.type: str = self._spec[self.ATTRIBUTE_TYPE]
         self.when: Expression = Expression(
             self._spec[self.ATTRIBUTE_WHEN]) if self.ATTRIBUTE_WHEN in self._spec else None
+        self.description = self._spec.get(self.ATTRIBUTE_DESCRIPTION, None)
 
     def extend_schema(self, spec: Dict[str, Any]) -> Dict[str, Any]:
         """ Extends the defined schema specifications at runtime with defaults """
@@ -120,6 +118,13 @@ class BaseItem(ABC):
         """
         raise NotImplementedError('restore() must be implemented')
 
+    @abstractmethod
+    def reset(self) -> None:
+        """
+        Resets the state of the item.
+        """
+        raise NotImplementedError('reset() must be implemented')
+
 
 class BaseItemCollection(BaseItem, ABC):
     """
@@ -170,6 +175,10 @@ class BaseItemCollection(BaseItem, ABC):
 
         except Exception as e:
             raise SnapshotError('Error while restoring snapshot: {}'.format(self._snapshot)) from e
+
+    def reset(self) -> None:
+        for _, item in self._nested_items.items():
+            item.reset()
 
     @abstractmethod
     def finalize(self) -> None:

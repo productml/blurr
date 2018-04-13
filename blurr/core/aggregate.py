@@ -10,7 +10,7 @@ from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
 
 
-class DataGroupSchema(BaseSchemaCollection, ABC):
+class AggregateSchema(BaseSchemaCollection, ABC):
     """
     Group Schema must inherit from this base.  Data Group schema provides the
     abstraction for managing the 'Fields' in the group.
@@ -32,7 +32,7 @@ class DataGroupSchema(BaseSchemaCollection, ABC):
 
     def _load_store(self, store_name: str) -> 'Store':
         """
-        Load a store into the datagroup
+        Load a store into the Aggregate
         :param store_name: The name of the store
         """
         store_fq_name = self.schema_loader.get_fully_qualified_name(
@@ -55,13 +55,13 @@ class DataGroupSchema(BaseSchemaCollection, ABC):
         return super().extend_schema(spec)
 
 
-class DataGroup(BaseItemCollection, ABC):
+class Aggregate(BaseItemCollection, ABC):
     """
     All Data Groups inherit from this base.  Provides an abstraction for 'value' of the encapsulated
     to be called as properties of the data group itself.
     """
 
-    def __init__(self, schema: DataGroupSchema, identity: str,
+    def __init__(self, schema: AggregateSchema, identity: str,
                  evaluation_context: EvaluationContext) -> None:
         """
         Initializes the data group with the inherited context and adds
@@ -80,13 +80,13 @@ class DataGroup(BaseItemCollection, ABC):
     @property
     def _nested_items(self) -> Dict[str, Type[BaseItem]]:
         """
-        Returns the dictionary of fields the DataGroup contains
+        Returns the dictionary of fields the Aggregate contains
         """
         return self._fields
 
     def finalize(self) -> None:
         """
-        Saves the current state of the DataGroup in the store as the final rites
+        Saves the current state of the Aggregate in the store as the final rites
         """
         self.persist()
 

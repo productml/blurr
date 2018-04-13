@@ -2,12 +2,12 @@ from typing import Dict, Any
 
 from pytest import fixture
 
-from blurr.core.complex_fields import Map, List, Set
-from blurr.core.data_group import DataGroup, DataGroupSchema
+from blurr.core.field_complex import Map, List, Set
+from blurr.core.aggregate import Aggregate, AggregateSchema
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.variable_data_group import VariableDataGroup, \
-    VariableDataGroupSchema
+from blurr.core.aggregate_variable import VariableAggregate, \
+    VariableAggregateSchema
 
 # Test custom functions implemented for complex fields
 
@@ -66,9 +66,9 @@ def test_set_add() -> None:
 
 
 @fixture(scope='module')
-def data_group_schema_spec() -> Dict[str, Any]:
+def aggregate_schema_spec() -> Dict[str, Any]:
     return {
-        'Type': 'Blurr:DataGroup:VariableAggregate',
+        'Type': 'Blurr:Aggregate:VariableAggregate',
         'Name': 'test',
         'Fields': [{
             'Name': 'map_field',
@@ -104,78 +104,96 @@ def schema_loader() -> SchemaLoader:
 
 
 @fixture(scope='module')
-def data_group_schema(schema_loader: SchemaLoader,
-                      data_group_schema_spec: Dict[str, Any]) -> DataGroupSchema:
-    return VariableDataGroupSchema(schema_loader.add_schema(data_group_schema_spec), schema_loader)
+def aggregate_schema(schema_loader: SchemaLoader,
+                     aggregate_schema_spec: Dict[str, Any]) -> AggregateSchema:
+    return VariableAggregateSchema(schema_loader.add_schema(aggregate_schema_spec), schema_loader)
 
 
 @fixture
-def data_group(data_group_schema: DataGroupSchema) -> DataGroup:
+def aggregate(aggregate_schema: AggregateSchema) -> Aggregate:
     context = EvaluationContext()
 
-    dg = VariableDataGroup(schema=data_group_schema, identity="12345", evaluation_context=context)
+    dg = VariableAggregate(schema=aggregate_schema, identity="12345", evaluation_context=context)
     context.global_add('test', dg)
     context.global_add('identity', "12345")
 
     return dg
 
 
-def test_field_evaluation(data_group: DataGroup) -> None:
-    assert len(data_group.map_field) == 0
-    assert len(data_group.set_field) == 0
-    assert len(data_group.list_field) == 0
+def test_field_evaluation(aggregate: Aggregate) -> None:
+    assert len(aggregate.map_field) == 0
+    assert len(aggregate.set_field) == 0
+    assert len(aggregate.list_field) == 0
 
-    data_group.evaluate()
+    aggregate.evaluate()
 
-    assert len(data_group.map_field) == 3
-    assert data_group.map_field['incr'] == 10
-    assert data_group.map_field['set'] == 'value'
-    assert data_group.map_field['update'] == 'value'
+    assert len(aggregate.map_field) == 3
+    assert aggregate.map_field['incr'] == 10
+    assert aggregate.map_field['set'] == 'value'
+    assert aggregate.map_field['update'] == 'value'
 
-    assert len(data_group.set_field) == 3
-    assert data_group.set_field == {2, 5, 6}
+    assert len(aggregate.set_field) == 3
+    assert aggregate.set_field == {2, 5, 6}
 
-    assert len(data_group.list_field) == 3
-    assert data_group.list_field == [0, 1, 2]
-
-
-def test_field_multiple_evaluation_type_cast_map(data_group: DataGroup) -> None:
-    assert len(data_group.map_field_cast) == 0
-
-    data_group.evaluate()
-
-    assert len(data_group.map_field_cast) == 1
-    assert data_group.map_field_cast['incr'] == 10
-
-    data_group.evaluate()
-
-    assert len(data_group.map_field_cast) == 1
-    assert data_group.map_field_cast['incr'] == 20
+    assert len(aggregate.list_field) == 3
+    assert aggregate.list_field == [0, 1, 2]
 
 
-def test_field_multiple_evaluation_type_cast_list(data_group: DataGroup) -> None:
-    assert len(data_group.list_field_cast) == 0
+def test_field_reset(aggregate: Aggregate) -> None:
+    assert len(aggregate.map_field) == 0
+    assert len(aggregate.set_field) == 0
+    assert len(aggregate.list_field) == 0
 
-    data_group.evaluate()
+    aggregate.evaluate()
 
-    assert len(data_group.list_field_cast) == 1
-    assert data_group.list_field_cast == [0]
+    assert len(aggregate.map_field) == 3
+    assert len(aggregate.set_field) == 3
+    assert len(aggregate.list_field) == 3
 
-    data_group.evaluate()
+    aggregate.reset()
 
-    assert len(data_group.list_field_cast) == 3
-    assert data_group.list_field_cast == [0, 1, 1]
+    assert len(aggregate.map_field) == 0
+    assert len(aggregate.set_field) == 0
+    assert len(aggregate.list_field) == 0
 
 
-def test_field_multiple_evaluation_type_cast_set(data_group: DataGroup) -> None:
-    assert len(data_group.set_field_cast) == 0
+def test_field_multiple_evaluation_type_cast_map(aggregate: Aggregate) -> None:
+    assert len(aggregate.map_field_cast) == 0
 
-    data_group.evaluate()
+    aggregate.evaluate()
 
-    assert len(data_group.set_field_cast) == 1
-    assert data_group.set_field_cast == {0}
+    assert len(aggregate.map_field_cast) == 1
+    assert aggregate.map_field_cast['incr'] == 10
 
-    data_group.evaluate()
+    aggregate.evaluate()
 
-    assert len(data_group.set_field_cast) == 3
-    assert data_group.set_field_cast == {0, 1, 2}
+    assert len(aggregate.map_field_cast) == 1
+    assert aggregate.map_field_cast['incr'] == 20
+
+
+def test_field_multiple_evaluation_type_cast_list(aggregate: Aggregate) -> None:
+    assert len(aggregate.list_field_cast) == 0
+
+    aggregate.evaluate()
+
+    assert len(aggregate.list_field_cast) == 1
+    assert aggregate.list_field_cast == [0]
+
+    aggregate.evaluate()
+
+    assert len(aggregate.list_field_cast) == 3
+    assert aggregate.list_field_cast == [0, 1, 1]
+
+
+def test_field_multiple_evaluation_type_cast_set(aggregate: Aggregate) -> None:
+    assert len(aggregate.set_field_cast) == 0
+
+    aggregate.evaluate()
+
+    assert len(aggregate.set_field_cast) == 1
+    assert aggregate.set_field_cast == {0}
+
+    aggregate.evaluate()
+
+    assert len(aggregate.set_field_cast) == 3
+    assert aggregate.set_field_cast == {0, 1, 2}

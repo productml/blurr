@@ -7,7 +7,7 @@ from pytest import fixture
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.field import FieldSchema, Field
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.simple_fields import SimpleField, BooleanFieldSchema, IntegerFieldSchema, FloatFieldSchema
+from blurr.core.field_simple import SimpleField, BooleanFieldSchema, IntegerFieldSchema, FloatFieldSchema
 
 
 @fixture
@@ -114,3 +114,11 @@ def test_field_restore(test_field_schema):
     field = MockField(test_field_schema, EvaluationContext())
     field.restore(5)
     assert field.value == 5
+
+
+def test_field_reset(test_field_schema):
+    field = MockField(test_field_schema, EvaluationContext())
+    field.restore(5)
+    assert field.value == 5
+    field.reset()
+    assert field.value == 0

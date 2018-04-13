@@ -3,8 +3,8 @@
 In this tutorial we'll learn how Blurr performs basic data aggregation. The following concepts will be introduced:
 
 * The _Data Transform Configuration_ document (DTC)
-* The basic blocks of a DTC: `Header`, `Store`, `Identity` and `DataGroups`
-* How events are processed and aggregated one by one by a `BlockAggregate` DataGroup
+* The basic blocks of a DTC: `Header`, `Store`, `Identity` and `Aggregates`
+* How events are processed and aggregated one by one by a `BlockAggregate` Aggregate
 * How `Identity` and `Split` are used to create new records.
 
 Try the code from this example [launching a Jupyter Notebook](https://mybinder.org/v2/gh/productml/blurr/master?filepath=examples%2Ftutorial).
@@ -64,21 +64,21 @@ We will transform the original sequence of events into an series of records cont
 In order to obtain this transformation, Blurr will process the events sequentially one by one using this __Data Transform Configuration (DTC)__ file.
 
 ```yaml
-Type: Blurr:DTC:Streaming
+Type: Blurr:Transform:Streaming
 Version: '2018-03-01'
 Name : sessions
 
 Store:
-   - Type: Blurr:DTC:Store:MemoryStore
+   - Type: Blurr:Store:MemoryStore
      Name: hello_world_store
 
 Identity: source.user_id
 
 Time: parser.parse(source.timestamp)
 
-DataGroups:
+Aggregates:
 
- - Type: Blurr:DTC:DataGroup:BlockAggregate
+ - Type: Blurr:Aggregate:BlockAggregate
    Name: session_stats
    Store: hello_world_store
 
@@ -101,12 +101,12 @@ DataGroups:
        Value: session_stats.games_won + 1
 ```
 
-Let's have a quick look at the five main blocks of this DTC: `Header`, `Store`, `Time`, `Identity` and `DataGroups`.
+Let's have a quick look at the five main blocks of this DTC: `Header`, `Store`, `Time`, `Identity` and `Aggregates`.
 
 ### 2.1. Header
 
 ```yaml
-Type: Blurr:DTC:Streaming
+Type: Blurr:Transform:Streaming
 Version: '2018-03-07'
 Name : sessions
 ```
@@ -119,7 +119,7 @@ Further in this series of tutorials we'll introduce different types of DTCs, suc
 
 ```yaml
 Store:
-   - Type: ProductML:DTC:Store:MemoryStore
+   - Type: Blurr:Store:MemoryStore
      Name: hello_world_store
 ```
 
@@ -148,20 +148,20 @@ Time: parser.parse(source.timestamp, 'YYYY/mm/dd HH:MM:SS')
 Among other things, Blurr uses `Time` to internally generates `start_time` and `end_time` values for each session. We'll see in the next tutorial why this is critical to certain aggregation features.
 
 
-### 2.5. DataGroups
+### 2.5. Aggregates
 
-This is where the magic happens. DataGroups define the nature of the transformation. Our example has a single DataGroup of type `BlockAggregate`. Different types of DataGroups will be introduced in the next tutorials.
+This is where the magic happens. Aggregates define the nature of the transformation. Our example has a single Aggregate of type `BlockAggregate`. Different types of Aggregates will be introduced in the next tutorials.
 
 We'll learn how the transformation happens in the next section by examining the flow of data event by event.
 
 
 ## 3. Data Flow
 
-Events are processed one by one, and then aggregated as defined in the `BlockAggregate` DataGroup:
+Events are processed one by one, and then aggregated as defined in the `BlockAggregate` Aggregate:
 
 ```yaml
-DataGroups:
- - Type: ProductML:DTC:DataGroup:BlockAggregate
+Aggregates:
+ - Type: Blurr:Aggregate:BlockAggregate
    Name: session_stats
    Store: hello_world_store
 
@@ -205,7 +205,7 @@ Aggregates are calculated taking into account the historical series of events. I
 
 Whenever a `game_start` event is received, the existing `session_stats.games_played` record is increased by one.
 
-> You can always access a field in the previously saved record by using the name of the DataGroup and the name of the field, such as in `session_stats.games_played` or `session_stats.games_won`.
+> You can always access a field in the previously saved record by using the name of the Aggregate and the name of the field, such as in `session_stats.games_played` or `session_stats.games_won`.
 
 Since this is the first historic event, the following will happen:
 
@@ -296,7 +296,7 @@ After some time, the user decides to play again. This is considered a new sessio
 { "user_id": "09C1", "session_id": "T8KA", "country" : "UK", "event_id": "game_start" }
 ```
 
-There's an element of the DataGroup we haven't covered yet, `Split`:
+There's an element of the Aggregate we haven't covered yet, `Split`:
 
 ```yaml
 Split: source.session_id != session_stats.session_id
@@ -364,7 +364,7 @@ $ blurr transform --streaming-dtc sessions-dtc.yml events.log
 
 Each entry consists of an array with 2 items:
 
-* A `session_id/datagroup_name/timestamp` string. This represents the __Identity__ (`user_id`) in the tables.
+* A `session_id/Aggregate_name/timestamp` string. This represents the __Identity__ (`user_id`) in the tables.
 * An object with the remaining values of the record.
 
 As we can see, not all the Identity representations have a timestamp. A "session end" timestamp is added after a new record is added for an Identity (after the `Split` condition is fulfilled), so only the last session of a user will not have a timestamp.

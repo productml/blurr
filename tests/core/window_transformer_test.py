@@ -8,10 +8,10 @@ from blurr.core.anchor import AnchorSchema
 from blurr.core.errors import AnchorBlockNotDefinedError, PrepareWindowMissingBlocksError
 from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.block_data_group import BlockDataGroup, \
-    BlockDataGroupSchema
-from blurr.core.streaming_transformer import StreamingTransformer
-from blurr.core.window_transformer import WindowTransformer, \
+from blurr.core.aggregate_block import BlockAggregate, \
+    BlockAggregateSchema
+from blurr.core.transformer_streaming import StreamingTransformer
+from blurr.core.transformer_window import WindowTransformer, \
     WindowTransformerSchema
 from tests.core.conftest import init_memory_store
 
@@ -50,9 +50,9 @@ def window_transformer(schema_loader, stream_transformer, window_schema_spec):
 @fixture
 def block_aggregate(stream_transformer):
     block = None
-    for data_group in stream_transformer._nested_items.values():
-        if isinstance(data_group, BlockDataGroup):
-            block = data_group
+    for aggregate in stream_transformer._nested_items.values():
+        if isinstance(aggregate, BlockAggregate):
+            block = aggregate
 
     return block
 
@@ -129,3 +129,24 @@ def test_window_transformer(schema_loader, window_transformer, block_aggregate):
         'last_day.total_events': 3,
         'last_day._identity': 'user1'
     }
+
+
+def test_window_transformer_internal_reset(schema_loader, window_transformer, block_aggregate):
+    init_memory_store(schema_loader.get_schema_object('Sessions.memory'))
+    window_transformer._anchor._schema.max = None
+
+    block_aggregate.restore({
+        'events': 3,
+        '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc),
+        '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc)
+    })
+
+    assert window_transformer.evaluate_anchor(block_aggregate) is True
+    snapshot = window_transformer._snapshot
+    assert snapshot['last_session'] == {'_identity': 'user1', 'events': 2}
+    assert snapshot['last_day'] == {'_identity': 'user1', 'total_events': 3}
+
+    assert window_transformer.evaluate_anchor(block_aggregate) is True
+    snapshot = window_transformer._snapshot
+    assert snapshot['last_session'] == {'_identity': 'user1', 'events': 2}
+    assert snapshot['last_day'] == {'_identity': 'user1', 'total_events': 3}

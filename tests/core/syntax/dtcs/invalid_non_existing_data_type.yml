@@ -1,4 +1,4 @@
-Type: Blurr:Streaming
+Type: Blurr:Transform:Streaming
 Version: '2018-03-01'
 Description: Example
 Name: example_name
@@ -7,8 +7,8 @@ When: source.package_version == '1.0'
 Stores:
  - Type: Blurr:Store:MemoryStore
    Name: memory_store
-DataGroups:
- - Type: Blurr:DataGroup:IdentityAggregate
+Aggregates:
+ - Type: Blurr:Aggregate:IdentityAggregate
    Name: user
    Store: offer_ai_dynamo
    Fields:

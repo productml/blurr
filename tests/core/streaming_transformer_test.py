@@ -8,14 +8,14 @@ from blurr.core.errors import IdentityError, TimeError
 from blurr.core.evaluation import Context
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.streaming_transformer import StreamingTransformerSchema, StreamingTransformer
+from blurr.core.transformer_streaming import StreamingTransformerSchema, StreamingTransformer
 
 
 @fixture
 def schema_spec() -> Dict[str, Any]:
     return {
         'Name': 'test',
-        'Type': 'Blurr:Streaming',
+        'Type': 'Blurr:Transform:Streaming',
         'Version': '2018-03-01',
         'Import': [{
             'Module': 'datetime',
@@ -27,9 +27,9 @@ def schema_spec() -> Dict[str, Any]:
             'Name': 'memstore',
             'Type': 'Blurr:Store:MemoryStore'
         }],
-        'DataGroups': [{
+        'Aggregates': [{
             'Name': 'test_group',
-            'Type': 'Blurr:DataGroup:IdentityAggregate',
+            'Type': 'Blurr:Aggregate:IdentityAggregate',
             'Store': 'memstore',
             'Fields': [{
                 "Type": "integer",
