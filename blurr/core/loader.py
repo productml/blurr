@@ -65,10 +65,10 @@ class TypeLoader:
         lower_type_name = type_name.lower()
         if lower_type_name not in type_map:
             raise InvalidSchemaError('Unknown schema type {}'.format(type_name))
-        return TypeLoader.import_by_full_name(type_map[lower_type_name])
+        return TypeLoader.import_class_by_full_name(type_map[lower_type_name])
 
     @staticmethod
-    def import_by_full_name(name):
+    def import_class_by_full_name(name):
         components = name.rsplit('.', 1)
         mod = importlib.import_module(components[0])
         if len(components) == 1:
