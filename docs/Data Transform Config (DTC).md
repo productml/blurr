@@ -19,7 +19,7 @@ The raw event being processed is defined as `source` in the DTC. Event parameter
 ## Header
 
 ```yaml
-Type: Blurr:Streaming
+Type: Blurr:Transform:Streaming
 Version: '2018-03-07'
 Description: Create blocks from streaming Raw Data
 Name: offer_ai_v1
@@ -30,7 +30,7 @@ When: source.package_version = '1.0'
 
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
-Type | The type of DTC - Streaming or Window | `Blurr:Streaming` or `Blurr:Window` | Required
+Type | The type of DTC - Streaming or Window | `Blurr:Transform:Streaming` or `Blurr:Transform:Window` | Required
 Version | Version number of the DTC, used by the Data Transformer Library to parse the template | Specific DTC versions only `2018-03-01` | Required
 Description | Text description for the DTC | Any `string`  | Optional
 Name | Unique name for the DTC | Any `string` | Required
@@ -176,7 +176,7 @@ The decision point is the Anchor. A window defines segments of data relative to 
 ## Header
 
 ```yaml
-Type: Blurr:Window
+Type: Blurr:Transform:Window
 Version: '2018-03-01'
 Description: Generate features around an Anchor
 Name: Window Example
@@ -185,7 +185,7 @@ SourceDTC: offer_ai_v1
 
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
-Type | The type of DTC - Streaming or Window | `Blurr:Streaming` or `Blurr:Window` | Required
+Type | The type of DTC - Streaming or Window | `Blurr:Transform:Streaming` or `Blurr:Transform:Window` | Required
 Version | Version number of the DTC, used by the Data Transformer Library to parse the template | Specific DTC versions only `2018-03-01` | Required
 Description | Text description for the DTC | Any `string` | Optional
 Name | Unique name for the Window DTC | Any `string` | Required

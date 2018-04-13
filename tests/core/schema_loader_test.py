@@ -6,7 +6,7 @@ from pytest import fixture
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.field_simple import IntegerFieldSchema
-from blurr.core.streaming_transformer import StreamingTransformerSchema
+from blurr.core.transformer_streaming import StreamingTransformerSchema
 
 
 @fixture
@@ -34,7 +34,7 @@ def nested_schema_spec_bad_type() -> Dict:
 def nested_schema_spec() -> Dict:
     return {
         'Name': 'test',
-        'Type': 'Blurr:Transform:Simple',
+        'Type': 'Blurr:Transform:Streaming',
         "Version": "2018-03-01",
         "Time": "parser.parse(source.event_time)",
         "Identity": "source.user_id",

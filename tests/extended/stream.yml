@@ -1,4 +1,4 @@
-Type: Blurr:Streaming
+Type: Blurr:Transform:Streaming
 Version: '2018-03-01'
 Name: Sessions
 Description: Streaming Extended Test

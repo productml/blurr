@@ -5,7 +5,8 @@ import importlib
 from blurr.core.errors import InvalidSchemaError
 
 ITEM_MAP = {
-    'Blurr:Transform:Simple': 'blurr.core.transformer_simple.SimpleTransformer',
+    'Blurr:Transform:Streaming': 'blurr.core.transformer_streaming.StreamingTransformer',
+    'Blurr:Transform:Window': 'blurr.core.transformer_window.WindowTransformer',
     'Blurr:Aggregate:BlockAggregate': 'blurr.core.aggregate_block.BlockAggregate',
     'Blurr:Aggregate:IdentityAggregate': 'blurr.core.aggregate_identity.IdentityAggregate',
     'Blurr:Aggregate:VariableAggregate': 'blurr.core.aggregate_variable.VariableAggregate',
@@ -25,9 +26,8 @@ ITEM_MAP = {
 ITEM_MAP_LOWER_CASE = {k.lower(): v for k, v in ITEM_MAP.items()}
 
 SCHEMA_MAP = {
-    'Blurr:Transform:Simple': 'blurr.core.streaming_transformer.StreamingTransformerSchema',
-    'Blurr:Streaming': 'blurr.core.streaming_transformer.StreamingTransformerSchema',
-    'Blurr:Window': 'blurr.core.window_transformer.WindowTransformerSchema',
+    'Blurr:Transform:Streaming': 'blurr.core.transformer_streaming.StreamingTransformerSchema',
+    'Blurr:Transform:Window': 'blurr.core.transformer_window.WindowTransformerSchema',
     'Blurr:Aggregate:BlockAggregate': 'blurr.core.aggregate_block.BlockAggregateSchema',
     'Blurr:Aggregate:IdentityAggregate': 'blurr.core.aggregate_identity.IdentityAggregateSchema',
     'Blurr:Aggregate:VariableAggregate': 'blurr.core.aggregate_variable.VariableAggregateSchema',

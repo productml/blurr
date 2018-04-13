@@ -114,11 +114,11 @@ def _validate_streaming(dtc_dict: Dict, name: str) -> None:
 
 
 def is_window_dtc(dtc_dict: Dict) -> bool:
-    return dtc_dict.get('Type', '').lower() == 'blurr:window'
+    return dtc_dict.get('Type', '').lower() == 'blurr:transform:window'
 
 
 def is_streaming_dtc(dtc_dict: Dict) -> bool:
-    return dtc_dict.get('Type', '').lower() == 'blurr:streaming'
+    return dtc_dict.get('Type', '').lower() == 'blurr:transform:streaming'
 
 
 def validate(dtc_dict: Dict, name='dtc') -> None:

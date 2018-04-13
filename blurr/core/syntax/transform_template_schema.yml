@@ -1,4 +1,4 @@
-Type: enum('Blurr:Transform:Basic')
+Type: enum('Blurr:Transform:Streaming')
 Version: enum('2018-04-15')
 Description: str(min=1, required=False)
 Name: identifier()

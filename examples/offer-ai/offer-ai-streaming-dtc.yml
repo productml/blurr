@@ -4,7 +4,7 @@
 
 # Type of DTC. Streaming or Window
 # The Streaming DTC processes the raw data and converts it into sessions
-Type: Blurr:Streaming
+Type: Blurr:Transform:Streaming
 Version: '2018-03-01'
 Description: Generate sessions from streaming Raw Data
 Name: offer_ai_v1

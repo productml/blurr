@@ -1,4 +1,4 @@
-Type: 'Blurr:Streaming'
+Type: Blurr:Transform:Streaming
 Version: '2018-03-01'
 Description: 'Level 1 trasnformation from streaming Raw Data'
 Name: Sessions

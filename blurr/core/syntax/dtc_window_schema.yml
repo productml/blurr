@@ -1,4 +1,4 @@
-Type: enum('Blurr:Window')
+Type: enum('Blurr:Transform:Window')
 Version: enum('2018-03-01')
 Description: str(min=1, required=False)
 Name: identifier()

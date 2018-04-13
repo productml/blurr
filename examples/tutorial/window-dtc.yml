@@ -1,4 +1,4 @@
-Type: Blurr:Window
+Type: Blurr:Transform:Window
 Version: '2018-03-01'
 Name: boost_data
 

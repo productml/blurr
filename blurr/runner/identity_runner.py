@@ -10,9 +10,9 @@ from blurr.core.evaluation import Context
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
-from blurr.core.streaming_transformer import StreamingTransformer, \
+from blurr.core.transformer_streaming import StreamingTransformer, \
     StreamingTransformerSchema
-from blurr.core.window_transformer import WindowTransformer
+from blurr.core.transformer_window import WindowTransformer
 from blurr.store.memory_store import MemoryStore
 
 
@@ -107,5 +107,5 @@ def get_memory_store(schema_loader: SchemaLoader) -> MemoryStore:
 
 
 def get_streaming_transformer_schema(schema_loader: SchemaLoader) -> StreamingTransformerSchema:
-    streaming_transformer_schema = schema_loader.get_schemas_of_type('Blurr:Streaming')
+    streaming_transformer_schema = schema_loader.get_schemas_of_type('Blurr:Transform:Streaming')
     return schema_loader.get_schema_object(streaming_transformer_schema[0][0])

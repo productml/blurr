@@ -14,7 +14,7 @@ from blurr.core.transformer import TransformerSchema, Transformer
 def schema_spec() -> Dict[str, Any]:
     return {
         'Name': 'test',
-        'Type': 'Blurr:Streaming',
+        'Type': 'Blurr:Transform:Streaming',
         'Version': '2018-03-01',
         'Stores': [{
             'Name': 'memstore',
@@ -62,7 +62,7 @@ def test_transformer_schema_init(schema_loader: SchemaLoader, schema_spec: Dict[
     name = schema_loader.add_schema(schema_spec)
     test_transformer_schema = MockTransformerSchema(name, schema_loader)
     assert test_transformer_schema.version == '2018-03-01'
-    assert test_transformer_schema.type == 'Blurr:Streaming'
+    assert test_transformer_schema.type == 'Blurr:Transform:Streaming'
     assert test_transformer_schema.stores['memstore'].type == 'Blurr:Store:MemoryStore'
 
 

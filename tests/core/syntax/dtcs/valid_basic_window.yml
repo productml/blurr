@@ -1,4 +1,4 @@
-Type: Blurr:Window
+Type: Blurr:Transform:Window
 Version: '2018-03-01'
 Description: Second Level processing for feature generation
 Name: ProductMLExample

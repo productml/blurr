@@ -17,7 +17,7 @@ from blurr.core.evaluation import Context
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
-from blurr.core.streaming_transformer import StreamingTransformerSchema
+from blurr.core.transformer_streaming import StreamingTransformerSchema
 from blurr.core.syntax.schema_validator import validate
 from pyspark import RDD, SparkContext
 from pyspark.sql import SparkSession

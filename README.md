@@ -55,7 +55,7 @@ using this DTC
 
 ```yaml
 
-Type: Blurr:Streaming
+Type: Blurr:Transform:Streaming
 Version: '2018-03-01'
 Name : sessions
 
