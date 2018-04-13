@@ -107,7 +107,9 @@ class ExpressionType(Enum):
 
 class Expression:
     """ Encapsulates a python code statement in string and in compilable expression"""
-    def __init__(self, code_string: str, expression_type: ExpressionType = ExpressionType.EVAL) -> None:
+
+    def __init__(self, code_string: str,
+                 expression_type: ExpressionType = ExpressionType.EVAL) -> None:
         """
         An expression must be initialized with a python statement
         :param code_string: Python code statement
@@ -135,7 +137,8 @@ class Expression:
         try:
 
             if self.type == ExpressionType.EVAL:
-                return eval(self.code_object, evaluation_context.global_context, evaluation_context.local_context)
+                return eval(self.code_object, evaluation_context.global_context,
+                            evaluation_context.local_context)
 
             elif self.type == ExpressionType.EXEC:
                 # Passing None as the local context as we want exec to extend the global context

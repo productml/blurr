@@ -40,7 +40,7 @@ def test_import_module_and_multiple_identifiers():
 
     assert not context.local_context
     assert context.global_context
-    
+
     from dateutil import parser
     from dateutil import tz
     assert context.global_context['parser'] == parser

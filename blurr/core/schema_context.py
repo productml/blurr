@@ -19,7 +19,8 @@ class SchemaContext:
 
         for custom_import in self.import_spec:
             module = custom_import[self.ATTRIBUTE_IMPORT_MODULE]
-            if self.ATTRIBUTE_IMPORT_IDENTIFIER not in custom_import or not custom_import[self.ATTRIBUTE_IMPORT_IDENTIFIER]:
+            if self.ATTRIBUTE_IMPORT_IDENTIFIER not in custom_import or not custom_import[self.
+                                                                                          ATTRIBUTE_IMPORT_IDENTIFIER]:
                 import_str = 'import ' + module
                 import_expression_list.append(Expression(import_str, ExpressionType.EXEC))
                 continue
@@ -27,7 +28,8 @@ class SchemaContext:
             import_str = 'from ' + module + ' import '
 
             for identifier in custom_import[self.ATTRIBUTE_IMPORT_IDENTIFIER]:
-                import_expression_list.append(Expression(import_str + identifier, ExpressionType.EXEC))
+                import_expression_list.append(
+                    Expression(import_str + identifier, ExpressionType.EXEC))
 
         return import_expression_list
 
