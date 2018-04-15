@@ -14,11 +14,15 @@ Blurr transforms `raw data` into `features` for model training and prediction us
 
 For production ML applications, __experimentation__ and __iteration speed__ is important. Working directly with raw data provides the most flexibility. Blurr allows product teams to iterate quickly during ML dev and provides a self-service way to take experiments to production.
 
-![Data Transformer](docs/images/data-transformer.png)
-
 >Coming up with features is difficult, time-consuming, requires expert knowledge. 'Applied machine learning' is basically feature engineering
 
 >--- Andrew Ng
+
+# How is Blurr different from Spark/Kafka?
+
+Blurr is a __data transform definition__. It does not execute the transforms, it does not store any data.
+
+The idea is to define data transformations in Blurr, and these data transformations can execute on any stream processor like Spark or Kafka. Because real world infrastructure is extremely diverse, Blurr is designed to run on virtually any infrastructure stack.
 
 # Table of contents
 
