@@ -17,15 +17,18 @@ from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.syntax.schema_validator import validate
 from blurr.runner.identity_runner import execute_dtc
+from blurr.runner.record_processor import DataProcessor, SingleJsonDataProcessor
 
 
 class LocalRunner:
     def __init__(self,
                  local_json_files: List[str],
                  stream_dtc_file: str,
-                 window_dtc_file: Optional[str] = None):
+                 window_dtc_file: Optional[str] = None,
+                 record_processor: DataProcessor = SingleJsonDataProcessor()):
         self._raw_files = local_json_files
         self._schema_loader = SchemaLoader()
+        self._record_processor = record_processor
 
         self._stream_dtc = yaml.safe_load(open(stream_dtc_file))
         self._window_dtc = None if window_dtc_file is None else yaml.safe_load(
@@ -55,8 +58,9 @@ class LocalRunner:
 
     def _consume_file(self, file: str) -> None:
         with open(file) as f:
-            for record in f:
-                self._consume_record(Record(json.loads(record)))
+            for data_str in f:
+                for record in self._record_processor.process_data(data_str):
+                    self._consume_record(record)
 
     def execute_for_all_users(self) -> None:
         for identity, events in self._user_events.items():
