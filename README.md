@@ -20,9 +20,9 @@ For production ML applications, __experimentation__ and __iteration speed__ is i
 
 # How is Blurr different from Spark/Kafka?
 
-Blurr is a __data transform definition__, it does not store any data.
+Blurr is a __data transform definition__. *(Technically - the DTC contains the definition, or descriptor)*
 
-The idea is to define data transformations in Blurr, and these data transformations can execute on any stream processor like Spark or Kafka. Because real world infrastructure is extremely diverse, Blurr is designed to run on virtually any infrastructure stack.
+Blurr is processor-agnostic, so DTCs can be run by stream processors like Spark or Kafka. Because real world infrastructure is extremely diverse, Blurr is designed to run on virtually any infrastructure stack.
 
 # Table of contents
 
