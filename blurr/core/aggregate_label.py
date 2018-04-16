@@ -47,14 +47,13 @@ class LabelAggregate(BlockAggregate):
 
         label = str(self._schema.label.evaluate(self._evaluation_context))
 
-        if not self._label_value:
-            self._label_value = label
-        elif self._label_value != label:
+        if self._label_value and self._label_value != label:
             # Save the current snapshot with the current timestamp
             self.persist()
             # Reset the state of the contents
             self.reset()
-            self._label_value = label
+
+        self._label_value = label
 
         super().evaluate()
 
