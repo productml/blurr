@@ -20,7 +20,7 @@ For production ML applications, __experimentation__ and __iteration speed__ is i
 
 # How is Blurr different from Spark/Kafka?
 
-Blurr is a __data transform definition__. It does not execute the transforms, it does not store any data.
+Blurr is a __data transform definition__, it does not store any data.
 
 The idea is to define data transformations in Blurr, and these data transformations can execute on any stream processor like Spark or Kafka. Because real world infrastructure is extremely diverse, Blurr is designed to run on virtually any infrastructure stack.
 
@@ -150,7 +150,7 @@ __Stay in touch!__ Star this project or email hello@blurr.ai
 
 Blurr is all about enabling machine learning and AI teams to run faster.
 
-**Developer Preview 0**: Local transformations only
+~~**Developer Preview 0**: Local transformations only~~
 
 **Developer Preview 1**: S3-S3 data transformations
 
