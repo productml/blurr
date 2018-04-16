@@ -10,15 +10,17 @@
 [![PyPI version](https://badge.fury.io/py/blurr.svg)](https://badge.fury.io/py/blurr)
 [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/productml/blurr/master?filepath=examples%2Ftutorial)
 
+# What is Blurr?
+
 Blurr transforms `raw data` into `features` for model training and prediction using a `high-level expressive YAML-based language` called the Data Transform Configuration (DTC).
 
 For production ML applications, __experimentation__ and __iteration speed__ is important. Working directly with raw data provides the most flexibility. Blurr allows product teams to iterate quickly during ML dev and provides a self-service way to take experiments to production.
 
-![Data Transformer](docs/images/data-transformer.png)
+# How is Blurr different from Spark/Kafka?
 
->Coming up with features is difficult, time-consuming, requires expert knowledge. 'Applied machine learning' is basically feature engineering
+Blurr is a __data transform definition__. *(Technically - the DTC contains the definition, or descriptor)*
 
->--- Andrew Ng
+Blurr is processor-agnostic, so DTCs can be run by stream processors like Spark or Kafka. Because real world infrastructure is extremely diverse, Blurr is designed to run on virtually any infrastructure stack.
 
 # Table of contents
 
@@ -28,6 +30,10 @@ For production ML applications, __experimentation__ and __iteration speed__ is i
 - [Contribute](#contribute-to-blurr)
 - [Data Science 'Joel Test'](#data-science-joel-test)
 - [Roadmap](#roadmap)
+
+>Coming up with features is difficult, time-consuming, requires expert knowledge. 'Applied machine learning' is basically feature engineering
+
+>--- Andrew Ng
 
 # DTC at a glance
 
@@ -146,7 +152,7 @@ __Stay in touch!__ Star this project or email hello@blurr.ai
 
 Blurr is all about enabling machine learning and AI teams to run faster.
 
-**Developer Preview 0**: Local transformations only
+~~**Developer Preview 0**: Local transformations only~~
 
 **Developer Preview 1**: S3-S3 data transformations
 
