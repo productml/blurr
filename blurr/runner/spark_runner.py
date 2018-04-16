@@ -1,6 +1,6 @@
 """
 Usage:
-    spark_runner.py --raw-data=<files> --streaming-dtc=<file> [--window-dtc=<file>] --output-file=<file>
+    spark_runner.py --raw-data=<files> --streaming-dtc=<file> [--window-dtc=<file>] --output-file=<file> [--data-processor=<data-processor>]
     spark_runner.py (-h | --help)
 """
 
@@ -9,20 +9,17 @@ from datetime import datetime
 from typing import List, Optional, Tuple, Any, Dict, Union
 
 import yaml
-from dateutil import parser
 from docopt import docopt
 
 import blurr.runner.identity_runner as identity_runner
-from blurr.core.evaluation import Context
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
-from blurr.core.transformer_streaming import StreamingTransformerSchema
 from blurr.core.syntax.schema_validator import validate
+from blurr.core.transformer_streaming import StreamingTransformerSchema
+from blurr.runner.record_processor import DataProcessor, SingleJsonDataProcessor, IpfixDataProcessor
 from pyspark import RDD, SparkContext
 from pyspark.sql import SparkSession
-
-from blurr.runner.record_processor import DataProcessor, SingleJsonDataProcessor
 
 
 class SparkRunner:
@@ -63,9 +60,8 @@ class SparkRunner:
     def get_per_user_records(self, event_str: str) -> List[Tuple[str, Tuple[datetime, Record]]]:
         record_list = []
         for record in self._record_processor.process_data(event_str):
-            source_context = Context({'source': record})
-            source_context.add('parser', parser)
-            record_list.append((self._stream_transformer_schema.get_identity(source_context), (self._stream_transformer_schema.get_time(source_context), record)))
+            record_list.append((self._stream_transformer_schema.get_identity(record),
+                                (self._stream_transformer_schema.get_time(record), record)))
         return record_list
 
     def execute(self, spark_context: SparkContext) -> RDD:
@@ -84,10 +80,14 @@ class SparkRunner:
             spark.createDataFrame(per_user_data).write.csv(path, header=True)
 
 
+DATA_PROCESSOR = {'ipfix': IpfixDataProcessor}
+
+
 def main():
     arguments = docopt(__doc__, version='pre-alpha')
-    spark_runner = SparkRunner(arguments['--raw-data'].split(','), arguments['--streaming-dtc'],
-                               arguments['--window-dtc'])
+    spark_runner = SparkRunner(
+        arguments['--raw-data'].split(','), arguments['--streaming-dtc'], arguments['--window-dtc'],
+        DATA_PROCESSOR.get(arguments['--data-processor'], SingleJsonDataProcessor)())
 
     spark = SparkSession \
         .builder \
