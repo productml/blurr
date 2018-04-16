@@ -3,8 +3,8 @@ Version: '2018-03-01'
 Description: Example
 Name: example_name
 Import:
- - { Module: dateutil, Identifier: [ parser, tz]}
- - { Module: dateutil, Identifier: [ parser ]}
+ - { Module: dateutil, Identifiers: [ parser, tz]}
+ - { Module: dateutil, Identifiers: [ parser ]}
  - { Module: dateutil}
 Identity: source.user_id
 Time: source.timestamp

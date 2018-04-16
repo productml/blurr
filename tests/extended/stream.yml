@@ -3,7 +3,7 @@ Version: '2018-03-01'
 Name: Sessions
 Description: Streaming Extended Test
 Import:
-  - { Module: dateutil, Identifier: [ parser ]}
+  - { Module: dateutil, Identifiers: [ parser ]}
 Identity: source.user_id
 Time: parser.parse(source.time)
 Stores: 

@@ -29,21 +29,23 @@ class StreamingTransformerSchema(TransformerSchema):
         :return: The evaluated identity
         :raises: IdentityError if identity cannot be determined.
         """
-        self.schema_context.add_record(record)
-        identity = self.identity.evaluate(self.schema_context)
+        context = self.schema_context.context
+        context.add_record(record)
+        identity = self.identity.evaluate(context)
         if not identity:
             raise IdentityError('Could not determine identity using {}. Record is {}'.format(
                 self.identity.code_string, record))
-        self.schema_context.remove_record()
+        context.remove_record()
         return identity
 
     def get_time(self, record: Record) -> datetime:
-        self.schema_context.add_record(record)
-        time = self.time.evaluate(self.schema_context)
+        context = self.schema_context.context
+        context.add_record(record)
+        time = self.time.evaluate(context)
         if not time or not isinstance(time, datetime):
             raise TimeError('Could not determine time using {}.  Record is {}'.format(
                 self.time.code_string, record))
-        self.schema_context.remove_record()
+        context.remove_record()
         return time
 
 

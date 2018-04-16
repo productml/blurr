@@ -19,7 +19,7 @@ def schema_spec() -> Dict[str, Any]:
         'Version': '2018-03-01',
         'Import': [{
             'Module': 'datetime',
-            'Identifier': ['datetime']
+            'Identifiers': ['datetime']
         }],
         'Identity': '\'user1\'',
         'Time': 'datetime(2016,10,10)',
