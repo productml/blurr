@@ -4,7 +4,7 @@ Description: 'Level 1 trasnformation from streaming Raw Data'
 Name: Sessions
 
 Import:
-  - { Module: dateutil.parser, Identifier: [ parse ]}
+  - { Module: dateutil.parser, Identifiers: [ parse ]}
 
 Identity: source.user_id
 Time: parse(source.event_time)

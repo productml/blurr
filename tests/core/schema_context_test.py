@@ -24,7 +24,7 @@ def test_import_just_module():
 
 
 def test_import_module_and_identifier():
-    spec = [{'Module': 'dateutil', 'Identifier': ['parser']}]
+    spec = [{'Module': 'dateutil', 'Identifiers': ['parser']}]
     schema_context = SchemaContext(spec)
     context = schema_context.context
 
@@ -36,7 +36,7 @@ def test_import_module_and_identifier():
 
 
 def test_import_module_and_multiple_identifiers():
-    spec = [{'Module': 'dateutil', 'Identifier': ['parser', 'tz']}]
+    spec = [{'Module': 'dateutil', 'Identifiers': ['parser', 'tz']}]
     schema_context = SchemaContext(spec)
     context = schema_context.context
 
@@ -62,7 +62,7 @@ def test_import_just_module_with_alias():
 
 
 def test_import_module_and_identifier_with_alias():
-    spec = [{'Module': 'dateutil', 'Identifier': ['parser as my_func']}]
+    spec = [{'Module': 'dateutil', 'Identifiers': ['parser as my_func']}]
     schema_context = SchemaContext(spec)
     context = schema_context.context
 
@@ -81,7 +81,7 @@ def test_import_just_module_error():
 
 
 def test_import_module_and_identifier_error():
-    spec = [{'Module': 'dateutil', 'Identifier': ['unknown_func']}]
+    spec = [{'Module': 'dateutil', 'Identifiers': ['unknown_func']}]
     schema_context = SchemaContext(spec)
     with pytest.raises(ImportError, match='cannot import name \'unknown_func\''):
         assert schema_context.context

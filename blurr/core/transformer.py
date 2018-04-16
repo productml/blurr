@@ -1,3 +1,4 @@
+from copy import copy
 from typing import Dict, Type
 
 from abc import ABC
@@ -37,7 +38,7 @@ class TransformerSchema(BaseSchemaCollection, ABC):
         }
 
         self.import_list = self._spec.get(self.ATTRIBUTE_IMPORT, [])
-        self.schema_context = SchemaContext(self.import_list).context
+        self.schema_context = SchemaContext(self.import_list)
 
 
 class Transformer(BaseItemCollection, ABC):
@@ -47,7 +48,7 @@ class Transformer(BaseItemCollection, ABC):
     """
 
     def __init__(self, schema: TransformerSchema, identity: str) -> None:
-        super().__init__(schema, schema.schema_context)
+        super().__init__(schema, copy(schema.schema_context.context))
         # Load the nested items into the item
         self._aggregates: Dict[str, Aggregate] = {
             name: TypeLoader.load_item(item_schema.type)(item_schema, identity,
