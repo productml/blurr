@@ -127,7 +127,7 @@ def test_execution_error_type_mismatch(caplog) -> None:
 def test_execution_error_missing_aggregate(caplog, schema_loader: SchemaLoader) -> None:
     caplog.set_level(logging.DEBUG)
     context = Context({
-        'test': StreamingTransformer(schema_loader.get_schema_object('test'), 'user1', Context())
+        'test': StreamingTransformer(schema_loader.get_schema_object('test'), 'user1')
     })
     with raises(MissingAttributeError, match='missing_aggregate not defined in test'):
         Expression('test.missing_aggregate + 1').evaluate(EvaluationContext(context))
@@ -141,7 +141,7 @@ def test_execution_error_missing_aggregate(caplog, schema_loader: SchemaLoader) 
 def test_execution_error_missing_field(caplog, schema_loader: SchemaLoader) -> None:
     caplog.set_level(logging.DEBUG)
     context = Context({
-        'test': StreamingTransformer(schema_loader.get_schema_object('test'), 'user1', Context())
+        'test': StreamingTransformer(schema_loader.get_schema_object('test'), 'user1')
     })
     with raises(MissingAttributeError, match='missing_field not defined in test_group'):
         Expression('test.test_group.missing_field').evaluate(EvaluationContext(context))

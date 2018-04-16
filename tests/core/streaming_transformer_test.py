@@ -1,6 +1,7 @@
 from typing import Dict, Any
 
 import pytest
+from datetime import datetime
 from pytest import fixture
 
 from blurr.core.errors import IdentityError, TimeError
@@ -16,6 +17,10 @@ def schema_spec() -> Dict[str, Any]:
         'Name': 'test',
         'Type': 'Blurr:Transform:Streaming',
         'Version': '2018-03-01',
+        'Import': [{
+            'Module': 'datetime',
+            'Identifier': ['datetime']
+        }],
         'Identity': '\'user1\'',
         'Time': 'datetime(2016,10,10)',
         'Stores': [{
@@ -60,11 +65,7 @@ def test_streaming_transformer_schema_get_identity_from_record(schema_loader: Sc
     schema_spec['Identity'] = 'source.user'
     streaming_dtc = schema_loader.add_schema(schema_spec)
     transformer_schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
-    assert transformer_schema.get_identity(Context({
-        'source': Record({
-            'user': 'user1'
-        })
-    })) == 'user1'
+    assert transformer_schema.get_identity(Record({'user': 'user1'})) == 'user1'
 
 
 def test_streaming_transformer_schema_get_identity_error(schema_loader: SchemaLoader,
@@ -73,19 +74,19 @@ def test_streaming_transformer_schema_get_identity_error(schema_loader: SchemaLo
     streaming_dtc = schema_loader.add_schema(schema_spec)
     transformer_schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
     with pytest.raises(IdentityError, match='Could not determine identity using source.user'):
-        assert transformer_schema.get_identity(Context({'source': Record()}))
+        assert transformer_schema.get_identity(Record())
 
 
 def test_streaming_transformer_schema_get_time_constant(schema_loader: SchemaLoader,
                                                         schema_spec: Dict[str, Any]) -> None:
-    from datetime import datetime
     streaming_dtc = schema_loader.add_schema(schema_spec)
     transformer_schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
-    assert transformer_schema.get_time(Context({'datetime': datetime})) == datetime(2016, 10, 10)
+    assert transformer_schema.get_time(Record()) == datetime(2016, 10, 10)
 
 
 def test_streaming_transformer_schema_get_time_datetime_not_defined(
         schema_loader: SchemaLoader, schema_spec: Dict[str, Any]) -> None:
+    del schema_spec['Import']
     streaming_dtc = schema_loader.add_schema(schema_spec)
     transformer_schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
     with pytest.raises(NameError, match='name \'datetime\' is not defined'):
@@ -103,19 +104,19 @@ def test_streaming_transformer_schema_get_time_type_error(schema_loader: SchemaL
 
 def test_streaming_transformer_evaluate_record_time_error(schema_loader: SchemaLoader,
                                                           schema_spec: Dict[str, Any]) -> None:
+    del schema_spec['Import']
     streaming_dtc = schema_loader.add_schema(schema_spec)
     transformer_schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
-    transformer = StreamingTransformer(transformer_schema, 'user1', Context())
+    transformer = StreamingTransformer(transformer_schema, 'user1')
     with pytest.raises(NameError, match='name \'datetime\' is not defined'):
         assert transformer.evaluate_record(Record())
 
 
 def test_streaming_transformer_evaluate_record_user_mismatch(schema_loader: SchemaLoader,
                                                              schema_spec: Dict[str, Any]) -> None:
-    from datetime import datetime
     streaming_dtc = schema_loader.add_schema(schema_spec)
     transformer_schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
-    transformer = StreamingTransformer(transformer_schema, 'user2', Context({'datetime': datetime}))
+    transformer = StreamingTransformer(transformer_schema, 'user2')
     with pytest.raises(
             IdentityError,
             match='Identity in transformer \(user2\) and new record \(user1\) do not match'):
@@ -124,10 +125,9 @@ def test_streaming_transformer_evaluate_record_user_mismatch(schema_loader: Sche
 
 def test_streaming_transformer_evaluate_record(schema_loader: SchemaLoader,
                                                schema_spec: Dict[str, Any]) -> None:
-    from datetime import datetime
     streaming_dtc = schema_loader.add_schema(schema_spec)
     transformer_schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
-    transformer = StreamingTransformer(transformer_schema, 'user1', Context({'datetime': datetime}))
+    transformer = StreamingTransformer(transformer_schema, 'user1')
     transformer.evaluate_record(Record())
 
     assert transformer._snapshot == {'test_group': {'_identity': 'user1', 'events': 1}}

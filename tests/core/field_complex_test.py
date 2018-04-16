@@ -105,7 +105,7 @@ def schema_loader() -> SchemaLoader:
 
 @fixture(scope='module')
 def aggregate_schema(schema_loader: SchemaLoader,
-                      aggregate_schema_spec: Dict[str, Any]) -> AggregateSchema:
+                     aggregate_schema_spec: Dict[str, Any]) -> AggregateSchema:
     return VariableAggregateSchema(schema_loader.add_schema(aggregate_schema_spec), schema_loader)
 
 

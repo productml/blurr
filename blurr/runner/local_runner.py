@@ -9,10 +9,8 @@ from typing import List, Optional
 
 import yaml
 from collections import defaultdict
-from dateutil import parser
 from docopt import docopt
 
-from blurr.core.evaluation import Context
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.syntax.schema_validator import validate
@@ -49,10 +47,8 @@ class LocalRunner:
             validate(self._window_dtc)
 
     def _consume_record(self, record: Record) -> None:
-        source_context = Context({'source': record})
-        source_context.add('parser', parser)
-        identity = self._stream_transformer_schema.get_identity(source_context)
-        time = self._stream_transformer_schema.get_time(source_context)
+        identity = self._stream_transformer_schema.get_identity(record)
+        time = self._stream_transformer_schema.get_time(record)
 
         self._user_events[identity].append((time, record))
 

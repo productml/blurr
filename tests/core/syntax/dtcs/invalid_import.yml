@@ -3,17 +3,15 @@ Version: '2018-03-01'
 Description: Example
 Name: example_name
 Import:
- - { Module: dateutil, Identifier: [ parser, tz]}
- - { Module: dateutil, Identifier: [ parser ]}
- - { Module: dateutil}
+ - { Identifier: [ parser]}
 Identity: source.user_id
 Time: source.timestamp
 When: source.package_version == '1.0'
 Stores:
  - Type: Blurr:Store:MemoryStore
    Name: memory_store
-Aggregates:
- - Type: Blurr:Aggregate:IdentityAggregate
+DataGroups:
+ - Type: Blurr:DataGroup:IdentityAggregate
    Name: user
    Store: offer_ai_dynamo
    Fields:

@@ -2,6 +2,8 @@ Type: Blurr:Transform:Streaming
 Version: '2018-03-01'
 Name: Sessions
 Description: Streaming Extended Test
+Import:
+  - { Module: dateutil, Identifier: [ parser ]}
 Identity: source.user_id
 Time: parser.parse(source.time)
 Stores: 
@@ -98,3 +100,4 @@ Aggregates:
         Type: integer
         Value: source.score
         When: time == session._end_time
+
