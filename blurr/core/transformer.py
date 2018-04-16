@@ -79,7 +79,7 @@ class Transformer(BaseItemCollection, ABC):
         Makes the value of the nested items available as properties
         of the collection object.  This is used for retrieving data groups
         for dynamic execution.
-        :param item: Data group requested
+        :param item: Aggregate requested
         """
         return self.__getitem__(item)
 

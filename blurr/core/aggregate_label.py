@@ -5,9 +5,7 @@ from blurr.core.store_key import Key
 
 
 class LabelAggregateSchema(BlockAggregateSchema):
-    """
-    Data group that handles the block rollup aggregation
-    """
+    """ Schema for Block Aggregation by a Label that can determined by the record being processed """
 
     ATTRIBUTE_LABEL = 'Label'
 
@@ -19,9 +17,7 @@ class LabelAggregateSchema(BlockAggregateSchema):
 
 
 class LabelAggregate(BlockAggregate):
-    """
-    Manages the aggregates for block based roll-ups of streaming data
-    """
+    """ Aggregates records in blocks by a label calculated from teh record """
 
     def __init__(self, schema: LabelAggregateSchema, identity: str,
                  evaluation_context: EvaluationContext) -> None:
@@ -29,9 +25,7 @@ class LabelAggregate(BlockAggregate):
         self._label = None
 
     def evaluate(self) -> None:
-        """
-        Evaluates the current item
-        """
+        """ Evaluates the current item """
 
         label = self._schema.label.evaluate(self._evaluation_context)
 

@@ -7,7 +7,7 @@ from blurr.core.schema_loader import SchemaLoader
 
 class BlockAggregateSchema(AggregateSchema):
     """
-    Data group that handles the block rollup aggregation
+    Aggregates that handles the block rollup aggregation
     """
 
     ATTRIBUTE_SPLIT = 'Split'
