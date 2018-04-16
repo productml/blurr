@@ -1,3 +1,5 @@
+from typing import Dict, Any
+
 from blurr.core.aggregate_block import BlockAggregate, BlockAggregateSchema
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
@@ -17,6 +19,16 @@ class LabelAggregateSchema(BlockAggregateSchema):
         # Load type specific attributes
         self.label: Expression = Expression(self._spec[self.ATTRIBUTE_LABEL])
 
+    def extend_schema(self, spec: Dict[str, Any]) -> Dict[str, Any]:
+        """ Injects the label field """
+
+        label_field = {'Name': '_label', 'Type': 'string', 'Value': spec[self.ATTRIBUTE_NAME] + '._label_value'}
+        spec[self.ATTRIBUTE_FIELDS].insert(0, label_field)
+
+        self.schema_loader.add_schema(label_field, self.fully_qualified_name)
+
+        return super().extend_schema(spec)
+
 
 class LabelAggregate(BlockAggregate):
     """
@@ -26,33 +38,28 @@ class LabelAggregate(BlockAggregate):
     def __init__(self, schema: LabelAggregateSchema, identity: str,
                  evaluation_context: EvaluationContext) -> None:
         super().__init__(schema, identity, evaluation_context)
-        self._label = None
+        self._label_value = None
 
     def evaluate(self) -> None:
         """
         Evaluates the current item
         """
 
-        label = self._schema.label.evaluate(self._evaluation_context)
+        label = str(self._schema.label.evaluate(self._evaluation_context))
 
-        if not self._label:
-            self._label = label
-        elif self._label != label:
+        if not self._label_value:
+            self._label_value = label
+        elif self._label_value != label:
             # Save the current snapshot with the current timestamp
-            self.persist(self._start_time)
+            self.persist()
             # Reset the state of the contents
-            self.__init__(self._schema, self._identity, self._evaluation_context)
-            self._label = label
+            self.reset()
+            self._label_value = label
 
         super().evaluate()
 
     def persist(self, timestamp=None) -> None:
         """ Persists the label by combining it with group. """
         # TODO Refactor keys when refactoring store
-        self._schema.store.save(Key(self._identity, self._name + '.' + self._label, timestamp),
-                                    self._snapshot)
-
-    def finalize(self):
-        """ Persist the current frame with time at finalization """
-        if self._label:
-            self.persist(self._start_time)
+        self._schema.store.save(Key(self._identity, self._name + '.' + self._label_value,
+                                    timestamp if timestamp else self._start_time), self._snapshot)

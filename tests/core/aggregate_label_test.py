@@ -17,7 +17,7 @@ def label_aggregate_schema_spec() -> Dict[str, Any]:
     return {
         'Type': 'Blurr:Aggregate:LabelAggregate',
         'Name': 'label_aggr',
-        'Label': 'source.label',
+        'Label': 'source.label + "-label"',
         'Store': 'memory',
         'Fields': [{
             'Name': 'sum',
@@ -47,11 +47,36 @@ def label_aggregate_schema(label_aggregate_schema_spec, store_spec):
 @fixture
 def label_events():
     return [
-        Record({'id': 'user1', 'label': 'a', 'event_value': 10, 'event_time': '2018-01-01T01:01:01+00:00'}),
-        Record({'id': 'user1', 'label': 'a', 'event_value': 100, 'event_time': '2018-01-01T01:01:05+00:00'}),
-        Record({'id': 'user1', 'label': 'b', 'event_value': 1, 'event_time': '2018-01-01T01:02:01+00:00'}),
-        Record({'id': 'user1', 'label': 'c', 'event_value': 1000, 'event_time': '2018-01-01T03:01:01+00:00'}),
-        Record({'id': 'user1', 'label': 'c', 'event_value': 10000, 'event_time': '2018-01-02T01:01:01+00:00'})
+        Record({
+            'id': 'user1',
+            'label': 'a',
+            'event_value': 10,
+            'event_time': '2018-01-01T01:01:01+00:00'
+        }),
+        Record({
+            'id': 'user1',
+            'label': 'a',
+            'event_value': 100,
+            'event_time': '2018-01-01T01:01:05+00:00'
+        }),
+        Record({
+            'id': 'user1',
+            'label': 'b',
+            'event_value': 1,
+            'event_time': '2018-01-01T01:02:01+00:00'
+        }),
+        Record({
+            'id': 'user1',
+            'label': 'c',
+            'event_value': 1000,
+            'event_time': '2018-01-01T03:01:01+00:00'
+        }),
+        Record({
+            'id': 'user1',
+            'label': 'c',
+            'event_value': 10000,
+            'event_time': '2018-01-02T01:01:01+00:00'
+        })
     ]
 
 
@@ -70,7 +95,7 @@ def test_split_by_label(label_aggregate_schema, label_events):
     evaluation_context.global_add(label_aggregate._schema.name, label_aggregate)
 
     # Check that initial state is empty
-    assert label_aggregate._label is None
+    assert label_aggregate._label_value is None
     assert label_aggregate._schema.store.get_all() == {}
 
     def evaluate_event(index):
@@ -81,30 +106,38 @@ def test_split_by_label(label_aggregate_schema, label_events):
 
     # Check state at the end of the first event processed
     evaluate_event(0)
-    assert label_aggregate._label == 'a'
+    assert label_aggregate._label_value == label_aggregate._label == 'a-label'
     assert label_aggregate._schema.store.get_all() == {}
 
     # Check for labeled partition and persistence of the first label when label changes
     evaluate_event(1)
     evaluate_event(2)
-    assert label_aggregate._label == 'b'
+    assert label_aggregate._label_value == label_aggregate._label == 'b-label'
     store_state = label_aggregate._schema.store.get_all()
     assert len(store_state) == 1
-    assert store_state.get(Key('user1', 'label_aggr.a', datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc))) == {
-        '_identity': 'user1', '_start_time': datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc),
-        '_end_time': datetime(2018, 1, 1, 1, 1, 5, 0, timezone.utc), 'sum': 110, 'count': 2}
+    assert store_state.get(
+        Key('user1', 'label_aggr.a-label', datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc))) == {
+            '_identity': 'user1',
+            '_label': 'a-label',
+            '_start_time': datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc),
+            '_end_time': datetime(2018, 1, 1, 1, 1, 5, 0, timezone.utc),
+            'sum': 110,
+            'count': 2
+        }
 
     # Check for final state
     evaluate_event(3)
     evaluate_event(4)
     label_aggregate.finalize()
-    assert label_aggregate._label == 'c'
+    assert label_aggregate._label_value == label_aggregate._label == 'c-label'
     store_state = label_aggregate._schema.store.get_all()
     assert len(store_state) == 3
-    assert store_state.get(Key('user1', 'label_aggr.c', datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc))) == {
-        '_identity': 'user1', '_start_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc),
-        '_end_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc), 'sum': 11000, 'count': 2}
-
-
-
-
+    assert store_state.get(
+        Key('user1', 'label_aggr.c-label', datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc))) == {
+            '_identity': 'user1',
+            '_label': 'c-label',
+            '_start_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc),
+            '_end_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc),
+            'sum': 11000,
+            'count': 2
+        }
