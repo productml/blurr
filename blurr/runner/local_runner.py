@@ -7,37 +7,25 @@ import csv
 import json
 from typing import List, Optional
 
-import yaml
 from collections import defaultdict
-from docopt import docopt
 
 from blurr.core.record import Record
-from blurr.core.schema_loader import SchemaLoader
 from blurr.core.syntax.schema_validator import validate
-from blurr.runner.identity_runner import execute_dtc
-from blurr.runner.record_processor import DataProcessor, SingleJsonDataProcessor
+from blurr.runner.Runner import Runner
 
 
-class LocalRunner:
+class LocalRunner(Runner):
     def __init__(self,
                  local_json_files: List[str],
                  stream_dtc_file: str,
                  window_dtc_file: Optional[str] = None,
-                 record_processor: DataProcessor = SingleJsonDataProcessor()):
-        self._raw_files = local_json_files
-        self._schema_loader = SchemaLoader()
-        self._record_processor = record_processor
+                 record_processor: str = 'default'):
+        super().__init__(local_json_files,
+                         stream_dtc_file,
+                         window_dtc_file,
+                         record_processor)
 
-        self._stream_dtc = yaml.safe_load(open(stream_dtc_file))
-        self._window_dtc = None if window_dtc_file is None else yaml.safe_load(
-            open(window_dtc_file))
-        self._validate_dtc_syntax()
-
-        self._stream_dtc_name = self._schema_loader.add_schema(self._stream_dtc)
-        self._stream_transformer_schema = self._schema_loader.get_schema_object(
-            self._stream_dtc_name)
-
-        self._user_events = defaultdict(list)
+        self._users_events = defaultdict(list)
         self._block_data = {}
         self._window_data = {}
 
@@ -50,21 +38,21 @@ class LocalRunner:
         identity = self._stream_transformer_schema.get_identity(record)
         time = self._stream_transformer_schema.get_time(record)
 
-        self._user_events[identity].append((time, record))
+        self._users_events[identity].append((time, record))
 
     def _consume_file(self, file: str) -> None:
         with open(file) as f:
             for data_str in f:
-                for record in self._record_processor.process_data(data_str):
-                    self._consume_record(record)
+                for identity, time_record in self.get_per_user_records(data_str):
+                    self._users_events[identity].append(time_record)
 
     def execute_for_all_users(self) -> None:
-        for identity, events in self._user_events.items():
-            block_data, window_data = execute_dtc(events, identity, self._stream_dtc,
-                                                  self._window_dtc)
-
-            self._block_data.update(block_data)
-            self._window_data[identity] = window_data
+        for user_events in self._users_events.items():
+            data = self.execute_per_user_events(user_events)
+            if self._window_dtc:
+                self._window_data[user_events[0]] = data
+            else:
+                self._block_data.update(data)
 
     def execute(self) -> None:
         for file in self._raw_files:
@@ -90,18 +78,3 @@ class LocalRunner:
             writer.writeheader()
             for data_rows in self._window_data.values():
                 writer.writerows(data_rows)
-
-
-def main():
-    arguments = docopt(__doc__, version='pre-alpha')
-    local_runner = LocalRunner(arguments['--raw-data'].split(','), arguments['--streaming-dtc'],
-                               arguments['--window-dtc'])
-    local_runner.execute()
-    if arguments['--output-file'] is None:
-        local_runner.print_output()
-    else:
-        local_runner.write_output_file(arguments['--output-file'])
-
-
-if __name__ == "__main__":
-    main()

@@ -10,8 +10,10 @@ def run_command(stream_dtc_file: Optional[str], window_dtc_file: Optional[str],
     return cli({
         'transform': True,
         'validate': False,
+        '--runner': None,
         '--streaming-dtc': stream_dtc_file,
         '--window-dtc': window_dtc_file,
+        '--data-processor': None,
         '--source': source,
         '<raw-json-files>': raw_json_files,
     })
