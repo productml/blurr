@@ -22,7 +22,11 @@ class LabelAggregateSchema(BlockAggregateSchema):
     def extend_schema(self, spec: Dict[str, Any]) -> Dict[str, Any]:
         """ Injects the label field """
 
-        label_field = {'Name': '_label', 'Type': 'string', 'Value': spec[self.ATTRIBUTE_NAME] + '._label_value'}
+        label_field = {
+            'Name': '_label',
+            'Type': 'string',
+            'Value': spec[self.ATTRIBUTE_NAME] + '._label_value'
+        }
         spec[self.ATTRIBUTE_FIELDS].insert(0, label_field)
 
         self.schema_loader.add_schema(label_field, self.fully_qualified_name)

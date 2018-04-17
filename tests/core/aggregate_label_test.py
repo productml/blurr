@@ -132,35 +132,32 @@ def test_split_by_label_valid(label_aggregate_schema_spec: Dict[str, Any],
     store_state = label_aggregate._schema.store.get_all()
     assert len(store_state) == 3
 
-    assert store_state.get(
-        Key('user1', 'label_aggr.a')) == {
-               '_identity': 'user1',
-               '_label': 'a',
-               '_start_time': datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc),
-               '_end_time': datetime(2018, 1, 1, 1, 1, 5, 0, timezone.utc),
-               'sum': 110,
-               'count': 2
-           }
+    assert store_state.get(Key('user1', 'label_aggr.a')) == {
+        '_identity': 'user1',
+        '_label': 'a',
+        '_start_time': datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc),
+        '_end_time': datetime(2018, 1, 1, 1, 1, 5, 0, timezone.utc),
+        'sum': 110,
+        'count': 2
+    }
 
-    assert store_state.get(
-        Key('user1', 'label_aggr.b')) == {
-               '_identity': 'user1',
-               '_label': 'b',
-               '_start_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc),
-               '_end_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc),
-               'sum': 1,
-               'count': 1
-           }
+    assert store_state.get(Key('user1', 'label_aggr.b')) == {
+        '_identity': 'user1',
+        '_label': 'b',
+        '_start_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc),
+        '_end_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc),
+        'sum': 1,
+        'count': 1
+    }
 
-    assert store_state.get(
-        Key('user1', 'label_aggr.c')) == {
-               '_identity': 'user1',
-               '_label': 'c',
-               '_start_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc),
-               '_end_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc),
-               'sum': 11000,
-               'count': 2
-           }
+    assert store_state.get(Key('user1', 'label_aggr.c')) == {
+        '_identity': 'user1',
+        '_label': 'c',
+        '_start_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc),
+        '_end_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc),
+        'sum': 11000,
+        'count': 2
+    }
 
 
 def test_split_when_label_evaluates_to_none(label_aggregate_schema_spec: Dict[str, Any],
@@ -184,22 +181,20 @@ def test_split_when_label_evaluates_to_none(label_aggregate_schema_spec: Dict[st
 
     store_state = label_aggregate._schema.store.get_all()
     assert len(store_state) == 2
-    assert store_state.get(
-        Key('user1', 'label_aggr.None')) == {
-               '_identity': 'user1',
-               '_label': 'None',
-               '_start_time': datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc),
-               '_end_time': datetime(2018, 1, 1, 1, 1, 5, 0, timezone.utc),
-               'sum': 110,
-               'count': 2
-           }
+    assert store_state.get(Key('user1', 'label_aggr.None')) == {
+        '_identity': 'user1',
+        '_label': 'None',
+        '_start_time': datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc),
+        '_end_time': datetime(2018, 1, 1, 1, 1, 5, 0, timezone.utc),
+        'sum': 110,
+        'count': 2
+    }
 
-    assert store_state.get(
-        Key('user1', 'label_aggr.b')) == {
-               '_identity': 'user1',
-               '_label': 'b',
-               '_start_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc),
-               '_end_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc),
-               'sum': 1,
-               'count': 1
-           }
+    assert store_state.get(Key('user1', 'label_aggr.b')) == {
+        '_identity': 'user1',
+        '_label': 'b',
+        '_start_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc),
+        '_end_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc),
+        'sum': 1,
+        'count': 1
+    }
