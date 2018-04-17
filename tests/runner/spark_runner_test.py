@@ -10,7 +10,7 @@ def test_spark_runner_stream_only():
     spark_runner = SparkRunner(['tests/data/raw.json'], 'tests/data/stream.yml', None)
     block_data = {k: v for (k, v) in spark_runner.execute().collect()}
 
-    assert len(block_data) == 7
+    assert len(block_data) == 8
 
     # Stream DTC output
     assert block_data[Key('userA', 'session')] == {
@@ -40,8 +40,8 @@ def test_spark_runner_stream_only():
 
     assert block_data[Key('userB', 'session')] == {
         '_identity': 'userB',
-        '_start_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=tzutc()),
-        '_end_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=tzutc()),
+        '_start_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()),
+        '_end_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()),
         'events': 1,
         'country': '',
         'continent': ''

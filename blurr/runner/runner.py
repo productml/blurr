@@ -10,20 +10,15 @@ from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
 from blurr.core.syntax.schema_validator import validate
-from blurr.runner.record_processor import SingleJsonDataProcessor, IpfixDataProcessor
-
-DATA_PROCESSOR = {'ipfix': IpfixDataProcessor, 'default': SingleJsonDataProcessor}
+from blurr.runner.record_processor import DataProcessor
 
 
 class Runner(ABC):
-    def __init__(self,
-                 json_files: List[str],
-                 stream_dtc_file: str,
-                 window_dtc_file: Optional[str] = None,
-                 data_processor: str = 'default'):
+    def __init__(self, json_files: List[str], stream_dtc_file: str, window_dtc_file: Optional[str],
+                 data_processor: DataProcessor):
         self._raw_files = json_files
         self._schema_loader = SchemaLoader()
-        self._record_processor = DATA_PROCESSOR.get(data_processor, SingleJsonDataProcessor)()
+        self._data_processor = data_processor
 
         self._stream_dtc = yaml.safe_load(open(stream_dtc_file))
         self._window_dtc = None if window_dtc_file is None else yaml.safe_load(
@@ -53,7 +48,7 @@ class Runner(ABC):
 
     def get_per_user_records(self, event_str: str) -> List[Tuple[str, Tuple[datetime, Record]]]:
         record_list = []
-        for record in self._record_processor.process_data(event_str):
+        for record in self._data_processor.process_data(event_str):
             record_list.append((self._stream_transformer_schema.get_identity(record),
                                 (self._stream_transformer_schema.get_time(record), record)))
         return record_list
