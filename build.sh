@@ -17,7 +17,7 @@ pipenv run yapf -i -r .
 
 
 echo "running tests..."
-export PYTHONPATH=`pwd`:$PYTHONPATH
+export PYTHONPATH=`pwd`:$SPARK_HOME/python/lib/pyspark.zip:$SPARK_HOME/python/lib/py4j-0.10.4-src.zip:$PYTHONPATH
 pipenv run pytest -v --cov=blurr
 
 
