@@ -6,15 +6,15 @@ from pytest import fixture
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.field import Field
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.block_data_group import BlockDataGroupSchema, \
-    BlockDataGroup
+from blurr.core.aggregate_block import BlockAggregateSchema, \
+    BlockAggregate
 from blurr.core.store_key import Key
 
 
 @fixture
-def block_data_group_schema_spec() -> Dict[str, Any]:
+def block_aggregate_schema_spec() -> Dict[str, Any]:
     return {
-        'Type': 'Blurr:DataGroup:BlockAggregate',
+        'Type': 'Blurr:Aggregate:BlockAggregate',
         'Name': 'user',
         'Store': 'memstore',
         'Fields': [{
@@ -50,29 +50,28 @@ def check_fields(fields: Dict[str, Field], expected_field_values: Dict[str, Any]
     return True
 
 
-def create_block_data_group(schema, time, identity) -> BlockDataGroup:
+def create_block_aggregate(schema, time, identity) -> BlockAggregate:
     evaluation_context = EvaluationContext()
-    block_data_group = BlockDataGroup(
+    block_aggregate = BlockAggregate(
         schema=schema, identity=identity, evaluation_context=evaluation_context)
     evaluation_context.global_add('time', time)
-    evaluation_context.global_add('user', block_data_group)
+    evaluation_context.global_add('user', block_aggregate)
     evaluation_context.global_add('identity', identity)
-    return block_data_group
+    return block_aggregate
 
 
-def test_block_data_group_schema_evaluate_without_split(block_data_group_schema_spec,
-                                                        schema_loader):
-    name = schema_loader.add_schema(block_data_group_schema_spec)
-    block_data_group_schema = BlockDataGroupSchema(name, schema_loader)
+def test_block_aggregate_schema_evaluate_without_split(block_aggregate_schema_spec, schema_loader):
+    name = schema_loader.add_schema(block_aggregate_schema_spec)
+    block_aggregate_schema = BlockAggregateSchema(name, schema_loader)
 
     identity = 'userA'
     time = datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc)
-    block_data_group = create_block_data_group(block_data_group_schema, time, identity)
-    block_data_group.evaluate()
+    block_aggregate = create_block_aggregate(block_aggregate_schema, time, identity)
+    block_aggregate.evaluate()
 
     # Check eval results of various fields
-    assert len(block_data_group._nested_items) == 4
-    assert check_fields(block_data_group._nested_items, {
+    assert len(block_aggregate._nested_items) == 4
+    assert check_fields(block_aggregate._nested_items, {
         '_identity': identity,
         'event_count': 1,
         '_start_time': time,
@@ -80,36 +79,36 @@ def test_block_data_group_schema_evaluate_without_split(block_data_group_schema_
     })
 
     # aggregate snapshot should not exist in store
-    assert block_data_group_schema.store.get(
-        Key(identity=block_data_group._identity,
-            group=block_data_group._name,
-            timestamp=block_data_group._start_time)) is None
+    assert block_aggregate_schema.store.get(
+        Key(identity=block_aggregate._identity,
+            group=block_aggregate._name,
+            timestamp=block_aggregate._start_time)) is None
 
 
-def test_block_data_group_schema_evaluate_with_split(block_data_group_schema_spec, schema_loader):
-    block_data_group_schema_spec['Split'] = 'user.event_count == 2'
-    name = schema_loader.add_schema(block_data_group_schema_spec)
-    block_data_group_schema = BlockDataGroupSchema(name, schema_loader)
+def test_block_aggregate_schema_evaluate_with_split(block_aggregate_schema_spec, schema_loader):
+    block_aggregate_schema_spec['Split'] = 'user.event_count == 2'
+    name = schema_loader.add_schema(block_aggregate_schema_spec)
+    block_aggregate_schema = BlockAggregateSchema(name, schema_loader)
 
     identity = 'userA'
     time = datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc)
-    block_data_group = create_block_data_group(block_data_group_schema, time, identity)
-    block_data_group.evaluate()
-    block_data_group.evaluate()
+    block_aggregate = create_block_aggregate(block_aggregate_schema, time, identity)
+    block_aggregate.evaluate()
+    block_aggregate.evaluate()
 
     # Check eval results of various fields before split
-    assert check_fields(block_data_group._nested_items, {
+    assert check_fields(block_aggregate._nested_items, {
         '_identity': identity,
         'event_count': 2,
         '_start_time': time,
         '_end_time': time
     })
 
-    current_snapshot = block_data_group._snapshot
-    block_data_group.evaluate()
+    current_snapshot = block_aggregate._snapshot
+    block_aggregate.evaluate()
 
     # Check eval results of various fields
-    assert check_fields(block_data_group._nested_items, {
+    assert check_fields(block_aggregate._nested_items, {
         '_identity': identity,
         'event_count': 1,
         '_start_time': time,
@@ -117,6 +116,6 @@ def test_block_data_group_schema_evaluate_with_split(block_data_group_schema_spe
     })
 
     # Check aggregate snapshot present in store
-    assert block_data_group_schema.store.get(
-        Key(identity=block_data_group._identity, group=block_data_group._name,
+    assert block_aggregate_schema.store.get(
+        Key(identity=block_aggregate._identity, group=block_aggregate._name,
             timestamp=time)) == current_snapshot

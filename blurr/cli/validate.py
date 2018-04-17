@@ -14,7 +14,6 @@ def validate_command(dtc_files: List[str]) -> int:
     if len(dtc_files) == 0:
         dtc_files = get_yml_files()
     for dtc_file in dtc_files:
-        print('Running syntax validation on {}'.format(dtc_file))
         if validate_file(dtc_file) == 1:
             all_files_valid = False
 
@@ -22,6 +21,7 @@ def validate_command(dtc_files: List[str]) -> int:
 
 
 def validate_file(dtc_file: str) -> int:
+    print('Running syntax validation on {}'.format(dtc_file))
     try:
         dtc_dict = yaml.safe_load(open(dtc_file, 'r', encoding='utf-8'))
         validate(dtc_dict)

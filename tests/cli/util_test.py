@@ -10,13 +10,13 @@ def override_open(filename: str) -> Any:
     if filename == 'invalid.yml':
         content = "Type: ABC"
     elif filename == 'stream1.yml':
-        content = 'Type: Blurr:Streaming'
+        content = 'Type: Blurr:Transform:Streaming'
     elif filename == 'stream2.yml':
-        content = 'Type: Blurr:Streaming'
+        content = 'Type: Blurr:Transform:Streaming'
     elif filename == 'window1.yml':
-        content = 'Type: Blurr:Window'
+        content = 'Type: Blurr:Transform:Window'
     elif filename == 'window2.yml':
-        content = 'Type: Blurr:Window'
+        content = 'Type: Blurr:Transform:Window'
     else:
         raise FileNotFoundError(filename)
     file_object = mock.mock_open(read_data=content).return_value

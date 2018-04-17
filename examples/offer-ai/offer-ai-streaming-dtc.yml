@@ -4,7 +4,7 @@
 
 # Type of DTC. Streaming or Window
 # The Streaming DTC processes the raw data and converts it into sessions
-Type: Blurr:Streaming
+Type: Blurr:Transform:Streaming
 Version: '2018-03-01'
 Description: Generate sessions from streaming Raw Data
 Name: offer_ai_v1
@@ -21,11 +21,11 @@ Stores:
  - Type: Blurr:Store:MemoryStore
    Name: offer_ai
 
-DataGroups:
+Aggregates:
 
    # IdentityAggregate is meant for user profile information that is rarely updated. This is processed first
    # These are things like country, install source and whether user is logged in to Facebook
- - Type: Blurr:DataGroup:IdentityAggregate
+ - Type: Blurr:Aggregate:IdentityAggregate
    Name: user
    Store: offer_ai
    When: source.event_id in ['app_launched', 'user_updated']
@@ -46,7 +46,7 @@ DataGroups:
 
 
    # BlockAggregates definition
- - Type: Blurr:DataGroup:BlockAggregate
+ - Type: Blurr:Aggregate:BlockAggregate
    Name: game_stats
    # We defined this store earlier
    Store: offer_ai

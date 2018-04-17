@@ -5,8 +5,8 @@ from pytest import fixture
 
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.simple_fields import IntegerFieldSchema
-from blurr.core.streaming_transformer import StreamingTransformerSchema
+from blurr.core.field_simple import IntegerFieldSchema
+from blurr.core.transformer_streaming import StreamingTransformerSchema
 
 
 @fixture
@@ -15,7 +15,7 @@ def nested_schema_spec_bad_type() -> Dict:
         'Name': 'test',
         'Type': 'Blurr:Unknown',
         'Ignored': 2,
-        'DataGroups': [{
+        'Aggregates': [{
             'Name': 'test_group',
             'Fields': [{
                 "Type": "string",
@@ -34,14 +34,14 @@ def nested_schema_spec_bad_type() -> Dict:
 def nested_schema_spec() -> Dict:
     return {
         'Name': 'test',
-        'Type': 'Blurr:Streaming',
+        'Type': 'Blurr:Transform:Streaming',
         "Version": "2018-03-01",
         "Time": "parser.parse(source.event_time)",
         "Identity": "source.user_id",
         'Ignored': 2,
-        'DataGroups': [{
+        'Aggregates': [{
             'Name': 'test_group',
-            'Type': 'Blurr:DataGroup:IdentityAggregate',
+            'Type': 'Blurr:Aggregate:IdentityAggregate',
             'Fields': [{
                 "Type": "string",
                 "Name": "country",
@@ -89,11 +89,11 @@ def test_add_valid_nested_schema(nested_schema_spec_bad_type: Dict) -> None:
 
     assert schema_loader.add_schema(nested_schema_spec_bad_type) == 'test'
     assert schema_loader.get_schema_spec('test.test_group') == nested_schema_spec_bad_type[
-        'DataGroups'][0]
+        'Aggregates'][0]
     assert schema_loader.get_schema_spec('test.test_group.country') == nested_schema_spec_bad_type[
-        'DataGroups'][0]['Fields'][0]
+        'Aggregates'][0]['Fields'][0]
     assert schema_loader.get_schema_spec('test.test_group.events') == nested_schema_spec_bad_type[
-        'DataGroups'][0]['Fields'][1]
+        'Aggregates'][0]['Fields'][1]
 
 
 def test_get_schema_object_error(nested_schema_spec_bad_type: Dict) -> None:
@@ -130,7 +130,7 @@ def test_get_fully_qualified_name() -> None:
 
 def test_get_schemas_of_type(schema_loader: SchemaLoader, nested_schema_spec: Dict) -> None:
     assert schema_loader.get_schemas_of_type('integer') == [
-        ('test.test_group.events', nested_schema_spec['DataGroups'][0]['Fields'][1])
+        ('test.test_group.events', nested_schema_spec['Aggregates'][0]['Fields'][1])
     ]
 
 

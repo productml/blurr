@@ -22,7 +22,7 @@ class Map(ComplexTypeBase, dict):
 class MapFieldSchema(FieldSchema):
     @property
     def type_object(self) -> Any:
-        return dict
+        return Map
 
     @property
     def default(self) -> Any:
@@ -48,7 +48,7 @@ class List(ComplexTypeBase, list):
 class ListFieldSchema(FieldSchema):
     @property
     def type_object(self) -> Any:
-        return list
+        return List
 
     @property
     def default(self) -> Any:
@@ -69,7 +69,7 @@ class Set(ComplexTypeBase, set):
 class SetFieldSchema(FieldSchema):
     @property
     def type_object(self) -> Any:
-        return set
+        return Set
 
     @property
     def default(self) -> Any:

@@ -1,14 +1,14 @@
-Type: Blurr:Window
+Type: Blurr:Transform:Window
 Version: '2018-03-01'
 Name: boost_data
 
-SourceDTC: streaming-dtc.yml
+SourceDTC: sessions
 
 Anchor:
   Condition: sessions.session_stats.boost == True
 
-DataGroups:
-  - Type: Blurr:DataGroup:WindowAggregate
+Aggregates:
+  - Type: Blurr:Aggregate:WindowAggregate
     Name: last_7_days
     WindowType: day
     WindowValue: -7
@@ -19,7 +19,7 @@ DataGroups:
        Type: float
        Value: sum(source.games_played) / len(source.session_id)
 
-  - Type: Blurr:DataGroup:WindowAggregate
+  - Type: Blurr:Aggregate:WindowAggregate
     Name: next_3_days
     WindowType: day
     WindowValue: +3

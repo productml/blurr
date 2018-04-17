@@ -1,4 +1,5 @@
-import ast
+import traceback
+
 import os
 import re
 from typing import Dict
@@ -10,7 +11,6 @@ from yamale.validators.constraints import Constraint
 
 from blurr.core.errors import InvalidSchemaError
 
-EQUAL_OPERATOR_EXISTS_REGEX = re.compile(r'(?:^|[^!=]+)=(?:[^=]+|$)')
 IDENTITY_VALIDATOR_REGEX = re.compile(r'^_|[^\S]')
 
 
@@ -54,35 +54,24 @@ class Identifier(Validator):
 class Expression(Validator):
     TAG = 'expression'
 
-    ERROR_STRING_SET_NOT_ALLOWED = '\'%s\' sets value using `=`.'
     ERROR_STRING_INVALID_PYTHON_EXPRESSION = '\'%s\' is an invalid python expression.'
     failure_reason = None
 
     def _is_valid(self, value: str) -> bool:
         value = str(value)
-        if EQUAL_OPERATOR_EXISTS_REGEX.findall(value):
-            self.failure_reason = self.ERROR_STRING_SET_NOT_ALLOWED
-            return False
-        elif not self.is_valid_python_expression(value):
+        try:
+            compile(str(value), '<string>', 'eval')
+            return True
+        except Exception as err:
+            traceback.print_exc(limit=0)
             self.failure_reason = self.ERROR_STRING_INVALID_PYTHON_EXPRESSION
-            return False
-        return True
+        return False
 
     def get_name(self) -> str:
         return 'Expression'
 
     def fail(self, value):
         return self.failure_reason % value
-
-    @staticmethod
-    def is_valid_python_expression(expression):
-        try:
-            ast.parse(expression)
-        except SyntaxError:
-            return False
-        except TypeError:
-            return False
-        return True
 
 
 VALIDATORS = {
@@ -114,11 +103,11 @@ def _validate_streaming(dtc_dict: Dict, name: str) -> None:
 
 
 def is_window_dtc(dtc_dict: Dict) -> bool:
-    return dtc_dict.get('Type', '').lower() == 'blurr:window'
+    return dtc_dict.get('Type', '').lower() == 'blurr:transform:window'
 
 
 def is_streaming_dtc(dtc_dict: Dict) -> bool:
-    return dtc_dict.get('Type', '').lower() == 'blurr:streaming'
+    return dtc_dict.get('Type', '').lower() == 'blurr:transform:streaming'
 
 
 def validate(dtc_dict: Dict, name='dtc') -> None:
@@ -127,4 +116,5 @@ def validate(dtc_dict: Dict, name='dtc') -> None:
     elif is_streaming_dtc(dtc_dict):
         _validate_streaming(dtc_dict, name)
     else:
-        raise ValueError('Document is not a valid DTC')
+        raise InvalidSchemaError('Document has an invalid DTC \'Type\' {}.'.format(
+            dtc_dict.get('Type', '')))

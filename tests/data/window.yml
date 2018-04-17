@@ -1,4 +1,4 @@
-Type: Blurr:Window
+Type: Blurr:Transform:Window
 Version: '2018-03-01'
 Description: Second Level processing for feature generation
 
@@ -11,8 +11,8 @@ Anchor:
   Max: 1
 
 
-DataGroups:
-  - Type: Blurr:DataGroup:WindowAggregate
+Aggregates:
+  - Type: Blurr:Aggregate:WindowAggregate
     Name: last_session
     WindowType: count
     WindowValue: -1
@@ -23,7 +23,7 @@ DataGroups:
        Type: integer
        Value: source.events[0]
 
-  - Type: Blurr:DataGroup:WindowAggregate
+  - Type: Blurr:Aggregate:WindowAggregate
     Name: last_day
     WindowType: day
     WindowValue: -1
@@ -32,4 +32,6 @@ DataGroups:
     Fields:
      - Name: total_events
        Type: integer
-       Value: sum(source.events)
+       # Should be similar to just sum(source.events) as Window DTC is not
+       # supposed to run with state.
+       Value: last_day.total_events + sum(source.events)

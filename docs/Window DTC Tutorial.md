@@ -2,6 +2,7 @@
 
 In this tutorial we'll introduce a new type of DTC: the __Window DTC__, and will learn how a Window DTC consumes session data produced in the first tutorial in order to generate __time aggregated data__.
 
+Try the code from this example [launching a Jupyter Notebook](https://mybinder.org/v2/gh/productml/blurr/master?filepath=examples%2Ftutorial).
 
 ## 1. Game Boosts
 
@@ -48,7 +49,7 @@ This result shows our players have increased the games played per session after 
 In order to obtain the output described before, Blurr will perform __time-based aggregation__ over the historic session data obtained with the Streaming DTC in the first tutorial. This transformation is defined in a __Window DTC__:
 
 ```yaml
-Type: Blurr:DTC:Window
+Type: Blurr:Transform:Window
 Version: '2018-03-01'
 Name: boost_data
 
@@ -57,8 +58,8 @@ SourceDTC: sessions
 Anchor:
   Condition: source.event_id == "game_start" and source.boost == True
 
-DataGroups:
-  - Type: Blurr:DTC:DataGroup:WindowAggregate
+Aggregates:
+  - Type: Blurr:Aggregate:WindowAggregate
     Name: last_7_days
     Window:
       Type: day
@@ -70,7 +71,7 @@ DataGroups:
        Type: float
        Value: sum(source.games_played) / len(source.session_id)
 
-  - Type: Blurr:DTC:DataGroup:WindowAggregate
+  - Type: Blurr:Aggregate:WindowAggregate
     Name: next_3_days
     Window:
       Type: day
@@ -97,7 +98,7 @@ SourceDTC: sessions
 
 ```yaml
 # excerpt from Streaming DTC
-Type: Blurr:DTC:Streaming
+Type: Blurr:Transform:Streaming
 Version: '2018-03-07'
 Name : sessions
 ```
@@ -135,11 +136,11 @@ Our Window DTC performs 2 different aggregations:
 * Over all sessions 7 days __before__ the Anchor Point.
 * Over all sessions 3 days __before__ the Anchor Point.
 
-How each aggregated is calculated is defined by `WindowAggregate` DataGroups:
+How each aggregated is calculated is defined by `WindowAggregate` Aggregates:
 
 
 ```yaml
-- Type: Blurr:DTC:DataGroup:WindowAggregate
+- Type: Blurr:Aggregate:WindowAggregate
     Name: last_7_days
     Window:
       Type: day
@@ -168,12 +169,12 @@ Value: -7
 
 `Source` is used to __lookup input data__ from the Streaming DTC.
 
-In this case the input is session data produced in `session_stats` DataGroup in `sessions` Streaming DTC:
+In this case the input is session data produced in `session_stats` Aggregate in `sessions` Streaming DTC:
 
 ```yaml
 # excerpt from Streaming DTC
-DataGroups:
- - Type: Blurr:DTC:DataGroup:BlockAggregate
+Aggregates:
+ - Type: Blurr:Aggregate:BlockAggregate
    Name: session_stats
 ```
 
