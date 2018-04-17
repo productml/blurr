@@ -1,8 +1,6 @@
 from datetime import datetime
 from typing import List, Dict, Tuple, Any, Optional
 
-from dateutil import parser
-
 from blurr.core import logging
 from blurr.core.aggregate_block import BlockAggregate
 from blurr.core.errors import PrepareWindowMissingBlocksError
@@ -35,10 +33,8 @@ def execute_stream_dtc(identity_events: List[Tuple[datetime, Record]], identity:
 
     stream_dtc_name = schema_loader.add_schema(stream_dtc_spec)
     stream_transformer_schema = schema_loader.get_schema_object(stream_dtc_name)
-    exec_context = Context()
-    exec_context.add('parser', parser)
 
-    stream_transformer = StreamingTransformer(stream_transformer_schema, identity, exec_context)
+    stream_transformer = StreamingTransformer(stream_transformer_schema, identity)
     for time, event in identity_events:
         stream_transformer.evaluate_record(event)
     stream_transformer.finalize()
@@ -52,14 +48,12 @@ def execute_window_dtc(identity: str, schema_loader: SchemaLoader,
         logging.debug('Window DTC not provided')
         return []
 
-    exec_context = Context()
-    exec_context.add('parser', parser)
-
     stream_transformer = StreamingTransformer(
-        get_streaming_transformer_schema(schema_loader), identity, Context())
+        get_streaming_transformer_schema(schema_loader), identity)
     all_data = get_memory_store(schema_loader).get_all()
     stream_transformer.restore(all_data)
 
+    exec_context = Context()
     exec_context.add(stream_transformer._schema.name, stream_transformer)
 
     block_obj = None
