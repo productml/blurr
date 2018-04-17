@@ -22,15 +22,14 @@ def test_spark_runner_stream_only():
         'continent': 'World'
     }
 
-    assert block_data[Key('userA', 'session',
-                                        datetime(2018, 3, 7, 22, 35, 31))] == {
+    assert block_data[Key('userA', 'session', datetime(2018, 3, 7, 22, 35, 31))] == {
         '_identity': 'userA',
         '_start_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=tzutc()),
         '_end_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=tzutc()),
         'events': 1,
         'country': 'US',
         'continent': 'North America'
-    }  # yapf: disable
+    }
 
     assert block_data[Key('userA', 'state')] == {
         '_identity': 'userA',

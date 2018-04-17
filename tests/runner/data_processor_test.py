@@ -38,7 +38,7 @@ def test_ipfix_data_processor_success():
     ]
 
 
-def test_ipfix_data_processor_invalid_ipfix():
+def test_ipfix_data_processor_invalid_ipfix_data_error():
     data_processor = IpfixDataProcessor()
     assert data_processor.process_data('{"test": 1}') == []
 
