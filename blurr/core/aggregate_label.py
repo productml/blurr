@@ -33,7 +33,7 @@ class LabelAggregateSchema(BlockAggregateSchema):
 
 
 class LabelAggregate(BlockAggregate):
-    """ Aggregates records in blocks by a label calculated from teh record """
+    """ Aggregates records in blocks by a label calculated from the record """
 
     def __init__(self, schema: LabelAggregateSchema, identity: str,
                  evaluation_context: EvaluationContext) -> None:
