@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: productml/spark-builder:0.30
+      - image: productml/spark-builder:0.31
     steps:
       - checkout
       - run:
@@ -10,7 +10,7 @@ jobs:
           command: sh build.sh
   deploy:
     docker:
-      - image: productml/spark-builder:0.30
+      - image: productml/spark-builder:0.31
     steps:
       - checkout
       - run:
