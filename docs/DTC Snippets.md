@@ -70,3 +70,40 @@ Fields:
     Value: [item for sublist in source.products_bought for item in sublist]
     # Flattens the list of list of tuples of products_bought
 ```
+
+# Data validation
+
+# Determine correctness of a session
+
+One possible way of determining the correctness of a session (without relying on the order of events) could be done with:
+
+```yaml
+- Name: game_start_and_end
+  Type: list
+  Value: session_stats.game_start_and_end.add((time, source.event_id))
+  When: source.event_id == 'game_start' or source.event_id == 'game_end'
+```
+
+Then another field can be defined to determine the correctness:
+
+```yaml
+-  Name: valid_session
+  Type: boolean
+  Value: valid_start_and_end(session_stats.game_start_and_end)
+  When: source.event_id == 'game_start' or source.event_id == 'game_end'
+```
+```yaml  
+def valid_start_and_end(games_list):
+  # Determine that each game_start has a corresponding game_end.
+  # and return True / False accordingly.
+```
+As more events are processed the value of session_stats.valid_session will maintain whether this session is valid or not. The fields are evaluated in the order they are defined so the valid_session field should be defined after game_start_and_end field.
+
+# Per event validation
+
+Validate individual events for things like missing field values, reuse fields etc. Some ways to do so are:
+
+- Create a variable (`VariableAggregate`) with the required clean up on the event field
+- Use `When` in `Field` for validation conditions
+- Define a `valid_event` field and use that in When. This can be go in `VariableAggregate` if we don't want to save it
+- If it is ok to ignore fields that have errors (e.g. missing), Blurr does not process the event and drops it as default behavior. If the source is missing event fields, the `Field evaluation` is skipped and an error is logged in debug logs.
