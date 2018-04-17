@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 from dateutil import parser
 from pytest import fixture
@@ -36,7 +36,8 @@ def store_spec() -> Dict[str, Any]:
 
 
 @fixture
-def activity_aggregate_schema(activity_aggregate_schema_spec, store_spec):
+def activity_aggregate_schema(activity_aggregate_schema_spec: Dict[str, Any],
+                              store_spec: Dict[str, Any]) -> ActivityAggregateSchema:
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(activity_aggregate_schema_spec)
     schema_loader.add_schema(store_spec, name)
@@ -44,7 +45,7 @@ def activity_aggregate_schema(activity_aggregate_schema_spec, store_spec):
 
 
 @fixture
-def activity_events():
+def activity_events() -> List[Record]:
     return [
         Record({'id': 'user1', 'event_value': 10, 'event_time': '2018-01-01T01:01:01+00:00'}),
         Record({'id': 'user1', 'event_value': 100, 'event_time': '2018-01-01T01:01:05+00:00'}),
@@ -54,7 +55,8 @@ def activity_events():
     ]
 
 
-def test_split_by_inactivity(activity_aggregate_schema, activity_events):
+def test_split_by_inactivity(activity_aggregate_schema: ActivityAggregateSchema,
+                             activity_events: List[Record]) -> None:
     # Initialize the starting state
     identity = 'user1'
     evaluation_context = EvaluationContext()
