@@ -32,12 +32,6 @@ class LocalRunner(Runner):
         if self._window_dtc is not None:
             validate(self._window_dtc)
 
-    def _consume_record(self, record: Record) -> None:
-        identity = self._stream_transformer_schema.get_identity(record)
-        time = self._stream_transformer_schema.get_time(record)
-
-        self._users_events[identity].append((time, record))
-
     def _consume_file(self, file: str) -> None:
         with open(file) as f:
             for data_str in f:
@@ -64,13 +58,20 @@ class LocalRunner(Runner):
             print(json.dumps(row, default=str))
 
     def write_output_file(self, output_file: str, data):
-        header = []
-        for data_rows in data.values():
-            for data_row in data_rows:
-                header = data_row.keys()
-                break
-        with open(output_file, 'w') as csv_file:
-            writer = csv.DictWriter(csv_file, header)
-            writer.writeheader()
-            for data_rows in self._window_data.values():
-                writer.writerows(data_rows)
+        if not self._window_dtc:
+            with open(output_file, 'w') as file:
+                for row in data.items():
+                    file.write(json.dumps(row, default=str))
+                    file.write('\n')
+        else:
+            header = []
+            for data_rows in data.values():
+                for data_row in data_rows:
+                    header = list(data_row.keys())
+                    break
+            header.sort()
+            with open(output_file, 'w') as csv_file:
+                writer = csv.DictWriter(csv_file, header)
+                writer.writeheader()
+                for data_rows in data.values():
+                    writer.writerows(data_rows)

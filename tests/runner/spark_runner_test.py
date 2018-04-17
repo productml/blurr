@@ -6,7 +6,7 @@ from blurr.core.store_key import Key
 from blurr.runner.spark_runner import SparkRunner
 
 
-def test_spark_runner_stream_only():
+def test_only_stream_dtc_provided():
     spark_runner = SparkRunner(['tests/data/raw.json'], 'tests/data/stream.yml', None)
     block_data = {k: v for (k, v) in spark_runner.execute().collect()}
 
@@ -47,7 +47,7 @@ def test_spark_runner_stream_only():
     }
 
 
-def test_spark_runner_no_vars_stored():
+def test_no_variable_aggreate_data_stored():
     spark_runner = SparkRunner(['tests/data/raw.json'], 'tests/data/stream.yml', None)
     block_data = {k: v for (k, v) in spark_runner.execute().collect()}
 
@@ -55,7 +55,7 @@ def test_spark_runner_no_vars_stored():
     assert Key('userA', 'vars') not in block_data
 
 
-def test_spark_runner_with_window():
+def test_stream_and_window_dtc_provided():
     spark_runner = SparkRunner(['tests/data/raw.json'], 'tests/data/stream.yml',
                                'tests/data/window.yml')
     window_data = dict(spark_runner.execute().collect())
@@ -67,3 +67,36 @@ def test_spark_runner_with_window():
         'last_day._identity': 'userA'
     }]
     assert window_data['userB'] == []
+
+
+def test_write_output_file_only_source_dtc_provided(tmpdir):
+    spark_runner = SparkRunner(['tests/data/raw.json'], 'tests/data/stream.yml', None)
+    window_data = spark_runner.execute()
+    out_dir = tmpdir.join('out')
+    spark_runner.write_output_file(str(out_dir), window_data)
+    output_files = out_dir.listdir(lambda x: x.basename.startswith('part'))
+    output_text = []
+    for output_file in output_files:
+        output_text.extend(output_file.readlines(cr=False))
+    assert ('["userA/session/2018-03-07T22:35:31+00:00", {'
+            '"_identity": "userA", '
+            '"_start_time": "2018-03-07 22:35:31+00:00", '
+            '"_end_time": "2018-03-07 22:35:31+00:00", '
+            '"events": 1, '
+            '"country": "US", '
+            '"continent": "North America"'
+            '}]') in output_text
+
+
+def test_write_output_file_with_stream_and_window_dtc_provided(tmpdir):
+    spark_runner = SparkRunner(['tests/data/raw.json'], 'tests/data/stream.yml',
+                               'tests/data/window.yml')
+    window_data = spark_runner.execute()
+    out_dir = tmpdir.join('out')
+    spark_runner.write_output_file(str(out_dir), window_data)
+    output_files = out_dir.listdir(lambda x: x.basename.startswith('part'))
+    output_text = []
+    for output_file in output_files:
+        output_text.extend(output_file.readlines(cr=False))
+    assert 'last_day._identity,last_day.total_events,last_session._identity,last_session.events' in output_text
+    assert 'userA,1,userA,1' in output_text

@@ -6,7 +6,7 @@ from blurr.core.store_key import Key
 from blurr.runner.local_runner import LocalRunner
 
 
-def test_local_runner_stream_only():
+def test_only_stream_dtc_provided():
     local_runner = LocalRunner(['tests/data/raw.json'], 'tests/data/stream.yml', None)
     local_runner.execute()
 
@@ -49,7 +49,7 @@ def test_local_runner_stream_only():
     assert not local_runner._window_data
 
 
-def test_local_runner_no_vars_stored():
+def test_no_variable_aggreate_data_stored():
     local_runner = LocalRunner(['tests/data/raw.json'], 'tests/data/stream.yml', None)
     local_runner.execute()
 
@@ -57,7 +57,7 @@ def test_local_runner_no_vars_stored():
     assert Key('userA', 'vars') not in local_runner._block_data
 
 
-def test_local_runner_with_window():
+def test_stream_and_window_dtc_provided():
     local_runner = LocalRunner(['tests/data/raw.json'], 'tests/data/stream.yml',
                                'tests/data/window.yml')
     local_runner.execute()
@@ -72,3 +72,30 @@ def test_local_runner_with_window():
         'last_day._identity': 'userA'
     }]
     assert local_runner._window_data['userB'] == []
+
+
+def test_write_output_file_only_source_dtc_provided(tmpdir):
+    local_runner = LocalRunner(['tests/data/raw.json'], 'tests/data/stream.yml', None)
+    window_data = local_runner.execute()
+    output_file = tmpdir.join('out.txt')
+    local_runner.write_output_file(str(output_file), window_data)
+    output_text = output_file.readlines(cr=False)
+    assert ('["userA/session/2018-03-07T22:35:31+00:00", {'
+            '"_identity": "userA", '
+            '"_start_time": "2018-03-07 22:35:31+00:00", '
+            '"_end_time": "2018-03-07 22:35:31+00:00", '
+            '"events": 1, '
+            '"country": "US", '
+            '"continent": "North America"'
+            '}]') in output_text
+
+
+def test_write_output_file_with_stream_and_window_dtc_provided(tmpdir):
+    local_runner = LocalRunner(['tests/data/raw.json'], 'tests/data/stream.yml',
+                               'tests/data/window.yml')
+    window_data = local_runner.execute()
+    output_file = tmpdir.join('out.txt')
+    local_runner.write_output_file(str(output_file), window_data)
+    output_text = output_file.readlines(cr=False)
+    assert 'last_day._identity,last_day.total_events,last_session._identity,last_session.events' in output_text
+    assert 'userA,1,userA,1' in output_text
