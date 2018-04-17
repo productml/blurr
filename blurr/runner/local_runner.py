@@ -11,7 +11,7 @@ from collections import defaultdict
 
 from blurr.core.record import Record
 from blurr.core.syntax.schema_validator import validate
-from blurr.runner.record_processor import DataProcessor, SimpleJsonDataProcessor
+from blurr.runner.data_processor import DataProcessor, SimpleJsonDataProcessor
 from blurr.runner.runner import Runner
 
 
@@ -48,7 +48,7 @@ class LocalRunner(Runner):
         for user_events in self._users_events.items():
             data = self.execute_per_user_events(user_events)
             if self._window_dtc:
-                self._window_data[user_events[0]] = data
+                self._window_data.update(data)
             else:
                 self._block_data.update(data)
 

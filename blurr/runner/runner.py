@@ -10,7 +10,7 @@ from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
 from blurr.core.syntax.schema_validator import validate
-from blurr.runner.record_processor import DataProcessor
+from blurr.runner.data_processor import DataProcessor
 
 
 class Runner(ABC):
@@ -35,7 +35,7 @@ class Runner(ABC):
             validate(self._window_dtc)
 
     def execute_per_user_events(self, user_events: Tuple[str, List[Tuple[datetime, Record]]]
-                                ) -> Union[List[Tuple[Key, Any]], List[Dict]]:
+                                ) -> List[Union[Tuple[Key, Any], Tuple[str, Any]]]:
         identity = user_events[0]
         events = user_events[1]
         block_data, window_data = identity_runner.execute_dtc(events, identity, self._stream_dtc,
@@ -44,7 +44,7 @@ class Runner(ABC):
         if self._window_dtc is None:
             return [(k, v) for k, v in block_data.items()]
         else:
-            return window_data
+            return [(identity, window_data)]
 
     def get_per_user_records(self, event_str: str) -> List[Tuple[str, Tuple[datetime, Record]]]:
         record_list = []

@@ -59,11 +59,12 @@ def test_spark_runner_no_vars_stored():
 def test_spark_runner_with_window():
     spark_runner = SparkRunner(['tests/data/raw.json'], 'tests/data/stream.yml',
                                'tests/data/window.yml')
-    window_data = spark_runner.execute().collect()
+    window_data = dict(spark_runner.execute().collect())
 
-    assert window_data == [{
+    assert window_data['userA'] == [{
         'last_session.events': 1,
         'last_session._identity': 'userA',
         'last_day.total_events': 1,
         'last_day._identity': 'userA'
     }]
+    assert window_data['userB'] == []
