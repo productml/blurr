@@ -11,7 +11,6 @@ class ActivityAggregateSchema(BlockAggregateSchema):
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
 
-        # Load type specific attributes
         self.separation_interval: timedelta = timedelta(
             seconds=int(self._spec[self.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS]))
 
@@ -19,19 +18,13 @@ class ActivityAggregateSchema(BlockAggregateSchema):
 class ActivityAggregate(BlockAggregate):
     """ Aggregates activity in blocks separated by periods of inactivity"""
 
-    def __init__(self, schema: ActivityAggregateSchema, identity: str,
-                 evaluation_context: EvaluationContext) -> None:
-        super().__init__(schema, identity, evaluation_context)
-        self._label = None
-
     def evaluate(self) -> None:
         time = self._evaluation_context.global_context['time']
 
+        # If the event time is beyond separation threshold, create a new block
         if self._start_time and (time < self._start_time - self._schema.separation_interval or
                                  time > self._end_time + self._schema.separation_interval):
-            # Save the current snapshot with the current timestamp
             self.persist(self._start_time)
-            # Reset the state of the contents
             self.reset()
 
         super().evaluate()
