@@ -21,13 +21,19 @@ Commands:
 Options:
     -h --help                   Show this screen.
     --version                   Show version.
+    --runner=<runner>           The runner to use for the transform.
+                                Possible values:
+                                local - Transforms done in memory. <default>
+                                spark - Transforms done using spark locally.
     --streaming-dtc=<dtc-file>  Streaming DTC file to use.
     --window-dtc=<dtc-file>     Window DTC file to use.
     --source=<raw-json-files>   List of source files separated by comma
     --debug                     Output debug logs.
     --data-processor=<data-processor>   Data processor to use to process each record. If none provided
-                                        the default processor is used which assumes one event dictionary
-                                        per line in the source file(s).
+                                        the
+                                        Possible values:
+                                        simple - One event dictionary per line in the source file(s). <default>
+                                        ipfix - Processor for IpFix format.
 """
 import logging
 import sys

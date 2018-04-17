@@ -11,7 +11,7 @@ from collections import defaultdict
 
 from blurr.core.record import Record
 from blurr.core.syntax.schema_validator import validate
-from blurr.runner.record_processor import DataProcessor, SingleJsonDataProcessor
+from blurr.runner.record_processor import DataProcessor, SimpleJsonDataProcessor
 from blurr.runner.runner import Runner
 
 
@@ -20,7 +20,7 @@ class LocalRunner(Runner):
                  local_json_files: List[str],
                  stream_dtc_file: str,
                  window_dtc_file: Optional[str] = None,
-                 data_processor: DataProcessor = SingleJsonDataProcessor()):
+                 data_processor: DataProcessor = SimpleJsonDataProcessor()):
         super().__init__(local_json_files, stream_dtc_file, window_dtc_file, data_processor)
 
         self._users_events = defaultdict(list)

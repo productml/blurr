@@ -1,7 +1,7 @@
 import json
 from typing import List, Optional
 
-from blurr.runner.record_processor import DataProcessor, SingleJsonDataProcessor
+from blurr.runner.record_processor import DataProcessor, SimpleJsonDataProcessor
 from blurr.runner.runner import Runner
 _spark_import_err = None
 try:
@@ -37,7 +37,7 @@ class SparkRunner(Runner):
                  json_files: List[str],
                  stream_dtc_file: str,
                  window_dtc_file: Optional[str] = None,
-                 data_processor: DataProcessor = SingleJsonDataProcessor()):
+                 data_processor: DataProcessor = SimpleJsonDataProcessor()):
         if _spark_import_err:
             raise _spark_import_err
         super().__init__(json_files, stream_dtc_file, window_dtc_file, data_processor)

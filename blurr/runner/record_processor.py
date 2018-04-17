@@ -12,7 +12,7 @@ class DataProcessor(ABC):
         pass
 
 
-class SingleJsonDataProcessor(DataProcessor):
+class SimpleJsonDataProcessor(DataProcessor):
     def process_data(self, data_string: str) -> List[Record]:
         return [Record(json.loads(data_string))]
 
