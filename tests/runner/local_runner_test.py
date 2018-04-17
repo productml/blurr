@@ -13,7 +13,7 @@ def test_local_runner_stream_only():
     assert len(local_runner._block_data) == 7
 
     # Stream DTC output
-    assert local_runner._block_data[Key('userA', 'session')] == {
+    assert local_runner._block_data[Key('userA', 'session', datetime(2018, 3, 7, 23, 35, 31))] == {
         '_identity': 'userA',
         '_start_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()),
         '_end_time': datetime(2018, 3, 7, 23, 35, 32, tzinfo=tzutc()),
@@ -38,7 +38,7 @@ def test_local_runner_stream_only():
         'continent': 'World'
     }
 
-    assert local_runner._block_data[Key('userB', 'session')] == {
+    assert local_runner._block_data[Key('userB', 'session', datetime(2018, 3, 7, 22, 35, 31))] == {
         '_identity': 'userB',
         '_start_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=tzutc()),
         '_end_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=tzutc()),
