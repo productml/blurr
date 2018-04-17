@@ -1,10 +1,8 @@
+from copy import copy
 from typing import Any, Dict
 
-import re
-from copy import copy
-
 from blurr.core import logging
-from blurr.core.errors import ExpressionEvaluationError, InvalidExpressionError, \
+from blurr.core.errors import InvalidExpressionError, \
     MissingAttributeError
 
 
