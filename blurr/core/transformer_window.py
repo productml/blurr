@@ -40,8 +40,9 @@ class WindowTransformer(Transformer):
     """
 
     def __init__(self, schema: WindowTransformerSchema, identity: str, context: Context) -> None:
-        super().__init__(schema, identity, context)
-        self._anchor = Anchor(schema.anchor, EvaluationContext(global_context=context))
+        super().__init__(schema, identity)
+        self._evaluation_context.merge(EvaluationContext(context))
+        self._anchor = Anchor(schema.anchor, self._evaluation_context)
 
     def evaluate_anchor(self, block: BlockAggregate) -> bool:
         """
@@ -58,7 +59,7 @@ class WindowTransformer(Transformer):
                 self._anchor.add_condition_met()
                 return True
             finally:
-                del self._evaluation_context.global_context['anchor']
+                self._evaluation_context.global_remove('anchor')
 
         return False
 

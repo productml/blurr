@@ -22,32 +22,36 @@ class StreamingTransformerSchema(TransformerSchema):
         self.identity = Expression(self._spec[self.ATTRIBUTE_IDENTITY])
         self.time = Expression(self._spec[self.ATTRIBUTE_TIME])
 
-    def get_identity(self, context: Context) -> str:
+    def get_identity(self, record: Record) -> str:
         """
         Evaluates and returns the identity as specified in the schema.
-        :param context: Context with the 'source' record set which is used to
-        determine the identity.
+        :param record: Record which is used to determine the identity.
         :return: The evaluated identity
         :raises: IdentityError if identity cannot be determined.
         """
-        identity = self.identity.evaluate(EvaluationContext(None, context))
+        context = self.schema_context.context
+        context.add_record(record)
+        identity = self.identity.evaluate(context)
         if not identity:
-            raise IdentityError(
-                'Could not determine identity using {}. Evaluation context is {}'.format(
-                    self.identity.code_string, context))
+            raise IdentityError('Could not determine identity using {}. Record is {}'.format(
+                self.identity.code_string, record))
+        context.remove_record()
         return identity
 
-    def get_time(self, context: Context) -> datetime:
-        time = self.time.evaluate(EvaluationContext(None, context))
+    def get_time(self, record: Record) -> datetime:
+        context = self.schema_context.context
+        context.add_record(record)
+        time = self.time.evaluate(context)
         if not time or not isinstance(time, datetime):
-            raise TimeError('Could not determine time using {}. Evaluation context is {}'.format(
-                self.time.code_string, context))
+            raise TimeError('Could not determine time using {}.  Record is {}'.format(
+                self.time.code_string, record))
+        context.remove_record()
         return time
 
 
 class StreamingTransformer(Transformer):
-    def __init__(self, schema: TransformerSchema, identity: str, context: Context) -> None:
-        super().__init__(schema, identity, context)
+    def __init__(self, schema: TransformerSchema, identity: str) -> None:
+        super().__init__(schema, identity)
         self._evaluation_context.global_add('identity', self._identity)
 
     def evaluate_record(self, record: Record):
@@ -57,19 +61,18 @@ class StreamingTransformer(Transformer):
         :raises: IdentityError if identity is different from the one used during
         initialization.
         """
-        # Add source record and time to the global context
-        self._evaluation_context.global_add('source', record)
-        self._evaluation_context.global_add('time',
-                                            self._schema.time.evaluate(self._evaluation_context))
-
-        record_identity = self._schema.get_identity(self._evaluation_context.global_context)
+        record_identity = self._schema.get_identity(record)
         if self._identity != record_identity:
             raise IdentityError(
                 'Identity in transformer ({}) and new record ({}) do not match'.format(
                     self._identity, record_identity))
 
+        # Add source record and time to the global context
+        self._evaluation_context.add_record(record)
+        self._evaluation_context.global_add('time',
+                                            self._schema.time.evaluate(self._evaluation_context))
         self.evaluate()
 
         # Cleanup source and time form the context
-        del self._evaluation_context.global_context['source']
-        del self._evaluation_context.global_context['time']
+        self._evaluation_context.remove_record()
+        self._evaluation_context.global_remove('time')
