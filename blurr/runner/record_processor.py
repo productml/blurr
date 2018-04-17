@@ -28,9 +28,9 @@ class IpfixDataProcessor(DataProcessor):
 
     def process_data(self, data_string: str) -> List[Record]:
         data = json.loads(data_string)
-        print(data)
         if not isinstance(data, dict):
             return []
+
         record_list = []
         for data_row in data.get('DataSets', []):
             record = {}
@@ -40,5 +40,4 @@ class IpfixDataProcessor(DataProcessor):
             if self.IPFIX_EVENT_MAPPER[56] in record:
                 record_list.append(Record(record))
 
-        print(record_list)
         return record_list

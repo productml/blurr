@@ -6,8 +6,9 @@ from blurr.runner.Runner import Runner
 from pyspark import RDD, SparkContext
 from pyspark.sql import SparkSession
 
-
-spark_session = None
+# Setting these at global level as they cannot be part of the spark runner object because they
+# cannot be serialized
+spark_session: SparkSession = None
 
 
 def get_spark_context() -> SparkContext:
@@ -18,6 +19,7 @@ def get_spark_context() -> SparkContext:
     spark_session = SparkSession \
         .builder \
         .appName("BlurrSparkRunner") \
+        .config("spark.driver.host", "localhost") \
         .getOrCreate()
     return spark_session.sparkContext
 
@@ -32,7 +34,6 @@ class SparkRunner(Runner):
                  stream_dtc_file,
                  window_dtc_file,
                  record_processor)
-        self._per_user_data: RDD = None
 
     def execute(self):
         spark_context = get_spark_context()
@@ -41,16 +42,16 @@ class SparkRunner(Runner):
         per_user_records = raw_records.flatMap(
             lambda x: self.get_per_user_records(x)).groupByKey().mapValues(list)
 
-        self._per_user_data = per_user_records.flatMap(lambda x: self.execute_per_user_events(x))
+        return per_user_records.flatMap(lambda x: self.execute_per_user_events(x))
 
-    def write_output_file(self, spark: SparkSession, path: str) -> None:
+    def write_output_file(self, path: str, per_user_data) -> None:
         if self._window_dtc is None:
-            self._per_user_data.map(lambda x: json.dumps(x, default=str)).saveAsTextFile(path)
+            per_user_data.map(lambda x: json.dumps(x, default=str)).saveAsTextFile(path)
         else:
             # Convert to a DataFrame first so that the data can be saved as a CSV
-            spark.createDataFrame(self._per_user_data).write.csv(path, header=True)
+            spark_session.createDataFrame(per_user_data).write.csv(path, header=True)
 
-    def print_output(self) -> None:
-        for row in self._per_user_data.collect():
+    def print_output(self, per_user_data) -> None:
+        for row in per_user_data.collect():
             print(json.dumps(row, default=str))
 

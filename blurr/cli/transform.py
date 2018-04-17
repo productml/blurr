@@ -24,7 +24,7 @@ def transform(runner: str, stream_dtc_file: Optional[str], window_dtc_file: Opti
         return 1
 
     runner = RUNNER_CLASS.get(runner, LocalRunner)(raw_json_files, stream_dtc_file, window_dtc_file, data_processor)
-    runner.execute()
-    runner.print_output()
+    out = runner.execute()
+    runner.print_output(out)
 
     return 0

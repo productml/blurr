@@ -5,7 +5,7 @@ Usage:
 """
 import csv
 import json
-from typing import List, Optional
+from typing import List, Optional, Any
 
 from collections import defaultdict
 
@@ -54,25 +54,23 @@ class LocalRunner(Runner):
             else:
                 self._block_data.update(data)
 
-    def execute(self) -> None:
+    def execute(self) -> Any:
         for file in self._raw_files:
             self._consume_file(file)
 
         self.execute_for_all_users()
+        return self._window_data if self._window_dtc else self._block_data
 
-    def print_output(self) -> None:
-        if self._window_dtc is not None:
-            for row in self._window_data.items():
-                print(json.dumps(row, default=str))
-        else:
-            for row in self._block_data.items():
-                print(json.dumps(row, default=str))
+    def print_output(self, data) -> None:
+        for row in data.items():
+            print(json.dumps(row, default=str))
 
-    def write_output_file(self, output_file: str):
+    def write_output_file(self, output_file: str, data):
         header = []
-        for data_rows in self._window_data.values():
+        for data_rows in data.values():
             for data_row in data_rows:
                 header = data_row.keys()
+                break
         with open(output_file, 'w') as csv_file:
             writer = csv.DictWriter(csv_file, header)
             writer.writeheader()

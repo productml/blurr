@@ -47,6 +47,8 @@ class Runner(ABC):
         events = user_events[1]
         block_data, window_data = identity_runner.execute_dtc(events, identity, self._stream_dtc,
                                                               self._window_dtc)
+
+        print(block_data, window_data)
         if self._window_dtc is None:
             return [(k, v) for k, v in block_data.items()]
         else:
