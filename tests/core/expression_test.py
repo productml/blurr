@@ -2,7 +2,6 @@ import logging
 from typing import Dict
 
 import pytest
-import yaml
 from pytest import raises, fixture
 
 from blurr.core.base import Expression

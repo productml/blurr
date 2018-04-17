@@ -4,7 +4,6 @@ import pytest
 from pytest import fixture
 
 from blurr.core.errors import MissingAttributeError
-from blurr.core.evaluation import Context
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
 from blurr.core.transformer import TransformerSchema, Transformer

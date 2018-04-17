@@ -22,7 +22,7 @@ class SchemaContext:
             module = custom_import[self.ATTRIBUTE_IMPORT_MODULE]
             identifier_list = custom_import.get(self.ATTRIBUTE_IMPORT_IDENTIFIERS, None)
 
-            statement = ' '.join(['import ', module]) if not identifier_list else ' '.join(
+            statement = ' '.join(['import', module]) if not identifier_list else ' '.join(
                 ['from', module, 'import', ','.join(identifier_list)])
             import_expression_list.append(Expression(statement, ExpressionType.EXEC))
 
