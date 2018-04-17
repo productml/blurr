@@ -11,7 +11,7 @@ from collections import defaultdict
 
 from blurr.core.record import Record
 from blurr.core.syntax.schema_validator import validate
-from blurr.runner.Runner import Runner
+from blurr.runner.runner import Runner
 
 
 class LocalRunner(Runner):
@@ -20,14 +20,11 @@ class LocalRunner(Runner):
                  stream_dtc_file: str,
                  window_dtc_file: Optional[str] = None,
                  record_processor: str = 'default'):
-        super().__init__(local_json_files,
-                         stream_dtc_file,
-                         window_dtc_file,
-                         record_processor)
+        super().__init__(local_json_files, stream_dtc_file, window_dtc_file, record_processor)
 
         self._users_events = defaultdict(list)
         self._block_data = {}
-        self._window_data = {}
+        self._window_data = defaultdict(list)
 
     def _validate_dtc_syntax(self) -> None:
         validate(self._stream_dtc)

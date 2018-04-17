@@ -1,8 +1,7 @@
-
 import json
 from typing import List, Optional
 
-from blurr.runner.Runner import Runner
+from blurr.runner.runner import Runner
 from pyspark import RDD, SparkContext
 from pyspark.sql import SparkSession
 
@@ -30,10 +29,7 @@ class SparkRunner(Runner):
                  stream_dtc_file: str,
                  window_dtc_file: Optional[str] = None,
                  record_processor: str = 'default'):
-        super().__init__(json_files,
-                 stream_dtc_file,
-                 window_dtc_file,
-                 record_processor)
+        super().__init__(json_files, stream_dtc_file, window_dtc_file, record_processor)
 
     def execute(self):
         spark_context = get_spark_context()
@@ -52,6 +48,5 @@ class SparkRunner(Runner):
             spark_session.createDataFrame(per_user_data).write.csv(path, header=True)
 
     def print_output(self, per_user_data) -> None:
-        for row in per_user_data.collect():
-            print(json.dumps(row, default=str))
-
+        for row in per_user_data.map(lambda x: json.dumps(x, default=str)).collect():
+            print(row)

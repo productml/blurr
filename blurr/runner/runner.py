@@ -1,4 +1,3 @@
-
 import csv
 from datetime import datetime
 from typing import List, Optional, Tuple, Any, Dict, Union
@@ -12,7 +11,6 @@ from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
 from blurr.core.syntax.schema_validator import validate
 from blurr.runner.record_processor import SingleJsonDataProcessor, IpfixDataProcessor
-
 
 DATA_PROCESSOR = {'ipfix': IpfixDataProcessor, 'default': SingleJsonDataProcessor}
 
@@ -48,7 +46,6 @@ class Runner(ABC):
         block_data, window_data = identity_runner.execute_dtc(events, identity, self._stream_dtc,
                                                               self._window_dtc)
 
-        print(block_data, window_data)
         if self._window_dtc is None:
             return [(k, v) for k, v in block_data.items()]
         else:

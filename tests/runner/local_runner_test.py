@@ -47,8 +47,7 @@ def test_local_runner_stream_only():
         'continent': ''
     }
 
-    assert local_runner._window_data['userA'] == []
-    assert local_runner._window_data['userB'] == []
+    assert not local_runner._window_data
 
 
 def test_local_runner_no_vars_stored():
@@ -64,7 +63,7 @@ def test_local_runner_with_window():
                                'tests/data/window.yml')
     local_runner.execute()
 
-    assert len(local_runner._block_data) == 7
+    assert not local_runner._block_data
 
     # Window DTC output
     assert local_runner._window_data['userA'] == [{
