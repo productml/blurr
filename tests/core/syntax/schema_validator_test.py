@@ -73,7 +73,8 @@ def test_valid_basic_window_dtc():
      ('invalid_set_expression.yml', 'When: \'x = \'test\'\' is an invalid python expression'),
      ('invalid_aggregate_has_no_fields.yml', 'Aggregates.0.Fields: Required field missing'),
      ('invalid_field_name.yml', "Name: '_name' starts with _ or containing whitespace characters."),
-     ('invalid_import.yml', 'Import.0.Module: Required field missing')])
+     ('invalid_import.yml', 'Import.0.Module: Required field missing'),
+     ('invalid_dtc_type.yml', 'Document has an invalid DTC \'Type\' Blurr:Transform:Incorrect.')])
 def test_invalid_schema(test_file: str, err_string: str) -> None:
     with raises(InvalidSchemaError, match=err_string):
         validate(load_example(test_file))
