@@ -11,7 +11,7 @@ from blurr.core.aggregate_window import WindowAggregateSchema, WindowAggregate
 
 @fixture
 def window_aggregate_schema(schema_loader_with_mem_store: SchemaLoader, mem_store_name: str,
-                             stream_dtc_name: str) -> WindowAggregateSchema:
+                            stream_dtc_name: str) -> WindowAggregateSchema:
     schema_loader_with_mem_store.add_schema({
         'Type': 'Blurr:Aggregate:BlockAggregate',
         'Name': 'session',
