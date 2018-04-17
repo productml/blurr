@@ -73,5 +73,7 @@ class TypeLoader:
     def import_class_by_full_name(name):
         components = name.rsplit('.', 1)
         mod = importlib.import_module(components[0])
+        if len(components) == 1:
+            return mod
         loaded_class = getattr(mod, components[1])
         return loaded_class

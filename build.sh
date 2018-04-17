@@ -26,7 +26,7 @@ pipenv run python setup.py sdist
 pipenv run python setup.py bdist_wheel
 
 
-if [ ! -z "CIRCLECI" ];
+if [ ! -z "$CIRCLECI" ];
 # post-build commands to execute on CircleCI only
 then
     echo "publishing coverage report..."
