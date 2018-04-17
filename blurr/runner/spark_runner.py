@@ -24,7 +24,6 @@ def get_spark_context() -> 'SparkContext':
     spark_session = SparkSession \
         .builder \
         .appName("BlurrSparkRunner") \
-        .config("spark.driver.host", "localhost") \
         .getOrCreate()
     return spark_session.sparkContext
 
