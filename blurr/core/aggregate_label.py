@@ -15,13 +15,10 @@ class LabelAggregateSchema(BlockAggregateSchema):
 
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
-
-        # Load type specific attributes
         self.label: Expression = Expression(self._spec[self.ATTRIBUTE_LABEL])
 
     def extend_schema(self, spec: Dict[str, Any]) -> Dict[str, Any]:
-        """ Injects the label field """
-
+        """ Introduces `label` as a field in the aggregate """
         label_field = {
             'Name': '_label',
             'Type': 'string',
@@ -45,9 +42,6 @@ class LabelAggregate(BlockAggregate):
         self._label_value = None
 
     def evaluate(self) -> None:
-        """
-        Evaluates the current item
-        """
 
         label = str(self._schema.label.evaluate(self._evaluation_context))
 
@@ -67,10 +61,10 @@ class LabelAggregate(BlockAggregate):
         super().evaluate()
 
     def prepare_key(self, label: str):
+        """ Generates the Key object based on label """
         return Key(self._identity, self._name + '.' + label)
 
     def persist(self, timestamp=None) -> None:
-        """ Persists the label by combining it with group. """
         # TODO Refactor keys when refactoring store
         # Timestamp is ignored for now.
         self._schema.store.save(self.prepare_key(self._label_value), self._snapshot)
