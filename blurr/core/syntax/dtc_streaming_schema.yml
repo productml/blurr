@@ -2,6 +2,7 @@ Type: enum('Blurr:Transform:Streaming')
 Version: enum('2018-03-01')
 Description: str(min=1, required=False)
 Name: identifier()
+Import: list(include('import_block'), required=False)
 Identity: expression()
 Time: expression(required=True)
 When: expression(required=False)
@@ -59,3 +60,7 @@ field:
 memory_store:
   Type: enum('Blurr:Store:MemoryStore')
   Name: identifier()
+
+import_block:
+  Module: str(required=True)
+  Identifier: list(str(), required=False)

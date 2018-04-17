@@ -1,5 +1,6 @@
 from typing import List
 
+import sys
 import yaml
 
 from blurr.cli.util import get_yml_files, eprint
@@ -21,17 +22,20 @@ def validate_command(dtc_files: List[str]) -> int:
 def validate_file(dtc_file: str) -> int:
     print('Running syntax validation on {}'.format(dtc_file))
     try:
-        dtc_dict = yaml.safe_load(open(dtc_file))
+        dtc_dict = yaml.safe_load(open(dtc_file, 'r', encoding='utf-8'))
         validate(dtc_dict)
         print('Document is valid')
         return 0
-    except yaml.YAMLError:
+    except yaml.YAMLError as err:
         eprint('Invalid yaml')
+        eprint(str(err))
         return 1
     except InvalidSchemaError as err:
         eprint(str(err))
         return 1
     except:
+        exception_value = sys.exc_info()[1]
+        logging.error(exception_value)
         eprint('There was an error parsing the document')
         return 1
 

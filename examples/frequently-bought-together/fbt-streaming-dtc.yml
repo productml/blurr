@@ -57,7 +57,6 @@ Aggregates:
        # is later than the time of the event being processed, so user.time will
        # always be the first event that was seen for the user
 
-
    Fields:
      - Name: days_since_install
        Value: (time - user.time).days
@@ -78,14 +77,12 @@ Aggregates:
        Value: item_stats.product_primary.append(source.item_id)
        When: source.event_name == 'view_item'
 
-   Fields:
      - Name: transaction_value_this_session
        Type: float
        Value: sum([float(val.strip()) for val in source.value.split(',')])
        #This also sums all the values in the list if multiple items were bought in one transaction
        When: source.event_name == 'ecommerce_purchase' and source.currency == 'usd'
 
-   Fields:
      - Name: products_bought
        Type: list
        Value: item_stats.products_bought.extend(list(zip([val.strip() for val in source.item_id.split(',')], [float(val.strip()) for val in source.value.split(',')])))

@@ -62,16 +62,19 @@ def test_valid_basic_window_dtc():
     validate(dtc_dict)
 
 
-@mark.parametrize("test_file,err_string", [
-    ('invalid_wrong_version.yml', 'Version: \'2088-03-01\' not in \(\'2018-03-01\',\)'),
-    ('invalid_missing_time.yml', 'Time: Required field missing'),
-    ('invalid_string_instead_integer.yml', "Anchor.Max: 'one' is not a int."),
-    ('invalid_non_existing_data_type.yml', "Type: 'foo' is not a DTC Valid Data Type."),
-    ('invalid_incorrect_expression.yml', "When: 'x == senor roy' is an invalid python expression."),
-    ('invalid_set_expression.yml', 'When: \'x = \'test\'\' is an invalid python expression'),
-    ('invalid_aggregate_has_no_fields.yml', 'Aggregates.0.Fields: Required field missing'),
-    ('invalid_field_name.yml', "Name: '_name' starts with _ or containing whitespace characters."),
-])
+@mark.parametrize(
+    "test_file,err_string",
+    [('invalid_wrong_version.yml', 'Version: \'2088-03-01\' not in \(\'2018-03-01\',\)'),
+     ('invalid_missing_time.yml', 'Time: Required field missing'),
+     ('invalid_string_instead_integer.yml', "Anchor.Max: 'one' is not a int."),
+     ('invalid_non_existing_data_type.yml', "Type: 'foo' is not a DTC Valid Data Type."),
+     ('invalid_incorrect_expression.yml',
+      "When: 'x == senor roy' is an invalid python expression."),
+     ('invalid_set_expression.yml', 'When: \'x = \'test\'\' is an invalid python expression'),
+     ('invalid_aggregate_has_no_fields.yml', 'Aggregates.0.Fields: Required field missing'),
+     ('invalid_field_name.yml', "Name: '_name' starts with _ or containing whitespace characters."),
+     ('invalid_import.yml', 'Import.0.Module: Required field missing'),
+     ('invalid_dtc_type.yml', 'Document has an invalid DTC \'Type\' Blurr:Transform:Incorrect.')])
 def test_invalid_schema(test_file: str, err_string: str) -> None:
     with raises(InvalidSchemaError, match=err_string):
         validate(load_example(test_file))

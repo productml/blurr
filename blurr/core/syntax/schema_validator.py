@@ -116,4 +116,5 @@ def validate(dtc_dict: Dict, name='dtc') -> None:
     elif is_streaming_dtc(dtc_dict):
         _validate_streaming(dtc_dict, name)
     else:
-        raise ValueError('Document is not a valid DTC')
+        raise InvalidSchemaError('Document has an invalid DTC \'Type\' {}.'.format(
+            dtc_dict.get('Type', '')))

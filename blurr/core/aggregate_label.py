@@ -20,7 +20,11 @@ class LabelAggregateSchema(BlockAggregateSchema):
     def extend_schema(self, spec: Dict[str, Any]) -> Dict[str, Any]:
         """ Injects the label field """
 
-        label_field = {'Name': '_label', 'Type': 'string', 'Value': spec[self.ATTRIBUTE_NAME] + '._label_value'}
+        label_field = {
+            'Name': '_label',
+            'Type': 'string',
+            'Value': spec[self.ATTRIBUTE_NAME] + '._label_value'
+        }
         spec[self.ATTRIBUTE_FIELDS].insert(0, label_field)
 
         self.schema_loader.add_schema(label_field, self.fully_qualified_name)
@@ -44,15 +48,23 @@ class LabelAggregate(BlockAggregate):
         if self._label_value and self._label_value != label:
             # Save the current snapshot with the current timestamp
             self.persist()
-            # Reset the state of the contents
-            self.reset()
+
+            # Try restoring a previous state if it exists, otherwise, reset to create a new state
+            snapshot = self._schema.store.get(self.prepare_key(label))
+            if snapshot:
+                self.restore(snapshot)
+            else:
+                self.reset()
 
         self._label_value = label
 
         super().evaluate()
 
+    def prepare_key(self, label: str):
+        return Key(self._identity, self._name + '.' + label)
+
     def persist(self, timestamp=None) -> None:
         """ Persists the label by combining it with group. """
         # TODO Refactor keys when refactoring store
-        self._schema.store.save(Key(self._identity, self._name + '.' + self._label_value,
-                                    timestamp if timestamp else self._start_time), self._snapshot)
+        # Timestamp is ignored for now.
+        self._schema.store.save(self.prepare_key(self._label_value), self._snapshot)
