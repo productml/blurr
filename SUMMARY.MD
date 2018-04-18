@@ -2,7 +2,7 @@
 
 * [Blurr overview](README.md)
 * [Data Transform Config (DTC)](docs/Data Transform Config.md)
-* [Blurr CLI](dpcs/Blurr CLI.md)
+* [Blurr CLI](docs/Blurr CLI.md)
 * [DTC Snippets](docs/DTC snippets.md)
 
 
