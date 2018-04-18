@@ -4,8 +4,7 @@ from copy import copy
 from enum import Enum
 
 from blurr.core import logging
-from blurr.core.errors import InvalidExpressionError, \
-    MissingAttributeError
+from blurr.core.errors import InvalidExpressionError, MissingAttributeError
 from blurr.core.record import Record
 
 
