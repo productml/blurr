@@ -59,7 +59,7 @@ class FieldSchema(BaseSchema, ABC):
         return value
 
 
-class Field(BaseItem, ABC):
+class Field(BaseItem):
     """
     An individual field object responsible for retaining the field value
     """
