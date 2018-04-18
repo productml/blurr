@@ -162,12 +162,10 @@ __Stay in touch!__ Star this project or email hello@blurr.ai
 
 # Roadmap
 
-Blurr is all about enabling machine learning and AI teams to run faster.
+Blurr is currently in developer preview.
 
-~~**Developer Preview 0**: Local transformations only~~
-
-**Developer Preview 1**: S3-S3 data transformations
-
-**Developer Preview 2**: Add DynamoDB as a Store + Features server for ML production use
-
-Ingestion connectors to Kafka and Spark
+- ~~Local transformations only~~
+- Spark runner
+- S3-S3 data transformations
+- Add DynamoDB as a Store
+- Features server 
