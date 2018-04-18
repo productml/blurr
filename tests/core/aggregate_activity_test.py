@@ -61,7 +61,7 @@ def evaluate_event(record: Record, aggregate: ActivityAggregate) -> None:
     aggregate.evaluate()
 
 
-def test_split_by_inactivity(activity_aggregate_schema: ActivityAggregateSchema,
+def test_aggregate_final_state(activity_aggregate_schema: ActivityAggregateSchema,
                              activity_events: List[Record]) -> None:
     # Initialize the starting state
     identity = 'user1'
