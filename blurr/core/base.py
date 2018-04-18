@@ -96,7 +96,7 @@ class BaseItem(ABC):
         return self._schema.name
 
     @abstractmethod
-    def evaluate(self) -> None:
+    def evaluate(self, *args, **kwargs) -> None:
         """
         Evaluates the current item
         """
@@ -140,7 +140,7 @@ class BaseItemCollection(BaseItem, ABC):
 
         super().__init__(schema, evaluation_context)
 
-    def evaluate(self) -> None:
+    def evaluate(self, *args, **kwargs) -> None:
         """
         Evaluates the current item
         :returns An evaluation result object containing the result, or reasons why

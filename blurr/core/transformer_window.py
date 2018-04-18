@@ -44,7 +44,7 @@ class WindowTransformer(Transformer):
         self._evaluation_context.merge(EvaluationContext(context))
         self._anchor = Anchor(schema.anchor, self._evaluation_context)
 
-    def evaluate_anchor(self, block: BlockAggregate) -> bool:
+    def evaluate(self, block: BlockAggregate) -> bool:
         """
         Evaluates the anchor condition against the specified block.
         :param block: Block to run the anchor condition against.
@@ -75,10 +75,6 @@ class WindowTransformer(Transformer):
                 item.prepare_window(self._anchor.anchor_block._start_time)
 
         super().evaluate()
-
-    def evaluate(self):
-        raise AnchorBlockNotDefinedError(('WindowTransformer does not support evaluate directly. '
-                                          'Call evaluate_anchor instead.'))
 
     @property
     def flattened_snapshot(self) -> Dict:
