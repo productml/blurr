@@ -16,11 +16,22 @@ Blurr transforms `raw data` into `features` for model training and prediction us
 
 For production ML applications, __experimentation__ and __iteration speed__ is important. Working directly with raw data provides the most flexibility. Blurr allows product teams to iterate quickly during ML dev and provides a self-service way to take experiments to production.
 
-# How is Blurr different from Spark/Kafka?
+# How is Blurr different from Spark/Kafka/any other stream processor?
 
 Blurr is a __data transform definition__. *(Technically - the DTC contains the definition, or descriptor)*
 
-Blurr is processor-agnostic, so DTCs can be run by stream processors like Spark or Kafka. Because real world infrastructure is extremely diverse, Blurr is designed to run on virtually any infrastructure stack.
+Blurr is processor-agnostic, so DTCs can be run by stream processors such as Spark or Kafka.
+
+1. Blurr is to Spark as [Hibernate](http://hibernate.org/) is to databases
+2. Blurr can be used on Spark in the same way as SparkSQL
+3. Blurr is WORAIS (Write Once, Run on Any Infrastructure Stack)
+4. Blurr is to ETL as Docker is to application packaging
+
+<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeUP5RFuXH0Kbi4CnV6V3IZ-xyJmd3KQP_2Ij-pTvN-_h7wUg/viewform?embedded=true" width="760" height="500" frameborder="0" marginheight="0" marginwidth="0">Form</iframe>
+
+Because real world infrastructure is extremely diverse, Blurr is designed to run on virtually any infrastructure stack.
+
+Motivation for building Blurr
 
 # Table of contents
 
