@@ -29,8 +29,7 @@ Options:
     --window-dtc=<dtc-file>     Window DTC file to use.
     --source=<raw-json-files>   List of source files separated by comma
     --debug                     Output debug logs.
-    --data-processor=<data-processor>   Data processor to use to process each record. If none provided
-                                        the
+    --data-processor=<data-processor>   Data processor to use to process each record.
                                         Possible values:
                                         simple - One event dictionary per line in the source file(s). <default>
                                         ipfix - Processor for IpFix format.

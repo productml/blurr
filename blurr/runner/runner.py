@@ -36,8 +36,7 @@ class Runner(ABC):
 
     def execute_per_user_events(self, user_events: Tuple[str, List[Tuple[datetime, Record]]]
                                 ) -> List[Union[Tuple[Key, Any], Tuple[str, Any]]]:
-        identity = user_events[0]
-        events = user_events[1]
+        identity, events = user_events
         block_data, window_data = identity_runner.execute_dtc(events, identity, self._stream_dtc,
                                                               self._window_dtc)
 

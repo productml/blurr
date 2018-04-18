@@ -1,9 +1,19 @@
 from datetime import datetime
+from pathlib import PosixPath
+from typing import List
 
 from dateutil.tz import tzutc
 
 from blurr.core.store_key import Key
 from blurr.runner.spark_runner import SparkRunner
+
+
+def get_spark_output(out_dir: PosixPath) -> List:
+    output_files = out_dir.listdir(lambda x: x.basename.startswith('part'))
+    output_text = []
+    for output_file in output_files:
+        output_text.extend(output_file.readlines(cr=False))
+    return output_text
 
 
 def test_only_stream_dtc_provided():
@@ -74,10 +84,7 @@ def test_write_output_file_only_source_dtc_provided(tmpdir):
     window_data = spark_runner.execute()
     out_dir = tmpdir.join('out')
     spark_runner.write_output_file(str(out_dir), window_data)
-    output_files = out_dir.listdir(lambda x: x.basename.startswith('part'))
-    output_text = []
-    for output_file in output_files:
-        output_text.extend(output_file.readlines(cr=False))
+    output_text = get_spark_output(out_dir)
     assert ('["userA/session/2018-03-07T22:35:31+00:00", {'
             '"_identity": "userA", '
             '"_start_time": "2018-03-07 22:35:31+00:00", '
@@ -94,9 +101,6 @@ def test_write_output_file_with_stream_and_window_dtc_provided(tmpdir):
     window_data = spark_runner.execute()
     out_dir = tmpdir.join('out')
     spark_runner.write_output_file(str(out_dir), window_data)
-    output_files = out_dir.listdir(lambda x: x.basename.startswith('part'))
-    output_text = []
-    for output_file in output_files:
-        output_text.extend(output_file.readlines(cr=False))
+    output_text = get_spark_output(out_dir)
     assert 'last_day._identity,last_day.total_events,last_session._identity,last_session.events' in output_text
     assert 'userA,1,userA,1' in output_text
