@@ -8,11 +8,11 @@
 
 # What is Blurr?
 
-Blurr transforms `raw data` into `features` for model training and prediction using a `high-level expressive YAML-based language` called the Data Transform Configuration (DTC).
+Blurr transforms structured, streaming `raw data` into `features` for model training and prediction using a `high-level expressive YAML-based language` called the Data Transform Configuration (DTC).
 
 ## Blurr vs. stream processors
 
-The DTC is a __data transform definition__.
+The DTC is a __data transform definition__ for structured data.
 
 Blurr is processor-agnostic, so DTCs can be run by stream processors such as Spark.
 
