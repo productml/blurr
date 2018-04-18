@@ -5,99 +5,73 @@ Usage:
 """
 import csv
 import json
-from typing import List, Optional
+from typing import List, Optional, Any
 
-import yaml
 from collections import defaultdict
-from docopt import docopt
 
 from blurr.core.record import Record
-from blurr.core.schema_loader import SchemaLoader
 from blurr.core.syntax.schema_validator import validate
-from blurr.runner.identity_runner import execute_dtc
+from blurr.runner.data_processor import DataProcessor, SimpleJsonDataProcessor
+from blurr.runner.runner import Runner
 
 
-class LocalRunner:
+class LocalRunner(Runner):
     def __init__(self,
                  local_json_files: List[str],
                  stream_dtc_file: str,
-                 window_dtc_file: Optional[str] = None):
-        self._raw_files = local_json_files
-        self._schema_loader = SchemaLoader()
+                 window_dtc_file: Optional[str] = None,
+                 data_processor: DataProcessor = SimpleJsonDataProcessor()):
+        super().__init__(local_json_files, stream_dtc_file, window_dtc_file, data_processor)
 
-        self._stream_dtc = yaml.safe_load(open(stream_dtc_file))
-        self._window_dtc = None if window_dtc_file is None else yaml.safe_load(
-            open(window_dtc_file))
-        self._validate_dtc_syntax()
-
-        self._stream_dtc_name = self._schema_loader.add_schema(self._stream_dtc)
-        self._stream_transformer_schema = self._schema_loader.get_schema_object(
-            self._stream_dtc_name)
-
-        self._user_events = defaultdict(list)
+        self._identity_records = defaultdict(list)
         self._block_data = {}
-        self._window_data = {}
+        self._window_data = defaultdict(list)
 
     def _validate_dtc_syntax(self) -> None:
         validate(self._stream_dtc)
         if self._window_dtc is not None:
             validate(self._window_dtc)
 
-    def _consume_record(self, record: Record) -> None:
-        identity = self._stream_transformer_schema.get_identity(record)
-        time = self._stream_transformer_schema.get_time(record)
-
-        self._user_events[identity].append((time, record))
-
     def _consume_file(self, file: str) -> None:
         with open(file) as f:
-            for record in f:
-                self._consume_record(Record(json.loads(record)))
+            for data_str in f:
+                for identity, time_record in self.get_per_identity_records(data_str):
+                    self._identity_records[identity].append(time_record)
 
-    def execute_for_all_users(self) -> None:
-        for identity, events in self._user_events.items():
-            block_data, window_data = execute_dtc(events, identity, self._stream_dtc,
-                                                  self._window_dtc)
+    def execute_for_all_identities(self) -> None:
+        for identity_records in self._identity_records.items():
+            data = self.execute_per_identity_records(identity_records)
+            if self._window_dtc:
+                self._window_data.update(data)
+            else:
+                self._block_data.update(data)
 
-            self._block_data.update(block_data)
-            self._window_data[identity] = window_data
-
-    def execute(self) -> None:
+    def execute(self) -> Any:
         for file in self._raw_files:
             self._consume_file(file)
 
-        self.execute_for_all_users()
+        self.execute_for_all_identities()
+        return self._window_data if self._window_dtc else self._block_data
 
-    def print_output(self) -> None:
-        if self._window_dtc is not None:
-            for row in self._window_data.items():
-                print(json.dumps(row, default=str))
+    def print_output(self, data) -> None:
+        for row in data.items():
+            print(json.dumps(row, default=str))
+
+    def write_output_file(self, output_file: str, data):
+        if not self._window_dtc:
+            with open(output_file, 'w') as file:
+                for row in data.items():
+                    file.write(json.dumps(row, default=str))
+                    file.write('\n')
         else:
-            for row in self._block_data.items():
-                print(json.dumps(row, default=str))
-
-    def write_output_file(self, output_file: str):
-        header = []
-        for data_rows in self._window_data.values():
-            for data_row in data_rows:
-                header = data_row.keys()
-        with open(output_file, 'w') as csv_file:
-            writer = csv.DictWriter(csv_file, header)
-            writer.writeheader()
-            for data_rows in self._window_data.values():
-                writer.writerows(data_rows)
-
-
-def main():
-    arguments = docopt(__doc__, version='pre-alpha')
-    local_runner = LocalRunner(arguments['--raw-data'].split(','), arguments['--streaming-dtc'],
-                               arguments['--window-dtc'])
-    local_runner.execute()
-    if arguments['--output-file'] is None:
-        local_runner.print_output()
-    else:
-        local_runner.write_output_file(arguments['--output-file'])
-
-
-if __name__ == "__main__":
-    main()
+            header = []
+            for data_rows in data.values():
+                for data_row in data_rows:
+                    header = list(data_row.keys())
+                    break
+            header.sort()
+            with open(output_file, 'w') as csv_file:
+                writer = csv.DictWriter(csv_file, header)
+                writer.writeheader()
+                for data_rows in data.values():
+                    writer.writerows(data_rows)
