@@ -46,23 +46,23 @@ class SparkRunner(Runner):
         spark_context = get_spark_session(spark_session).sparkContext
         raw_records = spark_context.union(
             [spark_context.textFile(file) for file in self._raw_files])
-        per_user_records = raw_records.flatMap(
-            lambda x: self.get_per_user_records(x)).groupByKey().mapValues(list)
+        per_identity_records = raw_records.flatMap(
+            lambda x: self.get_per_identity_records(x)).groupByKey().mapValues(list)
 
-        return per_user_records.flatMap(lambda x: self.execute_per_user_events(x))
+        return per_identity_records.flatMap(lambda x: self.execute_per_identity_records(x))
 
     def write_output_file(self,
                           path: str,
-                          per_user_data: RDD,
+                          per_identity_data: RDD,
                           spark_session: Optional['SparkSession'] = None) -> None:
         _spark_session_ = get_spark_session(spark_session)
         if not self._window_dtc:
-            per_user_data.map(lambda x: json.dumps(x, default=str)).saveAsTextFile(path)
+            per_identity_data.map(lambda x: json.dumps(x, default=str)).saveAsTextFile(path)
         else:
             # Convert to a DataFrame first so that the data can be saved as a CSV
-            _spark_session_.createDataFrame(per_user_data.flatMap(lambda x: x[1])).write.csv(
+            _spark_session_.createDataFrame(per_identity_data.flatMap(lambda x: x[1])).write.csv(
                 path, header=True)
 
-    def print_output(self, per_user_data) -> None:
-        for row in per_user_data.map(lambda x: json.dumps(x, default=str)).collect():
+    def print_output(self, per_identity_data) -> None:
+        for row in per_identity_data.map(lambda x: json.dumps(x, default=str)).collect():
             print(row)
