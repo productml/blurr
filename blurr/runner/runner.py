@@ -6,6 +6,7 @@ import yaml
 from abc import ABC, abstractmethod
 
 import blurr.runner.identity_runner as identity_runner
+from blurr.core import logging
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
@@ -23,20 +24,18 @@ class Runner(ABC):
         self._stream_dtc = yaml.safe_load(open(stream_dtc_file))
         self._window_dtc = None if window_dtc_file is None else yaml.safe_load(
             open(window_dtc_file))
-        self._validate_dtc_syntax()
+        validate(self._stream_dtc)
+        if self._window_dtc is not None:
+            validate(self._window_dtc)
 
         self._stream_dtc_name = self._schema_loader.add_schema(self._stream_dtc)
         self._stream_transformer_schema = self._schema_loader.get_schema_object(
             self._stream_dtc_name)
 
-    def _validate_dtc_syntax(self) -> None:
-        validate(self._stream_dtc)
-        if self._window_dtc is not None:
-            validate(self._window_dtc)
-
-    def execute_per_user_events(self, user_events: Tuple[str, List[Tuple[datetime, Record]]]
-                                ) -> List[Union[Tuple[Key, Any], Tuple[str, Any]]]:
-        identity, events = user_events
+    def execute_per_identity_records(self,
+                                     identity_records: Tuple[str, List[Tuple[datetime, Record]]]
+                                     ) -> List[Union[Tuple[Key, Any], Tuple[str, Any]]]:
+        identity, events = identity_records
         block_data, window_data = identity_runner.execute_dtc(events, identity, self._stream_dtc,
                                                               self._window_dtc)
 
@@ -45,11 +44,14 @@ class Runner(ABC):
         else:
             return [(identity, window_data)]
 
-    def get_per_user_records(self, event_str: str) -> List[Tuple[str, Tuple[datetime, Record]]]:
+    def get_per_identity_records(self, event_str: str) -> List[Tuple[str, Tuple[datetime, Record]]]:
         record_list = []
         for record in self._data_processor.process_data(event_str):
-            record_list.append((self._stream_transformer_schema.get_identity(record),
-                                (self._stream_transformer_schema.get_time(record), record)))
+            try:
+                record_list.append((self._stream_transformer_schema.get_identity(record),
+                                    (self._stream_transformer_schema.get_time(record), record)))
+            except Exception as err:
+                logging.debug('{} in parsing Record.'.format(err))
         return record_list
 
     @abstractmethod

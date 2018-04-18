@@ -21,7 +21,7 @@ def test_ipfix_data_processor_success():
         '{"Other":1,"DataSets":['
         '[{"I":2,"E":1230,"V":"test1"}],'
         '[{"I":56,"V":"aa:aa:aa:aa:aa:aa"},{"I":12,"V":"0.0.0.0"},{"I":182,"V":80},{"I":183,"V":81},{"I":4,"V":6},{"I":150,"V":1522385684}],'
-        '[{"I":56,"V":"bb:bb:bb:bb:bb:bb"}]'
+        '[{"I":56,"V":"bb:bb:bb:bb:bb:bb"}, {"I":123,"V":321}]'
         ']}')
     assert data_processor.process_data(test_data) == [
         Record({
@@ -29,11 +29,12 @@ def test_ipfix_data_processor_success():
             'dest_ip': '0.0.0.0',
             'source_port': 80,
             'dest_port': 81,
-            4: 6,
+            'protocol': 6,
             'timestamp': 1522385684
         }),
         Record({
-            'source_mac': 'bb:bb:bb:bb:bb:bb'
+            'source_mac': 'bb:bb:bb:bb:bb:bb',
+            123: 321
         })
     ]
 

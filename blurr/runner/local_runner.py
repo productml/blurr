@@ -23,7 +23,7 @@ class LocalRunner(Runner):
                  data_processor: DataProcessor = SimpleJsonDataProcessor()):
         super().__init__(local_json_files, stream_dtc_file, window_dtc_file, data_processor)
 
-        self._users_events = defaultdict(list)
+        self._identity_records = defaultdict(list)
         self._block_data = {}
         self._window_data = defaultdict(list)
 
@@ -35,12 +35,12 @@ class LocalRunner(Runner):
     def _consume_file(self, file: str) -> None:
         with open(file) as f:
             for data_str in f:
-                for identity, time_record in self.get_per_user_records(data_str):
-                    self._users_events[identity].append(time_record)
+                for identity, time_record in self.get_per_identity_records(data_str):
+                    self._identity_records[identity].append(time_record)
 
-    def execute_for_all_users(self) -> None:
-        for user_events in self._users_events.items():
-            data = self.execute_per_user_events(user_events)
+    def execute_for_all_identities(self) -> None:
+        for identity_records in self._identity_records.items():
+            data = self.execute_per_identity_records(identity_records)
             if self._window_dtc:
                 self._window_data.update(data)
             else:
@@ -50,7 +50,7 @@ class LocalRunner(Runner):
         for file in self._raw_files:
             self._consume_file(file)
 
-        self.execute_for_all_users()
+        self.execute_for_all_identities()
         return self._window_data if self._window_dtc else self._block_data
 
     def print_output(self, data) -> None:

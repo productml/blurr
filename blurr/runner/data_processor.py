@@ -19,6 +19,7 @@ class SimpleJsonDataProcessor(DataProcessor):
 
 class IpfixDataProcessor(DataProcessor):
     IPFIX_EVENT_MAPPER = {
+        4: 'protocol',
         12: 'dest_ip',
         56: 'source_mac',
         182: 'source_port',

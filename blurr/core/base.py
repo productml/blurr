@@ -76,7 +76,7 @@ class BaseItem(ABC):
         :param evaluation_context: Context dictionary for evaluation
         """
         self._schema = schema
-        self._evaluation_context = evaluation_context
+        self._evaluation_context: EvaluationContext = evaluation_context
 
     @property
     def _needs_evaluation(self) -> bool:
