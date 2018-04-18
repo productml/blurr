@@ -1,9 +1,5 @@
 ![Blurr](logo.png)
 
->We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer. The lines are blurred (*cough*). Just like development and operations became DevOps over time
-
->--- Blurr authors
-
 [![CircleCI](https://circleci.com/gh/productml/blurr/tree/master.svg?style=svg)](https://circleci.com/gh/productml/blurr/tree/master)
 [![Documentation Status](https://readthedocs.org/projects/productml-blurr/badge/?version=latest)](http://productml-blurr.readthedocs.io/en/latest/?badge=latest)
 [![Coverage Status](https://coveralls.io/repos/github/productml/blurr/badge.svg?branch=master)](https://coveralls.io/github/productml/blurr?branch=master)
@@ -16,22 +12,25 @@ Blurr transforms `raw data` into `features` for model training and prediction us
 
 For production ML applications, __experimentation__ and __iteration speed__ is important. Working directly with raw data provides the most flexibility. Blurr allows product teams to iterate quickly during ML dev and provides a self-service way to take experiments to production.
 
-# How is Blurr different from Spark/Kafka/any other stream processor?
+## Vision
 
-Blurr is a __data transform definition__. *(Technically - the DTC contains the definition, or descriptor)*
+The DTC is a __data transform definition__. Blurr is a collection of components built for MLOps, the DTC is one of them. DTC ⊆ Blurr
 
 Blurr is processor-agnostic, so DTCs can be run by stream processors such as Spark or Kafka.
 
 1. Blurr is to Spark as [Hibernate](http://hibernate.org/) is to databases
 2. Blurr can be used on Spark in the same way as SparkSQL
 3. Blurr is WORAIS (Write Once, Run on Any Infrastructure Stack)
-4. Blurr is to ETL as Docker is to application packaging
-
-<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeUP5RFuXH0Kbi4CnV6V3IZ-xyJmd3KQP_2Ij-pTvN-_h7wUg/viewform?embedded=true" width="760" height="500" frameborder="0" marginheight="0" marginwidth="0">Form</iframe>
 
 Because real world infrastructure is extremely diverse, Blurr is designed to run on virtually any infrastructure stack.
 
-Motivation for building Blurr
+Help improve Blurr by [giving us feedback on the metaphors](https://docs.google.com/forms/d/e/1FAIpQLSf5wqW7M4IibJU-NYDEZ-rx0TvJYMkTiV_hehZgKV6a6HvXaA/viewform)!
+
+>We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer. The lines are blurred (*cough*). Just like development and operations became DevOps over time
+
+>--- Blurr authors
+
+We see a future where MLOps means teams putting together various technologies to suit their needs. For production ML applications, __experimentation__ and __iteration speed__ is important. The DTC helps teams iterate on features faster. The vision for Blurr is to build components in MLOps to help ML teams experiment at high speed.
 
 # Table of contents
 
