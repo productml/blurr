@@ -2,7 +2,18 @@
     "plugins": [ "versions" ],
     "pluginsConfig": {
         "versions": {
-            "type": "tags"
+            "gitbookConfigURL": "https://github.com/productml/blurr/book.json",
+            "options": [
+                {
+                    "value": "https://github.com/productml/blurr",
+                    "text": "Latest",
+                    "selected": true
+                },
+                {
+                    "value": "https://github.com/productml/blurr/",
+                    "text": "Developer preview 0.1.1"
+                }
+            ]
         }
     }
 }
