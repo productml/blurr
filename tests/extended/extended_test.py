@@ -22,9 +22,15 @@ def test_extended_runner():
         'offers_purchased': {
             'offer1': 1
         },
-        'badges': {'bronze', 'silver', 'gold'},
+        'badges': {'silver', 'bronze', 'gold'},
         'signin_method': 'other'
     }
+    # Assert the badges is a list and then convert to set for unordered comparison.
+    # badges in DTC is a set but we encode it into a list when creating a snapshot. The creation of
+    # the list cant result in a non-deterministic element order in the list.
+    assert result_state['badges']
+    assert isinstance(result_state['badges'], list)
+    result_state['badges'] = set(result_state['badges'])
 
     assert result_state == expected_state
 

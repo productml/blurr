@@ -116,4 +116,4 @@ class Aggregate(BaseItemCollection, ABC):
             raise MissingAttributeError('{item} not defined in {name}'.format(
                 item=item, name=self._name))
 
-        return self._nested_items[item]._snapshot
+        return self._nested_items[item].value
