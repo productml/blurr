@@ -1,9 +1,5 @@
 ![Blurr](logo.png)
 
->We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer. The lines are blurred (*cough*). Just like development and operations became DevOps over time
-
->--- Blurr authors
-
 [![CircleCI](https://circleci.com/gh/productml/blurr/tree/master.svg?style=svg)](https://circleci.com/gh/productml/blurr/tree/master)
 [![Documentation Status](https://readthedocs.org/projects/productml-blurr/badge/?version=latest)](http://productml-blurr.readthedocs.io/en/latest/?badge=latest)
 [![Coverage Status](https://coveralls.io/repos/github/productml/blurr/badge.svg?branch=master)](https://coveralls.io/github/productml/blurr?branch=master)
@@ -12,15 +8,31 @@
 
 # What is Blurr?
 
-Blurr transforms `raw data` into `features` for model training and prediction using a `high-level expressive YAML-based language` called the Data Transform Configuration (DTC).
+Blurr transforms structured, streaming `raw data` into `features` for model training and prediction using a `high-level expressive YAML-based language` called the Data Transform Configuration (DTC).
 
-For production ML applications, __experimentation__ and __iteration speed__ is important. Working directly with raw data provides the most flexibility. Blurr allows product teams to iterate quickly during ML dev and provides a self-service way to take experiments to production.
+## Blurr vs. stream/batch processors
 
-# How is Blurr different from Spark/Kafka?
+The DTC is a __data transform definition__ for structured data. The DTC encapsulates the *business logic* of data transforms and Blurr orchestrates the *execution* of data transforms.
 
-Blurr is a __data transform definition__. *(Technically - the DTC contains the definition, or descriptor)*
+Blurr is processor-agnostic, so DTCs can be run by event processors such as Spark.
 
-Blurr is processor-agnostic, so DTCs can be run by stream processors like Spark or Kafka. Because real world infrastructure is extremely diverse, Blurr is designed to run on virtually any infrastructure stack.
+1. Blurr is to Spark as [Hibernate](http://hibernate.org/) is to databases
+2. Blurr can be used on Spark in the same way as SparkSQL
+3. Blurr is WORAIS (Write Once, Run on Any Infrastructure Stack)
+
+Because real world infrastructure is extremely diverse, Blurr is designed to run on virtually any infrastructure stack that runs Python 3.6+.
+
+[Give us feedback on the metaphors](https://docs.google.com/forms/d/e/1FAIpQLSf5wqW7M4IibJU-NYDEZ-rx0TvJYMkTiV_hehZgKV6a6HvXaA/viewform) and help improve Blurr!
+
+## The future of MLOps
+
+>We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer. The lines are blurred (*cough*). Just like development and operations became DevOps over time
+
+>--- Blurr authors
+
+Blurr is a collection of components built for MLOps, the DTC is one of them. **DTC ⊆ Blurr**
+
+We see a future where MLOps means teams putting together various technologies to suit their needs. For production ML applications, the __speed of experimentation__ and __iterations__ is the difference between success and failure. The DTC helps teams iterate on features faster. The vision for Blurr is to build MLOps components to help ML teams experiment at high speed.
 
 # Table of contents
 
@@ -146,16 +158,14 @@ Inspired by the (old school) [Joel Test](https://www.joelonsoftware.com/2000/08/
 4. Successful ML is a long game. You play it like it is
 5. Kaizen. Experimentation and iterations are a way of life
 
-__Stay in touch!__ Star this project or email hello@blurr.ai
+
 
 # Roadmap
 
-Blurr is all about enabling machine learning and AI teams to run faster.
+Blurr is currently in developer preview. __Stay in touch!__: Star this project or email hello@blurr.ai
 
-~~**Developer Preview 0**: Local transformations only~~
-
-**Developer Preview 1**: S3-S3 data transformations
-
-**Developer Preview 2**: Add DynamoDB as a Store + Features server for ML production use
-
-Ingestion connectors to Kafka and Spark
+- ~~Local transformations only~~
+- Spark runner
+- S3-S3 data transformations
+- Add DynamoDB as a Store
+- Features server

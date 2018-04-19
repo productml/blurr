@@ -1,20 +1,13 @@
 import logging
-from typing import Dict, Any
+from typing import Any
 
-import pytest
 from pytest import fixture
 
 from blurr.core.evaluation import EvaluationContext
-from blurr.core.field import FieldSchema, Field
+from blurr.core.field import FieldSchema
+from blurr.core.field_complex import SetFieldSchema
+from blurr.core.field_simple import Field, BooleanFieldSchema, IntegerFieldSchema, FloatFieldSchema
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.field_simple import SimpleField, BooleanFieldSchema, IntegerFieldSchema, FloatFieldSchema
-
-
-@fixture
-def test_field_schema() -> Dict[str, Any]:
-    schema_loader = SchemaLoader()
-    name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': 'integer', 'Value': 5})
-    return MockFieldSchema(name, schema_loader)
 
 
 class MockFieldSchema(FieldSchema):
@@ -25,6 +18,13 @@ class MockFieldSchema(FieldSchema):
     @property
     def default(self) -> Any:
         return int(0)
+
+
+@fixture
+def test_field_schema() -> MockFieldSchema:
+    schema_loader = SchemaLoader()
+    name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': 'integer', 'Value': 5})
+    return MockFieldSchema(name, schema_loader)
 
 
 class MockField(Field):
@@ -63,7 +63,7 @@ def test_field_evaluate_incorrect_typecast_to_type_default(caplog):
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': 'integer', 'Value': '"Hi"'})
     field_schema = IntegerFieldSchema(name, schema_loader)
-    field = SimpleField(field_schema, EvaluationContext())
+    field = Field(field_schema, EvaluationContext())
     field.evaluate()
 
     assert field.value == 0
@@ -76,7 +76,7 @@ def test_field_evaluate_implicit_typecast_integer():
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': 'integer', 'Value': '23.45'})
     field_schema = IntegerFieldSchema(name, schema_loader)
-    field = SimpleField(field_schema, EvaluationContext())
+    field = Field(field_schema, EvaluationContext())
     field.evaluate()
 
     assert field._snapshot == 23
@@ -86,7 +86,7 @@ def test_field_evaluate_implicit_typecast_float():
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': 'float', 'Value': '23'})
     field_schema = FloatFieldSchema(name, schema_loader)
-    field = SimpleField(field_schema, EvaluationContext())
+    field = Field(field_schema, EvaluationContext())
     field.evaluate()
 
     assert field._snapshot == 23.0
@@ -96,7 +96,7 @@ def test_field_evaluate_implicit_typecast_bool():
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': 'boolean', 'Value': '1+2'})
     field_schema = BooleanFieldSchema(name, schema_loader)
-    field = SimpleField(field_schema, EvaluationContext())
+    field = Field(field_schema, EvaluationContext())
     field.evaluate()
 
     assert field._snapshot is True
@@ -122,3 +122,30 @@ def test_field_reset(test_field_schema):
     assert field.value == 5
     field.reset()
     assert field.value == 0
+
+
+def test_set_field_snapshot_encoding():
+    schema_loader = SchemaLoader()
+    name = schema_loader.add_schema({'Name': 'test', 'Type': 'set', 'Value': 'test.add(0).add(1)'})
+    field_schema = SetFieldSchema(name, schema_loader)
+    field = Field(field_schema, EvaluationContext())
+    field._evaluation_context.global_add('test', field.value)
+    field.evaluate()
+
+    assert field.value == {0, 1}
+    assert field._snapshot
+    assert isinstance(field._snapshot, list)
+    assert set(field._snapshot) == field.value
+
+
+def test_set_field_snapshot_decoding():
+    schema_loader = SchemaLoader()
+    name = schema_loader.add_schema({'Name': 'test', 'Type': 'set', 'Value': 'test.add(0).add(1)'})
+    field_schema = SetFieldSchema(name, schema_loader)
+    field = Field(field_schema, EvaluationContext())
+    field.restore([2, 3])
+
+    assert field.value == {2, 3}
+    assert field._snapshot
+    assert isinstance(field._snapshot, list)
+    assert set(field._snapshot) == field.value
