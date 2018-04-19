@@ -23,7 +23,7 @@ def test_only_stream_dtc_provided():
     assert len(block_data) == 8
 
     # Stream DTC output
-    assert block_data[Key('userA', 'session')] == {
+    assert block_data[Key('userA', 'session', datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()))] == {
         '_identity': 'userA',
         '_start_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()),
         '_end_time': datetime(2018, 3, 7, 23, 35, 32, tzinfo=tzutc()),
@@ -47,7 +47,7 @@ def test_only_stream_dtc_provided():
         'continent': 'World'
     }
 
-    assert block_data[Key('userB', 'session')] == {
+    assert block_data[Key('userB', 'session', datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()))] == {
         '_identity': 'userB',
         '_start_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()),
         '_end_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()),
