@@ -15,14 +15,14 @@ ITEM_MAP = {
     'day': 'blurr.core.window.Window',
     'hour': 'blurr.core.window.Window',
     'count': 'blurr.core.window.Window',
-    'string': 'blurr.core.field_simple.SimpleField',
-    'integer': 'blurr.core.field_simple.SimpleField',
-    'boolean': 'blurr.core.field_simple.SimpleField',
-    'datetime': 'blurr.core.field_simple.SimpleField',
-    'float': 'blurr.core.field_simple.SimpleField',
-    'map': 'blurr.core.field_simple.SimpleField',
-    'list': 'blurr.core.field_simple.SimpleField',
-    'set': 'blurr.core.field_simple.SimpleField',
+    'string': 'blurr.core.field.Field',
+    'integer': 'blurr.core.field.Field',
+    'boolean': 'blurr.core.field.Field',
+    'datetime': 'blurr.core.field.Field',
+    'float': 'blurr.core.field.Field',
+    'map': 'blurr.core.field.Field',
+    'list': 'blurr.core.field.Field',
+    'set': 'blurr.core.field.Field',
 }
 ITEM_MAP_LOWER_CASE = {k.lower(): v for k, v in ITEM_MAP.items()}
 

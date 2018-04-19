@@ -53,7 +53,7 @@ class SparkRunner(Runner):
 
     def write_output_file(self,
                           path: str,
-                          per_identity_data: RDD,
+                          per_identity_data: 'RDD',
                           spark_session: Optional['SparkSession'] = None) -> None:
         _spark_session_ = get_spark_session(spark_session)
         if not self._window_dtc:
