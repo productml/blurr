@@ -73,9 +73,9 @@ Fields:
 
 # Data validation
 
-# Determine correctness of a session
+# Determine correctness of a BlockAggregate
 
-One possible way of determining the correctness of a session (without relying on the order of events) could be done with:
+One possible way of determining the correctness of a BlockAggregate (like a user session, for example), without relying on the order of events could be done with:
 
 ```yaml
 - Name: game_start_and_end
@@ -92,16 +92,20 @@ Then another field can be defined to determine the correctness:
   Value: valid_start_and_end(session_stats.game_start_and_end)
   When: source.event_id == 'game_start' or source.event_id == 'game_end'
 ```
+
+`valid_start_and_end` is defined as a custom function.
+
 ```yaml  
 def valid_start_and_end(games_list):
   # Determine that each game_start has a corresponding game_end.
   # and return True / False accordingly.
 ```
+
 As more events are processed the value of session_stats.valid_session will maintain whether this session is valid or not. The fields are evaluated in the order they are defined so the valid_session field should be defined after game_start_and_end field.
 
 # Per event validation
 
-Validate individual events for things like missing field values, reuse fields etc. Some ways to do so are:
+Some ways to validate individual events for things like missing field values, reuse fields etc are:
 
 - Create a variable (`VariableAggregate`) with the required clean up on the event field
 - Use `When` in `Field` for validation conditions
