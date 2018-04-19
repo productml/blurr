@@ -12,6 +12,8 @@ The Window DTC generates data relative to a block. This is especially useful for
 
 ![Window](images/window.png)
 
+**Blurr is in Developer Preview so the spec is likely to change**
+
 # The anatomy of a Streaming DTC
 
 The raw event being processed is defined as `source` in the DTC. Event parameters are accessed as `source.<key>` such as `source.user_id`. DTCs are processed in a python 3.6 environment and the expressions used for field values are executed as python statements.

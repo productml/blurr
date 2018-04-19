@@ -22,13 +22,19 @@ def test_extended_runner():
         'offers_purchased': {
             'offer1': 1
         },
-        'badges': {'bronze', 'silver', 'gold'},
+        'badges': {'silver', 'bronze', 'gold'},
         'signin_method': 'other'
     }
+    # Assert the badges is a list and then convert to set for unordered comparison.
+    # badges in DTC is a set but we encode it into a list when creating a snapshot. The creation of
+    # the list cant result in a non-deterministic element order in the list.
+    assert result_state['badges']
+    assert isinstance(result_state['badges'], list)
+    result_state['badges'] = set(result_state['badges'])
 
     assert result_state == expected_state
 
-    result_session = local_runner._block_data[Key('user-1', 'session')]
+    result_session = local_runner._block_data[Key('user-1', 'session', datetime(2016, 2, 13, 0, 0, 58))]
     expected_session = {
         '_identity': 'user-1',
         '_start_time': datetime(2016, 2, 13, 0, 0, 58),
