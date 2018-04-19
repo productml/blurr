@@ -1,14 +1,13 @@
 import logging
-from typing import Dict, Any
+from typing import Any
 
-import pytest
 from pytest import fixture
 
 from blurr.core.evaluation import EvaluationContext
-from blurr.core.field import FieldSchema, Field
+from blurr.core.field import FieldSchema
 from blurr.core.field_complex import SetFieldSchema
-from blurr.core.schema_loader import SchemaLoader
 from blurr.core.field_simple import Field, BooleanFieldSchema, IntegerFieldSchema, FloatFieldSchema
+from blurr.core.schema_loader import SchemaLoader
 
 
 class MockFieldSchema(FieldSchema):
