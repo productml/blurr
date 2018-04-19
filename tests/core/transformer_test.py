@@ -4,7 +4,6 @@ import pytest
 from pytest import fixture
 
 from blurr.core.errors import MissingAttributeError
-from blurr.core.evaluation import Context
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
 from blurr.core.transformer import TransformerSchema, Transformer
@@ -55,7 +54,7 @@ def schema_loader() -> SchemaLoader:
 @fixture
 def test_transformer(schema_loader: SchemaLoader, schema_spec: Dict[str, Any]) -> MockTransformer:
     name = schema_loader.add_schema(schema_spec)
-    return MockTransformer(MockTransformerSchema(name, schema_loader), 'user1', Context())
+    return MockTransformer(MockTransformerSchema(name, schema_loader), 'user1')
 
 
 def test_transformer_schema_init(schema_loader: SchemaLoader, schema_spec: Dict[str, Any]) -> None:

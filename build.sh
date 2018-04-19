@@ -17,7 +17,7 @@ pipenv run yapf -i -r .
 
 
 echo "running tests..."
-export PYTHONPATH=`pwd`:$PYTHONPATH
+export PYTHONPATH=`pwd`:$SPARK_HOME/python/lib/pyspark.zip:$SPARK_HOME/python/lib/py4j-0.10.4-src.zip:$PYTHONPATH
 pipenv run pytest -v --cov=blurr
 
 
@@ -26,7 +26,7 @@ pipenv run python setup.py sdist
 pipenv run python setup.py bdist_wheel
 
 
-if [ ! -z "CIRCLECI" ];
+if [ ! -z "$CIRCLECI" ];
 # post-build commands to execute on CircleCI only
 then
     echo "publishing coverage report..."

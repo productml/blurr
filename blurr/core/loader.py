@@ -8,20 +8,21 @@ ITEM_MAP = {
     'Blurr:Transform:Streaming': 'blurr.core.transformer_streaming.StreamingTransformer',
     'Blurr:Transform:Window': 'blurr.core.transformer_window.WindowTransformer',
     'Blurr:Aggregate:BlockAggregate': 'blurr.core.aggregate_block.BlockAggregate',
+    'Blurr:Aggregate:LabelAggregate': 'blurr.core.aggregate_label.LabelAggregate',
     'Blurr:Aggregate:IdentityAggregate': 'blurr.core.aggregate_identity.IdentityAggregate',
     'Blurr:Aggregate:VariableAggregate': 'blurr.core.aggregate_variable.VariableAggregate',
     'Blurr:Aggregate:WindowAggregate': 'blurr.core.aggregate_window.WindowAggregate',
     'day': 'blurr.core.window.Window',
     'hour': 'blurr.core.window.Window',
     'count': 'blurr.core.window.Window',
-    'string': 'blurr.core.field_simple.SimpleField',
-    'integer': 'blurr.core.field_simple.SimpleField',
-    'boolean': 'blurr.core.field_simple.SimpleField',
-    'datetime': 'blurr.core.field_simple.SimpleField',
-    'float': 'blurr.core.field_simple.SimpleField',
-    'map': 'blurr.core.field_simple.SimpleField',
-    'list': 'blurr.core.field_simple.SimpleField',
-    'set': 'blurr.core.field_simple.SimpleField',
+    'string': 'blurr.core.field.Field',
+    'integer': 'blurr.core.field.Field',
+    'boolean': 'blurr.core.field.Field',
+    'datetime': 'blurr.core.field.Field',
+    'float': 'blurr.core.field.Field',
+    'map': 'blurr.core.field.Field',
+    'list': 'blurr.core.field.Field',
+    'set': 'blurr.core.field.Field',
 }
 ITEM_MAP_LOWER_CASE = {k.lower(): v for k, v in ITEM_MAP.items()}
 
@@ -29,6 +30,7 @@ SCHEMA_MAP = {
     'Blurr:Transform:Streaming': 'blurr.core.transformer_streaming.StreamingTransformerSchema',
     'Blurr:Transform:Window': 'blurr.core.transformer_window.WindowTransformerSchema',
     'Blurr:Aggregate:BlockAggregate': 'blurr.core.aggregate_block.BlockAggregateSchema',
+    'Blurr:Aggregate:LabelAggregate': 'blurr.core.aggregate_label.LabelAggregateSchema',
     'Blurr:Aggregate:IdentityAggregate': 'blurr.core.aggregate_identity.IdentityAggregateSchema',
     'Blurr:Aggregate:VariableAggregate': 'blurr.core.aggregate_variable.VariableAggregateSchema',
     'Blurr:Aggregate:WindowAggregate': 'blurr.core.aggregate_window.WindowAggregateSchema',
@@ -71,5 +73,7 @@ class TypeLoader:
     def import_class_by_full_name(name):
         components = name.rsplit('.', 1)
         mod = importlib.import_module(components[0])
+        if len(components) == 1:
+            return mod
         loaded_class = getattr(mod, components[1])
         return loaded_class
