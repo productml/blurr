@@ -1,6 +1,5 @@
-import csv
 from datetime import datetime
-from typing import List, Optional, Tuple, Any, Dict, Union
+from typing import List, Optional, Tuple, Any, Union
 
 import yaml
 from abc import ABC, abstractmethod
@@ -10,7 +9,6 @@ from blurr.core import logging
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
-from blurr.core.syntax.schema_validator import validate
 from blurr.runner.data_processor import DataProcessor
 
 
@@ -24,9 +22,14 @@ class Runner(ABC):
         self._stream_dtc = yaml.safe_load(open(stream_dtc_file))
         self._window_dtc = None if window_dtc_file is None else yaml.safe_load(
             open(window_dtc_file))
-        validate(self._stream_dtc)
-        if self._window_dtc is not None:
-            validate(self._window_dtc)
+
+        # TODO: Assume validation will be done separately.
+        # This causes a problem when running the code on spark
+        # as the validation yml file is inside the archived package
+        # and yamale is not able to read that.
+        # validate(self._stream_dtc)
+        # if self._window_dtc is not None:
+        #     validate(self._window_dtc)
 
         self._stream_dtc_name = self._schema_loader.add_schema(self._stream_dtc)
         self._stream_transformer_schema = self._schema_loader.get_schema_object(
