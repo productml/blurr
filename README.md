@@ -10,17 +10,17 @@
 
 Blurr transforms structured, streaming `raw data` into `features` for model training and prediction using a `high-level expressive YAML-based language` called the Data Transform Configuration (DTC).
 
-## Blurr vs. stream processors
+## Blurr vs. stream/batch processors
 
-The DTC is a __data transform definition__ for structured data.
+The DTC is a __data transform definition__ for structured data. The DTC encapsulates the *business logic* of data transforms and Blurr orchestrates the *execution* of data transforms.
 
-Blurr is processor-agnostic, so DTCs can be run by stream processors such as Spark.
+Blurr is processor-agnostic, so DTCs can be run by event processors such as Spark.
 
 1. Blurr is to Spark as [Hibernate](http://hibernate.org/) is to databases
 2. Blurr can be used on Spark in the same way as SparkSQL
 3. Blurr is WORAIS (Write Once, Run on Any Infrastructure Stack)
 
-Because real world infrastructure is extremely diverse, Blurr is designed to run on virtually any infrastructure stack.
+Because real world infrastructure is extremely diverse, Blurr is designed to run on virtually any infrastructure stack that runs Python 3.6+.
 
 [Give us feedback on the metaphors](https://docs.google.com/forms/d/e/1FAIpQLSf5wqW7M4IibJU-NYDEZ-rx0TvJYMkTiV_hehZgKV6a6HvXaA/viewform) and help improve Blurr!
 
@@ -32,7 +32,7 @@ Because real world infrastructure is extremely diverse, Blurr is designed to run
 
 Blurr is a collection of components built for MLOps, the DTC is one of them. **DTC ⊆ Blurr**
 
-We see a future where MLOps means teams putting together various technologies to suit their needs. For production ML applications, __experimentation__ and __iteration speed__ is the difference between success and failure. The DTC helps teams iterate on features faster. The vision for Blurr is to build MLOps components to help ML teams experiment at high speed.
+We see a future where MLOps means teams putting together various technologies to suit their needs. For production ML applications, the __speed of experimentation__ and __iterations__ is the difference between success and failure. The DTC helps teams iterate on features faster. The vision for Blurr is to build MLOps components to help ML teams experiment at high speed.
 
 # Table of contents
 
@@ -158,14 +158,14 @@ Inspired by the (old school) [Joel Test](https://www.joelonsoftware.com/2000/08/
 4. Successful ML is a long game. You play it like it is
 5. Kaizen. Experimentation and iterations are a way of life
 
-__Stay in touch!__ Star this project or email hello@blurr.ai
+
 
 # Roadmap
 
-Blurr is currently in developer preview.
+Blurr is currently in developer preview. __Stay in touch!__: Star this project or email hello@blurr.ai
 
 - ~~Local transformations only~~
 - Spark runner
 - S3-S3 data transformations
 - Add DynamoDB as a Store
-- Features server 
+- Features server
