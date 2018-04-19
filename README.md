@@ -165,6 +165,7 @@ Inspired by the (old school) [Joel Test](https://www.joelonsoftware.com/2000/08/
 Blurr is currently in developer preview. __Stay in touch!__: Star this project or email hello@blurr.ai
 
 - ~~Local transformations only~~
+- ~~Support for custom functions and other python libraries in the DTC~~
 - Spark runner
 - S3-S3 data transformations
 - Add DynamoDB as a Store
