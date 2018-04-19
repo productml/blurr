@@ -33,7 +33,8 @@ def schema_loader():
 @fixture
 def stream_transformer(schema_loader, stream_schema_spec):
     stream_dtc_name = schema_loader.add_schema(stream_schema_spec)
-    stream_transformer = StreamingTransformer(schema_loader.get_schema_object(stream_dtc_name), 'user1')
+    stream_transformer = StreamingTransformer(
+        schema_loader.get_schema_object(stream_dtc_name), 'user1')
     stream_transformer.restore({Key('user1', 'state'): {'country': 'US'}})
     return stream_transformer
 
