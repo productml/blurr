@@ -36,7 +36,7 @@ def execute_stream_dtc(identity_events: List[Tuple[datetime, Record]], identity:
 
     stream_transformer = StreamingTransformer(stream_transformer_schema, identity)
     for time, event in identity_events:
-        stream_transformer.evaluate_record(event)
+        stream_transformer.evaluate(event)
     stream_transformer.finalize()
 
     return get_memory_store(schema_loader).get_all()
@@ -83,7 +83,7 @@ def execute_window_dtc(identity: str, schema_loader: SchemaLoader,
             continue
         try:
             blocks += 1
-            if window_transformer.evaluate_anchor(block_obj.restore(data)):
+            if window_transformer.evaluate(block_obj.restore(data)):
                 anchors += 1
                 window_data.append(window_transformer.flattened_snapshot)
         except PrepareWindowMissingBlocksError as err:
