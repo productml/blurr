@@ -70,7 +70,7 @@ def test_window_transformer_schema_init(schema_loader, stream_schema_spec, windo
     assert isinstance(window_transformer_schema.anchor, AnchorSchema)
 
 
-def test_evaluate_anchor_prepare_window_error(window_transformer, block_aggregate):
+def test_evaluate_prepare_window_error(window_transformer, block_aggregate):
     block_aggregate.restore({
         'events': 3,
         '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc),
@@ -79,34 +79,32 @@ def test_evaluate_anchor_prepare_window_error(window_transformer, block_aggregat
     with pytest.raises(
             PrepareWindowMissingBlocksError,
             match='last_session WindowAggregate: Expecting 1 but found 0 blocks'):
-        window_transformer.evaluate_anchor(block_aggregate)
+        window_transformer.evaluate(block_aggregate)
 
 
-def test_evaluate_anchor_prepare_window(schema_loader, window_transformer, block_aggregate):
+def test_evaluate_prepare_window(schema_loader, window_transformer, block_aggregate):
     init_memory_store(schema_loader.get_schema_object('Sessions.memory'))
     block_aggregate.restore({
         'events': 3,
         '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc),
         '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc)
     })
-    assert window_transformer.evaluate_anchor(block_aggregate) is True
+    assert window_transformer.evaluate(block_aggregate) is True
 
 
-def test_evaluate_anchor_false(schema_loader, window_transformer, block_aggregate):
+def test_evaluate_false(schema_loader, window_transformer, block_aggregate):
     init_memory_store(schema_loader.get_schema_object('Sessions.memory'))
     block_aggregate.restore({
         'events': 0,
         '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc),
         '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc)
     })
-    assert window_transformer.evaluate_anchor(block_aggregate) is False
+    assert window_transformer.evaluate(block_aggregate) is False
 
 
-def test_evaluate_error(window_transformer):
+def test_evaluate_missing_block_error(window_transformer):
     with pytest.raises(
-            AnchorBlockNotDefinedError,
-            match=('WindowTransformer does not support evaluate directly.'
-                   ' Call evaluate_anchor instead.')):
+            TypeError, match='evaluate\(\) missing 1 required positional argument: \'block\''):
         window_transformer.evaluate()
 
 
@@ -119,7 +117,7 @@ def test_window_transformer(schema_loader, window_transformer, block_aggregate):
         '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc)
     })
 
-    assert window_transformer.evaluate_anchor(block_aggregate) is True
+    assert window_transformer.evaluate(block_aggregate) is True
 
     snapshot = window_transformer._snapshot
     assert snapshot['last_session'] == {'_identity': 'user1', 'events': 2}
@@ -143,12 +141,12 @@ def test_window_transformer_internal_reset(schema_loader, window_transformer, bl
         '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc)
     })
 
-    assert window_transformer.evaluate_anchor(block_aggregate) is True
+    assert window_transformer.evaluate(block_aggregate) is True
     snapshot = window_transformer._snapshot
     assert snapshot['last_session'] == {'_identity': 'user1', 'events': 2}
     assert snapshot['last_day'] == {'_identity': 'user1', 'total_events': 3}
 
-    assert window_transformer.evaluate_anchor(block_aggregate) is True
+    assert window_transformer.evaluate(block_aggregate) is True
     snapshot = window_transformer._snapshot
     assert snapshot['last_session'] == {'_identity': 'user1', 'events': 2}
     assert snapshot['last_day'] == {'_identity': 'user1', 'total_events': 3}
