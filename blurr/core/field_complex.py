@@ -1,3 +1,4 @@
+import typing
 from typing import Any
 
 from blurr.core.field import FieldSchema, ComplexTypeBase
@@ -74,3 +75,11 @@ class SetFieldSchema(FieldSchema):
     @property
     def default(self) -> Any:
         return Set()
+
+    @staticmethod
+    def encoder(value: Any) -> Set:
+        return list(value)
+
+    @staticmethod
+    def decoder(value: Any) -> Set:
+        return Set(value)

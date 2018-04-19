@@ -1,7 +1,7 @@
 """
 Usage:
     blurr validate [--debug] [<DTC> ...]
-    blurr transform [--debug] [--streaming-dtc=<dtc-file>] [--window-dtc=<dtc-file>] (--source=<raw-json-files> | <raw-json-files>)
+    blurr transform [--debug] [--runner=<runner>] [--streaming-dtc=<dtc-file>] [--window-dtc=<dtc-file>] [--data-processor=<data-processor>] (--source=<raw-json-files> | <raw-json-files>)
     blurr -h | --help
 
 Commands:
@@ -21,10 +21,18 @@ Commands:
 Options:
     -h --help                   Show this screen.
     --version                   Show version.
+    --runner=<runner>           The runner to use for the transform.
+                                Possible values:
+                                local - Transforms done in memory. <default>
+                                spark - Transforms done using spark locally.
     --streaming-dtc=<dtc-file>  Streaming DTC file to use.
     --window-dtc=<dtc-file>     Window DTC file to use.
     --source=<raw-json-files>   List of source files separated by comma
     --debug                     Output debug logs.
+    --data-processor=<data-processor>   Data processor to use to process each record.
+                                        Possible values:
+                                        simple - One event dictionary per line in the source file(s). <default>
+                                        ipfix - Processor for IpFix format.
 """
 import logging
 import sys

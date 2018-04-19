@@ -7,7 +7,7 @@ Identity: expression()
 Time: expression(required=True)
 When: expression(required=False)
 Stores: List(any(include('memory_store')), min=1)
-Aggregates: list(any(include('identity_aggregate'), include('block_aggregate'), include('variable_aggregate')), min=1)
+Aggregates: list(any(include('identity_aggregate'), include('block_aggregate'), include('label_aggregate'), include('variable_aggregate')), min=1)
 
 ---
 
@@ -24,6 +24,14 @@ identity_aggregate:
   Type: enum('Blurr:Aggregate:IdentityAggregate')
   Store: identifier(required=False)
   When: expression(required=False)
+  Fields: list(include('field'), min=1)
+
+label_aggregate:
+  Name: identifier()
+  Type: enum('Blurr:Aggregate:LabelAggregate')
+  Store: identifier(required=False)
+  When: expression(required=False)
+  Label: expression(required=True)
   Fields: list(include('field'), min=1)
 
 block_aggregate:

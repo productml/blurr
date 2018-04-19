@@ -50,8 +50,16 @@ class FieldSchema(BaseSchema, ABC):
         """
         raise NotImplementedError('type_object is required')
 
+    @staticmethod
+    def encoder(value: Any) -> Any:
+        return value
 
-class Field(BaseItem, ABC):
+    @staticmethod
+    def decoder(value: Any) -> Any:
+        return value
+
+
+class Field(BaseItem):
     """
     An individual field object responsible for retaining the field value
     """
@@ -96,13 +104,13 @@ class Field(BaseItem, ABC):
         """
         Snapshots the current value of the field
         """
-        return self.value
+        return self._schema.encoder(self.value)
 
     def restore(self, snapshot) -> None:
         """
         Restores the value of a field from a snapshot
         """
-        self.value = snapshot
+        self.value = self._schema.decoder(snapshot)
 
     def reset(self) -> None:
         self.value = self._schema.default
