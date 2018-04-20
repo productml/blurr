@@ -52,7 +52,7 @@ class LabelAggregate(BlockAggregate):
         if self._needs_evaluation:
             for _, item in self._label_fields.items():
                 item.evaluate()
-                if item.none_result:
+                if item.eval_error:
                     return False
         return True
 
