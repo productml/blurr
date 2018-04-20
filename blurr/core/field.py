@@ -74,6 +74,7 @@ class Field(BaseItem):
 
         # When the field is created, the value is set to the field type default
         self.value = self._schema.default
+        self.none_result = False
 
     def evaluate(self) -> None:
         """
@@ -84,7 +85,8 @@ class Field(BaseItem):
         if self._needs_evaluation:
             result = self._schema.value.evaluate(self._evaluation_context)
 
-        if result is None:
+        self.none_result = result is None
+        if self.none_result:
             return
 
         # Only set the value if it conforms to the field type

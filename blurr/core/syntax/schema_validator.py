@@ -1,9 +1,8 @@
 import traceback
+from typing import Dict
 
 import os
 import re
-from typing import Dict
-
 from yamale import yamale
 from yamale.schema import Data
 from yamale.validators import DefaultValidators, Validator
@@ -35,6 +34,18 @@ class DataType(Validator):
 
     def get_name(self) -> str:
         return 'DTC Valid Data Type'
+
+
+class LabelDataType(Validator):
+    TAG = 'label_data_type'
+
+    VALUES = ['integer', 'boolean', 'string', 'datetime']
+
+    def _is_valid(self, value: str) -> bool:
+        return value in self.VALUES
+
+    def get_name(self) -> str:
+        return 'Valid LabelField Type'
 
 
 class Identifier(Validator):
@@ -75,9 +86,11 @@ class Expression(Validator):
 
 
 VALIDATORS = {
-    **DefaultValidators.copy(), DataType.TAG: DataType,
+    **DefaultValidators.copy(),
+    DataType.TAG: DataType,
+    LabelDataType.TAG: LabelDataType,
     Identifier.TAG: Identifier,
-    Expression.TAG: Expression
+    Expression.TAG: Expression,
 }
 
 PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))

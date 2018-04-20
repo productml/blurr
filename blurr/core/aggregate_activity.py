@@ -22,8 +22,8 @@ class ActivityAggregate(BlockAggregate):
         time = self._evaluation_context.global_context['time']
 
         # If the event time is beyond separation threshold, create a new block
-        if self._start_time and (time < self._start_time - self._schema.separation_interval or
-                                 time > self._end_time + self._schema.separation_interval):
+        if self._start_time and (time < self._start_time - self._schema.separation_interval
+                                 or time > self._end_time + self._schema.separation_interval):
             self.persist(self._start_time)
             self.reset()
 
