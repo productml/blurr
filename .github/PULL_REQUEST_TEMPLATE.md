@@ -7,7 +7,7 @@ _Describe the big picture of your changes here_
 
 
 
-####Link to issue
-fixes #<add-referenced-issue-number-here>
+#### Link to issue
+fixes #issue-number
 
 
