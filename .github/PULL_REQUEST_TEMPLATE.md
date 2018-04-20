@@ -1,4 +1,4 @@
-**Pull Request Checklist**
+####Pull Request Checklist:
 - [ ] Tests for the changes have been added
 - [ ] Docs have been added / updated
 
