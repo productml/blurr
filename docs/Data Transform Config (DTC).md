@@ -58,7 +58,7 @@ Name | Name of the store, used for internal referencing within the DTC | Any `st
 
 ## Import
 
-The import section ca be used to specify arbitrary python code that 
+The import section can be used to specify arbitrary python code that 
 can be used in the DTC.
 
 As shown below `Time` key is using `datetime` and `timezone` and these 
