@@ -35,82 +35,65 @@ class LabelAggregate(BlockAggregate):
             name: TypeLoader.load_item(item_schema.type)(item_schema, self._evaluation_context)
             for name, item_schema in self._schema.label_fields.items()
         }
-        self._key = None
 
-        # Dictionary to store label fields before deciding whether the current state needs to be
-        # persisted or not and whether store needs to be queried.
-        self._temp_label_fields: Dict[str, Field] = {
+        # Also add the label fields to regular fields so that they get processed by other functions
+        # such as snapshot, restore, etc as per normal.
+        # We don't add self._label_fields here as we want these fields to be separate objects.
+        self._fields.update({
             name: TypeLoader.load_item(item_schema.type)(item_schema, self._evaluation_context)
             for name, item_schema in self._schema.label_fields.items()
-        }
-        self._temp_key = None
+        })
+        self._key = None
 
-    def _evaluate_temp_label_fields(self) -> bool:
+    def _evaluate_label_fields(self) -> bool:
+        """
+        Evaluates the label fields. Returns False if any of the fields could not be evaluated.
+        """
         if self._needs_evaluation:
-            for _, item in self._temp_label_fields.items():
+            for _, item in self._label_fields.items():
                 item.evaluate()
                 if item.none_result:
                     return False
-        self._temp_key = self._prepare_key(self._temp_label_fields)
         return True
 
-    def _set_label_fields_from_temp(self):
-        for name, item in self._temp_label_fields.items():
-            self._label_fields[name].restore(item._snapshot)
-        self._key = self._prepare_key(self._label_fields)
+    def _compare_label_fields_to_fields(self) -> bool:
+        """ Compares the label field values to the same fields in regular fields"""
+        for name, item in self._label_fields.items():
+            if item.value != self._nested_items[name].value:
+                return False
+        return True
 
-    def _prepare_key(self, label_fields: Dict[str, Field]):
+    def _prepare_key(self):
         """ Generates the Key object based on label """
         return Key(self._identity, self._name + '.' +
-                   (':').join([str(item.value) for item in label_fields.values()]))
+                   (':').join([str(item.value) for item in self._label_fields.values()]))
 
     def evaluate(self) -> None:
-        if not self._evaluate_temp_label_fields():
+        if not self._evaluate_label_fields():
             return
 
-        if self._key and self._key != self._temp_key:
-            # Save the current snapshot with the current timestamp
+        if self._key and not self._compare_label_fields_to_fields():
+            # Save the current snapshot.
             self.persist()
 
             # Try restoring a previous state if it exists, otherwise, reset to create a new state
-            snapshot = self._schema.store.get(self._temp_key)
+            self._key = self._prepare_key()
+            snapshot = self._schema.store.get(self._key)
             if snapshot:
                 self.restore(snapshot)
             else:
                 self.reset()
 
         if not self._key:
-            self._set_label_fields_from_temp()
+            self._key = self._prepare_key()
 
         super().evaluate()
 
     def persist(self, timestamp=None) -> None:
         # TODO Refactor keys when refactoring store
         # Timestamp is ignored for now.
-        self._schema.store.save(self._prepare_key(self._label_fields), self._snapshot)
-
-    @property
-    def _snapshot(self) -> Dict[str, Any]:
-        snapshot = super()._snapshot
-        try:
-            snapshot.update({name: item._snapshot for name, item in self._label_fields.items()})
-            return snapshot
-        except Exception as e:
-            raise SnapshotError('Error while creating snapshot for {}'.format(self._name)) from e
-
-    def restore(self, snapshot: Dict[Union[str, Key], Any]):
-        try:
-            label_snapshot = snapshot.copy()
-            for name, item in self._label_fields.items():
-                item.restore(label_snapshot[name])
-                del label_snapshot[name]
-            super().restore(label_snapshot)
-            self._key = self._prepare_key(self._label_fields)
-        except Exception as e:
-            raise SnapshotError('Error while restoring snapshot: {}'.format(self._snapshot)) from e
+        self._schema.store.save(self._key, self._snapshot)
 
     def reset(self):
         super().reset()
-        for _, item in self._label_fields.items():
-            item.reset()
         self._key = None
