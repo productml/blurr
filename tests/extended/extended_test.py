@@ -34,7 +34,7 @@ def test_extended_runner():
 
     assert result_state == expected_state
 
-    result_session = local_runner._block_data[Key('user-1', 'session')]
+    result_session = local_runner._block_data[Key('user-1', 'session', datetime(2016, 2, 13, 0, 0, 58))]
     expected_session = {
         '_identity': 'user-1',
         '_start_time': datetime(2016, 2, 13, 0, 0, 58),

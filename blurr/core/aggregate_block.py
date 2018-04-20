@@ -3,11 +3,12 @@ from typing import Dict, Any, List
 from blurr.core.aggregate import Aggregate, AggregateSchema
 from blurr.core.evaluation import Expression
 from blurr.core.schema_loader import SchemaLoader
+from blurr.core.store_key import Key
 
 
 class BlockAggregateSchema(AggregateSchema):
     """
-    Data group that handles the block rollup aggregation
+    Aggregates that handles the block rollup aggregation
     """
 
     ATTRIBUTE_SPLIT = 'Split'
@@ -79,3 +80,6 @@ class BlockAggregate(Aggregate):
             self.__init__(self._schema, self._identity, self._evaluation_context)
 
         super().evaluate()
+
+    def persist(self, timestamp=None) -> None:
+        super().persist(timestamp if timestamp else self._start_time)
