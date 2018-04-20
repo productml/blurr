@@ -1,11 +1,9 @@
 #### Issue Checklist:
 - [ ] Descriptive title
 - [ ] Completed sections below
-- [ ] Bug report? Relevant debug logs / reproduction information
 
 ### Problem Description
-_A description of the problem, including **why** this is a problem_
-
+_A description of the problem, including **why** this is a problem.  If it is a bug report, include elevant debug logs / reproduction information_
 
 ### Solution Proposal
 _An overview of the suggested solution_
