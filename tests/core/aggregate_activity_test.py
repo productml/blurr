@@ -5,6 +5,7 @@ from dateutil import parser
 from pytest import fixture
 
 from blurr.core.aggregate_activity import ActivityAggregate, ActivityAggregateSchema
+from blurr.core.constants import BLURR_AGGREGATE_ACTIVITY, BLURR_STORE_MEMORY
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
@@ -14,7 +15,7 @@ from blurr.core.store_key import Key
 @fixture
 def activity_aggregate_schema_spec() -> Dict[str, Any]:
     return {
-        'Type': 'Blurr:Aggregate:ActivityAggregate',
+        'Type': BLURR_AGGREGATE_ACTIVITY,
         'Name': 'activity_aggr',
         'SeparateByInactiveSeconds': '1800',
         'Store': 'memory',
@@ -32,7 +33,7 @@ def activity_aggregate_schema_spec() -> Dict[str, Any]:
 
 @fixture
 def store_spec() -> Dict[str, Any]:
-    return {'Type': 'Blurr:Store:MemoryStore', 'Name': 'memory'}
+    return {'Type': BLURR_STORE_MEMORY, 'Name': 'memory'}
 
 
 @fixture
@@ -47,11 +48,31 @@ def activity_aggregate_schema(activity_aggregate_schema_spec: Dict[str, Any],
 @fixture
 def activity_events() -> List[Record]:
     return [
-        Record({'id': 'user1', 'event_value': 10, 'event_time': '2018-01-01T01:01:01+00:00'}),
-        Record({'id': 'user1', 'event_value': 100, 'event_time': '2018-01-01T01:01:05+00:00'}),
-        Record({'id': 'user1', 'event_value': 1, 'event_time': '2018-01-01T01:02:01+00:00'}),
-        Record({'id': 'user1', 'event_value': 1000, 'event_time': '2018-01-01T03:01:01+00:00'}),
-        Record({'id': 'user1', 'event_value': 10000, 'event_time': '2018-01-02T01:01:01+00:00'})
+        Record({
+            'id': 'user1',
+            'event_value': 10,
+            'event_time': '2018-01-01T01:01:01+00:00'
+        }),
+        Record({
+            'id': 'user1',
+            'event_value': 100,
+            'event_time': '2018-01-01T01:01:05+00:00'
+        }),
+        Record({
+            'id': 'user1',
+            'event_value': 1,
+            'event_time': '2018-01-01T01:02:01+00:00'
+        }),
+        Record({
+            'id': 'user1',
+            'event_value': 1000,
+            'event_time': '2018-01-01T03:01:01+00:00'
+        }),
+        Record({
+            'id': 'user1',
+            'event_value': 10000,
+            'event_time': '2018-01-02T01:01:01+00:00'
+        })
     ]
 
 
@@ -62,7 +83,7 @@ def evaluate_event(record: Record, aggregate: ActivityAggregate) -> None:
 
 
 def test_aggregate_final_state(activity_aggregate_schema: ActivityAggregateSchema,
-                             activity_events: List[Record]) -> None:
+                               activity_events: List[Record]) -> None:
     # Initialize the starting state
     identity = 'user1'
     evaluation_context = EvaluationContext()
@@ -77,17 +98,32 @@ def test_aggregate_final_state(activity_aggregate_schema: ActivityAggregateSchem
 
     store_state = activity_aggregate._schema.store.get_all()
     assert len(store_state) == 3
-    assert store_state.get(Key('user1', 'activity_aggr', datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc))) == {
-        '_identity': 'user1', '_start_time': datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc),
-        '_end_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc), 'sum': 111, 'count': 3}
+    assert store_state.get(
+        Key('user1', 'activity_aggr', datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc))) == {
+            '_identity': 'user1',
+            '_start_time': datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc),
+            '_end_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc),
+            'sum': 111,
+            'count': 3
+        }
 
-    assert store_state.get(Key('user1', 'activity_aggr', datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc))) == {
-        '_identity': 'user1', '_start_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc),
-        '_end_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc), 'sum': 1000, 'count': 1}
+    assert store_state.get(
+        Key('user1', 'activity_aggr', datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc))) == {
+            '_identity': 'user1',
+            '_start_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc),
+            '_end_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc),
+            'sum': 1000,
+            'count': 1
+        }
 
-    assert store_state.get(Key('user1', 'activity_aggr', datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc))) == {
-        '_identity': 'user1', '_start_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc),
-        '_end_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc), 'sum': 10000, 'count': 1}
+    assert store_state.get(
+        Key('user1', 'activity_aggr', datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc))) == {
+            '_identity': 'user1',
+            '_start_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc),
+            '_end_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc),
+            'sum': 10000,
+            'count': 1
+        }
 
 
 def test_evaluate_no_separation(activity_aggregate_schema: ActivityAggregateSchema,

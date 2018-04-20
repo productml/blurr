@@ -5,6 +5,7 @@ import pytest
 from pytest import raises, fixture
 
 from blurr.core.base import Expression
+from blurr.core.constants import BLURR_TRANSFORM_STREAMING, BLURR_AGGREGATE_IDENTITY
 from blurr.core.errors import InvalidExpressionError, MissingAttributeError
 from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
@@ -15,13 +16,13 @@ from blurr.core.transformer_streaming import StreamingTransformer
 def schema_spec() -> Dict:
     return {
         'Name': 'test',
-        'Type': 'Blurr:Transform:Streaming',
+        'Type': BLURR_TRANSFORM_STREAMING,
         "Version": "2018-03-01",
         "Time": "parser.parse(source.event_time)",
         "Identity": "source.user_id",
         'Aggregates': [{
             'Name': 'test_group',
-            'Type': 'Blurr:Aggregate:IdentityAggregate',
+            'Type': BLURR_AGGREGATE_IDENTITY,
             'Fields': [{
                 "Type": "integer",
                 "Name": "events",

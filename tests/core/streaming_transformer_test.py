@@ -4,6 +4,7 @@ import pytest
 from datetime import datetime
 from pytest import fixture
 
+from blurr.core.constants import BLURR_TRANSFORM_STREAMING, BLURR_STORE_MEMORY, BLURR_AGGREGATE_IDENTITY
 from blurr.core.errors import IdentityError, TimeError
 from blurr.core.evaluation import Context
 from blurr.core.record import Record
@@ -15,7 +16,7 @@ from blurr.core.transformer_streaming import StreamingTransformerSchema, Streami
 def schema_spec() -> Dict[str, Any]:
     return {
         'Name': 'test',
-        'Type': 'Blurr:Transform:Streaming',
+        'Type': BLURR_TRANSFORM_STREAMING,
         'Version': '2018-03-01',
         'Import': [{
             'Module': 'datetime',
@@ -25,11 +26,11 @@ def schema_spec() -> Dict[str, Any]:
         'Time': 'datetime(2016,10,10)',
         'Stores': [{
             'Name': 'memstore',
-            'Type': 'Blurr:Store:MemoryStore'
+            'Type': BLURR_STORE_MEMORY
         }],
         'Aggregates': [{
             'Name': 'test_group',
-            'Type': 'Blurr:Aggregate:IdentityAggregate',
+            'Type': BLURR_AGGREGATE_IDENTITY,
             'Store': 'memstore',
             'Fields': [{
                 "Type": "integer",

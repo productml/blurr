@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 import pytest
 from pytest import fixture
 
+from blurr.core.constants import BLURR_AGGREGATE_BLOCK, BLURR_AGGREGATE_WINDOW
 from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import EvaluationContext, Context
 from blurr.core.schema_loader import SchemaLoader
@@ -13,7 +14,7 @@ from blurr.core.aggregate_window import WindowAggregateSchema, WindowAggregate
 def window_aggregate_schema(schema_loader_with_mem_store: SchemaLoader, mem_store_name: str,
                             stream_dtc_name: str) -> WindowAggregateSchema:
     schema_loader_with_mem_store.add_schema({
-        'Type': 'Blurr:Aggregate:BlockAggregate',
+        'Type': BLURR_AGGREGATE_BLOCK,
         'Name': 'session',
         'Store': mem_store_name,
         'Fields': [
@@ -25,7 +26,7 @@ def window_aggregate_schema(schema_loader_with_mem_store: SchemaLoader, mem_stor
         ],
     }, stream_dtc_name)
     name = schema_loader_with_mem_store.add_schema({
-        'Type': 'Blurr:Aggregate:WindowAggregate',
+        'Type': BLURR_AGGREGATE_WINDOW,
         'Name': 'test_window_name',
         'WindowType': 'day',
         'WindowValue': 1,

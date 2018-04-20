@@ -2,17 +2,18 @@ from typing import Any
 
 import importlib
 
+import blurr.core.constants as constants
 from blurr.core.errors import InvalidSchemaError
 
 ITEM_MAP = {
-    'Blurr:Transform:Streaming': 'blurr.core.transformer_streaming.StreamingTransformer',
-    'Blurr:Transform:Window': 'blurr.core.transformer_window.WindowTransformer',
-    'Blurr:Aggregate:BlockAggregate': 'blurr.core.aggregate_block.BlockAggregate',
-    'Blurr:Aggregate:LabelAggregate': 'blurr.core.aggregate_label.LabelAggregate',
-    'Blurr:Aggregate:ActivityAggregate': 'blurr.core.aggregate_activity.ActivityAggregate',
-    'Blurr:Aggregate:IdentityAggregate': 'blurr.core.aggregate_identity.IdentityAggregate',
-    'Blurr:Aggregate:VariableAggregate': 'blurr.core.aggregate_variable.VariableAggregate',
-    'Blurr:Aggregate:WindowAggregate': 'blurr.core.aggregate_window.WindowAggregate',
+    constants.BLURR_TRANSFORM_STREAMING: 'blurr.core.transformer_streaming.StreamingTransformer',
+    constants.BLURR_TRANSFORM_WINDOW: 'blurr.core.transformer_window.WindowTransformer',
+    constants.BLURR_AGGREGATE_BLOCK: 'blurr.core.aggregate_block.BlockAggregate',
+    constants.BLURR_AGGREGATE_LABEL: 'blurr.core.aggregate_label.LabelAggregate',
+    constants.BLURR_AGGREGATE_ACTIVITY: 'blurr.core.aggregate_activity.ActivityAggregate',
+    constants.BLURR_AGGREGATE_IDENTITY: 'blurr.core.aggregate_identity.IdentityAggregate',
+    constants.BLURR_AGGREGATE_VARIABLE: 'blurr.core.aggregate_variable.VariableAggregate',
+    constants.BLURR_AGGREGATE_WINDOW: 'blurr.core.aggregate_window.WindowAggregate',
     'day': 'blurr.core.window.Window',
     'hour': 'blurr.core.window.Window',
     'count': 'blurr.core.window.Window',
@@ -28,15 +29,15 @@ ITEM_MAP = {
 ITEM_MAP_LOWER_CASE = {k.lower(): v for k, v in ITEM_MAP.items()}
 
 SCHEMA_MAP = {
-    'Blurr:Transform:Streaming': 'blurr.core.transformer_streaming.StreamingTransformerSchema',
-    'Blurr:Transform:Window': 'blurr.core.transformer_window.WindowTransformerSchema',
-    'Blurr:Aggregate:BlockAggregate': 'blurr.core.aggregate_block.BlockAggregateSchema',
-    'Blurr:Aggregate:LabelAggregate': 'blurr.core.aggregate_label.LabelAggregateSchema',
-    'Blurr:Aggregate:ActivityAggregate': 'blurr.core.aggregate_activity.ActivityAggregateSchema',
-    'Blurr:Aggregate:IdentityAggregate': 'blurr.core.aggregate_identity.IdentityAggregateSchema',
-    'Blurr:Aggregate:VariableAggregate': 'blurr.core.aggregate_variable.VariableAggregateSchema',
-    'Blurr:Aggregate:WindowAggregate': 'blurr.core.aggregate_window.WindowAggregateSchema',
-    'Blurr:Store:MemoryStore': 'blurr.store.memory_store.MemoryStore',
+    constants.BLURR_TRANSFORM_STREAMING: 'blurr.core.transformer_streaming.StreamingTransformerSchema',
+    constants.BLURR_TRANSFORM_WINDOW: 'blurr.core.transformer_window.WindowTransformerSchema',
+    constants.BLURR_AGGREGATE_BLOCK: 'blurr.core.aggregate_block.BlockAggregateSchema',
+    constants.BLURR_AGGREGATE_LABEL: 'blurr.core.aggregate_label.LabelAggregateSchema',
+    constants.BLURR_AGGREGATE_ACTIVITY: 'blurr.core.aggregate_activity.ActivityAggregateSchema',
+    constants.BLURR_AGGREGATE_IDENTITY: 'blurr.core.aggregate_identity.IdentityAggregateSchema',
+    constants.BLURR_AGGREGATE_VARIABLE: 'blurr.core.aggregate_variable.VariableAggregateSchema',
+    constants.BLURR_AGGREGATE_WINDOW: 'blurr.core.aggregate_window.WindowAggregateSchema',
+    constants.BLURR_STORE_MEMORY: 'blurr.store.memory_store.MemoryStore',
     'anchor': 'blurr.core.anchor.AnchorSchema',
     'day': 'blurr.core.window.WindowSchema',
     'hour': 'blurr.core.window.WindowSchema',

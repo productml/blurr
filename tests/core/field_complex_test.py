@@ -4,6 +4,7 @@ from pytest import fixture
 
 from blurr.core.field_complex import Map, List, Set
 from blurr.core.aggregate import Aggregate, AggregateSchema
+from blurr.core.constants import BLURR_AGGREGATE_VARIABLE
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.aggregate_variable import VariableAggregate, \
@@ -68,7 +69,7 @@ def test_set_add() -> None:
 @fixture(scope='module')
 def aggregate_schema_spec() -> Dict[str, Any]:
     return {
-        'Type': 'Blurr:Aggregate:VariableAggregate',
+        'Type': BLURR_AGGREGATE_VARIABLE,
         'Name': 'test',
         'Fields': [{
             'Name': 'map_field',

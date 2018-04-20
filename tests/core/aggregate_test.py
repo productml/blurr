@@ -4,6 +4,7 @@ from typing import Dict, Any
 from pytest import fixture
 
 from blurr.core.aggregate import AggregateSchema, Aggregate
+from blurr.core.constants import BLURR_AGGREGATE_BLOCK, BLURR_STORE_MEMORY
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.field import Field
 from blurr.core.schema_loader import SchemaLoader
@@ -12,7 +13,7 @@ from blurr.core.store_key import Key
 
 def get_aggregate_schema_spec() -> Dict[str, Any]:
     return {
-        'Type': 'Blurr:Aggregate:BlockAggregate',
+        'Type': BLURR_AGGREGATE_BLOCK,
         'Name': 'user',
         'Store': 'memory',
         'Fields': [{
@@ -24,7 +25,7 @@ def get_aggregate_schema_spec() -> Dict[str, Any]:
 
 
 def get_store_spec() -> Dict[str, Any]:
-    return {'Type': 'Blurr:Store:MemoryStore', 'Name': 'memory'}
+    return {'Type': BLURR_STORE_MEMORY, 'Name': 'memory'}
 
 
 class MockAggregateSchema(AggregateSchema):

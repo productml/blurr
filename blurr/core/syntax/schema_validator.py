@@ -9,6 +9,7 @@ from yamale.schema import Data
 from yamale.validators import DefaultValidators, Validator
 from yamale.validators.constraints import Constraint
 
+from blurr.core.constants import BLURR_TRANSFORM_STREAMING, BLURR_TRANSFORM_WINDOW
 from blurr.core.errors import InvalidSchemaError
 
 IDENTITY_VALIDATOR_REGEX = re.compile(r'^_|[^\S]')
@@ -103,11 +104,11 @@ def _validate_streaming(dtc_dict: Dict, name: str) -> None:
 
 
 def is_window_dtc(dtc_dict: Dict) -> bool:
-    return dtc_dict.get('Type', '').lower() == 'blurr:transform:window'
+    return dtc_dict.get('Type', '') == BLURR_TRANSFORM_WINDOW
 
 
 def is_streaming_dtc(dtc_dict: Dict) -> bool:
-    return dtc_dict.get('Type', '').lower() == 'blurr:transform:streaming'
+    return dtc_dict.get('Type', '') == BLURR_TRANSFORM_STREAMING
 
 
 def validate(dtc_dict: Dict, name='dtc') -> None:

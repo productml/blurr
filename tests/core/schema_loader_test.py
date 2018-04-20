@@ -3,6 +3,7 @@ from typing import Dict
 import pytest
 from pytest import fixture
 
+from blurr.core.constants import BLURR_TRANSFORM_STREAMING, BLURR_AGGREGATE_IDENTITY
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.field_simple import IntegerFieldSchema
@@ -34,14 +35,14 @@ def nested_schema_spec_bad_type() -> Dict:
 def nested_schema_spec() -> Dict:
     return {
         'Name': 'test',
-        'Type': 'Blurr:Transform:Streaming',
+        'Type': BLURR_TRANSFORM_STREAMING,
         "Version": "2018-03-01",
         "Time": "parser.parse(source.event_time)",
         "Identity": "source.user_id",
         'Ignored': 2,
         'Aggregates': [{
             'Name': 'test_group',
-            'Type': 'Blurr:Aggregate:IdentityAggregate',
+            'Type': BLURR_AGGREGATE_IDENTITY,
             'Fields': [{
                 "Type": "string",
                 "Name": "country",

@@ -4,6 +4,7 @@ import pytest
 from pytest import fixture
 
 from blurr.core.aggregate import AggregateSchema
+from blurr.core.constants import BLURR_AGGREGATE_BLOCK, BLURR_STORE_MEMORY
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.schema_loader import SchemaLoader
 
@@ -11,7 +12,7 @@ from blurr.core.schema_loader import SchemaLoader
 @fixture
 def aggregate_schema_spec() -> Dict[str, Any]:
     return {
-        'Type': 'Blurr:Aggregate:BlockAggregate',
+        'Type': BLURR_AGGREGATE_BLOCK,
         'Name': 'user',
         'Fields': [{
             'Name': 'event_count',
@@ -26,7 +27,7 @@ def aggregate_schema_spec() -> Dict[str, Any]:
 
 @fixture
 def store_spec() -> Dict[str, Any]:
-    return {'Type': 'Blurr:Store:MemoryStore', 'Name': 'memory'}
+    return {'Type': BLURR_STORE_MEMORY, 'Name': 'memory'}
 
 
 class MockAggregateSchema(AggregateSchema):

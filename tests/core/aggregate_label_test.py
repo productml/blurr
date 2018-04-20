@@ -5,6 +5,7 @@ from dateutil import parser
 from pytest import fixture
 
 from blurr.core.aggregate_label import LabelAggregateSchema, LabelAggregate
+from blurr.core.constants import BLURR_AGGREGATE_LABEL, BLURR_STORE_MEMORY
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
@@ -15,7 +16,7 @@ from blurr.store.memory_store import MemoryStore
 @fixture
 def label_aggregate_schema_spec() -> Dict[str, Any]:
     return {
-        'Type': 'Blurr:Aggregate:LabelAggregate',
+        'Type': BLURR_AGGREGATE_LABEL,
         'Name': 'label_aggr',
         'Label': 'source.label',
         'Store': 'memory',
@@ -33,7 +34,7 @@ def label_aggregate_schema_spec() -> Dict[str, Any]:
 
 @fixture
 def store_spec() -> Dict[str, Any]:
-    return {'Type': 'Blurr:Store:MemoryStore', 'Name': 'memory'}
+    return {'Type': BLURR_STORE_MEMORY, 'Name': 'memory'}
 
 
 @fixture
