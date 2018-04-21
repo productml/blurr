@@ -10,7 +10,7 @@
 
 Blurr transforms structured, streaming `raw data` into `features` for model training and prediction using a `high-level expressive YAML-based language` called the Data Transform Configuration (DTC).
 
-The motivation for building Blurr is to help data scientists extract features from raw data *without depending on a data engineer*. Reducing engineering dependencies makes iterations on feature engineering and selection faster than existing methods - writing Spark code, using SparkSQL or KSQL.
+The motivation for building Blurr is to help data scientists extract features from raw data *without depending on a data engineer*. Reducing engineering dependencies makes iterations on feature engineering and selection faster than existing methods - writing Spark code, using SparkSQL or KSQL. We wanted to build something that is portable across any infrastructure stack. 
 
 Blurr has the same workflow during model development and taking it to production, so productionizing an ML pipeline is a breeze.
 
