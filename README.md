@@ -158,8 +158,6 @@ Inspired by the (old school) [Joel Test](https://www.joelonsoftware.com/2000/08/
 4. Successful ML is a long game. You play it like it is
 5. Kaizen. Experimentation and iterations are a way of life
 
-
-
 # Roadmap
 
 Blurr is currently in developer preview. __Stay in touch!__: Star this project or email hello@blurr.ai
