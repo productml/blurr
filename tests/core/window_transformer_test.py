@@ -4,7 +4,7 @@ import pytest
 import yaml
 from pytest import fixture
 
-from blurr.core.aggregate_streaming import StreamingAggregate
+from blurr.core.aggregate_block import BlockAggregate
 from blurr.core.anchor import AnchorSchema
 from blurr.core.errors import AnchorBlockNotDefinedError, PrepareWindowMissingBlocksError
 from blurr.core.evaluation import Context
@@ -53,7 +53,7 @@ def window_transformer(schema_loader, stream_transformer, window_schema_spec):
 def block_aggregate(stream_transformer):
     block = None
     for aggregate in stream_transformer._nested_items.values():
-        if isinstance(aggregate, StreamingAggregate):
+        if isinstance(aggregate, BlockAggregate):
             block = aggregate
 
     return block

@@ -1,6 +1,6 @@
 from pytest import raises
 
-from blurr.core.aggregate_streaming import StreamingAggregateSchema
+from blurr.core.aggregate_block import BlockAggregateSchema
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.aggregate_window import WindowAggregateSchema
@@ -9,10 +9,9 @@ from blurr.core.aggregate_window import WindowAggregateSchema
 def test_initialization_with_valid_source(schema_loader_with_mem_store: SchemaLoader,
                                           mem_store_name: str, stream_dtc_name: str):
     schema_loader_with_mem_store.add_schema({
-        'Type': 'Blurr:Aggregate:ActivityAggregate',
+        'Type': 'Blurr:Aggregate:BlockAggregate',
         'Name': 'session',
         'Store': mem_store_name,
-        'SeparateByInactiveSeconds': 1800,
         'Fields': [
             {
                 'Name': 'events',
@@ -37,7 +36,7 @@ def test_initialization_with_valid_source(schema_loader_with_mem_store: SchemaLo
     window_aggregate_schema = WindowAggregateSchema(name, schema_loader_with_mem_store)
     assert window_aggregate_schema.window_type == 'day'
     assert window_aggregate_schema.window_value == 1
-    assert isinstance(window_aggregate_schema.source, StreamingAggregateSchema)
+    assert isinstance(window_aggregate_schema.source, BlockAggregateSchema)
     assert window_aggregate_schema.source.name == 'session'
 
 

@@ -26,9 +26,9 @@ Aggregates:
       - { Name: country, Type: string, Value: source.country }
       - { Name: continent, Type: string, Value: vars.continent, When: bool(vars.continent) }
   -
-    Type: 'Blurr:Aggregate:ActivityAggregate'
+    Type: 'Blurr:Aggregate:BlockAggregate'
     Name: session
-    SeparateByInactiveSeconds: 1800
+    Split: '(time - session._end_time).seconds > 1800'
     Store: memory
     Fields:
       - { Name: events, Type: integer, Value: 'session.events + 1' }

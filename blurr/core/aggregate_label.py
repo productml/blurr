@@ -1,6 +1,8 @@
-from typing import Dict, Any
+from typing import Dict, Any, Type, Union
 
-from blurr.core.aggregate_streaming import StreamingAggregate, StreamingAggregateSchema
+from blurr.core.aggregate_block import BlockAggregate, BlockAggregateSchema
+from blurr.core.base import BaseItemCollection
+from blurr.core.errors import SnapshotError
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.field import FieldSchema, Field
 from blurr.core.loader import TypeLoader
@@ -8,7 +10,7 @@ from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
 
 
-class LabelAggregateSchema(StreamingAggregateSchema):
+class LabelAggregateSchema(BlockAggregateSchema):
     """ Schema for Block Aggregation by a Label that can determined by the record being processed """
 
     ATTRIBUTE_LABEL_FIELDS = 'LabelFields'
@@ -22,7 +24,7 @@ class LabelAggregateSchema(StreamingAggregateSchema):
         }
 
 
-class LabelAggregate(StreamingAggregate):
+class LabelAggregate(BlockAggregate):
     """ Aggregates records in blocks by a label calculated from the record """
 
     def __init__(self, schema: LabelAggregateSchema, identity: str,
