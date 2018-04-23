@@ -39,7 +39,7 @@ class DataType(Validator):
 class LabelDataType(Validator):
     TAG = 'label_data_type'
 
-    VALUES = ['integer', 'boolean', 'string', 'datetime']
+    VALUES = ['integer', 'boolean', 'string']
 
     def _is_valid(self, value: str) -> bool:
         return value in self.VALUES

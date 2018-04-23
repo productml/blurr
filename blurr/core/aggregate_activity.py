@@ -1,7 +1,6 @@
 from datetime import timedelta
 
 from blurr.core.aggregate_block import BlockAggregate, BlockAggregateSchema
-from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 
 
@@ -28,3 +27,6 @@ class ActivityAggregate(BlockAggregate):
             self.reset()
 
         super().evaluate()
+
+    def finalize(self):
+        self.persist(self._start_time)

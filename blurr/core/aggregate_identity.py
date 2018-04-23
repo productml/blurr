@@ -1,9 +1,97 @@
-from blurr.core.aggregate import Aggregate, AggregateSchema
+from datetime import datetime
+from typing import Dict
+
+from blurr.core.aggregate import AggregateSchema, Aggregate
+from blurr.core.evaluation import EvaluationContext
+from blurr.core.field import FieldSchema, Field
+from blurr.core.loader import TypeLoader
+from blurr.core.schema_loader import SchemaLoader
+from blurr.core.store_key import Key
 
 
 class IdentityAggregateSchema(AggregateSchema):
-    pass
+    """
+    Aggregates that handles the block rollup aggregation
+    """
+    DIMENSIONS_FIELDS = 'Dimensions'
+
+    def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
+        super().__init__(fully_qualified_name, schema_loader)
+
+        self.dimension_fields: Dict[str, FieldSchema] = {
+            schema_spec[self.ATTRIBUTE_NAME]: self.schema_loader.get_nested_schema_object(
+                self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
+            for schema_spec in self._spec.get(self.DIMENSIONS_FIELDS, [])
+        }
 
 
 class IdentityAggregate(Aggregate):
-    pass
+    def __init__(self, schema: AggregateSchema, identity: str,
+                 evaluation_context: EvaluationContext) -> None:
+        super().__init__(schema, identity, evaluation_context)
+
+        self._dimension_fields: Dict[str, Field] = {
+            name: TypeLoader.load_item(item_schema.type)(item_schema, self._evaluation_context)
+            for name, item_schema in self._schema.dimension_fields.items()
+        }
+
+        # Also add the label fields to regular fields so that they get processed by other functions
+        # such as snapshot, restore, etc as per normal.
+        # We don't add self._label_fields here as we want these fields to be separate objects.
+        self._fields.update({
+            name: TypeLoader.load_item(item_schema.type)(item_schema, self._evaluation_context)
+            for name, item_schema in self._schema.dimension_fields.items()
+        })
+        self._key = None
+
+    def evaluate(self) -> None:
+        if not self._needs_evaluation:
+            return
+
+        if not self._evaluate_dimension_fields():
+            return
+
+        if self._key and not self._compare_dimensions_to_fields():
+            # Save the current snapshot.
+            self.persist()
+
+            # Try restoring a previous state if it exists, otherwise, reset to create a new state
+            self._key = self._prepare_key()
+            snapshot = self._schema.store.get(self._key)
+            if snapshot:
+                self.restore(snapshot)
+            else:
+                self.reset()
+
+        super().evaluate()
+        self._key = self._prepare_key()
+
+    def _evaluate_dimension_fields(self) -> bool:
+        """
+        Evaluates the label fields. Returns False if any of the fields could not be evaluated.
+        """
+        for _, item in self._dimension_fields.items():
+            item.evaluate()
+            if item.eval_error:
+                return False
+        return True
+
+    def _compare_dimensions_to_fields(self) -> bool:
+        """ Compares the key field values to the value in regular fields."""
+        for name, item in self._dimension_fields.items():
+            if item.value != self._nested_items[name].value:
+                return False
+        return True
+
+    def _prepare_key(self, timestamp: datetime = None):
+        """ Generates the Key object based on key fields. """
+        if self._dimension_fields:
+            return Key(self._identity, self._name + '.' +
+                       (':').join([str(item.value) for item in self._dimension_fields.values()]),
+                       timestamp)
+
+        return Key(self._identity, self._name, timestamp)
+
+    def persist(self, timestamp=None) -> None:
+        # TODO Refactor keys when refactoring store
+        self._schema.store.save(self._key, self._snapshot)

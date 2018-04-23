@@ -16,17 +16,7 @@ Aggregates:
  - Type: Blurr:Aggregate:IdentityAggregate
    Name: user
    Store: offer_ai_dynamo
-   Fields:
-     - Name: user_id
-       Value: source.customer_identifier
-       Atomic: true
-     - Name: country
-       Value: source.country
-       When: last_session == None
- - Type: Blurr:Aggregate:LabelAggregate
-   Name: user
-   Store: offer_ai_dynamo
-   LabelFields:
+   Dimensions:
      - Name: user_id
        Value: source.customer_identifier
    Fields:
