@@ -52,19 +52,19 @@ class IdentityAggregate(Aggregate):
             return
 
         if self._key and not self._compare_dimensions_to_fields():
-            # Save the current snapshot.
             self.persist()
-
-            # Try restoring a previous state if it exists, otherwise, reset to create a new state
-            self._key = self._prepare_key()
-            snapshot = self._schema.store.get(self._key)
-            if snapshot:
-                self.restore(snapshot)
-            else:
-                self.reset()
+            self._init_state_from_key()
 
         super().evaluate()
         self._key = self._prepare_key()
+
+    def _init_state_from_key(self):
+        self._key = self._prepare_key()
+        snapshot = self._schema.store.get(self._key)
+        if snapshot:
+            self.restore(snapshot)
+        else:
+            self.reset()
 
     def _evaluate_dimension_fields(self) -> bool:
         """
@@ -77,14 +77,14 @@ class IdentityAggregate(Aggregate):
         return True
 
     def _compare_dimensions_to_fields(self) -> bool:
-        """ Compares the key field values to the value in regular fields."""
+        """ Compares the dimension field values to the value in regular fields."""
         for name, item in self._dimension_fields.items():
             if item.value != self._nested_items[name].value:
                 return False
         return True
 
     def _prepare_key(self, timestamp: datetime = None):
-        """ Generates the Key object based on key fields. """
+        """ Generates the Key object based on dimension fields. """
         if self._dimension_fields:
             return Key(self._identity, self._name + '.' +
                        (':').join([str(item.value) for item in self._dimension_fields.values()]),
