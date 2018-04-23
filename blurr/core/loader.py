@@ -37,6 +37,7 @@ SCHEMA_MAP = {
     'Blurr:Aggregate:VariableAggregate': 'blurr.core.aggregate_variable.VariableAggregateSchema',
     'Blurr:Aggregate:WindowAggregate': 'blurr.core.aggregate_window.WindowAggregateSchema',
     'Blurr:Store:MemoryStore': 'blurr.store.memory_store.MemoryStore',
+    'Blurr:Store:DynamoStore': 'blurr.store.dynamo_store.DynamoStore',
     'anchor': 'blurr.core.anchor.AnchorSchema',
     'day': 'blurr.core.window.WindowSchema',
     'hour': 'blurr.core.window.WindowSchema',
