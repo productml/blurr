@@ -12,7 +12,7 @@ Anchor:
 
 
 Aggregates:
-  - Type: Blurr:Aggregate:WindowAggregate
+  - Type: Blurr:Aggregate:Window
     Name: last_session
     WindowType: count
     WindowValue: -1
@@ -23,7 +23,7 @@ Aggregates:
        Type: integer
        Value: source.events[0]
 
-  - Type: Blurr:Aggregate:WindowAggregate
+  - Type: Blurr:Aggregate:Window
     Name: last_day
     WindowType: day
     WindowValue: -1

@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 from pytest import fixture
 
-from blurr.core.constants import BLURR_STORE_MEMORY
+from blurr.core.type import Type
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
 from blurr.store.memory_store import MemoryStore
@@ -16,7 +16,7 @@ def memory_store(schema_loader_with_mem_store, stream_dtc_name, mem_store_name) 
 @fixture
 def empty_memory_store() -> MemoryStore:
     schema_loader = SchemaLoader()
-    schema_loader.add_schema({'Name': 'memstore', 'Type': BLURR_STORE_MEMORY})
+    schema_loader.add_schema({'Name': 'memstore', 'Type': Type.BLURR_STORE_MEMORY})
     return MemoryStore('memstore', schema_loader)
 
 

@@ -26,7 +26,7 @@ Anchor:
 
 
 Aggregates:
- - Type: Blurr:Aggregate:WindowAggregate
+ - Type: Blurr:Aggregate:Window
    Name: last_session
       # Defines a processing window for the rollup. Supported window types are Day, Hour and Count
    WindowType: count
@@ -48,7 +48,7 @@ Aggregates:
       Type: float
       Value: source.win_ratio[0]
 
- - Type: Blurr:Aggregate:WindowAggregate
+ - Type: Blurr:Aggregate:Window
    Name: last_week
    WindowType: day
    WindowValue: -7
@@ -63,7 +63,7 @@ Aggregates:
       Value: sum(source.purchase_amount)
 
 
- - Type: Blurr:Aggregate:WindowAggregate
+ - Type: Blurr:Aggregate:Window
    Name: next_week
    WindowType: day
    WindowValue: 7

@@ -5,7 +5,7 @@ from dateutil import parser
 from pytest import fixture
 
 from blurr.core.aggregate_activity import ActivityAggregate, ActivityAggregateSchema
-from blurr.core.constants import BLURR_AGGREGATE_ACTIVITY, BLURR_STORE_MEMORY
+from blurr.core.type import Type
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
@@ -15,7 +15,7 @@ from blurr.core.store_key import Key
 @fixture
 def activity_aggregate_schema_spec() -> Dict[str, Any]:
     return {
-        'Type': BLURR_AGGREGATE_ACTIVITY,
+        'Type': Type.BLURR_AGGREGATE_ACTIVITY,
         'Name': 'activity_aggr',
         'SeparateByInactiveSeconds': '1800',
         'Store': 'memory',
@@ -33,7 +33,7 @@ def activity_aggregate_schema_spec() -> Dict[str, Any]:
 
 @fixture
 def store_spec() -> Dict[str, Any]:
-    return {'Type': BLURR_STORE_MEMORY, 'Name': 'memory'}
+    return {'Type': Type.BLURR_STORE_MEMORY, 'Name': 'memory'}
 
 
 @fixture

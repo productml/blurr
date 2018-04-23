@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from pytest import fixture
 
 from blurr.core.anchor import AnchorSchema, Anchor
-from blurr.core.constants import BLURR_AGGREGATE_BLOCK
+from blurr.core.type import Type
 from blurr.core.evaluation import EvaluationContext, Expression
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.aggregate_block import BlockAggregateSchema, \
@@ -40,7 +40,7 @@ def anchor_schema_max_two(schema_loader: SchemaLoader) -> AnchorSchema:
 @fixture
 def block_schema(schema_loader: SchemaLoader) -> BlockAggregateSchema:
     name = schema_loader.add_schema({
-        'Type': BLURR_AGGREGATE_BLOCK,
+        'Type': Type.BLURR_AGGREGATE_BLOCK,
         'Name': 'session',
         'Fields': [
             {

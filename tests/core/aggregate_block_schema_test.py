@@ -2,7 +2,7 @@ from typing import Dict, Any
 
 from pytest import fixture
 
-from blurr.core.constants import BLURR_AGGREGATE_BLOCK
+from blurr.core.type import Type
 from blurr.core.evaluation import Expression
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.aggregate_block import BlockAggregateSchema
@@ -11,7 +11,7 @@ from blurr.core.aggregate_block import BlockAggregateSchema
 @fixture
 def block_aggregate_schema_spec() -> Dict[str, Any]:
     return {
-        'Type': BLURR_AGGREGATE_BLOCK,
+        'Type': Type.BLURR_AGGREGATE_BLOCK,
         'Name': 'user',
         'Filter': 'source.event_id in ["app_launched", "user_updated"]',
         'Fields': [{

@@ -1,76 +1,75 @@
-from typing import Any
+from typing import Any, Union
 
 import importlib
 
-import blurr.core.constants as constants
+from blurr.core.type import Type
 from blurr.core.errors import InvalidSchemaError
 
 ITEM_MAP = {
-    constants.BLURR_TRANSFORM_STREAMING: 'blurr.core.transformer_streaming.StreamingTransformer',
-    constants.BLURR_TRANSFORM_WINDOW: 'blurr.core.transformer_window.WindowTransformer',
-    constants.BLURR_AGGREGATE_BLOCK: 'blurr.core.aggregate_block.BlockAggregate',
-    constants.BLURR_AGGREGATE_LABEL: 'blurr.core.aggregate_label.LabelAggregate',
-    constants.BLURR_AGGREGATE_ACTIVITY: 'blurr.core.aggregate_activity.ActivityAggregate',
-    constants.BLURR_AGGREGATE_IDENTITY: 'blurr.core.aggregate_identity.IdentityAggregate',
-    constants.BLURR_AGGREGATE_VARIABLE: 'blurr.core.aggregate_variable.VariableAggregate',
-    constants.BLURR_AGGREGATE_WINDOW: 'blurr.core.aggregate_window.WindowAggregate',
-    'day': 'blurr.core.window.Window',
-    'hour': 'blurr.core.window.Window',
-    'count': 'blurr.core.window.Window',
-    'string': 'blurr.core.field.Field',
-    'integer': 'blurr.core.field.Field',
-    'boolean': 'blurr.core.field.Field',
-    'datetime': 'blurr.core.field.Field',
-    'float': 'blurr.core.field.Field',
-    'map': 'blurr.core.field.Field',
-    'list': 'blurr.core.field.Field',
-    'set': 'blurr.core.field.Field',
+    Type.BLURR_TRANSFORM_STREAMING: 'blurr.core.transformer_streaming.StreamingTransformer',
+    Type.BLURR_TRANSFORM_WINDOW: 'blurr.core.transformer_window.WindowTransformer',
+    Type.BLURR_AGGREGATE_BLOCK: 'blurr.core.aggregate_block.BlockAggregate',
+    Type.BLURR_AGGREGATE_LABEL: 'blurr.core.aggregate_label.LabelAggregate',
+    Type.BLURR_AGGREGATE_ACTIVITY: 'blurr.core.aggregate_activity.ActivityAggregate',
+    Type.BLURR_AGGREGATE_IDENTITY: 'blurr.core.aggregate_identity.IdentityAggregate',
+    Type.BLURR_AGGREGATE_VARIABLE: 'blurr.core.aggregate_variable.VariableAggregate',
+    Type.BLURR_AGGREGATE_WINDOW: 'blurr.core.aggregate_window.WindowAggregate',
+    Type.DAY: 'blurr.core.window.Window',
+    Type.HOUR: 'blurr.core.window.Window',
+    Type.COUNT: 'blurr.core.window.Window',
+    Type.STRING: 'blurr.core.field.Field',
+    Type.INTEGER: 'blurr.core.field.Field',
+    Type.BOOLEAN: 'blurr.core.field.Field',
+    Type.DATETIME: 'blurr.core.field.Field',
+    Type.FLOAT: 'blurr.core.field.Field',
+    Type.MAP: 'blurr.core.field.Field',
+    Type.LIST: 'blurr.core.field.Field',
+    Type.SET: 'blurr.core.field.Field',
 }
-ITEM_MAP_LOWER_CASE = {k.lower(): v for k, v in ITEM_MAP.items()}
 
 SCHEMA_MAP = {
-    constants.BLURR_TRANSFORM_STREAMING: 'blurr.core.transformer_streaming.StreamingTransformerSchema',
-    constants.BLURR_TRANSFORM_WINDOW: 'blurr.core.transformer_window.WindowTransformerSchema',
-    constants.BLURR_AGGREGATE_BLOCK: 'blurr.core.aggregate_block.BlockAggregateSchema',
-    constants.BLURR_AGGREGATE_LABEL: 'blurr.core.aggregate_label.LabelAggregateSchema',
-    constants.BLURR_AGGREGATE_ACTIVITY: 'blurr.core.aggregate_activity.ActivityAggregateSchema',
-    constants.BLURR_AGGREGATE_IDENTITY: 'blurr.core.aggregate_identity.IdentityAggregateSchema',
-    constants.BLURR_AGGREGATE_VARIABLE: 'blurr.core.aggregate_variable.VariableAggregateSchema',
-    constants.BLURR_AGGREGATE_WINDOW: 'blurr.core.aggregate_window.WindowAggregateSchema',
-    constants.BLURR_STORE_MEMORY: 'blurr.store.memory_store.MemoryStore',
-    'anchor': 'blurr.core.anchor.AnchorSchema',
-    'day': 'blurr.core.window.WindowSchema',
-    'hour': 'blurr.core.window.WindowSchema',
-    'count': 'blurr.core.window.WindowSchema',
-    'string': 'blurr.core.field_simple.StringFieldSchema',
-    'integer': 'blurr.core.field_simple.IntegerFieldSchema',
-    'boolean': 'blurr.core.field_simple.BooleanFieldSchema',
-    'datetime': 'blurr.core.field_simple.DateTimeFieldSchema',
-    'float': 'blurr.core.field_simple.FloatFieldSchema',
-    'map': 'blurr.core.field_complex.MapFieldSchema',
-    'list': 'blurr.core.field_complex.ListFieldSchema',
-    'set': 'blurr.core.field_complex.SetFieldSchema'
+    Type.BLURR_TRANSFORM_STREAMING: 'blurr.core.transformer_streaming.StreamingTransformerSchema',
+    Type.BLURR_TRANSFORM_WINDOW: 'blurr.core.transformer_window.WindowTransformerSchema',
+    Type.BLURR_AGGREGATE_BLOCK: 'blurr.core.aggregate_block.BlockAggregateSchema',
+    Type.BLURR_AGGREGATE_LABEL: 'blurr.core.aggregate_label.LabelAggregateSchema',
+    Type.BLURR_AGGREGATE_ACTIVITY: 'blurr.core.aggregate_activity.ActivityAggregateSchema',
+    Type.BLURR_AGGREGATE_IDENTITY: 'blurr.core.aggregate_identity.IdentityAggregateSchema',
+    Type.BLURR_AGGREGATE_VARIABLE: 'blurr.core.aggregate_variable.VariableAggregateSchema',
+    Type.BLURR_AGGREGATE_WINDOW: 'blurr.core.aggregate_window.WindowAggregateSchema',
+    Type.BLURR_STORE_MEMORY: 'blurr.store.memory_store.MemoryStore',
+    Type.ANCHOR: 'blurr.core.anchor.AnchorSchema',
+    Type.DAY: 'blurr.core.window.WindowSchema',
+    Type.HOUR: 'blurr.core.window.WindowSchema',
+    Type.COUNT: 'blurr.core.window.WindowSchema',
+    Type.STRING: 'blurr.core.field_simple.StringFieldSchema',
+    Type.INTEGER: 'blurr.core.field_simple.IntegerFieldSchema',
+    Type.BOOLEAN: 'blurr.core.field_simple.BooleanFieldSchema',
+    Type.DATETIME: 'blurr.core.field_simple.DateTimeFieldSchema',
+    Type.FLOAT: 'blurr.core.field_simple.FloatFieldSchema',
+    Type.MAP: 'blurr.core.field_complex.MapFieldSchema',
+    Type.LIST: 'blurr.core.field_complex.ListFieldSchema',
+    Type.SET: 'blurr.core.field_complex.SetFieldSchema'
 }
-SCHEMA_MAP_LOWER_CASE = {k.lower(): v for k, v in SCHEMA_MAP.items()}
 
 # TODO Build dynamic type loader from a central configuration rather than reading a static dictionary
 
 
 class TypeLoader:
     @staticmethod
-    def load_schema(type_name: str):
-        return TypeLoader.load_type(type_name, SCHEMA_MAP_LOWER_CASE)
+    def load_schema(type_name: Union[str, Type]):
+        return TypeLoader.load_type(type_name, SCHEMA_MAP)
 
     @staticmethod
-    def load_item(type_name: str):
-        return TypeLoader.load_type(type_name, ITEM_MAP_LOWER_CASE)
+    def load_item(type_name: Union[str, Type]):
+        return TypeLoader.load_type(type_name, ITEM_MAP)
 
     @staticmethod
-    def load_type(type_name: str, type_map: dict) -> Any:
-        lower_type_name = type_name.lower()
-        if lower_type_name not in type_map:
+    def load_type(type_name: Union[str, Type], type_map: dict) -> Any:
+        try:
+            type_name_enum = Type(type_name)
+            return TypeLoader.import_class_by_full_name(type_map[type_name_enum])
+        except (KeyError, ValueError):
             raise InvalidSchemaError('Unknown schema type {}'.format(type_name))
-        return TypeLoader.import_class_by_full_name(type_map[lower_type_name])
 
     @staticmethod
     def import_class_by_full_name(name):

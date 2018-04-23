@@ -3,7 +3,7 @@ from typing import List, Dict, Tuple, Any, Optional
 
 from blurr.core import logging
 from blurr.core.aggregate_block import BlockAggregate
-from blurr.core.constants import BLURR_STORE_MEMORY, BLURR_TRANSFORM_STREAMING
+from blurr.core.type import Type
 from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import Context
 from blurr.core.record import Record
@@ -97,10 +97,10 @@ def execute_window_dtc(identity: str, schema_loader: SchemaLoader,
 
 
 def get_memory_store(schema_loader: SchemaLoader) -> MemoryStore:
-    store_schemas = schema_loader.get_schemas_of_type(BLURR_STORE_MEMORY)
+    store_schemas = schema_loader.get_schemas_of_type(Type.BLURR_STORE_MEMORY)
     return schema_loader.get_schema_object(store_schemas[0][0])
 
 
 def get_streaming_transformer_schema(schema_loader: SchemaLoader) -> StreamingTransformerSchema:
-    streaming_transformer_schema = schema_loader.get_schemas_of_type(BLURR_TRANSFORM_STREAMING)
+    streaming_transformer_schema = schema_loader.get_schemas_of_type(Type.BLURR_TRANSFORM_STREAMING)
     return schema_loader.get_schema_object(streaming_transformer_schema[0][0])
