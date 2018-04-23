@@ -80,12 +80,7 @@ def test_transformer_finalize(test_transformer: MockTransformer,
     store = schema_loader.get_schema_object('test.memstore')
 
     test_transformer.finalize()
-    assert store.get(Key('user1', 'test_group')) == {
-        '_identity': '',
-        'events': 0,
-        '_end_time': None,
-        '_start_time': None
-    }
+    assert store.get(Key('user1', 'test_group')) is None
 
     test_transformer._evaluation_context.global_add('time', datetime(2018, 3, 1, 10, 10, 10))
     test_transformer.evaluate()

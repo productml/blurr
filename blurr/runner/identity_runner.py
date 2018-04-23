@@ -4,7 +4,6 @@ from typing import List, Dict, Tuple, Any, Optional
 from blurr.core import logging
 from blurr.core.aggregate_activity import ActivityAggregate
 from blurr.core.aggregate_identity import IdentityAggregate
-from blurr.core.aggregate_label import LabelAggregate
 from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import Context
 from blurr.core.record import Record
@@ -60,15 +59,15 @@ def execute_window_dtc(identity: str, schema_loader: SchemaLoader,
 
     block_obj = None
     for aggregate in stream_transformer._nested_items.values():
-        if not isinstance(aggregate, (LabelAggregate, ActivityAggregate)):
+        if not isinstance(aggregate, (ActivityAggregate)):
             continue
         if block_obj is not None:
-            raise Exception(('Window operation is supported against Streaming '
-                             'DTC with only one BlockAggregate'))
+            raise Exception('Window operation is supported against Streaming '
+                            'DTC with only one ActivityAggregate')
         block_obj = aggregate
 
     if block_obj is None:
-        raise Exception('No BlockAggregate found in the Streaming DTC file')
+        raise Exception('No ActivityAggregate found in the Streaming DTC file')
 
     window_data = []
 

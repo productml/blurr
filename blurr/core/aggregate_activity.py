@@ -21,12 +21,12 @@ class ActivityAggregate(StreamingAggregate):
         time = self._evaluation_context.global_context['time']
 
         # If the event time is beyond separation threshold, create a new block
-        if self._start_time and (time < self._start_time - self._schema.separation_interval
-                                 or time > self._end_time + self._schema.separation_interval):
+        if self._key and (time < self._start_time - self._schema.separation_interval
+                          or time > self._end_time + self._schema.separation_interval):
+            self._key = self._prepare_key(self._start_time)
             self.persist(self._start_time)
             self.reset()
 
         super().evaluate()
 
-    def persist(self, timestamp=None) -> None:
-        super().persist(timestamp if timestamp else self._start_time)
+        self._key = self._prepare_key(self._start_time)
