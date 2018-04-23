@@ -35,9 +35,9 @@ class IdentityAggregate(Aggregate):
             for name, item_schema in self._schema.dimension_fields.items()
         }
 
-        # Also add the label fields to regular fields so that they get processed by other functions
-        # such as snapshot, restore, etc as per normal.
-        # We don't add self._label_fields here as we want these fields to be separate objects.
+        # Also add the dimension fields to regular fields so that they get processed by other
+        # functions such as snapshot, restore, etc as per normal.
+        # We don't add self._dimension_fields here as we want these fields to be separate objects.
         self._fields.update({
             name: TypeLoader.load_item(item_schema.type)(item_schema, self._evaluation_context)
             for name, item_schema in self._schema.dimension_fields.items()
@@ -68,7 +68,7 @@ class IdentityAggregate(Aggregate):
 
     def _evaluate_dimension_fields(self) -> bool:
         """
-        Evaluates the label fields. Returns False if any of the fields could not be evaluated.
+        Evaluates the dimension fields. Returns False if any of the fields could not be evaluated.
         """
         for _, item in self._dimension_fields.items():
             item.evaluate()

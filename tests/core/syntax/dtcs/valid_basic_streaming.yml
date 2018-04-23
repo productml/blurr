@@ -6,7 +6,7 @@ Import:
  - { Module: dateutil, Identifiers: [ parser, tz]}
  - { Module: dateutil, Identifiers: [ parser ]}
  - { Module: dateutil}
-Identity: source.user_id
+Identity: source.customer_identifier
 Time: source.timestamp
 When: source.package_version == '1.0'
 Stores:
@@ -17,8 +17,8 @@ Aggregates:
    Name: user
    Store: offer_ai_dynamo
    Dimensions:
-     - Name: user_id
-       Value: source.customer_identifier
+     - Name: level
+       Value: source.level
    Fields:
      - Name: user_id
        Value: source.customer_identifier
