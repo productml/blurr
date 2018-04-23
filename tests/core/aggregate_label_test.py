@@ -17,8 +17,39 @@ def label_aggregate_schema_spec() -> Dict[str, Any]:
     return {
         'Type': 'Blurr:Aggregate:LabelAggregate',
         'Name': 'label_aggr',
-        'Label': 'source.label',
         'Store': 'memory',
+        'LabelFields': [{
+            'Name': 'label',
+            'Type': 'string',
+            'Value': 'source.label'
+        }],
+        'Fields': [{
+            'Name': 'sum',
+            'Type': 'integer',
+            'Value': 'label_aggr.sum + source.event_value'
+        }, {
+            'Name': 'count',
+            'Type': 'integer',
+            'Value': 'label_aggr.count + 1'
+        }]
+    }
+
+
+@fixture
+def label_aggregate_schema_spec_with_two_label_fields() -> Dict[str, Any]:
+    return {
+        'Type': 'Blurr:Aggregate:LabelAggregate',
+        'Name': 'label_aggr',
+        'Store': 'memory',
+        'LabelFields': [{
+            'Name': 'label',
+            'Type': 'string',
+            'Value': 'source.label'
+        }, {
+            'Name': 'label_ascii',
+            'Type': 'integer',
+            'Value': 'ord(source.label)'
+        }],
         'Fields': [{
             'Name': 'sum',
             'Type': 'integer',
@@ -84,7 +115,7 @@ def test_label_aggregate_schema_initialization(label_aggregate_schema_spec: Dict
                                                store_spec: Dict[str, Any]):
     schema = label_aggregate_schema(label_aggregate_schema_spec, store_spec)
     assert isinstance(schema.store, MemoryStore)
-    assert isinstance(schema.label, Expression)
+    assert isinstance(schema.label_fields, dict)
 
 
 def evaluate_event(record: Record, aggregate: LabelAggregate) -> None:
@@ -104,37 +135,37 @@ def test_split_by_label_valid(label_aggregate_schema_spec: Dict[str, Any],
     evaluation_context.global_add(label_aggregate._schema.name, label_aggregate)
 
     # Check that initial state is empty
-    assert label_aggregate._label_value is None
+    assert label_aggregate._label_fields['label'].value == ''
     assert label_aggregate._schema.store.get_all() == {}
 
     # Check state at the end of the first event processed
     evaluate_event(label_events[0], label_aggregate)
 
-    assert label_aggregate._label_value == label_aggregate._label == 'a'
+    assert label_aggregate._label_fields['label'].value == 'a'
     assert label_aggregate._schema.store.get_all() == {}
 
     # Check for labeled partition and persistence of the first label when label changes
     evaluate_event(label_events[1], label_aggregate)
-    assert label_aggregate._label_value == label_aggregate._label == 'b'
+    assert label_aggregate._label_fields['label'].value == 'b'
 
     evaluate_event(label_events[2], label_aggregate)
     label_aggregate.persist()
     store_state = label_aggregate._schema.store.get_all()
 
-    assert label_aggregate._label_value == label_aggregate._label == 'a'
+    assert label_aggregate._label_fields['label'].value == 'a'
     assert len(store_state) == 2
 
     # Check for final state
     evaluate_event(label_events[3], label_aggregate)
     evaluate_event(label_events[4], label_aggregate)
     label_aggregate.persist()
-    assert label_aggregate._label_value == label_aggregate._label == 'c'
+    assert label_aggregate._label_fields['label'].value == 'c'
     store_state = label_aggregate._schema.store.get_all()
     assert len(store_state) == 3
 
     assert store_state.get(Key('user1', 'label_aggr.a')) == {
         '_identity': 'user1',
-        '_label': 'a',
+        'label': 'a',
         '_start_time': datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc),
         '_end_time': datetime(2018, 1, 1, 1, 1, 5, 0, timezone.utc),
         'sum': 110,
@@ -143,7 +174,7 @@ def test_split_by_label_valid(label_aggregate_schema_spec: Dict[str, Any],
 
     assert store_state.get(Key('user1', 'label_aggr.b')) == {
         '_identity': 'user1',
-        '_label': 'b',
+        'label': 'b',
         '_start_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc),
         '_end_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc),
         'sum': 1,
@@ -152,7 +183,7 @@ def test_split_by_label_valid(label_aggregate_schema_spec: Dict[str, Any],
 
     assert store_state.get(Key('user1', 'label_aggr.c')) == {
         '_identity': 'user1',
-        '_label': 'c',
+        'label': 'c',
         '_start_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc),
         '_end_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc),
         'sum': 11000,
@@ -162,7 +193,8 @@ def test_split_by_label_valid(label_aggregate_schema_spec: Dict[str, Any],
 
 def test_split_when_label_evaluates_to_none(label_aggregate_schema_spec: Dict[str, Any],
                                             store_spec: Dict[str, Any], label_events: List[Record]):
-    label_aggregate_schema_spec['Label'] = 'None if source.label == \'a\' else source.label'
+    label_aggregate_schema_spec['LabelFields'][0][
+        'Value'] = '1/0 if source.label == \'a\' else source.label'
     schema = label_aggregate_schema(label_aggregate_schema_spec, store_spec)
     # Initialize the starting state
     identity = 'user1'
@@ -175,26 +207,69 @@ def test_split_when_label_evaluates_to_none(label_aggregate_schema_spec: Dict[st
     evaluate_event(label_events[0], label_aggregate)
     evaluate_event(label_events[1], label_aggregate)
     evaluate_event(label_events[2], label_aggregate)
-    assert label_aggregate._label_value == label_aggregate._label == 'None'
+    assert label_aggregate._label_fields['label'].value == 'b'
 
     label_aggregate.finalize()
 
     store_state = label_aggregate._schema.store.get_all()
-    assert len(store_state) == 2
-    assert store_state.get(Key('user1', 'label_aggr.None')) == {
+    assert len(store_state) == 1
+
+    assert store_state.get(Key('user1', 'label_aggr.b')) == {
         '_identity': 'user1',
-        '_label': 'None',
+        'label': 'b',
+        '_start_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc),
+        '_end_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc),
+        'sum': 1,
+        'count': 1
+    }
+
+
+def test_two_label_fields_in_aggregate(
+        label_aggregate_schema_spec_with_two_label_fields: Dict[str, Any],
+        store_spec: Dict[str, Any], label_events: List[Record]):
+    schema = label_aggregate_schema(label_aggregate_schema_spec_with_two_label_fields, store_spec)
+    # Initialize the starting state
+    identity = 'user1'
+    evaluation_context = EvaluationContext()
+    evaluation_context.global_add('identity', identity)
+    label_aggregate = LabelAggregate(schema, identity, evaluation_context)
+    evaluation_context.global_add(label_aggregate._schema.name, label_aggregate)
+
+    # Evaluate all the events
+    for event in label_events:
+        evaluate_event(event, label_aggregate)
+
+    label_aggregate.finalize()
+
+    store_state = label_aggregate._schema.store.get_all()
+    assert len(store_state) == 3
+
+    assert store_state.get(Key('user1', 'label_aggr.a:97')) == {
+        '_identity': 'user1',
+        'label': 'a',
+        'label_ascii': 97,
         '_start_time': datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc),
         '_end_time': datetime(2018, 1, 1, 1, 1, 5, 0, timezone.utc),
         'sum': 110,
         'count': 2
     }
 
-    assert store_state.get(Key('user1', 'label_aggr.b')) == {
+    assert store_state.get(Key('user1', 'label_aggr.b:98')) == {
         '_identity': 'user1',
-        '_label': 'b',
+        'label': 'b',
+        'label_ascii': 98,
         '_start_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc),
         '_end_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc),
         'sum': 1,
         'count': 1
+    }
+
+    assert store_state.get(Key('user1', 'label_aggr.c:99')) == {
+        '_identity': 'user1',
+        'label': 'c',
+        'label_ascii': 99,
+        '_start_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc),
+        '_end_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc),
+        'sum': 11000,
+        'count': 2
     }

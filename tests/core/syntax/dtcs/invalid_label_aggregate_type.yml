@@ -28,6 +28,7 @@ Aggregates:
    Store: offer_ai_dynamo
    LabelFields:
      - Name: user_id
+       Type: map
        Value: source.customer_identifier
    Fields:
      - Name: user_id
