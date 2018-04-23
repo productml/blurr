@@ -7,6 +7,7 @@ from blurr.core.errors import InvalidSchemaError
 ITEM_MAP = {
     'Blurr:Transform:Streaming': 'blurr.core.transformer_streaming.StreamingTransformer',
     'Blurr:Transform:Window': 'blurr.core.transformer_window.WindowTransformer',
+    'Blurr:Aggregate:BlockAggregate': 'blurr.core.aggregate_block.BlockAggregate',
     'Blurr:Aggregate:ActivityAggregate': 'blurr.core.aggregate_activity.ActivityAggregate',
     'Blurr:Aggregate:IdentityAggregate': 'blurr.core.aggregate_identity.IdentityAggregate',
     'Blurr:Aggregate:VariableAggregate': 'blurr.core.aggregate_variable.VariableAggregate',
@@ -28,6 +29,7 @@ ITEM_MAP_LOWER_CASE = {k.lower(): v for k, v in ITEM_MAP.items()}
 SCHEMA_MAP = {
     'Blurr:Transform:Streaming': 'blurr.core.transformer_streaming.StreamingTransformerSchema',
     'Blurr:Transform:Window': 'blurr.core.transformer_window.WindowTransformerSchema',
+    'Blurr:Aggregate:BlockAggregate': 'blurr.core.aggregate_block.BlockAggregateSchema',
     'Blurr:Aggregate:ActivityAggregate': 'blurr.core.aggregate_activity.ActivityAggregateSchema',
     'Blurr:Aggregate:IdentityAggregate': 'blurr.core.aggregate_identity.IdentityAggregateSchema',
     'Blurr:Aggregate:VariableAggregate': 'blurr.core.aggregate_variable.VariableAggregateSchema',

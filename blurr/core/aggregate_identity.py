@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Dict
 
-from blurr.core.aggregate_streaming import StreamingAggregateSchema, StreamingAggregate
+from blurr.core.aggregate import AggregateSchema, Aggregate
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.field import FieldSchema, Field
 from blurr.core.loader import TypeLoader
@@ -9,7 +9,7 @@ from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
 
 
-class IdentityAggregateSchema(StreamingAggregateSchema):
+class IdentityAggregateSchema(AggregateSchema):
     """
     Aggregates that handles the block rollup aggregation
     """
@@ -25,9 +25,9 @@ class IdentityAggregateSchema(StreamingAggregateSchema):
         }
 
 
-class IdentityAggregate(StreamingAggregate):
-    def __init__(self, schema: StreamingAggregateSchema, identity: str,
-                     evaluation_context: EvaluationContext) -> None:
+class IdentityAggregate(Aggregate):
+    def __init__(self, schema: AggregateSchema, identity: str,
+                 evaluation_context: EvaluationContext) -> None:
         super().__init__(schema, identity, evaluation_context)
 
         self._dimension_fields: Dict[str, Field] = {

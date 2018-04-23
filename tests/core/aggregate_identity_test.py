@@ -166,8 +166,6 @@ def test_split_by_label_valid(identity_aggregate_schema_spec: Dict[str, Any],
     assert store_state.get(Key('user1', 'label_aggr.a')) == {
         '_identity': 'user1',
         'label': 'a',
-        '_start_time': datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc),
-        '_end_time': datetime(2018, 1, 1, 1, 1, 5, 0, timezone.utc),
         'sum': 110,
         'count': 2
     }
@@ -175,8 +173,6 @@ def test_split_by_label_valid(identity_aggregate_schema_spec: Dict[str, Any],
     assert store_state.get(Key('user1', 'label_aggr.b')) == {
         '_identity': 'user1',
         'label': 'b',
-        '_start_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc),
-        '_end_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc),
         'sum': 1,
         'count': 1
     }
@@ -184,8 +180,6 @@ def test_split_by_label_valid(identity_aggregate_schema_spec: Dict[str, Any],
     assert store_state.get(Key('user1', 'label_aggr.c')) == {
         '_identity': 'user1',
         'label': 'c',
-        '_start_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc),
-        '_end_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc),
         'sum': 11000,
         'count': 2
     }
@@ -217,8 +211,6 @@ def test_split_when_label_evaluates_to_none(identity_aggregate_schema_spec: Dict
     assert store_state.get(Key('user1', 'label_aggr.b')) == {
         '_identity': 'user1',
         'label': 'b',
-        '_start_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc),
-        '_end_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc),
         'sum': 1,
         'count': 1
     }
@@ -249,8 +241,6 @@ def test_two_key_fields_in_aggregate(
         '_identity': 'user1',
         'label': 'a',
         'label_ascii': 97,
-        '_start_time': datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc),
-        '_end_time': datetime(2018, 1, 1, 1, 1, 5, 0, timezone.utc),
         'sum': 110,
         'count': 2
     }
@@ -259,8 +249,6 @@ def test_two_key_fields_in_aggregate(
         '_identity': 'user1',
         'label': 'b',
         'label_ascii': 98,
-        '_start_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc),
-        '_end_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc),
         'sum': 1,
         'count': 1
     }
@@ -269,8 +257,6 @@ def test_two_key_fields_in_aggregate(
         '_identity': 'user1',
         'label': 'c',
         'label_ascii': 99,
-        '_start_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc),
-        '_end_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc),
         'sum': 11000,
         'count': 2
     }

@@ -6,7 +6,7 @@ from collections import defaultdict
 from blurr.core.base import BaseSchema, BaseItem
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.aggregate_streaming import StreamingAggregate
+from blurr.core.aggregate_block import BlockAggregate
 
 
 class AnchorSchema(BaseSchema):
@@ -29,7 +29,7 @@ class Anchor(BaseItem):
         self.condition_met: Dict[datetime, int] = defaultdict(int)
         self.anchor_block = None
 
-    def evaluate_anchor(self, block: StreamingAggregate) -> bool:
+    def evaluate_anchor(self, block: BlockAggregate) -> bool:
         self.anchor_block = block
         if self.max_condition_met(block):
             return False
@@ -45,7 +45,7 @@ class Anchor(BaseItem):
     def evaluate(self) -> bool:
         return self._schema.condition.evaluate(self._evaluation_context)
 
-    def max_condition_met(self, block: StreamingAggregate) -> bool:
+    def max_condition_met(self, block: BlockAggregate) -> bool:
         if self._schema.max is None:
             return False
         return self.condition_met[block._start_time.date()] >= self._schema.max

@@ -2,11 +2,12 @@ from datetime import datetime, timedelta
 from typing import Any, List, Tuple
 
 from blurr.core.aggregate import Aggregate, AggregateSchema
-from blurr.core.aggregate_streaming import StreamingAggregate
 from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
+from blurr.core.aggregate_block import BlockAggregate
 from blurr.core.store_key import Key
+from blurr.core.base import BaseItem
 
 
 class WindowAggregateSchema(AggregateSchema):
@@ -27,8 +28,8 @@ class _WindowSource:
     Represents a window on the pre-aggregated source data.
     """
 
-    def __init__(self, block_list: List[StreamingAggregate]):
-        self.view: List[StreamingAggregate] = block_list
+    def __init__(self, block_list: List[BlockAggregate]):
+        self.view: List[BlockAggregate] = block_list
 
     def __getattr__(self, item: str) -> List[Any]:
         return [getattr(block, item) for block in self.view]
@@ -93,15 +94,15 @@ class WindowAggregate(Aggregate):
         elif self._schema.window_type == 'hour':
             return start_time + timedelta(hours=self._schema.window_value)
 
-    def _load_blocks(self, blocks: List[Tuple[Key, Any]]) -> List[StreamingAggregate]:
+    def _load_blocks(self, blocks: List[Tuple[Key, Any]]) -> List[BlockAggregate]:
         """
         Converts [(Key, block)] to [BlockAggregate]
         :param blocks: List of (Key, block) blocks.
         :return: List of BlockAggregate
         """
         return [
-            StreamingAggregate(self._schema.source, self._identity,
-                               EvaluationContext()).restore(block) for (_, block) in blocks
+            BlockAggregate(self._schema.source, self._identity, EvaluationContext()).restore(block)
+            for (_, block) in blocks
         ]
 
     def evaluate(self) -> None:
