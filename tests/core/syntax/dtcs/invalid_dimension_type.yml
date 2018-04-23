@@ -17,9 +17,9 @@ Aggregates:
    Name: user
    Store: offer_ai_dynamo
    Dimensions:
-     - Name: user_id
+     - Name: value
        Type: map
-       Value: source.customer_identifier
+       Value: source.value
    Fields:
      - Name: user_id
        Value: source.customer_identifier

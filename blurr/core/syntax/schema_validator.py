@@ -36,8 +36,8 @@ class DataType(Validator):
         return 'DTC Valid Data Type'
 
 
-class LabelDataType(Validator):
-    TAG = 'label_data_type'
+class DimensionDataType(Validator):
+    TAG = 'dimension_data_type'
 
     VALUES = ['integer', 'boolean', 'string']
 
@@ -88,7 +88,7 @@ class Expression(Validator):
 VALIDATORS = {
     **DefaultValidators.copy(),
     DataType.TAG: DataType,
-    LabelDataType.TAG: LabelDataType,
+    DimensionDataType.TAG: DimensionDataType,
     Identifier.TAG: Identifier,
     Expression.TAG: Expression,
 }

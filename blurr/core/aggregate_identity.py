@@ -13,7 +13,7 @@ class IdentityAggregateSchema(AggregateSchema):
     """
     Aggregates that handles the block rollup aggregation
     """
-    DIMENSIONS_FIELDS = 'Dimensions'
+    ATTRIBUTE_DIMENSIONS = 'Dimensions'
 
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
@@ -21,7 +21,7 @@ class IdentityAggregateSchema(AggregateSchema):
         self.dimension_fields: Dict[str, FieldSchema] = {
             schema_spec[self.ATTRIBUTE_NAME]: self.schema_loader.get_nested_schema_object(
                 self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
-            for schema_spec in self._spec.get(self.DIMENSIONS_FIELDS, [])
+            for schema_spec in self._spec.get(self.ATTRIBUTE_DIMENSIONS, [])
         }
 
 

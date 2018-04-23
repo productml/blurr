@@ -24,7 +24,7 @@ identity_aggregate:
   Type: enum('Blurr:Aggregate:IdentityAggregate')
   Store: identifier(required=False)
   When: expression(required=False)
-  Dimensions: list(include('label_field'), min=0, required=False)
+  Dimensions: list(include('dimension_field'), min=0, required=False)
   Fields: list(include('field'), min=1)
 
 activity_aggregate:
@@ -43,9 +43,9 @@ block_aggregate:
   Split: expression(required=False)
   Fields: list(include('field'), min=1)
 
-label_field:
+dimension_field:
   Name: identifier()
-  Type: label_data_type(required=False)
+  Type: dimension_data_type(required=False)
   Value: expression()
   When: expression(required=False)
   Atomic: bool(required=False)
