@@ -74,6 +74,7 @@ class Field(BaseItem):
 
         # When the field is created, the value is set to the field type default
         self.value = self._schema.default
+        self.eval_error = False
 
     def evaluate(self) -> None:
         """
@@ -81,10 +82,12 @@ class Field(BaseItem):
         expression in the schema
         """
         result = None
+        self.eval_error = False
         if self._needs_evaluation:
             result = self._schema.value.evaluate(self._evaluation_context)
 
-        if result is None:
+        self.eval_error = result is None
+        if self.eval_error:
             return
 
         # Only set the value if it conforms to the field type
@@ -95,6 +98,7 @@ class Field(BaseItem):
                 logging.debug('{} in casting {} to {} for field {}. Error: {}'.format(
                     type(err).__name__, result, self._schema.type,
                     self._schema.fully_qualified_name, err))
+                self.eval_error = True
                 return
 
         self.value = result
