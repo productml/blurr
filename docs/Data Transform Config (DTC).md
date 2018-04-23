@@ -140,6 +140,33 @@ A `Aggregate` contains `fields` for the information being stored. IdentityAggreg
 
  All fields in the Aggregate are encapsulated in a Aggregate object. The object is available in the DTL, which is the python environment processing the DTC. Field values can be accessed using `AggregateName.FieldName`
 
+An `IdentityAggregate` can also has `Dimensions` to split the aggregation along those dimensions. `Dimensions` are also a 
+list of `Fields` with only `integer`, `boolean` and `string` types supported. Each raw event that is evaluated should
+ contain the data needed to determine all the `Dimensions` specified.
+
+Example:
+```yaml
+Aggregates:
+
+  - Type: Blurr:Aggregate:IdentityAggregate
+    Name: user
+    Store: offer_ai_dynamo
+    When: source.event_id in ['app_launched', 'user_updated']
+    
+    Dimensions:
+      - Name: level
+        Type: string
+        Value: source.level
+
+    Fields:
+
+      - Name: events
+        Type: int
+        Value: user.events + 1
+
+      - Name: country
+        Value: source.country
+```
 
 ### BlockAggregate
 
@@ -177,6 +204,10 @@ Name | Name of the field | Any `string` | Required
 Type | Type of data being stored | `integer`, `boolean`, `string`, `datetime`, `float`, `map`, `list`, `set` | Optional. If Type is not set, the DTL uses `string` as the default type
 Value | Value of the field | Any python expression, and must match the Type | Required  
 When | Boolean expression that defines which raw events to process | Any `boolean` expression | Optional
+
+### ActivityAggregate
+`Blurr:Aggregate:ActivityAggregate`.Activity Aggregate is a specialization of the Block Aggregate where the inactivity based `Split` condition is 
+specified by  `SeparateByInactiveSeconds`.
 
 ### Variable
 
