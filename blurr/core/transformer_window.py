@@ -6,7 +6,7 @@ from blurr.core.errors import AnchorBlockNotDefinedError, \
     PrepareWindowMissingBlocksError
 from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.aggregate_block import BlockAggregate
+from blurr.core.aggregate_streaming import StreamingAggregate
 from blurr.core.transformer import Transformer, TransformerSchema
 
 
@@ -44,7 +44,7 @@ class WindowTransformer(Transformer):
         self._evaluation_context.merge(EvaluationContext(context))
         self._anchor = Anchor(schema.anchor, self._evaluation_context)
 
-    def evaluate(self, block: BlockAggregate) -> bool:
+    def evaluate(self, block: StreamingAggregate) -> bool:
         """
         Evaluates the anchor condition against the specified block.
         :param block: Block to run the anchor condition against.

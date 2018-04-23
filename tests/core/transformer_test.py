@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Dict, Any
 
 import pytest
@@ -79,11 +80,22 @@ def test_transformer_finalize(test_transformer: MockTransformer,
     store = schema_loader.get_schema_object('test.memstore')
 
     test_transformer.finalize()
-    assert store.get(Key('user1', 'test_group')) == {'_identity': '', 'events': 0}
+    assert store.get(Key('user1', 'test_group')) == {
+        '_identity': '',
+        'events': 0,
+        '_end_time': None,
+        '_start_time': None
+    }
 
+    test_transformer._evaluation_context.global_add('time', datetime(2018, 3, 1, 10, 10, 10))
     test_transformer.evaluate()
     test_transformer.finalize()
-    assert store.get(Key('user1', 'test_group')) == {'_identity': 'user1', 'events': 1}
+    assert store.get(Key('user1', 'test_group')) == {
+        '_identity': 'user1',
+        'events': 1,
+        '_end_time': datetime(2018, 3, 1, 10, 10, 10),
+        '_start_time': datetime(2018, 3, 1, 10, 10, 10)
+    }
 
 
 def test_transformer_get_attr(test_transformer: MockTransformer) -> None:
