@@ -73,7 +73,7 @@ def test_valid_basic_window_dtc():
     ('invalid_field_name.yml', "Name: '_name' starts with _ or containing whitespace characters."),
     ('invalid_import.yml', 'Import.0.Module: Required field missing'),
     ('invalid_dtc_type.yml', 'Document has an invalid DTC \'Type\' Blurr:Transform:Incorrect.'),
-    ('invalid_label_aggregate_type.yml', 'Type: \'map\' is not a Valid LabelField Type.'),
+    ('invalid_dimension_type.yml', 'Type: \'map\' is not a Valid LabelField Type.'),
 ])
 def test_invalid_schema(test_file: str, err_string: str) -> None:
     with raises(InvalidSchemaError, match=err_string):

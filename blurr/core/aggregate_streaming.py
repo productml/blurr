@@ -14,16 +14,8 @@ class StreamingAggregateSchema(AggregateSchema, ABC):
     """
     Aggregates that handles the block rollup aggregation
     """
-    KEY_FIELDS = 'Keys'
-
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
-
-        self.key_fields: Dict[str, Type[FieldSchema]] = {
-            schema_spec[self.ATTRIBUTE_NAME]: self.schema_loader.get_nested_schema_object(
-                self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
-            for schema_spec in self._spec.get(self.KEY_FIELDS, [])
-        }
 
     def extend_schema(self, spec: Dict[str, Any]) -> Dict[str, Any]:
         """ Injects the block start and end times """
@@ -64,50 +56,4 @@ class StreamingAggregateSchema(AggregateSchema, ABC):
 
 
 class StreamingAggregate(Aggregate, ABC):
-    def __init__(self, schema: StreamingAggregateSchema, identity: str,
-                 evaluation_context: EvaluationContext) -> None:
-        super().__init__(schema, identity, evaluation_context)
-
-        self._key_fields: Dict[str, Field] = {
-            name: TypeLoader.load_item(item_schema.type)(item_schema, self._evaluation_context)
-            for name, item_schema in self._schema.key_fields.items()
-        }
-
-        # Also add the label fields to regular fields so that they get processed by other functions
-        # such as snapshot, restore, etc as per normal.
-        # We don't add self._label_fields here as we want these fields to be separate objects.
-        self._fields.update({
-            name: TypeLoader.load_item(item_schema.type)(item_schema, self._evaluation_context)
-            for name, item_schema in self._schema.key_fields.items()
-        })
-        self._key = None
-
-    def _evaluate_key_fields(self) -> bool:
-        """
-        Evaluates the label fields. Returns False if any of the fields could not be evaluated.
-        """
-        for _, item in self._key_fields.items():
-            item.evaluate()
-            if item.eval_error:
-                return False
-        return True
-
-    def _compare_keys_to_fields(self) -> bool:
-        """ Compares the key field values to the value in regular fields."""
-        for name, item in self._key_fields.items():
-            if item.value != self._nested_items[name].value:
-                return False
-        return True
-
-    def _prepare_key(self, timestamp: datetime = None):
-        """ Generates the Key object based on key fields. """
-        if self._key_fields:
-            return Key(self._identity, self._name + '.' +
-                       (':').join([str(item.value) for item in self._key_fields.values()]),
-                       timestamp)
-
-        return Key(self._identity, self._name, timestamp)
-
-    def persist(self, timestamp=None) -> None:
-        # TODO Refactor keys when refactoring store
-        self._schema.store.save(self._key, self._snapshot)
+    pass

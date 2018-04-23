@@ -18,7 +18,7 @@ def identity_aggregate_schema_spec() -> Dict[str, Any]:
         'Type': 'Blurr:Aggregate:IdentityAggregate',
         'Name': 'label_aggr',
         'Store': 'memory',
-        'Keys': [{
+        'Dimensions': [{
             'Name': 'label',
             'Type': 'string',
             'Value': 'source.label'
@@ -41,7 +41,7 @@ def identity_aggregate_schema_spec_with_two_key_fields() -> Dict[str, Any]:
         'Type': 'Blurr:Aggregate:IdentityAggregate',
         'Name': 'label_aggr',
         'Store': 'memory',
-        'Keys': [{
+        'Dimensions': [{
             'Name': 'label',
             'Type': 'string',
             'Value': 'source.label'
@@ -115,7 +115,7 @@ def test_schema_initialization(identity_aggregate_schema_spec: Dict[str, Any],
                                store_spec: Dict[str, Any]):
     schema = identity_aggregate_schema(identity_aggregate_schema_spec, store_spec)
     assert isinstance(schema.store, MemoryStore)
-    assert isinstance(schema.key_fields, dict)
+    assert isinstance(schema.dimension_fields, dict)
 
 
 def evaluate_event(record: Record, aggregate: IdentityAggregate) -> None:
@@ -135,31 +135,31 @@ def test_split_by_label_valid(identity_aggregate_schema_spec: Dict[str, Any],
     evaluation_context.global_add(identity_aggregate._schema.name, identity_aggregate)
 
     # Check that initial state is empty
-    assert identity_aggregate._key_fields['label'].value == ''
+    assert identity_aggregate._dimension_fields['label'].value == ''
     assert identity_aggregate._schema.store.get_all() == {}
 
     # Check state at the end of the first event processed
     evaluate_event(records[0], identity_aggregate)
 
-    assert identity_aggregate._key_fields['label'].value == 'a'
+    assert identity_aggregate._dimension_fields['label'].value == 'a'
     assert identity_aggregate._schema.store.get_all() == {}
 
     # Check for labeled partition and persistence of the first label when label changes
     evaluate_event(records[1], identity_aggregate)
-    assert identity_aggregate._key_fields['label'].value == 'b'
+    assert identity_aggregate._dimension_fields['label'].value == 'b'
 
     evaluate_event(records[2], identity_aggregate)
     identity_aggregate.persist()
     store_state = identity_aggregate._schema.store.get_all()
 
-    assert identity_aggregate._key_fields['label'].value == 'a'
+    assert identity_aggregate._dimension_fields['label'].value == 'a'
     assert len(store_state) == 2
 
     # Check for final state
     evaluate_event(records[3], identity_aggregate)
     evaluate_event(records[4], identity_aggregate)
     identity_aggregate.persist()
-    assert identity_aggregate._key_fields['label'].value == 'c'
+    assert identity_aggregate._dimension_fields['label'].value == 'c'
     store_state = identity_aggregate._schema.store.get_all()
     assert len(store_state) == 3
 
@@ -193,7 +193,7 @@ def test_split_by_label_valid(identity_aggregate_schema_spec: Dict[str, Any],
 
 def test_split_when_label_evaluates_to_none(identity_aggregate_schema_spec: Dict[str, Any],
                                             store_spec: Dict[str, Any], records: List[Record]):
-    identity_aggregate_schema_spec['Keys'][0][
+    identity_aggregate_schema_spec['Dimensions'][0][
         'Value'] = '1/0 if source.label == \'a\' else source.label'
     schema = identity_aggregate_schema(identity_aggregate_schema_spec, store_spec)
     # Initialize the starting state
@@ -207,7 +207,7 @@ def test_split_when_label_evaluates_to_none(identity_aggregate_schema_spec: Dict
     evaluate_event(records[0], identity_aggregate)
     evaluate_event(records[1], identity_aggregate)
     evaluate_event(records[2], identity_aggregate)
-    assert identity_aggregate._key_fields['label'].value == 'b'
+    assert identity_aggregate._dimension_fields['label'].value == 'b'
 
     identity_aggregate.finalize()
 
