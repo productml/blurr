@@ -68,11 +68,9 @@ def test_transform_only_stream(capsys, runner) -> None:
         'continent': 'North America'
     }), out)
     assert_record_in_ouput(('userA/state', {
-        "_identity": "userA",
-        "_start_time": "2018-03-07 22:35:31+00:00",
-        "_end_time": "2018-03-07 23:35:32+00:00",
-        "country": "IN",
-        "continent": "World"
+        '_identity': 'userA',
+        'country': 'IN',
+        'continent': 'World'
     }), out)
     assert_record_in_ouput(('userA/session/2018-03-07T23:35:31+00:00', {
         '_identity': 'userA',

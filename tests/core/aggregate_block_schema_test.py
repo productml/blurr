@@ -4,7 +4,7 @@ from pytest import fixture
 
 from blurr.core.evaluation import Expression
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.aggregate_streaming import StreamingAggregateSchema
+from blurr.core.aggregate_block import BlockAggregateSchema
 
 
 @fixture
@@ -47,7 +47,8 @@ def match_fields(fields):
 def test_block_aggregate_schema_initialization(block_aggregate_schema_spec):
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(block_aggregate_schema_spec)
-    assert StreamingAggregateSchema(name, schema_loader)
+    block_aggregate_schema = BlockAggregateSchema(name, schema_loader)
+    assert block_aggregate_schema.split is None
     assert match_fields(block_aggregate_schema_spec['Fields'])
 
     loader_spec = schema_loader.get_schema_spec(name)
@@ -58,7 +59,8 @@ def test_block_aggregate_schema_with_split_initialization(block_aggregate_schema
     block_aggregate_schema_spec['Split'] = '4 > 2'
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(block_aggregate_schema_spec)
-    assert StreamingAggregateSchema(name, schema_loader)
+    block_aggregate_schema = BlockAggregateSchema(name, schema_loader)
+    assert isinstance(block_aggregate_schema.split, Expression)
     assert match_fields(block_aggregate_schema_spec['Fields'])
 
     loader_spec = schema_loader.get_schema_spec(name)

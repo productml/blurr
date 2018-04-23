@@ -5,10 +5,8 @@ from abc import ABC
 from blurr.core.base import BaseSchemaCollection, BaseItemCollection, BaseItem
 from blurr.core.errors import MissingAttributeError
 from blurr.core.evaluation import EvaluationContext
-from blurr.core.field import Field
 from blurr.core.loader import TypeLoader
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.store import Store
 from blurr.core.store_key import Key
 
 
@@ -74,13 +72,13 @@ class Aggregate(BaseItemCollection, ABC):
         super().__init__(schema, evaluation_context)
         self._identity = identity
 
-        self._fields: Dict[str, Field] = {
+        self._fields: Dict[str, Type[BaseItem]] = {
             name: TypeLoader.load_item(item_schema.type)(item_schema, self._evaluation_context)
             for name, item_schema in self._schema.nested_schema.items()
         }
 
     @property
-    def _nested_items(self) -> Dict[str, Field]:
+    def _nested_items(self) -> Dict[str, Type[BaseItem]]:
         """
         Returns the dictionary of fields the Aggregate contains
         """

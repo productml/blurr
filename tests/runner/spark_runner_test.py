@@ -45,9 +45,7 @@ def test_only_stream_dtc_provided():
     assert block_data[Key('userA', 'state')] == {
         '_identity': 'userA',
         'country': 'IN',
-        'continent': 'World',
-        '_end_time': datetime(2018, 3, 7, 23, 35, 32, tzinfo=tzutc()),
-        '_start_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=tzutc())
+        'continent': 'World'
     }
 
     assert block_data[Key('userB', 'session',

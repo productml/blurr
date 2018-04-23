@@ -1,9 +1,9 @@
-from blurr.core.aggregate_streaming import StreamingAggregateSchema, StreamingAggregate
+from blurr.core.aggregate import Aggregate, AggregateSchema
 
 
-class IdentityAggregateSchema(StreamingAggregateSchema):
+class IdentityAggregateSchema(AggregateSchema):
     pass
 
 
-class IdentityAggregate(StreamingAggregate):
+class IdentityAggregate(Aggregate):
     pass
