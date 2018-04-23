@@ -1,11 +1,10 @@
 from datetime import timedelta
 
-from blurr.core.aggregate_block import BlockAggregate, BlockAggregateSchema
-from blurr.core.evaluation import EvaluationContext
+from blurr.core.aggregate_streaming import StreamingAggregate, StreamingAggregateSchema
 from blurr.core.schema_loader import SchemaLoader
 
 
-class ActivityAggregateSchema(BlockAggregateSchema):
+class ActivityAggregateSchema(StreamingAggregateSchema):
     ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS = 'SeparateByInactiveSeconds'
 
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
@@ -15,7 +14,7 @@ class ActivityAggregateSchema(BlockAggregateSchema):
             seconds=int(self._spec[self.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS]))
 
 
-class ActivityAggregate(BlockAggregate):
+class ActivityAggregate(StreamingAggregate):
     """ Aggregates activity in blocks separated by periods of inactivity"""
 
     def evaluate(self) -> None:
@@ -28,3 +27,6 @@ class ActivityAggregate(BlockAggregate):
             self.reset()
 
         super().evaluate()
+
+    def persist(self, timestamp=None) -> None:
+        super().persist(timestamp if timestamp else self._start_time)

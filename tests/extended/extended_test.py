@@ -13,6 +13,8 @@ def test_extended_runner():
     result_state = local_runner._block_data[Key('user-1', 'state')]
     expected_state = {
         '_identity': 'user-1',
+        '_end_time': datetime(2016, 2, 13, 0, 1, 25),
+        '_start_time': datetime(2016, 2, 10, 0, 0),
         'country': 'US',
         'build': 245,
         'is_paid': True,

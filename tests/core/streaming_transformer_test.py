@@ -130,4 +130,11 @@ def test_streaming_transformer_evaluate(schema_loader: SchemaLoader,
     transformer = StreamingTransformer(transformer_schema, 'user1')
     transformer.evaluate(Record())
 
-    assert transformer._snapshot == {'test_group': {'_identity': 'user1', 'events': 1}}
+    assert transformer._snapshot == {
+        'test_group': {
+            '_identity': 'user1',
+            '_end_time': datetime(2016, 10, 10, 0, 0),
+            '_start_time': datetime(2016, 10, 10, 0, 0),
+            'events': 1
+        }
+    }

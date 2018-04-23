@@ -63,9 +63,11 @@ Aggregates:
         When: state.build > 210 and state.build < 440
 
 
-  - Type: Blurr:Aggregate:BlockAggregate
+  - Type: Blurr:Aggregate:ActivityAggregate
     Name: session
-    Split: (time - session._end_time).total_seconds() > 1800 or session.session_id != source.session_id
+    # Add back session.session_id != source.session_id when we add support for keys to activity
+    # aggregate
+    SeparateByInactiveSeconds: 1800
     Store: memory
     Fields:
       - { Name: session_id, Type: string, Value: source.session_id }
