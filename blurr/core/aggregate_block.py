@@ -4,6 +4,7 @@ from blurr.core.aggregate import Aggregate, AggregateSchema
 from blurr.core.evaluation import Expression
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
+from blurr.core.type import Type
 
 
 class BlockAggregateSchema(AggregateSchema):
@@ -43,14 +44,14 @@ class BlockAggregateSchema(AggregateSchema):
         return [
             {
                 'Name': '_start_time',
-                'Type': 'datetime',
+                'Type': Type.DATETIME,
                 'Value': ('time if {aggregate}._start_time is None else time '
                           'if time < {aggregate}._start_time else {aggregate}._start_time'
                           ).format(aggregate=name_in_context)
             },
             {
                 'Name': '_end_time',
-                'Type': 'datetime',
+                'Type': Type.DATETIME,
                 'Value': ('time if {aggregate}._end_time is None else time '
                           'if time > {aggregate}._end_time else {aggregate}._end_time'
                           ).format(aggregate=name_in_context)

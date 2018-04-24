@@ -20,7 +20,7 @@ def block_aggregate_schema_spec() -> Dict[str, Any]:
         'Store': 'memstore',
         'Fields': [{
             'Name': 'event_count',
-            'Type': 'integer',
+            'Type': Type.INTEGER,
             'Value': 'user.event_count + 1'
         }]
     }

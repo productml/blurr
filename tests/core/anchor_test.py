@@ -21,7 +21,7 @@ def anchor_schema_max_one(schema_loader: SchemaLoader) -> AnchorSchema:
         'Condition': True,
         'Max': 1,
         'Name': 'anchor',
-        'Type': 'anchor'
+        'Type': Type.ANCHOR
     })
     return AnchorSchema(name, schema_loader)
 
@@ -32,7 +32,7 @@ def anchor_schema_max_two(schema_loader: SchemaLoader) -> AnchorSchema:
         'Condition': True,
         'Max': 2,
         'Name': 'anchor',
-        'Type': 'anchor'
+        'Type': Type.ANCHOR
     })
     return AnchorSchema(name, schema_loader)
 
@@ -45,7 +45,7 @@ def block_schema(schema_loader: SchemaLoader) -> BlockAggregateSchema:
         'Fields': [
             {
                 'Name': 'events',
-                'Type': 'integer',
+                'Type': Type.INTEGER,
                 'Value': 'session.events + 1',
             },
         ],

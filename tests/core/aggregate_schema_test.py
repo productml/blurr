@@ -16,7 +16,7 @@ def aggregate_schema_spec() -> Dict[str, Any]:
         'Name': 'user',
         'Fields': [{
             'Name': 'event_count',
-            'Type': 'integer',
+            'Type': Type.INTEGER,
             'Value': 5
         }, {
             'Name': 'missing_type',
@@ -69,5 +69,5 @@ def test_field_without_type_defaults_to_string(aggregate_schema_spec):
     aggregate_schema = MockAggregateSchema(name, schema_loader)
     missing_type_field = aggregate_schema.nested_schema['missing_type']
 
-    assert missing_type_field.type == 'string'
+    assert Type.is_type_equal(missing_type_field.type, Type.STRING)
     assert missing_type_field.type_object is str

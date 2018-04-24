@@ -73,27 +73,27 @@ def aggregate_schema_spec() -> Dict[str, Any]:
         'Name': 'test',
         'Fields': [{
             'Name': 'map_field',
-            'Type': 'map',
+            'Type': Type.MAP,
             'Value': 'test.map_field.set("set", "value").increment("incr", 10).update({"update": "value"})'
         }, {
             'Name': 'list_field',
-            'Type': 'list',
+            'Type': Type.LIST,
             'Value': 'test.list_field.append(1).insert(0, 0).extend([2, 3]).remove(3)'
         }, {
             'Name': 'set_field',
-            'Type': 'set',
+            'Type': Type.SET,
             'Value': 'test.set_field.add(1).copy().union({2, 3}).update({3, 4, 5}).discard(0).remove(1).intersection({2, 4, 5}).symmetric_difference_update({4, 6})'
         }, {
             'Name': 'map_field_cast',
-            'Type': 'map',
+            'Type': Type.MAP,
             'Value': '{"incr": 10} if len(test.map_field_cast) == 0 else test.map_field_cast.increment("incr", 10)'
         }, {
             'Name': 'list_field_cast',
-            'Type': 'list',
+            'Type': Type.LIST,
             'Value': '[0] if len(test.list_field_cast) == 0 else test.list_field_cast.append(1).append(1)'
         }, {
             'Name': 'set_field_cast',
-            'Type': 'set',
+            'Type': Type.SET,
             'Value': 'set({0}) if len(test.set_field_cast) == 0 else test.set_field_cast.add(1).add(2)'
         }]
     }

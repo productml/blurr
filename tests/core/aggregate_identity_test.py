@@ -21,16 +21,16 @@ def identity_aggregate_schema_spec() -> Dict[str, Any]:
         'Store': 'memory',
         'Dimensions': [{
             'Name': 'label',
-            'Type': 'string',
+            'Type': Type.STRING,
             'Value': 'source.label'
         }],
         'Fields': [{
             'Name': 'sum',
-            'Type': 'integer',
+            'Type': Type.INTEGER,
             'Value': 'label_aggr.sum + source.event_value'
         }, {
             'Name': 'count',
-            'Type': 'integer',
+            'Type': Type.INTEGER,
             'Value': 'label_aggr.count + 1'
         }]
     }
@@ -44,20 +44,20 @@ def identity_aggregate_schema_spec_with_two_key_fields() -> Dict[str, Any]:
         'Store': 'memory',
         'Dimensions': [{
             'Name': 'label',
-            'Type': 'string',
+            'Type': Type.STRING,
             'Value': 'source.label'
         }, {
             'Name': 'label_ascii',
-            'Type': 'integer',
+            'Type': Type.INTEGER,
             'Value': 'ord(source.label)'
         }],
         'Fields': [{
             'Name': 'sum',
-            'Type': 'integer',
+            'Type': Type.INTEGER,
             'Value': 'label_aggr.sum + source.event_value'
         }, {
             'Name': 'count',
-            'Type': 'integer',
+            'Type': Type.INTEGER,
             'Value': 'label_aggr.count + 1'
         }]
     }

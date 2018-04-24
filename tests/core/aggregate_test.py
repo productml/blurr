@@ -18,7 +18,7 @@ def get_aggregate_schema_spec() -> Dict[str, Any]:
         'Store': 'memory',
         'Fields': [{
             'Name': 'event_count',
-            'Type': 'integer',
+            'Type': Type.INTEGER,
             'Value': 5
         }]
     }

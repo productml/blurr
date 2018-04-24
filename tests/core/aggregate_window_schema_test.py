@@ -16,7 +16,7 @@ def test_initialization_with_valid_source(schema_loader_with_mem_store: SchemaLo
         'Fields': [
             {
                 'Name': 'events',
-                'Type': 'integer',
+                'Type': Type.INTEGER,
                 'Value': 'session.events + 1',
             },
         ],
@@ -24,18 +24,18 @@ def test_initialization_with_valid_source(schema_loader_with_mem_store: SchemaLo
     name = schema_loader_with_mem_store.add_schema({
         'Type': Type.BLURR_AGGREGATE_WINDOW,
         'Name': 'test_window_name',
-        'WindowType': 'day',
+        'WindowType': Type.DAY,
         'WindowValue': 1,
         'Source': stream_dtc_name + '.session',
         'Fields': [{
             'Name': 'total_events',
-            'Type': 'integer',
+            'Type': Type.INTEGER,
             'Value': 'sum(source.events)'
         }]
     })
 
     window_aggregate_schema = WindowAggregateSchema(name, schema_loader_with_mem_store)
-    assert window_aggregate_schema.window_type == 'day'
+    assert Type.is_type_equal(window_aggregate_schema.window_type, Type.DAY)
     assert window_aggregate_schema.window_value == 1
     assert isinstance(window_aggregate_schema.source, BlockAggregateSchema)
     assert window_aggregate_schema.source.name == 'session'
@@ -47,12 +47,12 @@ def test_initialization_with_invalid_source(schema_loader_with_mem_store: Schema
     name = schema_loader_with_mem_store.add_schema({
         'Type': Type.BLURR_AGGREGATE_WINDOW,
         'Name': 'test_window_name',
-        'WindowType': 'day',
+        'WindowType': Type.DAY,
         'WindowValue': 1,
         'Source': stream_dtc_name + '.session',
         'Fields': [{
             'Name': 'total_events',
-            'Type': 'integer',
+            'Type': Type.INTEGER,
             'Value': 'sum(source.events)'
         }]
     })

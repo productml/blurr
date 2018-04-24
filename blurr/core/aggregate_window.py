@@ -8,6 +8,7 @@ from blurr.core.schema_loader import SchemaLoader
 from blurr.core.aggregate_block import BlockAggregate
 from blurr.core.store_key import Key
 from blurr.core.base import BaseItem
+from blurr.core.type import Type
 
 
 class WindowAggregateSchema(AggregateSchema):
@@ -53,7 +54,8 @@ class WindowAggregate(Aggregate):
         """
         # evaluate window first which sets the correct window in the store
         store = self._schema.source.store
-        if self._schema.window_type == 'day' or self._schema.window_type == 'hour':
+        if Type.is_type_equal(self._schema.window_type, Type.DAY) or Type.is_type_equal(
+                self._schema.window_type, Type.HOUR):
             block_list = self._load_blocks(
                 store.get_range(
                     Key(self._identity, self._schema.source.name, start_time),
@@ -68,8 +70,9 @@ class WindowAggregate(Aggregate):
         self._validate_view()
 
     def _validate_view(self):
-        if self._schema.window_type == 'count' and len(self._window_source.view) != abs(
-                self._schema.window_value):
+        if Type.is_type_equal(
+                self._schema.window_type,
+                Type.COUNT) and len(self._window_source.view) != abs(self._schema.window_value):
             raise PrepareWindowMissingBlocksError(
                 '{} WindowAggregate: Expecting {} but found {} blocks'.format(
                     self._schema.name, abs(self._schema.window_value), len(
@@ -89,9 +92,9 @@ class WindowAggregate(Aggregate):
         based on the window type in the schema.
         :return:
         """
-        if self._schema.window_type == 'day':
+        if Type.is_type_equal(self._schema.window_type, Type.DAY):
             return start_time + timedelta(days=self._schema.window_value)
-        elif self._schema.window_type == 'hour':
+        elif Type.is_type_equal(self._schema.window_type, Type.HOUR):
             return start_time + timedelta(hours=self._schema.window_value)
 
     def _load_blocks(self, blocks: List[Tuple[Key, Any]]) -> List[BlockAggregate]:

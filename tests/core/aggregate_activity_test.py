@@ -21,11 +21,11 @@ def activity_aggregate_schema_spec() -> Dict[str, Any]:
         'Store': 'memory',
         'Fields': [{
             'Name': 'sum',
-            'Type': 'integer',
+            'Type': Type.INTEGER,
             'Value': 'activity_aggr.sum + source.event_value'
         }, {
             'Name': 'count',
-            'Type': 'integer',
+            'Type': Type.INTEGER,
             'Value': 'activity_aggr.count + 1'
         }]
     }

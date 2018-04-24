@@ -16,7 +16,7 @@ def block_aggregate_schema_spec() -> Dict[str, Any]:
         'Filter': 'source.event_id in ["app_launched", "user_updated"]',
         'Fields': [{
             'Name': 'event_count',
-            'Type': 'integer',
+            'Type': Type.INTEGER,
             'Value': 5
         }]
     }
@@ -25,21 +25,21 @@ def block_aggregate_schema_spec() -> Dict[str, Any]:
 def match_fields(fields):
     expected_fields = [{
         'Name': '_identity',
-        'Type': 'string',
+        'Type': Type.STRING,
         'Value': 'identity'
     }, {
         'Name': '_start_time',
-        'Type': 'datetime',
+        'Type': Type.DATETIME,
         'Value': 'time if user._start_time is None else time if time < '
         'user._start_time else user._start_time'
     }, {
         'Name': '_end_time',
-        'Type': 'datetime',
+        'Type': Type.DATETIME,
         'Value': 'time if user._end_time is None else time if time > '
         'user._end_time else user._end_time'
     }, {
         'Name': 'event_count',
-        'Type': 'integer',
+        'Type': Type.INTEGER,
         'Value': 5
     }]
     return fields == expected_fields

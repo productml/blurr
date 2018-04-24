@@ -8,6 +8,7 @@ from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.aggregate_block import BlockAggregate
 from blurr.core.transformer import Transformer, TransformerSchema
+from blurr.core.type import Type
 
 
 class WindowTransformerSchema(TransformerSchema):
@@ -26,7 +27,7 @@ class WindowTransformerSchema(TransformerSchema):
     def extend_schema(self, spec: Dict[str, Any]) -> Dict[str, Any]:
         # Inject name and type for Anchor as expected by BaseSchema
         spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_NAME] = 'anchor'
-        spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_TYPE] = 'anchor'
+        spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_TYPE] = Type.ANCHOR
 
         self.schema_loader.add_schema(spec[self.ATTRIBUTE_ANCHOR], self.fully_qualified_name)
 

@@ -8,6 +8,7 @@ from blurr.core.evaluation import EvaluationContext
 from blurr.core.loader import TypeLoader
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
+from blurr.core.type import Type as DTCType
 
 
 class AggregateSchema(BaseSchemaCollection, ABC):
@@ -42,7 +43,7 @@ class AggregateSchema(BaseSchemaCollection, ABC):
     def extend_schema(self, spec: Dict[str, Any]) -> Dict[str, Any]:
         """ Injects the identity field """
 
-        identity_field = {'Name': '_identity', 'Type': 'string', 'Value': 'identity'}
+        identity_field = {'Name': '_identity', 'Type': DTCType.STRING, 'Value': 'identity'}
         spec[self.ATTRIBUTE_FIELDS].insert(0, identity_field)
 
         self.schema_loader.add_schema(identity_field, self.fully_qualified_name)
@@ -50,7 +51,7 @@ class AggregateSchema(BaseSchemaCollection, ABC):
         # If field type is missing, set it to string by default
         for field in spec[self.ATTRIBUTE_FIELDS]:
             if self.ATTRIBUTE_TYPE not in field:
-                field[self.ATTRIBUTE_TYPE] = 'string'
+                field[self.ATTRIBUTE_TYPE] = DTCType.STRING
 
         return super().extend_schema(spec)
 
