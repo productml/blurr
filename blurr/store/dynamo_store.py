@@ -70,6 +70,7 @@ class DynamoStore(Store):
         item.pop('partition_key', None)
         item.pop('range_key', None)
         return item
+
     #
     # @staticmethod
     # def clean_item(item: Any) -> Any:
@@ -83,7 +84,8 @@ class DynamoStore(Store):
 
     def prepare_record(self, record: Dict[str, Any]) -> Tuple[Key, Any]:
         dimensions = record['range_key'].split(Key.PARTITION)
-        key = Key(record['partition_key'], dimensions[0], None if len(dimensions) == 1 else parser.parse(dimensions[1]))
+        key = Key(record['partition_key'], dimensions[0], None
+                  if len(dimensions) == 1 else parser.parse(dimensions[1]))
         return key, self.clean_key(record)
 
     def get(self, key: Key) -> Any:
@@ -132,8 +134,8 @@ class DynamoStore(Store):
 
     def get_all(self, identity: str) -> Dict[Key, Any]:
         response = self.table.query(KeyConditionExpression=DynamoKey('partition_key').eq(identity))
-        return dict([self.prepare_record(item) for item in response['Items']]
-                    if 'Items' in response else [])
+        return dict([self.prepare_record(item)
+                     for item in response['Items']] if 'Items' in response else [])
 
     def save(self, key: Key, item: Any) -> None:
         item['partition_key'] = key.identity
@@ -145,4 +147,3 @@ class DynamoStore(Store):
 
     def finalize(self) -> None:
         pass
-

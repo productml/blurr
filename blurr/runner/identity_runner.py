@@ -99,8 +99,8 @@ def execute_window_dtc(identity: str, schema_loader: SchemaLoader,
 def get_store(schema_loader: SchemaLoader):
     memory_store_schemas = schema_loader.get_schemas_of_type(Type.BLURR_STORE_MEMORY)
     dynamo_store_schemas = schema_loader.get_schemas_of_type(Type.BLURR_STORE_DYNAMO)
-    return schema_loader.get_schema_object(memory_store_schemas[0][0] if len(memory_store_schemas) > 0
-                                           else dynamo_store_schemas[0][0])
+    return schema_loader.get_schema_object(memory_store_schemas[0][
+        0] if len(memory_store_schemas) > 0 else dynamo_store_schemas[0][0])
 
 
 def get_streaming_transformer_schema(schema_loader: SchemaLoader) -> StreamingTransformerSchema:
