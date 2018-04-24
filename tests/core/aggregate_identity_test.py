@@ -9,13 +9,14 @@ from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
+from blurr.core.type import Type
 from blurr.store.memory_store import MemoryStore
 
 
 @fixture
 def identity_aggregate_schema_spec() -> Dict[str, Any]:
     return {
-        'Type': 'Blurr:Aggregate:IdentityAggregate',
+        'Type': Type.BLURR_AGGREGATE_IDENTITY,
         'Name': 'label_aggr',
         'Store': 'memory',
         'Dimensions': [{
@@ -38,7 +39,7 @@ def identity_aggregate_schema_spec() -> Dict[str, Any]:
 @fixture
 def identity_aggregate_schema_spec_with_two_key_fields() -> Dict[str, Any]:
     return {
-        'Type': 'Blurr:Aggregate:IdentityAggregate',
+        'Type': Type.BLURR_AGGREGATE_IDENTITY,
         'Name': 'label_aggr',
         'Store': 'memory',
         'Dimensions': [{
@@ -64,7 +65,7 @@ def identity_aggregate_schema_spec_with_two_key_fields() -> Dict[str, Any]:
 
 @fixture
 def store_spec() -> Dict[str, Any]:
-    return {'Type': 'Blurr:Store:MemoryStore', 'Name': 'memory'}
+    return {'Type': Type.BLURR_STORE_MEMORY, 'Name': 'memory'}
 
 
 @fixture
