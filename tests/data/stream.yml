@@ -10,23 +10,23 @@ Identity: source.user_id
 Time: parse(source.event_time)
 Stores:
   -
-    Type: 'Blurr:Store:MemoryStore'
+    Type: 'Blurr:Store:Memory'
     Name: memory
 Aggregates:
   -
-    Type: 'Blurr:Aggregate:VariableAggregate'
+    Type: 'Blurr:Aggregate:Variable'
     Name: vars
     Fields:
       - { Name: continent, Type: string, Value: '''North America'' if source.country == ''US'' else ''World''', When: bool(source.country) }
   -
-    Type: 'Blurr:Aggregate:IdentityAggregate'
+    Type: 'Blurr:Aggregate:Identity'
     Name: state
     Store: memory
     Fields:
       - { Name: country, Type: string, Value: source.country }
       - { Name: continent, Type: string, Value: vars.continent, When: bool(vars.continent) }
   -
-    Type: 'Blurr:Aggregate:BlockAggregate'
+    Type: 'Blurr:Aggregate:Block'
     Name: session
     Split: '(time - session._end_time).seconds > 1800'
     Store: memory

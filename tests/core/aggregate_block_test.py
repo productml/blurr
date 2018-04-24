@@ -3,6 +3,7 @@ from typing import Dict, Any
 
 from pytest import fixture
 
+from blurr.core.type import Type
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.field import Field
 from blurr.core.schema_loader import SchemaLoader
@@ -14,12 +15,12 @@ from blurr.core.store_key import Key
 @fixture
 def block_aggregate_schema_spec() -> Dict[str, Any]:
     return {
-        'Type': 'Blurr:Aggregate:BlockAggregate',
+        'Type': Type.BLURR_AGGREGATE_BLOCK,
         'Name': 'user',
         'Store': 'memstore',
         'Fields': [{
             'Name': 'event_count',
-            'Type': 'integer',
+            'Type': Type.INTEGER,
             'Value': 'user.event_count + 1'
         }]
     }
@@ -27,7 +28,7 @@ def block_aggregate_schema_spec() -> Dict[str, Any]:
 
 @fixture
 def store_spec() -> Dict[str, Any]:
-    return {'Name': 'memstore', 'Type': 'Blurr:Store:MemoryStore'}
+    return {'Name': 'memstore', 'Type': Type.BLURR_STORE_MEMORY}
 
 
 @fixture

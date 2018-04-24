@@ -21,12 +21,12 @@ Time: parser.parse(source.start_time) #This tells the DTC that source.start_time
 ##
 
 Stores:
-   - Type: Blurr:Store:MemoryStore
+   - Type: Blurr:Store:Memory
      Name: fbt
 
 Aggregates:
 
- - Type: Blurr:Aggregate:IdentityAggregate
+ - Type: Blurr:Aggregate:Identity
    Name: user
    Store: fbt
    When: source.event_name == 'session_start'
@@ -65,7 +65,7 @@ Aggregates:
 # Session aggregates definition
 ##
 
- - Type: Blurr:Aggregate:BlockAggregate
+ - Type: Blurr:Aggregate:Block
    Name: item_stats
    Store: fbt
    Split: source.session_id != item_stats.session_id

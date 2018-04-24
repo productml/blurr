@@ -6,6 +6,7 @@ from pytest import mark, fixture
 from blurr.core.base import BaseSchema, BaseItem
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
+from blurr.core.type import Type
 from tests.core.base_schema_test import TestSchema
 
 
@@ -47,7 +48,7 @@ def get_test_item(schema_spec: Dict[str, Any]) -> TestItem:
 def test_base_item_valid(schema_spec: Dict[str, Any]) -> None:
     test_item = get_test_item(schema_spec)
     assert test_item._schema.name == 'TestField'
-    assert test_item._schema.type == 'integer'
+    assert Type.is_type_equal(test_item._schema.type, Type.INTEGER)
     assert len(test_item._evaluation_context.global_context) == 0
     assert len(test_item._evaluation_context.local_context) == 0
 

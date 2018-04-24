@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from pytest import fixture
 
 from blurr.core.anchor import AnchorSchema, Anchor
+from blurr.core.type import Type
 from blurr.core.evaluation import EvaluationContext, Expression
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.aggregate_block import BlockAggregateSchema, \
@@ -20,7 +21,7 @@ def anchor_schema_max_one(schema_loader: SchemaLoader) -> AnchorSchema:
         'Condition': True,
         'Max': 1,
         'Name': 'anchor',
-        'Type': 'anchor'
+        'Type': Type.ANCHOR
     })
     return AnchorSchema(name, schema_loader)
 
@@ -31,7 +32,7 @@ def anchor_schema_max_two(schema_loader: SchemaLoader) -> AnchorSchema:
         'Condition': True,
         'Max': 2,
         'Name': 'anchor',
-        'Type': 'anchor'
+        'Type': Type.ANCHOR
     })
     return AnchorSchema(name, schema_loader)
 
@@ -39,12 +40,12 @@ def anchor_schema_max_two(schema_loader: SchemaLoader) -> AnchorSchema:
 @fixture
 def block_schema(schema_loader: SchemaLoader) -> BlockAggregateSchema:
     name = schema_loader.add_schema({
-        'Type': 'Blurr:Aggregate:BlockAggregate',
+        'Type': Type.BLURR_AGGREGATE_BLOCK,
         'Name': 'session',
         'Fields': [
             {
                 'Name': 'events',
-                'Type': 'integer',
+                'Type': Type.INTEGER,
                 'Value': 'session.events + 1',
             },
         ],

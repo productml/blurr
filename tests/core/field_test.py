@@ -8,6 +8,7 @@ from blurr.core.field import FieldSchema
 from blurr.core.field_complex import SetFieldSchema
 from blurr.core.field_simple import Field, BooleanFieldSchema, IntegerFieldSchema, FloatFieldSchema
 from blurr.core.schema_loader import SchemaLoader
+from blurr.core.type import Type
 
 
 class MockFieldSchema(FieldSchema):
@@ -23,7 +24,7 @@ class MockFieldSchema(FieldSchema):
 @fixture
 def test_field_schema() -> MockFieldSchema:
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': 'integer', 'Value': 5})
+    name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': Type.INTEGER, 'Value': 5})
     return MockFieldSchema(name, schema_loader)
 
 
@@ -47,7 +48,7 @@ def test_field_evaluate_without_needs_evaluation():
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema({
         'Name': 'max_attempts',
-        'Type': 'integer',
+        'Type': Type.INTEGER,
         'Value': 5,
         'When': '2 == 3'
     })
@@ -61,20 +62,24 @@ def test_field_evaluate_without_needs_evaluation():
 def test_field_evaluate_incorrect_typecast_to_type_default(caplog):
     caplog.set_level(logging.DEBUG)
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': 'integer', 'Value': '"Hi"'})
+    name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': Type.INTEGER, 'Value': '"Hi"'})
     field_schema = IntegerFieldSchema(name, schema_loader)
     field = Field(field_schema, EvaluationContext())
     field.evaluate()
 
     assert field.value == 0
-    assert ('ValueError in casting Hi to integer for field max_attempts. Error: invalid '
+    assert ('ValueError in casting Hi to Type.INTEGER for field max_attempts. Error: invalid '
             'literal for int() with base 10: \'Hi\'') in caplog.records[0].message
     assert caplog.records[0].levelno == logging.DEBUG
 
 
 def test_field_evaluate_implicit_typecast_integer():
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': 'integer', 'Value': '23.45'})
+    name = schema_loader.add_schema({
+        'Name': 'max_attempts',
+        'Type': Type.INTEGER,
+        'Value': '23.45'
+    })
     field_schema = IntegerFieldSchema(name, schema_loader)
     field = Field(field_schema, EvaluationContext())
     field.evaluate()
@@ -84,7 +89,7 @@ def test_field_evaluate_implicit_typecast_integer():
 
 def test_field_evaluate_implicit_typecast_float():
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': 'float', 'Value': '23'})
+    name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': Type.FLOAT, 'Value': '23'})
     field_schema = FloatFieldSchema(name, schema_loader)
     field = Field(field_schema, EvaluationContext())
     field.evaluate()
@@ -94,7 +99,7 @@ def test_field_evaluate_implicit_typecast_float():
 
 def test_field_evaluate_implicit_typecast_bool():
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': 'boolean', 'Value': '1+2'})
+    name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': Type.BOOLEAN, 'Value': '1+2'})
     field_schema = BooleanFieldSchema(name, schema_loader)
     field = Field(field_schema, EvaluationContext())
     field.evaluate()
@@ -126,7 +131,11 @@ def test_field_reset(test_field_schema):
 
 def test_set_field_snapshot_encoding():
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema({'Name': 'test', 'Type': 'set', 'Value': 'test.add(0).add(1)'})
+    name = schema_loader.add_schema({
+        'Name': 'test',
+        'Type': Type.SET,
+        'Value': 'test.add(0).add(1)'
+    })
     field_schema = SetFieldSchema(name, schema_loader)
     field = Field(field_schema, EvaluationContext())
     field._evaluation_context.global_add('test', field.value)
@@ -140,7 +149,11 @@ def test_set_field_snapshot_encoding():
 
 def test_set_field_snapshot_decoding():
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema({'Name': 'test', 'Type': 'set', 'Value': 'test.add(0).add(1)'})
+    name = schema_loader.add_schema({
+        'Name': 'test',
+        'Type': Type.SET,
+        'Value': 'test.add(0).add(1)'
+    })
     field_schema = SetFieldSchema(name, schema_loader)
     field = Field(field_schema, EvaluationContext())
     field.restore([2, 3])

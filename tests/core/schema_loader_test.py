@@ -3,6 +3,7 @@ from typing import Dict
 import pytest
 from pytest import fixture
 
+from blurr.core.type import Type
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.field_simple import IntegerFieldSchema
@@ -34,14 +35,14 @@ def nested_schema_spec_bad_type() -> Dict:
 def nested_schema_spec() -> Dict:
     return {
         'Name': 'test',
-        'Type': 'Blurr:Transform:Streaming',
+        'Type': Type.BLURR_TRANSFORM_STREAMING,
         "Version": "2018-03-01",
         "Time": "parser.parse(source.event_time)",
         "Identity": "source.user_id",
         'Ignored': 2,
         'Aggregates': [{
             'Name': 'test_group',
-            'Type': 'Blurr:Aggregate:IdentityAggregate',
+            'Type': Type.BLURR_AGGREGATE_IDENTITY,
             'Fields': [{
                 "Type": "string",
                 "Name": "country",
@@ -129,9 +130,9 @@ def test_get_fully_qualified_name() -> None:
 
 
 def test_get_schemas_of_type(schema_loader: SchemaLoader, nested_schema_spec: Dict) -> None:
-    assert schema_loader.get_schemas_of_type('integer') == [
-        ('test.test_group.events', nested_schema_spec['Aggregates'][0]['Fields'][1])
-    ]
+    assert schema_loader.get_schemas_of_type(
+        Type.INTEGER) == [('test.test_group.events',
+                           nested_schema_spec['Aggregates'][0]['Fields'][1])]
 
 
 def test_get_transformer_name() -> None:

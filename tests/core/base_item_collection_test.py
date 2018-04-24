@@ -10,6 +10,7 @@ from blurr.core.errors import SnapshotError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.loader import TypeLoader
 from blurr.core.schema_loader import SchemaLoader
+from blurr.core.type import Type as DTCType
 
 
 @fixture
@@ -20,7 +21,7 @@ def collection_schema_spec() -> Dict[str, Any]:
         'When': 'True',
         'Fields': [{
             'Name': 'event_count',
-            'Type': 'integer',
+            'Type': DTCType.INTEGER,
             'Value': 5
         }]
     }

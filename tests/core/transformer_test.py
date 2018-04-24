@@ -3,6 +3,7 @@ from typing import Dict, Any
 import pytest
 from pytest import fixture
 
+from blurr.core.type import Type
 from blurr.core.errors import MissingAttributeError
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
@@ -13,15 +14,15 @@ from blurr.core.transformer import TransformerSchema, Transformer
 def schema_spec() -> Dict[str, Any]:
     return {
         'Name': 'test',
-        'Type': 'Blurr:Transform:Streaming',
+        'Type': Type.BLURR_TRANSFORM_STREAMING,
         'Version': '2018-03-01',
         'Stores': [{
             'Name': 'memstore',
-            'Type': 'Blurr:Store:MemoryStore'
+            'Type': Type.BLURR_STORE_MEMORY
         }],
         'Aggregates': [{
             'Name': 'test_group',
-            'Type': 'Blurr:Aggregate:IdentityAggregate',
+            'Type': Type.BLURR_AGGREGATE_IDENTITY,
             'Store': 'memstore',
             'Fields': [{
                 "Type": "integer",
@@ -61,8 +62,8 @@ def test_transformer_schema_init(schema_loader: SchemaLoader, schema_spec: Dict[
     name = schema_loader.add_schema(schema_spec)
     test_transformer_schema = MockTransformerSchema(name, schema_loader)
     assert test_transformer_schema.version == '2018-03-01'
-    assert test_transformer_schema.type == 'Blurr:Transform:Streaming'
-    assert test_transformer_schema.stores['memstore'].type == 'Blurr:Store:MemoryStore'
+    assert test_transformer_schema.type == Type.BLURR_TRANSFORM_STREAMING
+    assert test_transformer_schema.stores['memstore'].type == Type.BLURR_STORE_MEMORY
 
 
 def test_transformer_init(test_transformer) -> None:

@@ -1,7 +1,8 @@
-from typing import Dict, Any, List, Tuple, Optional
+from typing import Dict, Any, List, Tuple, Optional, Union
 
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.loader import TypeLoader
+from blurr.core.type import Type
 
 
 class SchemaLoader:
@@ -96,16 +97,17 @@ class SchemaLoader:
         except:
             raise InvalidSchemaError("{} not declared in schema".format(fully_qualified_name))
 
-    def get_schemas_of_type(self, type: str) -> List[Tuple[str, Dict[str, Any]]]:
+    def get_schemas_of_type(self, schema_type: Type) -> List[Tuple[str, Dict[str, Any]]]:
         """
         Returns a list of fully qualified names and schema dictionary tuples for
         the schema type provided.
         :param type: Schema type.
         :return: List of fully qualified names and schema dictionary tuples.
         """
+
         return [(fq_name, schema)
                 for fq_name, schema in self._spec.items()
-                if schema.get(self.ATTRIBUTE_TYPE, '') == type]
+                if Type.is_type_equal(schema.get(self.ATTRIBUTE_TYPE, ''), schema_type)]
 
     @staticmethod
     def get_transformer_name(fully_qualified_name: str) -> str:

@@ -8,12 +8,12 @@ Identity: source.user_id
 Time: parser.parse(source.time)
 Stores: 
   -
-    Type: Blurr:Store:MemoryStore
+    Type: Blurr:Store:Memory
     Name: memory
 
 Aggregates:
   -
-    Type: Blurr:Aggregate:VariableAggregate
+    Type: Blurr:Aggregate:Variable
     Name: vars
     Fields:
 
@@ -25,7 +25,7 @@ Aggregates:
       #
       - { Name: os-version-parts, Type: list, Value: "source['os-version'].split('-')" }
   -
-    Type: Blurr:Aggregate:IdentityAggregate
+    Type: Blurr:Aggregate:Identity
     Name: state
     Store: memory
     Fields:
@@ -63,7 +63,7 @@ Aggregates:
         When: state.build > 210 and state.build < 440
 
 
-  - Type: Blurr:Aggregate:BlockAggregate
+  - Type: Blurr:Aggregate:Block
     Name: session
     Split: (time - session._end_time).total_seconds() > 1800 or session.session_id != source.session_id
     Store: memory

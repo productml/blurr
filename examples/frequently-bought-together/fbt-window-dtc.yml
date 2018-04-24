@@ -32,7 +32,7 @@ Anchor:
 
 Aggregates:
 
- - Type: Blurr:Aggregate:WindowAggregate
+ - Type: Blurr:Aggregate:Window
    Name: lifetime
 
    WindowType: day
@@ -51,7 +51,7 @@ Aggregates:
        Type: float
        Value: sum(source.transaction_value_this_session)
 
- - Type: Blurr:Aggregate:WindowAggregate
+ - Type: Blurr:Aggregate:Window
    Name: last_24_hours
    WindowType: hour
    WindowValue: -24
@@ -63,7 +63,7 @@ Aggregates:
        Value: [item for sublist in source.products_bought for item in sublist]
        # Flattens the list of list of tuples of products_bought
 
- - Type: Blurr:Aggregate:WindowAggregate
+ - Type: Blurr:Aggregate:Window
    Name: next_24_hours
    WindowType: hour
    WindowValue: 24

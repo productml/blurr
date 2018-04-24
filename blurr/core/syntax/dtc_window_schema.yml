@@ -17,14 +17,14 @@ anchor:
 
 aggregate_variable:
   Name: identifier()
-  Type: enum('Blurr:Aggregate:VariableAggregate')
+  Type: enum('Blurr:Aggregate:Variable')
   Store: identifier(required=False)
   When: expression(required=False)
   Fields: list(include('field'), min=1)
 
 aggregate_window:
   Name: identifier()
-  Type: enum('Blurr:Aggregate:WindowAggregate')
+  Type: enum('Blurr:Aggregate:Window')
   When: expression(required=False)
   WindowType: enum('day', 'hour', 'count')
   WindowValue: int()

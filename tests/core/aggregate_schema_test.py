@@ -4,6 +4,7 @@ import pytest
 from pytest import fixture
 
 from blurr.core.aggregate import AggregateSchema
+from blurr.core.type import Type
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.schema_loader import SchemaLoader
 
@@ -11,11 +12,11 @@ from blurr.core.schema_loader import SchemaLoader
 @fixture
 def aggregate_schema_spec() -> Dict[str, Any]:
     return {
-        'Type': 'Blurr:Aggregate:BlockAggregate',
+        'Type': Type.BLURR_AGGREGATE_BLOCK,
         'Name': 'user',
         'Fields': [{
             'Name': 'event_count',
-            'Type': 'integer',
+            'Type': Type.INTEGER,
             'Value': 5
         }, {
             'Name': 'missing_type',
@@ -26,7 +27,7 @@ def aggregate_schema_spec() -> Dict[str, Any]:
 
 @fixture
 def store_spec() -> Dict[str, Any]:
-    return {'Type': 'Blurr:Store:MemoryStore', 'Name': 'memory'}
+    return {'Type': Type.BLURR_STORE_MEMORY, 'Name': 'memory'}
 
 
 class MockAggregateSchema(AggregateSchema):
@@ -68,5 +69,5 @@ def test_field_without_type_defaults_to_string(aggregate_schema_spec):
     aggregate_schema = MockAggregateSchema(name, schema_loader)
     missing_type_field = aggregate_schema.nested_schema['missing_type']
 
-    assert missing_type_field.type == 'string'
+    assert Type.is_type_equal(missing_type_field.type, Type.STRING)
     assert missing_type_field.type_object is str
