@@ -8,6 +8,7 @@ from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
 from blurr.store.dynamo_store import DynamoStore
 
+import boto3
 
 @fixture
 def dynamo_store_spec() -> Dict[str, Any]:
@@ -24,6 +25,42 @@ def store(dynamo_store_spec) -> DynamoStore:
     schema_loader.add_schema(dynamo_store_spec)
     dynamo_store = DynamoStore('dynamostore', schema_loader)
     yield dynamo_store
+    dynamo_store.table.delete()
+
+
+def test_table_creation_if_not_exist(dynamo_store_spec):
+    table_name = '_unit_test_table_creation' + '_' + str(int(time.time()))
+    dynamo_store_spec['Table'] = table_name
+    schema_loader = SchemaLoader()
+    schema_loader.add_schema(dynamo_store_spec)
+
+    dynamodb_client = boto3.client('dynamodb')
+    # Check table does not exist
+    assert table_name not in dynamodb_client.list_tables()['TableNames']
+
+    # Test that the store is created if it does not exist
+    dynamo_store = DynamoStore('dynamostore', schema_loader)
+    assert table_name in dynamodb_client.list_tables()['TableNames']
+    assert dynamo_store.table.item_count == 0
+
+    dynamo_store.table.put_item(Item={'partition_key': 'part', 'range_key': 'range'})
+    item = dynamo_store.table.get_item(Key={
+        'partition_key': 'part',
+        'range_key': 'range'
+    }, ConsistentRead=True).get('Item', None)
+
+    assert item
+
+    # Ensure the same store is reused the next time
+    dynamo_store2 = DynamoStore('dynamostore', schema_loader)
+
+    item = dynamo_store2.table.get_item(Key={
+        'partition_key': 'part',
+        'range_key': 'range'
+    }, ConsistentRead=True).get('Item', None)
+
+    assert item
+
     dynamo_store.table.delete()
 
 
