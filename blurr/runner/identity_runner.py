@@ -95,6 +95,7 @@ def execute_window_dtc(identity: str, schema_loader: SchemaLoader,
     return window_data
 
 
+# TODO Clean up dirty implementation
 def get_store(schema_loader: SchemaLoader):
     memory_store_schemas = schema_loader.get_schemas_of_type(Type.BLURR_STORE_MEMORY)
     dynamo_store_schemas = schema_loader.get_schemas_of_type(Type.BLURR_STORE_DYNAMO)
