@@ -21,6 +21,22 @@ Split: (time - end_time).minutes > 30
 
 # Advanced DTC functions
 
+## Parsing UNIX timestamp
+```YAML
+Import:
+  - { Module: datetime, Identifiers: [ datetime, timezone ]}
+
+Time: datetime.fromtimestamp(source.timestamp, timezone.utc)
+```
+
+## Parsing ISO datetime string
+```YAML
+Import:
+  - { Module: dateutil.parser, Identifiers: [ parse ]}
+
+Time: parse(source.event_time)
+```
+
 ## Create a map
 
 ```yaml
