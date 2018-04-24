@@ -65,7 +65,6 @@ def test_extended_runner():
         'badges': {
             'bronze': 1
         },
-        'start_score': 0,
         'end_score': 57
     }
 
@@ -84,7 +83,6 @@ def test_extended_runner():
         'badges': {
             'silver': 1
         },
-        'start_score': 0,
         'end_score': 18
     }
 
@@ -103,7 +101,6 @@ def test_extended_runner():
         'badges': {
             'gold': 1
         },
-        'start_score': 0,
         'end_score': 51
     }
 
