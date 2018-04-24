@@ -10,6 +10,10 @@
 
 Blurr transforms structured, streaming `raw data` into `features` for model training and prediction using a `high-level expressive YAML-based language` called the Data Transform Configuration (DTC).
 
+The motivation for building Blurr is to help data scientists extract features from raw data *without depending on a data engineer*. Reducing engineering dependencies makes iterations on feature engineering and selection faster than existing methods - writing Spark code, using SparkSQL or KSQL. We wanted to build something that is portable across any infrastructure stack. 
+
+Blurr has the same workflow during model development and taking it to production, so productionizing an ML pipeline is a breeze.
+
 ## Blurr vs. stream/batch processors
 
 The DTC is a __data transform definition__ for structured data. The DTC encapsulates the *business logic* of data transforms and Blurr orchestrates the *execution* of data transforms.
@@ -157,8 +161,6 @@ Inspired by the (old school) [Joel Test](https://www.joelonsoftware.com/2000/08/
 3. Deploying to production needs minimal engineering help
 4. Successful ML is a long game. You play it like it is
 5. Kaizen. Experimentation and iterations are a way of life
-
-
 
 # Roadmap
 
