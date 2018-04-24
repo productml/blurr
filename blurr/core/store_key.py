@@ -41,8 +41,8 @@ class Key:
         return Key.PARTITION.join([self.identity, self.group])
 
     def __eq__(self, other: 'Key') -> bool:
-        return (self.identity, self.group, self.timestamp) == (other.identity, other.group,
-                                                               other.timestamp)
+        return False if not other else \
+            (self.identity, self.group, self.timestamp) == (other.identity, other.group, other.timestamp)
 
     def __lt__(self, other: 'Key') -> bool:
         """

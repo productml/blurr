@@ -1,13 +1,12 @@
+from time import sleep
 from typing import Any, Dict, List, Tuple
 
-from datetime import datetime, timezone
-
+import boto3
 from boto3.dynamodb.conditions import Key as DynamoKey
+from dateutil import parser
 
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store import Store, Key
-import boto3
-
 
 ATTRIBUTE_TABLE = 'Table'
 ATTRIBUTE_READ_CAPACITY_UNITS = 'ReadCapacityUnits'
@@ -59,89 +58,74 @@ class DynamoStore(Store):
                 }
             )
 
+        while self.table_name not in self.dynamodb_client.list_tables()['TableNames'] or \
+                self.dynamodb_client.describe_table(TableName=self.table_name).get('Table', {}).get('TableStatus',
+                                                                                                    '') != 'ACTIVE':
+            sleep(1)
+
         self.table = self.dynamodb_resource.Table(self.table_name)
 
+    @staticmethod
+    def dimensions(key: Key):
+        return key.group + key.PARTITION + key.timestamp.isoformat() if key.timestamp else key.group
+
     def get(self, key: Key) -> Any:
-        if not key.timestamp:
-            key_dict = {
-                    'identity': key.identity,
-                    'dimensions': key.group
-                }
-            if key.timestamp:
-                key_dict['start_time'] = key.timestamp.isoformat()
-
-            item = self.table.get_item(Key=key_dict).get('Item', None)
-        else:
-            response = self.table.query(
-                Limit=1,
-                KeyConditionExpression=DynamoKey('identity').eq(key.identity) & DynamoKey('dimensions').eq(key.group),
-                FilterExpression=DynamoKey('start_time').eq(key.timestamp.isoformat())
-            )
-            if 'Items' not in response or len(response['Items']) == 0:
-                return None
-
-            item = response['Items'][0]
+        item = self.table.get_item(Key={
+            'identity': key.identity,
+            'dimensions': self.dimensions(key)
+        }).get('Item', None)
 
         if not item:
             return None
 
         del item['identity']
         del item['dimensions']
-        item.pop('start_time', None)
 
         return item
 
-
-    def get_all(self) -> Dict[Key, Any]:
-        return self._cache
-
     def get_range(self, start: Key, end: Key = None, count: int = 0) -> List[Tuple[Key, Any]]:
+
         if end and count:
             raise ValueError('Only one of `end` or `count` can be set')
 
-        if end is not None and end < start:
-            start, end = end, start
+        dimension_key_condition = DynamoKey('dimensions')
 
-        if not count:
-            # TODO: Come up with a better way of getting this range for instances where key
-            # does not have a timestamp.
-            items_in_range = []
-            for key, item in self._cache.items():
-                if start < key < end:
-                    items_in_range.append((key, item))
-                elif key.timestamp is None:
-                    item_ts = item.get('_start_time', datetime.min)
-                    item_ts = item_ts if item_ts.tzinfo else item_ts.replace(tzinfo=timezone.utc)
-                    if start.timestamp < item_ts < end.timestamp:
-                        items_in_range.append((key, item))
-                        continue
-            return items_in_range
+        if end:
+            dimension_key_condition = dimension_key_condition.between(self.dimensions(start), self.dimensions(end))
         else:
-            filter_condition = (lambda i: i[0] > start) if count > 0 else (lambda i: i[0] < start)
+            dimension_key_condition = dimension_key_condition.gt(self.dimensions(start)) if count > 0 \
+                else dimension_key_condition.lt(self.dimensions(start))
 
-            items = sorted(filter(filter_condition, list(self._cache.items())))
+        response = self.table.query(
+            Limit=abs(count) if count else 1000,
+            KeyConditionExpression=DynamoKey('identity').eq(start.identity) & dimension_key_condition,
+            ScanIndexForward=count >= 0,
+        )
 
-            if abs(count) > len(items):
-                count = DynamoStore._sign(count) * len(items)
+        def prepare_record(record: Dict[str, Any]) -> Tuple[Key, Any]:
+            dimensions = record.pop('dimensions').split(Key.PARTITION)
+            key = Key(record.pop('identity'), dimensions[0], parser.parse(dimensions[1]))
+            return key, record
 
-            if count < 0:
-                return items[count:]
-            else:
-                return items[:count]
+        records = [prepare_record(item) for item in response['Items']] if \
+            'Items' in response else []
 
-    @staticmethod
-    def _sign(x: int) -> int:
-        return (1, -1)[x < 0]
+        # Ignore the starting record
+        if records[0][0] == start or records[0][0] == end:
+            del records[0]
+
+        if records[-1][0] == start or records[-1][0] == end:
+            del records[-1]
+
+        return records
 
     def save(self, key: Key, item: Any) -> None:
         item['identity'] = key.identity
-        item['dimensions'] = key.group
-        if key.timestamp:
-            item['start_time'] = key.timestamp.isoformat()
+        item['dimensions'] = self.dimensions(key)
         self.table.put_item(Item=item)
 
     def delete(self, key: Key) -> None:
-        self._cache.pop(key, None)
+        pass
 
     def finalize(self) -> None:
         pass
