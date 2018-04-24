@@ -20,8 +20,8 @@ def test_only_stream_dtc_provided():
     # Stream DTC output
     assert data[Key('userA', 'session', datetime(2018, 3, 7, 23, 35, 31))] == {
         '_identity': 'userA',
-        '_start_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()),
-        '_end_time': datetime(2018, 3, 7, 23, 35, 32, tzinfo=tzutc()),
+        '_start_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()).isoformat(),
+        '_end_time': datetime(2018, 3, 7, 23, 35, 32, tzinfo=tzutc()).isoformat(),
         'events': 2,
         'country': 'IN',
         'continent': 'World'
@@ -29,8 +29,8 @@ def test_only_stream_dtc_provided():
 
     assert data[Key('userA', 'session', datetime(2018, 3, 7, 22, 35, 31))] == {
         '_identity': 'userA',
-        '_start_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=tzutc()),
-        '_end_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=tzutc()),
+        '_start_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=tzutc()).isoformat(),
+        '_end_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=tzutc()).isoformat(),
         'events': 1,
         'country': 'US',
         'continent': 'North America'
@@ -44,8 +44,8 @@ def test_only_stream_dtc_provided():
 
     assert data[Key('userB', 'session', datetime(2018, 3, 7, 23, 35, 31))] == {
         '_identity': 'userB',
-        '_start_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()),
-        '_end_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()),
+        '_start_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()).isoformat(),
+        '_end_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()).isoformat(),
         'events': 1,
         'country': '',
         'continent': ''
@@ -84,8 +84,8 @@ def test_write_output_file_only_source_dtc_provided(tmpdir):
     output_text = output_file.readlines(cr=False)
     assert ('["userA/session/2018-03-07T22:35:31+00:00", {'
             '"_identity": "userA", '
-            '"_start_time": "2018-03-07 22:35:31+00:00", '
-            '"_end_time": "2018-03-07 22:35:31+00:00", '
+            '"_start_time": "2018-03-07T22:35:31+00:00", '
+            '"_end_time": "2018-03-07T22:35:31+00:00", '
             '"events": 1, '
             '"country": "US", '
             '"continent": "North America"'

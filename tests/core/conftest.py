@@ -34,19 +34,19 @@ def init_memory_store(store: MemoryStore) -> None:
     store.save(Key('user1', 'state'), {'variable_1': 1, 'variable_a': 'a', 'variable_true': True})
 
     date = datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc)
-    store.save(Key('user1', 'session', date), {'events': 1, '_start_time': date})
+    store.save(Key('user1', 'session', date), {'events': 1, '_start_time': date.isoformat()})
 
     date = datetime(2018, 3, 7, 20, 35, 35, 0, timezone.utc)
-    store.save(Key('user1', 'session', date), {'events': 2, '_start_time': date})
+    store.save(Key('user1', 'session', date), {'events': 2, '_start_time': date.isoformat()})
 
     date = datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc)
-    store.save(Key('user1', 'session', date), {'events': 3, '_start_time': date})
+    store.save(Key('user1', 'session', date), {'events': 3, '_start_time': date.isoformat()})
 
     date = datetime(2018, 3, 7, 22, 38, 31, 0, timezone.utc)
-    store.save(Key('user1', 'session', date), {'events': 4, '_start_time': date})
+    store.save(Key('user1', 'session', date), {'events': 4, '_start_time': date.isoformat()})
 
     date = datetime(2018, 3, 7, 23, 40, 31, 0, timezone.utc)
-    store.save(Key('user1', 'session', date), {'events': 5, '_start_time': date})
+    store.save(Key('user1', 'session', date), {'events': 5, '_start_time': date.isoformat()})
 
     date = datetime(2018, 3, 8, 23, 40, 31, 0, timezone.utc)
-    store.save(Key('user1', 'session'), {'events': 6, '_start_time': date})
+    store.save(Key('user1', 'session'), {'events': 6, '_start_time': date.isoformat()})

@@ -58,8 +58,8 @@ def block_item(block_schema: BlockAggregateSchema) -> BlockAggregate:
     block = BlockAggregate(block_schema, 'user1', EvaluationContext())
     block.restore({
         'events': 3,
-        '_start_time': datetime(2018, 3, 7, 22, 36, 31, 0, timezone.utc),
-        '_end_time': datetime(2018, 3, 7, 22, 37, 31, 0, timezone.utc)
+        '_start_time': datetime(2018, 3, 7, 22, 36, 31, 0, timezone.utc).isoformat(),
+        '_end_time': datetime(2018, 3, 7, 22, 37, 31, 0, timezone.utc).isoformat()
     })
     return block
 
@@ -100,8 +100,8 @@ def test_anchor_condition(anchor_schema_max_one: AnchorSchema, block_item: Block
 
     block_item.restore({
         'events': 4,
-        '_start_time': datetime(2018, 3, 7, 22, 36, 31, 0, timezone.utc),
-        '_end_time': datetime(2018, 3, 7, 22, 37, 31, 0, timezone.utc)
+        '_start_time': datetime(2018, 3, 7, 22, 36, 31, 0, timezone.utc).isoformat(),
+        '_end_time': datetime(2018, 3, 7, 22, 37, 31, 0, timezone.utc).isoformat()
     })
     assert anchor.evaluate_anchor(block_item) is True
     anchor.add_condition_met()

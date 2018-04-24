@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Any
-
+from dateutil import parser
 from blurr.core.field import FieldSchema, Field
 
 
@@ -52,3 +52,11 @@ class DateTimeFieldSchema(FieldSchema):
     @property
     def default(self) -> Any:
         return None
+
+    @staticmethod
+    def encoder(value: Any) -> str:
+        return value.isoformat() if value else None
+
+    @staticmethod
+    def decoder(value: Any) -> datetime:
+        return parser.parse(value) if value else None
