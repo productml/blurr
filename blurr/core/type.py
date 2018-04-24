@@ -12,6 +12,7 @@ class Type(Enum):
     BLURR_AGGREGATE_VARIABLE = "blurr:aggregate:variable"
     BLURR_AGGREGATE_WINDOW = "blurr:aggregate:window"
     BLURR_STORE_MEMORY = "blurr:store:memory"
+    BLURR_STORE_DYNAMO = "blurr:store:dynamo"
     ANCHOR = "anchor"
     DAY = "day"
     HOUR = "hour"
