@@ -1,4 +1,4 @@
-from typing import Any, List, Tuple
+from typing import Any, List, Tuple, Dict
 
 from abc import abstractmethod
 
@@ -8,6 +8,13 @@ from blurr.core.store_key import Key
 
 class Store(BaseSchema):
     """ Base Store that allows for data to be persisted during / after transformation """
+
+    @abstractmethod
+    def get_all(self, identity: str) -> Dict[Key, Any]:
+        """
+        Gets all the items for an identity
+        """
+        raise NotImplementedError()
 
     @abstractmethod
     def get(self, key: Key) -> Any:

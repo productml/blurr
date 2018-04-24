@@ -21,8 +21,8 @@ class MemoryStore(Store):
     def get(self, key: Key) -> Any:
         return self._cache.get(key, None)
 
-    def get_all(self) -> Dict[Key, Any]:
-        return self._cache
+    def get_all(self, identity: str) -> Dict[Key, Any]:
+        return {k: v for k, v in self._cache.items() if k.identity == identity}
 
     def get_range(self, start: Key, end: Key = None, count: int = 0) -> List[Tuple[Key, Any]]:
         if end and count:

@@ -69,6 +69,9 @@ class DynamoStore(Store):
         item.pop('range_key', None)
         return item
 
+    def get_all(self, identity: str) -> Dict[Key, Any]:
+        pass
+
     def get(self, key: Key) -> Any:
         item = self.table.get_item(Key={
             'partition_key': key.identity,

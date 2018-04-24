@@ -17,6 +17,11 @@ class SimpleJsonDataProcessor(DataProcessor):
         return [Record(json.loads(data_string))]
 
 
+class SimpleDictionaryDataProcessor(DataProcessor):
+    def process_data(self, data_dict: Dict) -> List[Record]:
+        return [Record(data_dict)]
+
+
 class IpfixDataProcessor(DataProcessor):
     IPFIX_EVENT_MAPPER = {
         4: 'protocol',

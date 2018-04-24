@@ -1,11 +1,17 @@
 from datetime import datetime
 from pathlib import PosixPath
-from typing import List
+from typing import List, Tuple, Any, Optional
 
 from dateutil.tz import tzutc
 
 from blurr.core.store_key import Key
 from blurr.runner.spark_runner import SparkRunner
+
+
+def execute_runner(stream_dtc_file: str, window_dtc_file: Optional[str],
+                   local_json_files: List[str]) -> Tuple[SparkRunner, Any]:
+    runner = SparkRunner(stream_dtc_file, window_dtc_file)
+    return runner, runner.execute(runner.get_record_rdd_from_json_files(local_json_files))
 
 
 def get_spark_output(out_dir: PosixPath) -> List:
@@ -17,8 +23,8 @@ def get_spark_output(out_dir: PosixPath) -> List:
 
 
 def test_only_stream_dtc_provided():
-    spark_runner = SparkRunner(['tests/data/raw.json'], 'tests/data/stream.yml', None)
-    block_data = {k: v for (k, v) in spark_runner.execute().collect()}
+    runner, data = execute_runner('tests/data/stream.yml', None, ['tests/data/raw.json'])
+    block_data = {k: v for (k, v) in data.collect()}
 
     assert len(block_data) == 8
 
@@ -60,17 +66,17 @@ def test_only_stream_dtc_provided():
 
 
 def test_no_variable_aggreate_data_stored():
-    spark_runner = SparkRunner(['tests/data/raw.json'], 'tests/data/stream.yml', None)
-    block_data = {k: v for (k, v) in spark_runner.execute().collect()}
+    runner, data = execute_runner('tests/data/stream.yml', None, ['tests/data/raw.json'])
+    block_data = {k: v for (k, v) in data.collect()}
 
     # Variables should not be stored
     assert Key('userA', 'vars') not in block_data
 
 
 def test_stream_and_window_dtc_provided():
-    spark_runner = SparkRunner(['tests/data/raw.json'], 'tests/data/stream.yml',
-                               'tests/data/window.yml')
-    window_data = dict(spark_runner.execute().collect())
+    runner, data = execute_runner('tests/data/stream.yml', 'tests/data/window.yml',
+                                  ['tests/data/raw.json'])
+    window_data = dict(data.collect())
 
     assert window_data['userA'] == [{
         'last_session.events': 1,
@@ -82,10 +88,9 @@ def test_stream_and_window_dtc_provided():
 
 
 def test_write_output_file_only_source_dtc_provided(tmpdir):
-    spark_runner = SparkRunner(['tests/data/raw.json'], 'tests/data/stream.yml', None)
-    window_data = spark_runner.execute()
+    runner, data = execute_runner('tests/data/stream.yml', None, ['tests/data/raw.json'])
     out_dir = tmpdir.join('out')
-    spark_runner.write_output_file(str(out_dir), window_data)
+    runner.write_output_file(str(out_dir), data)
     output_text = get_spark_output(out_dir)
     assert ('["userA/session/2018-03-07T22:35:31+00:00", {'
             '"_identity": "userA", '
@@ -98,11 +103,10 @@ def test_write_output_file_only_source_dtc_provided(tmpdir):
 
 
 def test_write_output_file_with_stream_and_window_dtc_provided(tmpdir):
-    spark_runner = SparkRunner(['tests/data/raw.json'], 'tests/data/stream.yml',
-                               'tests/data/window.yml')
-    window_data = spark_runner.execute()
+    runner, data = execute_runner('tests/data/stream.yml', 'tests/data/window.yml',
+                                  ['tests/data/raw.json'])
     out_dir = tmpdir.join('out')
-    spark_runner.write_output_file(str(out_dir), window_data)
+    runner.write_output_file(str(out_dir), data)
     output_text = get_spark_output(out_dir)
     assert 'last_day._identity,last_day.total_events,last_session._identity,last_session.events' in output_text
     assert 'userA,1,userA,1' in output_text
