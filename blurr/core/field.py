@@ -134,7 +134,7 @@ class ComplexTypeBase(ABC):
         attribute = super().__getattribute__(item)
 
         # Return the attribute as-is when it is NOT a function
-        if not callable(attribute):
+        if not callable(attribute) or (item.startswith('__') and item.endswith('__')):
             return attribute
 
         # Wrap the attribute in a function that changes its return value

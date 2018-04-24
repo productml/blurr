@@ -5,7 +5,7 @@ from blurr.runner.local_runner import LocalRunner
 
 
 def test_extended_runner():
-    local_runner = LocalRunner(['tests/extended/raw.json'], 'tests/extended/stream.yml')
+    local_runner = LocalRunner(['tests/store/dynamo/raw.json'], 'tests/store/dynamo/stream.yml')
     local_runner.execute()
 
     assert len(local_runner._block_data) == 5

@@ -61,8 +61,8 @@ def test_transform_only_stream(capsys, runner) -> None:
     out, err = capsys.readouterr()
     assert_record_in_ouput(('userA/session/2018-03-07T22:35:31+00:00', {
         '_identity': 'userA',
-        '_start_time': '2018-03-07 22:35:31+00:00',
-        '_end_time': '2018-03-07 22:35:31+00:00',
+        '_start_time': '2018-03-07T22:35:31+00:00',
+        '_end_time': '2018-03-07T22:35:31+00:00',
         'events': 1,
         'country': 'US',
         'continent': 'North America'
@@ -74,8 +74,8 @@ def test_transform_only_stream(capsys, runner) -> None:
     }), out)
     assert_record_in_ouput(('userA/session/2018-03-07T23:35:31+00:00', {
         '_identity': 'userA',
-        '_start_time': '2018-03-07 23:35:31+00:00',
-        '_end_time': '2018-03-07 23:35:32+00:00',
+        '_start_time': '2018-03-07T23:35:31+00:00',
+        '_end_time': '2018-03-07T23:35:32+00:00',
         'events': 2,
         'country': 'IN',
         'continent': 'World'

@@ -101,8 +101,8 @@ def test_aggregate_final_state(activity_aggregate_schema: ActivityAggregateSchem
     assert store_state.get(
         Key('user1', 'activity_aggr', datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc))) == {
             '_identity': 'user1',
-            '_start_time': datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc),
-            '_end_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc),
+            '_start_time': datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc).isoformat(),
+            '_end_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc).isoformat(),
             'sum': 111,
             'count': 3
         }
@@ -110,8 +110,8 @@ def test_aggregate_final_state(activity_aggregate_schema: ActivityAggregateSchem
     assert store_state.get(
         Key('user1', 'activity_aggr', datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc))) == {
             '_identity': 'user1',
-            '_start_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc),
-            '_end_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc),
+            '_start_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc).isoformat(),
+            '_end_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc).isoformat(),
             'sum': 1000,
             'count': 1
         }
@@ -119,8 +119,8 @@ def test_aggregate_final_state(activity_aggregate_schema: ActivityAggregateSchem
     assert store_state.get(
         Key('user1', 'activity_aggr', datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc))) == {
             '_identity': 'user1',
-            '_start_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc),
-            '_end_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc),
+            '_start_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc).isoformat(),
+            '_end_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc).isoformat(),
             'sum': 10000,
             'count': 1
         }

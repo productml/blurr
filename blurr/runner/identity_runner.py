@@ -3,7 +3,6 @@ from typing import List, Dict, Tuple, Any, Optional
 
 from blurr.core import logging
 from blurr.core.aggregate_block import BlockAggregate
-from blurr.core.type import Type
 from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import Context
 from blurr.core.record import Record
@@ -12,7 +11,7 @@ from blurr.core.store_key import Key
 from blurr.core.transformer_streaming import StreamingTransformer, \
     StreamingTransformerSchema
 from blurr.core.transformer_window import WindowTransformer
-from blurr.store.memory_store import MemoryStore
+from blurr.core.type import Type
 
 
 def execute_dtc(identity_events: List[Tuple[datetime, Record]], identity: str,
@@ -40,7 +39,7 @@ def execute_stream_dtc(identity_events: List[Tuple[datetime, Record]], identity:
         stream_transformer.evaluate(event)
     stream_transformer.finalize()
 
-    return get_memory_store(schema_loader).get_all()
+    return get_store(schema_loader).get_all(identity)
 
 
 def execute_window_dtc(identity: str, schema_loader: SchemaLoader,
@@ -51,7 +50,7 @@ def execute_window_dtc(identity: str, schema_loader: SchemaLoader,
 
     stream_transformer = StreamingTransformer(
         get_streaming_transformer_schema(schema_loader), identity)
-    all_data = get_memory_store(schema_loader).get_all()
+    all_data = get_store(schema_loader).get_all()
     stream_transformer.restore(all_data)
 
     exec_context = Context()
@@ -96,9 +95,11 @@ def execute_window_dtc(identity: str, schema_loader: SchemaLoader,
     return window_data
 
 
-def get_memory_store(schema_loader: SchemaLoader) -> MemoryStore:
-    store_schemas = schema_loader.get_schemas_of_type(Type.BLURR_STORE_MEMORY)
-    return schema_loader.get_schema_object(store_schemas[0][0])
+def get_store(schema_loader: SchemaLoader):
+    memory_store_schemas = schema_loader.get_schemas_of_type(Type.BLURR_STORE_MEMORY)
+    dynamo_store_schemas = schema_loader.get_schemas_of_type(Type.BLURR_STORE_DYNAMO)
+    return schema_loader.get_schema_object(memory_store_schemas[0][0] if len(memory_store_schemas) > 0
+                                           else dynamo_store_schemas[0][0])
 
 
 def get_streaming_transformer_schema(schema_loader: SchemaLoader) -> StreamingTransformerSchema:

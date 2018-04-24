@@ -186,3 +186,9 @@ def test_get_range_count_backward(loaded_store: DynamoStore) -> None:
     assert len(items) == 3
     assert items[0][1]['int_field'] == 5
     assert items[-1][1]['int_field'] == 3
+
+
+def test_get_all(loaded_store: DynamoStore) -> None:
+    items = loaded_store.get_all('test_user')
+
+    assert len(items) == 8
