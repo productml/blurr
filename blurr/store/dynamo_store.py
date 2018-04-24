@@ -69,6 +69,12 @@ class DynamoStore(Store):
     def dimensions(key: Key):
         return key.group + key.PARTITION + key.timestamp.isoformat() if key.timestamp else key.group
 
+    @staticmethod
+    def clean(item: Dict[str, Any]) -> Dict[str, Any]:
+        item.pop('identity', None)
+        item.pop('dimensions', None)
+        return item
+
     def get(self, key: Key) -> Any:
         item = self.table.get_item(Key={
             'identity': key.identity,
@@ -78,10 +84,7 @@ class DynamoStore(Store):
         if not item:
             return None
 
-        del item['identity']
-        del item['dimensions']
-
-        return item
+        return self.clean(item)
 
     def get_range(self, start: Key, end: Key = None, count: int = 0) -> List[Tuple[Key, Any]]:
 
@@ -103,9 +106,9 @@ class DynamoStore(Store):
         )
 
         def prepare_record(record: Dict[str, Any]) -> Tuple[Key, Any]:
-            dimensions = record.pop('dimensions').split(Key.PARTITION)
-            key = Key(record.pop('identity'), dimensions[0], parser.parse(dimensions[1]))
-            return key, record
+            dimensions = record['dimensions'].split(Key.PARTITION)
+            key = Key(record['identity'], dimensions[0], parser.parse(dimensions[1]))
+            return key, self.clean(record)
 
         records = [prepare_record(item) for item in response['Items']] if \
             'Items' in response else []
