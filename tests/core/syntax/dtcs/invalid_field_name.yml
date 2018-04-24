@@ -6,10 +6,10 @@ Identity: source.user_id
 Time: source.timestamp
 When: source.package_version == '1.0'
 Stores:
- - Type: Blurr:Store:MemoryStore
+ - Type: Blurr:Store:Memory
    Name: memory_store
 Aggregates:
- - Type: Blurr:Aggregate:IdentityAggregate
+ - Type: Blurr:Aggregate:Identity
    Name: user
    Store: offer_ai_dynamo
    Fields:

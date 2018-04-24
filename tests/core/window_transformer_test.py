@@ -12,6 +12,7 @@ from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
 from blurr.core.transformer_streaming import StreamingTransformer
 from blurr.core.transformer_window import WindowTransformer, WindowTransformerSchema
+from blurr.core.type import Type
 from tests.core.conftest import init_memory_store
 
 
@@ -66,7 +67,7 @@ def test_window_transformer_schema_init(schema_loader, stream_schema_spec, windo
     anchor_spec = schema_loader.get_schema_spec('ProductMLExample.anchor')
     assert anchor_spec == window_schema_spec['Anchor']
     assert anchor_spec['Name'] == 'anchor'
-    assert anchor_spec['Type'] == 'anchor'
+    assert Type.is_type_equal(anchor_spec['Type'], Type.ANCHOR)
     assert isinstance(window_transformer_schema.anchor, AnchorSchema)
 
 

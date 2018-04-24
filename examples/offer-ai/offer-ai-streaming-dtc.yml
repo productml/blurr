@@ -18,14 +18,14 @@ Time: parser.parse(source.event_time) #This tells the DTC that source.event_time
 # Store properties. Only DynamoDB is supported currently
 Stores:
 
- - Type: Blurr:Store:MemoryStore
+ - Type: Blurr:Store:Memory
    Name: offer_ai
 
 Aggregates:
 
    # IdentityAggregate is meant for user profile information that is rarely updated. This is processed first
    # These are things like country, install source and whether user is logged in to Facebook
- - Type: Blurr:Aggregate:IdentityAggregate
+ - Type: Blurr:Aggregate:Identity
    Name: user
    Store: offer_ai
    When: source.event_id in ['app_launched', 'user_updated']
@@ -46,7 +46,7 @@ Aggregates:
 
 
    # BlockAggregates definition
- - Type: Blurr:Aggregate:BlockAggregate
+ - Type: Blurr:Aggregate:Block
    Name: game_stats
    # We defined this store earlier
    Store: offer_ai

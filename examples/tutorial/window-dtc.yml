@@ -8,7 +8,7 @@ Anchor:
   Condition: sessions.session_stats.boost == True
 
 Aggregates:
-  - Type: Blurr:Aggregate:WindowAggregate
+  - Type: Blurr:Aggregate:Window
     Name: last_7_days
     WindowType: day
     WindowValue: -7
@@ -19,7 +19,7 @@ Aggregates:
        Type: float
        Value: sum(source.games_played) / len(source.session_id)
 
-  - Type: Blurr:Aggregate:WindowAggregate
+  - Type: Blurr:Aggregate:Window
     Name: next_3_days
     WindowType: day
     WindowValue: +3

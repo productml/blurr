@@ -14,14 +14,14 @@ Aggregates: list(any(include('identity_aggregate'), include('activity_aggregate'
 
 variable_aggregate:
   Name: identifier()
-  Type: enum('Blurr:Aggregate:VariableAggregate')
+  Type: enum('Blurr:Aggregate:Variable')
   Store: identifier(required=False)
   When: expression(required=False)
   Fields: list(include('field'), min=1)
 
 identity_aggregate:
   Name: identifier()
-  Type: enum('Blurr:Aggregate:IdentityAggregate')
+  Type: enum('Blurr:Aggregate:Identity')
   Store: identifier(required=False)
   When: expression(required=False)
   Dimensions: list(include('dimension_field'), min=0, required=False)
@@ -29,7 +29,7 @@ identity_aggregate:
 
 activity_aggregate:
   Name: identifier()
-  Type: enum('Blurr:Aggregate:ActivityAggregate')
+  Type: enum('Blurr:Aggregate:Activity')
   Store: identifier(required=False)
   When: expression(required=False)
   SeparateByInactiveSeconds: int(required=True, min=1)
@@ -37,7 +37,7 @@ activity_aggregate:
 
 block_aggregate:
   Name: identifier()
-  Type: enum('Blurr:Aggregate:BlockAggregate')
+  Type: enum('Blurr:Aggregate:Block')
   Store: identifier(required=False)
   When: expression(required=False)
   Split: expression(required=False)
@@ -58,7 +58,7 @@ field:
   Atomic: bool(required=False)
 
 memory_store:
-  Type: enum('Blurr:Store:MemoryStore')
+  Type: enum('Blurr:Store:Memory')
   Name: identifier()
 
 import_block:

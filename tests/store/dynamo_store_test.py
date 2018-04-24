@@ -14,7 +14,7 @@ import boto3
 def dynamo_store_spec() -> Dict[str, Any]:
     return {
         'Name': 'dynamostore',
-        'Type': 'Blurr:Store:DynamoStore',
+        'Type': 'Blurr:Store:Dynamo',
         'Table': '_unit_test' + '_' + str(int(time.time()))
     }
 

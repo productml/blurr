@@ -9,27 +9,28 @@ from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
+from blurr.core.type import Type
 from blurr.store.memory_store import MemoryStore
 
 
 @fixture
 def identity_aggregate_schema_spec() -> Dict[str, Any]:
     return {
-        'Type': 'Blurr:Aggregate:IdentityAggregate',
+        'Type': Type.BLURR_AGGREGATE_IDENTITY,
         'Name': 'label_aggr',
         'Store': 'memory',
         'Dimensions': [{
             'Name': 'label',
-            'Type': 'string',
+            'Type': Type.STRING,
             'Value': 'source.label'
         }],
         'Fields': [{
             'Name': 'sum',
-            'Type': 'integer',
+            'Type': Type.INTEGER,
             'Value': 'label_aggr.sum + source.event_value'
         }, {
             'Name': 'count',
-            'Type': 'integer',
+            'Type': Type.INTEGER,
             'Value': 'label_aggr.count + 1'
         }]
     }
@@ -38,25 +39,25 @@ def identity_aggregate_schema_spec() -> Dict[str, Any]:
 @fixture
 def identity_aggregate_schema_spec_with_two_key_fields() -> Dict[str, Any]:
     return {
-        'Type': 'Blurr:Aggregate:IdentityAggregate',
+        'Type': Type.BLURR_AGGREGATE_IDENTITY,
         'Name': 'label_aggr',
         'Store': 'memory',
         'Dimensions': [{
             'Name': 'label',
-            'Type': 'string',
+            'Type': Type.STRING,
             'Value': 'source.label'
         }, {
             'Name': 'label_ascii',
-            'Type': 'integer',
+            'Type': Type.INTEGER,
             'Value': 'ord(source.label)'
         }],
         'Fields': [{
             'Name': 'sum',
-            'Type': 'integer',
+            'Type': Type.INTEGER,
             'Value': 'label_aggr.sum + source.event_value'
         }, {
             'Name': 'count',
-            'Type': 'integer',
+            'Type': Type.INTEGER,
             'Value': 'label_aggr.count + 1'
         }]
     }
@@ -64,7 +65,7 @@ def identity_aggregate_schema_spec_with_two_key_fields() -> Dict[str, Any]:
 
 @fixture
 def store_spec() -> Dict[str, Any]:
-    return {'Type': 'Blurr:Store:MemoryStore', 'Name': 'memory'}
+    return {'Type': Type.BLURR_STORE_MEMORY, 'Name': 'memory'}
 
 
 @fixture
