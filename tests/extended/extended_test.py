@@ -5,8 +5,9 @@ from blurr.runner.local_runner import LocalRunner
 
 
 def test_extended_runner():
-    local_runner = LocalRunner(['tests/extended/raw.json'], 'tests/extended/stream.yml')
-    local_runner.execute()
+    local_runner = LocalRunner('tests/extended/stream.yml')
+    local_runner.execute(
+        local_runner.get_identity_records_from_json_files(['tests/extended/raw.json']))
 
     assert len(local_runner._block_data) == 5
 

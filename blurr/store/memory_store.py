@@ -1,6 +1,7 @@
 from typing import Any, Dict, List, Tuple
 
 from datetime import datetime, timezone
+
 from dateutil import parser
 
 from blurr.core.schema_loader import SchemaLoader
@@ -22,9 +23,10 @@ class MemoryStore(Store):
     def get(self, key: Key) -> Any:
         return self._cache.get(key, None)
 
-    def get_all(self, identity=None) -> Dict[Key, Any]:
-        return dict(filter(lambda x: x[0].identity == identity,
-                           list(self._cache.items()))) if identity else self._cache
+    def get_all(self, identity: str = None) -> Dict[Key, Any]:
+        return {k: v
+                for k, v in self._cache.items()
+                if k.identity == identity} if identity else self._cache.copy()
 
     def get_range(self, start: Key, end: Key = None, count: int = 0) -> List[Tuple[Key, Any]]:
         if end and count:
