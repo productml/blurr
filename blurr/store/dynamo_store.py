@@ -1,9 +1,11 @@
+from datetime import datetime
 from typing import Any, Dict, List, Tuple
 
 import boto3
 from boto3.dynamodb.conditions import Key as DynamoKey
 from dateutil import parser
 
+from blurr.core.field_complex import Map
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store import Store, Key
 
@@ -64,10 +66,16 @@ class DynamoStore(Store):
         return key.group + (key.PARTITION + key.timestamp.isoformat() if key.timestamp else '')
 
     @staticmethod
-    def clean(item: Dict[str, Any]) -> Dict[str, Any]:
+    def clean_key(item: Dict[str, Any]) -> Dict[str, Any]:
         item.pop('partition_key', None)
         item.pop('range_key', None)
         return item
+
+    def prepare_record(self, record: Dict[str, Any]) -> Tuple[Key, Any]:
+        dimensions = record['range_key'].split(Key.PARTITION)
+        key = Key(record['partition_key'], dimensions[0], None
+                  if len(dimensions) == 1 else parser.parse(dimensions[1]))
+        return key, self.clean_key(record)
 
     def get(self, key: Key) -> Any:
         item = self.table.get_item(Key={
@@ -78,7 +86,7 @@ class DynamoStore(Store):
         if not item:
             return None
 
-        return self.clean(item)
+        return self.clean_key(item)
 
     def get_range(self, start: Key, end: Key = None, count: int = 0) -> List[Tuple[Key, Any]]:
 
@@ -91,8 +99,9 @@ class DynamoStore(Store):
             dimension_key_condition = dimension_key_condition.between(
                 self.dimensions(start), self.dimensions(end))
         else:
-            dimension_key_condition = dimension_key_condition.gt(self.dimensions(start)) if count > 0 \
-                else dimension_key_condition.lt(self.dimensions(start))
+            dimension_key_condition = dimension_key_condition.gt(
+                self.dimensions(start)) if count > 0 else dimension_key_condition.lt(
+                    self.dimensions(start))
 
         response = self.table.query(
             Limit=abs(count) if count else 1000,
@@ -101,13 +110,8 @@ class DynamoStore(Store):
             ScanIndexForward=count >= 0,
         )
 
-        def prepare_record(record: Dict[str, Any]) -> Tuple[Key, Any]:
-            dimensions = record['range_key'].split(Key.PARTITION)
-            key = Key(record['partition_key'], dimensions[0], parser.parse(dimensions[1]))
-            return key, self.clean(record)
-
-        records = [prepare_record(item) for item in response['Items']] if \
-            'Items' in response else []
+        records = [self.prepare_record(item)
+                   for item in response['Items']] if 'Items' in response else []
 
         # Ignore the starting record because `between` includes the records that match the boundary condition
         if records[0][0] == start or records[0][0] == end:
@@ -117,6 +121,11 @@ class DynamoStore(Store):
             del records[-1]
 
         return records
+
+    def get_all(self, identity: str) -> Dict[Key, Any]:
+        response = self.table.query(KeyConditionExpression=DynamoKey('partition_key').eq(identity))
+        return dict([self.prepare_record(item)
+                     for item in response['Items']] if 'Items' in response else [])
 
     def save(self, key: Key, item: Any) -> None:
         item['partition_key'] = key.identity
