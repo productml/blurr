@@ -56,6 +56,43 @@ Type | The destination data store | `Blurr:Store:MemoryStore`. More Stores such 
 Name | Name of the store, used for internal referencing within the DTC | Any `string` | Required
 
 
+## Import
+
+The import section can be used to specify arbitrary python code that 
+can be used in the DTC.
+
+As shown below `Time` key is using `datetime` and `timezone` and these 
+are being specified in the import section.  
+```YAML
+Import:
+  - { Module: datetime, Identifiers: [ datetime, timezone ]}
+
+Time: datetime.fromtimestamp(source.timestamp, timezone.utc)
+```
+
+Similarly any custom python code written can be incorporated into the DTC:
+```YAML
+Import:
+  - { Module: my_module, Identifiers: [ my_function1, my_function2 ]}
+```
+After this `my_function1` and `my_function2` can be used in the DTC. This is equivalent
+to a `from my_module import my_function1, my_fuction2` python statement.
+
+
+Key |  Description | Allowed values | Required
+--- | ------------ | -------------- | --------
+Module | Python Module to import | Any module that is available to the python execution runtime | Required
+Identifiers | List of identifiers to import | The identifiers provided should be available in the module. If not identifiers are provided then the module is imported directly. | Optional
+
+Some examples and its equivalent python statement
+
+Import | Python statement
+------ | ----------------
+`Module: my_module, Identifiers: [ my_function1, my_function2 ]` | `from my_module import my_function1, my_fuction2`
+`Module: my_module` | `import my_module`
+`Module: my_module as mod_name` | `import my_module as mod_name`
+`Module: my_module, Identifiers: [ my_function1 as func1 ]` | `from my_module import my_function1 as func1`
+
 ## Aggregates
 
 Aggregates defines groups of data that are either in a one-to-one relationship with the Identity or a in a many-to-one relationship.
@@ -103,6 +140,33 @@ A `Aggregate` contains `fields` for the information being stored. IdentityAggreg
 
  All fields in the Aggregate are encapsulated in a Aggregate object. The object is available in the DTL, which is the python environment processing the DTC. Field values can be accessed using `AggregateName.FieldName`
 
+An `IdentityAggregate` can also has `Dimensions` to split the aggregation along those dimensions. `Dimensions` are also a 
+list of `Fields` with only `integer`, `boolean` and `string` types supported. Each raw event that is evaluated should
+ contain the data needed to determine all the `Dimensions` specified.
+
+Example:
+```yaml
+Aggregates:
+
+  - Type: Blurr:Aggregate:IdentityAggregate
+    Name: user
+    Store: offer_ai_dynamo
+    When: source.event_id in ['app_launched', 'user_updated']
+    
+    Dimensions:
+      - Name: level
+        Type: string
+        Value: source.level
+
+    Fields:
+
+      - Name: events
+        Type: int
+        Value: user.events + 1
+
+      - Name: country
+        Value: source.country
+```
 
 ### BlockAggregate
 
@@ -140,6 +204,10 @@ Name | Name of the field | Any `string` | Required
 Type | Type of data being stored | `integer`, `boolean`, `string`, `datetime`, `float`, `map`, `list`, `set` | Optional. If Type is not set, the DTL uses `string` as the default type
 Value | Value of the field | Any python expression, and must match the Type | Required  
 When | Boolean expression that defines which raw events to process | Any `boolean` expression | Optional
+
+### ActivityAggregate
+`Blurr:Aggregate:ActivityAggregate`.Activity Aggregate is a specialization of the Block Aggregate where the inactivity based `Split` condition is 
+specified by  `SeparateByInactiveSeconds`.
 
 ### Variable
 

@@ -6,19 +6,20 @@ Import:
  - { Module: dateutil, Identifiers: [ parser, tz]}
  - { Module: dateutil, Identifiers: [ parser ]}
  - { Module: dateutil}
-Identity: source.customer_identifier
+Identity: source.user_id
 Time: source.timestamp
 When: source.package_version == '1.0'
 Stores:
- - Type: Blurr:Store:Memory
+ - Type: Blurr:Store:MemoryStore
    Name: memory_store
 Aggregates:
- - Type: Blurr:Aggregate:Identity
+ - Type: Blurr:Aggregate:IdentityAggregate
    Name: user
    Store: offer_ai_dynamo
    Dimensions:
-     - Name: level
-       Value: source.level
+     - Name: value
+       Type: map
+       Value: source.value
    Fields:
      - Name: user_id
        Value: source.customer_identifier

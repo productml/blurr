@@ -80,7 +80,7 @@ def test_transformer_finalize(test_transformer: MockTransformer,
     store = schema_loader.get_schema_object('test.memstore')
 
     test_transformer.finalize()
-    assert store.get(Key('user1', 'test_group')) == {'_identity': '', 'events': 0}
+    assert store.get(Key('user1', 'test_group')) is None
 
     test_transformer.evaluate()
     test_transformer.finalize()
