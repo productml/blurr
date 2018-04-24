@@ -44,23 +44,20 @@ class DynamoStore(Store):
                         'KeyType': 'RANGE'
                     },
                 ],
-                AttributeDefinitions=[
-                    {
-                        'AttributeName': 'partition_key',
-                        'AttributeType': 'S'
-                    },
-                    {
-                        'AttributeName': 'range_key',
-                        'AttributeType': 'S'
-                    }
-                ],
+                AttributeDefinitions=[{
+                    'AttributeName': 'partition_key',
+                    'AttributeType': 'S'
+                }, {
+                    'AttributeName': 'range_key',
+                    'AttributeType': 'S'
+                }],
                 ProvisionedThroughput={
                     'ReadCapacityUnits': self.rcu,
                     'WriteCapacityUnits': self.wcu
-                }
-            )
+                })
             # Wait until the table creation is complete
-            self.table.meta.client.get_waiter('table_exists').wait(TableName=self.table_name, WaiterConfig={'Delay': 5})
+            self.table.meta.client.get_waiter('table_exists').wait(
+                TableName=self.table_name, WaiterConfig={'Delay': 5})
 
     @staticmethod
     def dimensions(key: Key):
@@ -91,14 +88,16 @@ class DynamoStore(Store):
         dimension_key_condition = DynamoKey('range_key')
 
         if end:
-            dimension_key_condition = dimension_key_condition.between(self.dimensions(start), self.dimensions(end))
+            dimension_key_condition = dimension_key_condition.between(
+                self.dimensions(start), self.dimensions(end))
         else:
             dimension_key_condition = dimension_key_condition.gt(self.dimensions(start)) if count > 0 \
                 else dimension_key_condition.lt(self.dimensions(start))
 
         response = self.table.query(
             Limit=abs(count) if count else 1000,
-            KeyConditionExpression=DynamoKey('partition_key').eq(start.identity) & dimension_key_condition,
+            KeyConditionExpression=DynamoKey('partition_key').eq(start.identity) &
+            dimension_key_condition,
             ScanIndexForward=count >= 0,
         )
 
