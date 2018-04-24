@@ -71,17 +71,6 @@ class DynamoStore(Store):
         item.pop('range_key', None)
         return item
 
-    #
-    # @staticmethod
-    # def clean_item(item: Any) -> Any:
-    #     for k, v in item.items():
-    #         if type(item[k]) is datetime:
-    #             item[k] = v.isoformat()
-    #         if type(item[k]) is Map:
-    #             item[k] = dict(v)
-    #
-    #     return item
-
     def prepare_record(self, record: Dict[str, Any]) -> Tuple[Key, Any]:
         dimensions = record['range_key'].split(Key.PARTITION)
         key = Key(record['partition_key'], dimensions[0], None
@@ -110,8 +99,9 @@ class DynamoStore(Store):
             dimension_key_condition = dimension_key_condition.between(
                 self.dimensions(start), self.dimensions(end))
         else:
-            dimension_key_condition = dimension_key_condition.gt(self.dimensions(start)) if count > 0 \
-                else dimension_key_condition.lt(self.dimensions(start))
+            dimension_key_condition = dimension_key_condition.gt(
+                self.dimensions(start)) if count > 0 else dimension_key_condition.lt(
+                    self.dimensions(start))
 
         response = self.table.query(
             Limit=abs(count) if count else 1000,
@@ -120,8 +110,8 @@ class DynamoStore(Store):
             ScanIndexForward=count >= 0,
         )
 
-        records = [self.prepare_record(item) for item in response['Items']] if \
-            'Items' in response else []
+        records = [self.prepare_record(item)
+                   for item in response['Items']] if 'Items' in response else []
 
         # Ignore the starting record because `between` includes the records that match the boundary condition
         if records[0][0] == start or records[0][0] == end:
