@@ -51,7 +51,8 @@ class Runner(ABC):
 
         schema_loader = SchemaLoader()
         stream_dtc_name = schema_loader.add_schema(self._stream_dtc)
-        stream_transformer_schema: StreamingTransformerSchema = schema_loader.get_schema_object(stream_dtc_name)
+        stream_transformer_schema: StreamingTransformerSchema = schema_loader.get_schema_object(
+            stream_dtc_name)
 
         # Extract out the expressions needed and store it as class members. When an object of this
         # class is being used in a execution environment like Spark the class members need to be
@@ -83,8 +84,11 @@ class Runner(ABC):
         for record in data_processor.process_data(event_str):
             try:
                 self._context.add_record(record)
-                record_list.append((self._id_expr.evaluate(self._context),
-                                    (self._time_expr.evaluate(self._context), record)))
+                id = self._id_expr.evaluate(self._context)
+                time = self._time_expr.evaluate(self._context)
+                if not id or not time or not isinstance(time, datetime):
+                    continue
+                record_list.append((id, (time, record)))
                 self._context.remove_record()
             except Exception as err:
                 logging.debug('{} in parsing Record.'.format(err))

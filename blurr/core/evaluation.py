@@ -139,7 +139,8 @@ class Expression:
                             evaluation_context.local_context)
 
             elif self.type == ExpressionType.EXEC:
-                return exec(self.code_object, evaluation_context.global_context, evaluation_context.local_context)
+                return exec(self.code_object, evaluation_context.global_context,
+                            evaluation_context.local_context)
 
         except Exception as err:
             # Evaluation exceptions are expected because of missing fields in the source 'Record'.

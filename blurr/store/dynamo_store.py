@@ -76,7 +76,7 @@ class DynamoStore(Store):
     def prepare_record(self, record: Dict[str, Any]) -> Tuple[Key, Any]:
         dimensions = record['range_key'].split(Key.PARTITION)
         key = Key(record['partition_key'], dimensions[0], None
-        if len(dimensions) == 1 else parser.parse(dimensions[1]))
+                  if len(dimensions) == 1 else parser.parse(dimensions[1]))
         return key, self.clean_for_get(record)
 
     def get(self, key: Key) -> Any:
@@ -106,12 +106,12 @@ class DynamoStore(Store):
         else:
             dimension_key_condition = dimension_key_condition.gt(
                 self.dimensions(start)) if count > 0 else dimension_key_condition.lt(
-                self.dimensions(start))
+                    self.dimensions(start))
 
         response = self.table.query(
             Limit=abs(count) if count else 1000,
             KeyConditionExpression=DynamoKey('partition_key').eq(start.identity) &
-                                   dimension_key_condition,
+            dimension_key_condition,
             ScanIndexForward=count >= 0,
         )
 
