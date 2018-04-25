@@ -52,8 +52,10 @@ class SparkRunner(Runner):
         return raw_records.flatMap(
             lambda x: self.get_per_identity_records(x, data_processor)).groupByKey().mapValues(list)
 
-    def get_record_rdd_from_rdd(
-            self, rdd: 'RDD', data_processor: DataProcessor = SimpleDictionaryDataProcessor()) -> 'RDD':
+    def get_record_rdd_from_rdd(self,
+                                rdd: 'RDD',
+                                data_processor: DataProcessor = SimpleDictionaryDataProcessor()
+                                ) -> 'RDD':
         return rdd.flatMap(
             lambda x: self.get_per_identity_records(x, data_processor)).groupByKey().mapValues(list)
 
@@ -63,7 +65,8 @@ class SparkRunner(Runner):
                           spark_session: Optional['SparkSession'] = None) -> None:
         _spark_session_ = get_spark_session(spark_session)
         if not self._window_dtc:
-            per_identity_data.map(lambda x: json.dumps(x, cls=BlurrJSONEncoder)).saveAsTextFile(path)
+            per_identity_data.map(lambda x: json.dumps(x, cls=BlurrJSONEncoder)).saveAsTextFile(
+                path)
         else:
             # Convert to a DataFrame first so that the data can be saved as a CSV
             _spark_session_.createDataFrame(per_identity_data.flatMap(lambda x: x[1])).write.csv(
