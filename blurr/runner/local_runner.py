@@ -13,7 +13,7 @@ from collections import defaultdict
 from blurr.core.record import Record
 from blurr.core.syntax.schema_validator import validate
 from blurr.runner.data_processor import DataProcessor, SimpleJsonDataProcessor
-from blurr.runner.runner import Runner
+from blurr.runner.runner import Runner, BlurrJSONEncoder
 
 
 class LocalRunner(Runner):
@@ -57,13 +57,13 @@ class LocalRunner(Runner):
 
     def print_output(self, data) -> None:
         for row in data.items():
-            print(json.dumps(row, default=str))
+            print(json.dumps(row, cls=BlurrJSONEncoder))
 
     def write_output_file(self, output_file: str, data):
         if not self._window_dtc:
             with open(output_file, 'w') as file:
                 for row in data.items():
-                    file.write(json.dumps(row, default=str))
+                    file.write(json.dumps(row, cls=BlurrJSONEncoder))
                     file.write('\n')
         else:
             header = []
