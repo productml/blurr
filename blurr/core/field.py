@@ -54,9 +54,9 @@ class FieldSchema(BaseSchema, ABC):
     def encoder(value: Any) -> Any:
         return value
 
-    @staticmethod
-    def decoder(value: Any) -> Any:
-        return value
+    # TODO: Add unit tests for the casting being done here.
+    def decoder(self, value: Any) -> Any:
+        return self.type_object(value)
 
 
 class Field(BaseItem):

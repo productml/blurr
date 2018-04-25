@@ -1,4 +1,6 @@
 from datetime import datetime
+from decimal import Decimal
+from json import JSONEncoder
 from typing import List, Optional, Tuple, Any, Union, Dict
 
 import yaml
@@ -18,10 +20,23 @@ from blurr.core.type import Type
 from blurr.runner.data_processor import DataProcessor
 
 
+class BlurrJSONEncoder(JSONEncoder):
+    def default(self, o):
+        if isinstance(o, Decimal):
+            ratio = o.as_integer_ratio()
+            if ratio[1] == 1:
+                return int(o)
+            else:
+                return float(o)
+
+        if isinstance(o, Key):
+            return str(o)
+
+        return super().default(o)
+
+
 class Runner(ABC):
     def __init__(self, stream_dtc_file: str, window_dtc_file: Optional[str]):
-        self._schema_loader = SchemaLoader()
-
         self._stream_dtc = yaml.safe_load(open(stream_dtc_file))
         self._window_dtc = None if window_dtc_file is None else yaml.safe_load(
             open(window_dtc_file))
@@ -34,9 +49,18 @@ class Runner(ABC):
         # if self._window_dtc is not None:
         #     validate(self._window_dtc)
 
-        self._stream_dtc_name = self._schema_loader.add_schema(self._stream_dtc)
-        self._stream_transformer_schema = self._schema_loader.get_schema_object(
-            self._stream_dtc_name)
+        schema_loader = SchemaLoader()
+        stream_dtc_name = schema_loader.add_schema(self._stream_dtc)
+        stream_transformer_schema: StreamingTransformerSchema = schema_loader.get_schema_object(stream_dtc_name)
+
+        # Extract out the expressions needed and store it as class members. When an object of this
+        # class is being used in a execution environment like Spark the class members need to be
+        # pickle-able. Have SchemaLoader or StreamingTransformerSchema as class members made it
+        # hard to ensure that as they can end up loading classes that cannot be pickled such as
+        # boto3.
+        self._id_expr = stream_transformer_schema.identity
+        self._time_expr = stream_transformer_schema.time
+        self._context = stream_transformer_schema.schema_context.context
 
     def execute_per_identity_records(self,
                                      identity_records: Tuple[str, List[Tuple[datetime, Record]]]
@@ -58,8 +82,10 @@ class Runner(ABC):
         record_list = []
         for record in data_processor.process_data(event_str):
             try:
-                record_list.append((self._stream_transformer_schema.get_identity(record),
-                                    (self._stream_transformer_schema.get_time(record), record)))
+                self._context.add_record(record)
+                record_list.append((self._id_expr.evaluate(self._context),
+                                    (self._time_expr.evaluate(self._context), record)))
+                self._context.remove_record()
             except Exception as err:
                 logging.debug('{} in parsing Record.'.format(err))
         return record_list

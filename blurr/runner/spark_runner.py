@@ -3,7 +3,8 @@ from typing import List, Optional
 
 from blurr.runner.data_processor import DataProcessor, SimpleJsonDataProcessor, \
     SimpleDictionaryDataProcessor
-from blurr.runner.runner import Runner
+from blurr.runner.runner import Runner, BlurrJSONEncoder
+
 _spark_import_err = None
 try:
     from pyspark import RDD, SparkContext
@@ -39,20 +40,20 @@ class SparkRunner(Runner):
             raise _spark_import_err
         super().__init__(stream_dtc_file, window_dtc_file)
 
-    def execute(self, identity_records: RDD):
+    def execute(self, identity_records: 'RDD'):
         return identity_records.flatMap(lambda x: self.execute_per_identity_records(x))
 
     def get_record_rdd_from_json_files(self,
                                        json_files: List[str],
                                        data_processor: DataProcessor = SimpleJsonDataProcessor(),
-                                       spark_session: Optional['SparkSession'] = None) -> RDD:
+                                       spark_session: Optional['SparkSession'] = None) -> 'RDD':
         spark_context = get_spark_session(spark_session).sparkContext
         raw_records = spark_context.union([spark_context.textFile(file) for file in json_files])
         return raw_records.flatMap(
             lambda x: self.get_per_identity_records(x, data_processor)).groupByKey().mapValues(list)
 
     def get_record_rdd_from_rdd(
-            self, rdd: RDD, data_processor: DataProcessor = SimpleDictionaryDataProcessor()) -> RDD:
+            self, rdd: 'RDD', data_processor: DataProcessor = SimpleDictionaryDataProcessor()) -> 'RDD':
         return rdd.flatMap(
             lambda x: self.get_per_identity_records(x, data_processor)).groupByKey().mapValues(list)
 
@@ -62,12 +63,12 @@ class SparkRunner(Runner):
                           spark_session: Optional['SparkSession'] = None) -> None:
         _spark_session_ = get_spark_session(spark_session)
         if not self._window_dtc:
-            per_identity_data.map(lambda x: json.dumps(x, default=str)).saveAsTextFile(path)
+            per_identity_data.map(lambda x: json.dumps(x, cls=BlurrJSONEncoder)).saveAsTextFile(path)
         else:
             # Convert to a DataFrame first so that the data can be saved as a CSV
             _spark_session_.createDataFrame(per_identity_data.flatMap(lambda x: x[1])).write.csv(
                 path, header=True)
 
     def print_output(self, per_identity_data) -> None:
-        for row in per_identity_data.map(lambda x: json.dumps(x, default=str)).collect():
+        for row in per_identity_data.map(lambda x: json.dumps(x, cls=BlurrJSONEncoder)).collect():
             print(row)

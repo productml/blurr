@@ -95,6 +95,9 @@ class DynamoStore(Store):
         if end and count:
             raise ValueError('Only one of `end` or `count` can be set')
 
+        if end is not None and end < start:
+            start, end = end, start
+
         dimension_key_condition = DynamoKey('range_key')
 
         if end:
@@ -114,6 +117,9 @@ class DynamoStore(Store):
 
         records = [self.prepare_record(item)
                    for item in response['Items']] if 'Items' in response else []
+
+        if not records:
+            return records
 
         # Ignore the starting record because `between` includes the records that match the boundary condition
         if records[0][0] == start or records[0][0] == end:
