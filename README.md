@@ -79,7 +79,7 @@ Version: '2018-03-01'
 Name : sessions
 
 Stores:
-   - Type: Blurr:Store:MemoryStore
+   - Type: Blurr:Store:Memory
      Name: hello_world_store
 
 Identity: source.user_id
@@ -88,7 +88,7 @@ Time: parser.parse(source.timestamp)
 
 Aggregates:
 
- - Type: Blurr:Aggregate:BlockAggregate
+ - Type: Blurr:Aggregate:Block
    Name: session_stats
    Store: hello_world_store
 

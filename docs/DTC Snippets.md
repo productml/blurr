@@ -89,9 +89,9 @@ Fields:
 
 # Data validation
 
-# Determine correctness of a BlockAggregate
+# Determine correctness of a Block Aggregate
 
-One possible way of determining the correctness of a BlockAggregate (like a user session, for example), without relying on the order of events could be done with:
+One possible way of determining the correctness of a Block Aggregate (like a user session, for example), without relying on the order of events could be done with:
 
 ```yaml
 - Name: game_start_and_end
@@ -123,7 +123,7 @@ As more events are processed the value of session_stats.valid_session will maint
 
 Some ways to validate individual events for things like missing field values, reuse fields etc are:
 
-- Create a variable (`VariableAggregate`) with the required clean up on the event field
+- Create a variable (`Variable Aggregate`) with the required clean up on the event field
 - Use `When` in `Field` for validation conditions
-- Define a `valid_event` field and use that in When. This can be go in `VariableAggregate` if we don't want to save it
+- Define a `valid_event` field and use that in When. This can be go in `Variable Aggregate` if we don't want to save it
 - If it is ok to ignore fields that have errors (e.g. missing), Blurr does not process the event and drops it as default behavior. If the source is missing event fields, the `Field evaluation` is skipped and an error is logged in debug logs.
