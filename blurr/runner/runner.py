@@ -84,6 +84,8 @@ class Runner(ABC):
         for record in data_processor.process_data(event_str):
             try:
                 self._context.add_record(record)
+                # TODO: Improve on this (perhaps use the functions defined in
+                # StreamingTransformerSchema)
                 id = self._id_expr.evaluate(self._context)
                 time = self._time_expr.evaluate(self._context)
                 if not id or not time or not isinstance(time, datetime):
