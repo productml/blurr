@@ -1,9 +1,27 @@
 from datetime import datetime
+from typing import Any
+from unittest import mock
+
+import boto3
 
 from blurr.core.store_key import Key
 from blurr.runner.local_runner import LocalRunner
 
+BOTO3_DYNAMODB_KWARGS = {
+    "endpoint_url": 'http://localhost:25877',
+    'region_name': 'us-west-2',
+    'aws_access_key_id': "anything",
+    'aws_secret_access_key': "anything"
+}
 
+
+def override_boto3_dynamodb_resource() -> Any:
+    return boto3.resource('dynamodb', **BOTO3_DYNAMODB_KWARGS)
+
+
+@mock.patch(
+    'blurr.store.dynamo_store.DynamoStore.get_dynamodb_resource',
+    new=override_boto3_dynamodb_resource)
 def test_extended_runner():
     local_runner = LocalRunner('tests/store/dynamo/stream.yml')
     local_runner.execute(

@@ -14,7 +14,7 @@ ATTRIBUTE_WRITE_CAPACITY_UNITS = 'WriteCapacityUnits'
 
 class DynamoStore(Store):
     """
-    In-memory store implementation
+    Dynamo store implementation
     """
 
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
@@ -24,8 +24,7 @@ class DynamoStore(Store):
         self.rcu = spec.get(ATTRIBUTE_READ_CAPACITY_UNITS, 5)
         self.wcu = spec.get(ATTRIBUTE_WRITE_CAPACITY_UNITS, 5)
 
-        self.dynamodb_resource = boto3.resource('dynamodb')
-
+        self.dynamodb_resource = DynamoStore.get_dynamodb_resource()
         self.table = self.dynamodb_resource.Table(self.table_name)
 
         # Test that the table exists.  Create a new one otherwise
@@ -58,6 +57,11 @@ class DynamoStore(Store):
             # Wait until the table creation is complete
             self.table.meta.client.get_waiter('table_exists').wait(
                 TableName=self.table_name, WaiterConfig={'Delay': 5})
+
+    @staticmethod
+    # This is separate out as a separate function so that this can be mocked in unit tests.
+    def get_dynamodb_resource() -> Any:
+        return boto3.resource('dynamodb')
 
     @staticmethod
     def dimensions(key: Key):

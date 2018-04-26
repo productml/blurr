@@ -1,6 +1,7 @@
 import time
 from datetime import datetime, timezone
 from typing import Dict, Any
+from unittest import mock
 
 import boto3
 from pytest import fixture
@@ -19,11 +20,30 @@ def dynamo_store_spec() -> Dict[str, Any]:
     }
 
 
+BOTO3_DYNAMODB_KWARGS = {
+    "endpoint_url": 'http://localhost:25877',
+    'region_name': 'us-west-2',
+    'aws_access_key_id': "anything",
+    'aws_secret_access_key': "anything"
+}
+
+
+def override_boto3_dynamodb_resource() -> Any:
+    return boto3.resource('dynamodb', **BOTO3_DYNAMODB_KWARGS)
+
+
+def get_boto3_dynamodb_client() -> Any:
+    return boto3.client('dynamodb', **BOTO3_DYNAMODB_KWARGS)
+
+
 @fixture
 def store(dynamo_store_spec) -> DynamoStore:
     schema_loader = SchemaLoader()
     schema_loader.add_schema(dynamo_store_spec)
-    dynamo_store = DynamoStore('dynamostore', schema_loader)
+    with mock.patch(
+            'blurr.store.dynamo_store.DynamoStore.get_dynamodb_resource',
+            new=override_boto3_dynamodb_resource):
+        dynamo_store = DynamoStore('dynamostore', schema_loader)
     yield dynamo_store
     dynamo_store.table.delete()
 
@@ -36,7 +56,10 @@ def loaded_store() -> DynamoStore:
         'Type': 'Blurr:Store:Dynamo',
         'Table': '_unit_test_range' + '_' + str(int(time.time()))
     })
-    dynamo_store = DynamoStore('dynamostore', schema_loader)
+    with mock.patch(
+            'blurr.store.dynamo_store.DynamoStore.get_dynamodb_resource',
+            new=override_boto3_dynamodb_resource):
+        dynamo_store = DynamoStore('dynamostore', schema_loader)
     dynamo_store.save(
         Key('test_user', 'test_group', datetime(2018, 1, 1, 1, 1, 1, 1, tzinfo=timezone.utc)), {
             'string_field': 'string',
@@ -92,13 +115,16 @@ def loaded_store() -> DynamoStore:
     dynamo_store.table.delete()
 
 
+@mock.patch(
+    'blurr.store.dynamo_store.DynamoStore.get_dynamodb_resource',
+    new=override_boto3_dynamodb_resource)
 def test_table_creation_if_not_exist(dynamo_store_spec):
     table_name = '_unit_test_table_creation' + '_' + str(int(time.time()))
     dynamo_store_spec['Table'] = table_name
     schema_loader = SchemaLoader()
     schema_loader.add_schema(dynamo_store_spec)
 
-    dynamodb_client = boto3.client('dynamodb')
+    dynamodb_client = get_boto3_dynamodb_client()
     # Check table does not exist
     assert table_name not in dynamodb_client.list_tables()['TableNames']
 
