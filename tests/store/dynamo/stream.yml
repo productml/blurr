@@ -1,0 +1,104 @@
+Type: Blurr:Transform:Streaming
+Version: '2018-03-01'
+Name: Sessions
+Description: Streaming Extended Test
+Import:
+  - { Module: dateutil, Identifiers: [ parser ]}
+Identity: source.user_id
+Time: parser.parse(source.time)
+Stores: 
+  -
+    Type: Blurr:Store:Dynamo
+    Name: dynamo
+    Table: _unit_test_extended
+
+Aggregates:
+  -
+    Type: Blurr:Aggregate:Variable
+    Name: vars
+    Fields:
+
+      # Checks for conditional filters
+      - { Name: is_paid, Type: boolean, Value: True, When: source.event_id == 'purchase_completed' }
+
+      # Checks for exception handling in cases where os-version is not specified
+      # Checks for using the bracket notation to access fields that do not have python valid fieldnames
+      #
+      - { Name: os-version-parts, Type: list, Value: "source['os-version'].split('-')" }
+  -
+    Type: Blurr:Aggregate:Identity
+    Name: state
+    Store: dynamo
+    Fields:
+      # Check for missing data in following events
+      - { Name: country, Type: string, Value: source.country }
+      # Check for data changes across events
+      # Uses bracket notation to access data
+      - { Name: build, Type: integer, Value: "source['build']" }
+      # Check for prior state value
+      # Checks for variable usage
+      - { Name: is_paid, Type: boolean, Value: state.is_paid or vars.is_paid }
+      # Tests accessing variables.
+      # Tests exceptional cases when variables don't exist
+      - { Name: os_name, Type: string, Value: "vars['os-version-parts'][0]" }
+      - { Name: os_version, Type: string, Value: "vars['os-version-parts'][1]" }
+      # Tests usage of max functions and conditional executions
+      - Name: max_level_completed
+        Type: integer
+        Value: max(source.level, state.max_level_completed)
+        When: source.event_id == 'game_end' and source.won
+      # Tests set addition
+      - Name: badges
+        Type: set
+        Value: state.badges.add(source.badge)
+      # Tests dictionary increment
+      - Name: offers_purchased
+        Type: map
+        Value: state.offers_purchased.increment(source.offer_key)
+        When: source.event_id == 'purchase_completed' and source.offer_key
+      # Shows how if else conditions can be used in expressions
+      # Shows how expressions that start with a quote character are to be wrapped YAML
+      - Name: signin_method
+        Type: string
+        Value: "'fb' if 'facebook.com' in source.signin_method else 'other'"
+        When: state.build > 210 and state.build < 440
+
+
+  - Type: Blurr:Aggregate:Block
+    Name: session
+    Split: (time - session._end_time).total_seconds() > 1800 or session.session_id != source.session_id
+    Store: dynamo
+    Fields:
+      - { Name: session_id, Type: string, Value: source.session_id }
+      # Tests basic aggregation
+      - { Name: events, Type: integer, Value: session.events + 1 }
+
+      # Tests a combination of when conditions
+      - Name: games_won
+        Type: integer
+        Value: session.games_won + 1
+        When: source.event_id == 'game_end' and source.won
+
+      # Tests list aggregation
+      - Name: levels_played
+        Type: list
+        Value: session.levels_played.append(source.level)
+        When: source.event_id == 'game_start'
+
+      # Tests Dictionary Aggregation
+      - Name: badges
+        Type: map
+        Value: session.badges.increment(source.badge)
+        When: source.won is True
+
+      # Tests access to time fields in a session
+      - Name: start_score
+        Type: integer
+        Value: source.score
+        When: time == session._start_time
+
+      - Name: end_score
+        Type: integer
+        Value: source.score
+        When: time == session._end_time
+

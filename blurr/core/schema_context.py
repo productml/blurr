@@ -32,8 +32,13 @@ class SchemaContext:
     def context(self) -> EvaluationContext:
         if self._context:
             return self._context
-        eval_context = EvaluationContext()
+        # The eval code adds the python global context to the global context dict being passed and
+        # new context being created is added to the local context. We take the local_context in
+        # temp_eval_context and use that as the global context for the returned EvaluationContext.
+        temp_eval_context = EvaluationContext()
         for import_statement in self.import_statements:
-            import_statement.evaluate(eval_context)
+            import_statement.evaluate(temp_eval_context)
+
+        eval_context = EvaluationContext(global_context=temp_eval_context.local_context)
 
         return eval_context

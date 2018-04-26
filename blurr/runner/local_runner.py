@@ -5,25 +5,21 @@ Usage:
 """
 import csv
 import json
-from typing import List, Optional, Any
+from datetime import datetime
+from typing import List, Optional, Any, Dict, Tuple
 
 from collections import defaultdict
 
 from blurr.core.record import Record
 from blurr.core.syntax.schema_validator import validate
 from blurr.runner.data_processor import DataProcessor, SimpleJsonDataProcessor
-from blurr.runner.runner import Runner
+from blurr.runner.runner import Runner, BlurrJSONEncoder
 
 
 class LocalRunner(Runner):
-    def __init__(self,
-                 local_json_files: List[str],
-                 stream_dtc_file: str,
-                 window_dtc_file: Optional[str] = None,
-                 data_processor: DataProcessor = SimpleJsonDataProcessor()):
-        super().__init__(local_json_files, stream_dtc_file, window_dtc_file, data_processor)
+    def __init__(self, stream_dtc_file: str, window_dtc_file: Optional[str] = None):
+        super().__init__(stream_dtc_file, window_dtc_file)
 
-        self._identity_records = defaultdict(list)
         self._block_data = {}
         self._window_data = defaultdict(list)
 
@@ -32,36 +28,42 @@ class LocalRunner(Runner):
         if self._window_dtc is not None:
             validate(self._window_dtc)
 
-    def _consume_file(self, file: str) -> None:
-        with open(file) as f:
-            for data_str in f:
-                for identity, time_record in self.get_per_identity_records(data_str):
-                    self._identity_records[identity].append(time_record)
-
-    def execute_for_all_identities(self) -> None:
-        for identity_records in self._identity_records.items():
-            data = self.execute_per_identity_records(identity_records)
+    def _execute_for_all_identities(
+            self, identity_records: Dict[str, List[Tuple[datetime, Record]]]) -> None:
+        for per_identity_records in identity_records.items():
+            data = self.execute_per_identity_records(per_identity_records)
             if self._window_dtc:
                 self._window_data.update(data)
             else:
                 self._block_data.update(data)
 
-    def execute(self) -> Any:
-        for file in self._raw_files:
-            self._consume_file(file)
+    def get_identity_records_from_json_files(
+            self,
+            local_json_files: List[str],
+            data_processor: DataProcessor = SimpleJsonDataProcessor()
+    ) -> Dict[str, List[Tuple[datetime, Record]]]:
+        identity_records = defaultdict(list)
+        for file in local_json_files:
+            with open(file) as f:
+                for data_str in f:
+                    for identity, time_record in self.get_per_identity_records(
+                            data_str, data_processor):
+                        identity_records[identity].append(time_record)
+        return identity_records
 
-        self.execute_for_all_identities()
+    def execute(self, identity_records: Dict[str, List[Tuple[datetime, Record]]]) -> Any:
+        self._execute_for_all_identities(identity_records)
         return self._window_data if self._window_dtc else self._block_data
 
     def print_output(self, data) -> None:
         for row in data.items():
-            print(json.dumps(row, default=str))
+            print(json.dumps(row, cls=BlurrJSONEncoder))
 
     def write_output_file(self, output_file: str, data):
         if not self._window_dtc:
             with open(output_file, 'w') as file:
                 for row in data.items():
-                    file.write(json.dumps(row, default=str))
+                    file.write(json.dumps(row, cls=BlurrJSONEncoder))
                     file.write('\n')
         else:
             header = []

@@ -54,9 +54,9 @@ class FieldSchema(BaseSchema, ABC):
     def encoder(value: Any) -> Any:
         return value
 
-    @staticmethod
-    def decoder(value: Any) -> Any:
-        return value
+    # TODO: Add unit tests for the casting being done here.
+    def decoder(self, value: Any) -> Any:
+        return self.type_object(value)
 
 
 class Field(BaseItem):
@@ -134,7 +134,7 @@ class ComplexTypeBase(ABC):
         attribute = super().__getattribute__(item)
 
         # Return the attribute as-is when it is NOT a function
-        if not callable(attribute):
+        if not callable(attribute) or (item.startswith('__') and item.endswith('__')):
             return attribute
 
         # Wrap the attribute in a function that changes its return value

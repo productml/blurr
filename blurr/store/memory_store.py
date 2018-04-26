@@ -2,6 +2,8 @@ from typing import Any, Dict, List, Tuple
 
 from datetime import datetime, timezone
 
+from dateutil import parser
+
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store import Store, Key
 
@@ -21,8 +23,10 @@ class MemoryStore(Store):
     def get(self, key: Key) -> Any:
         return self._cache.get(key, None)
 
-    def get_all(self) -> Dict[Key, Any]:
-        return self._cache
+    def get_all(self, identity: str = None) -> Dict[Key, Any]:
+        return {k: v
+                for k, v in self._cache.items()
+                if k.identity == identity} if identity else self._cache.copy()
 
     def get_range(self, start: Key, end: Key = None, count: int = 0) -> List[Tuple[Key, Any]]:
         if end and count:
@@ -39,7 +43,7 @@ class MemoryStore(Store):
                 if start < key < end:
                     items_in_range.append((key, item))
                 elif key.timestamp is None:
-                    item_ts = item.get('_start_time', datetime.min)
+                    item_ts = parser.parse(item.get('_start_time', datetime.min.isoformat()))
                     item_ts = item_ts if item_ts.tzinfo else item_ts.replace(tzinfo=timezone.utc)
                     if start.timestamp < item_ts < end.timestamp:
                         items_in_range.append((key, item))

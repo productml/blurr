@@ -74,8 +74,8 @@ def test_window_transformer_schema_init(schema_loader, stream_schema_spec, windo
 def test_evaluate_prepare_window_error(window_transformer, block_aggregate):
     block_aggregate.restore({
         'events': 3,
-        '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc),
-        '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc)
+        '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc).isoformat(),
+        '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc).isoformat()
     })
     with pytest.raises(
             PrepareWindowMissingBlocksError,
@@ -87,8 +87,8 @@ def test_evaluate_prepare_window(schema_loader, window_transformer, block_aggreg
     init_memory_store(schema_loader.get_schema_object('Sessions.memory'))
     block_aggregate.restore({
         'events': 3,
-        '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc),
-        '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc)
+        '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc).isoformat(),
+        '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc).isoformat()
     })
     assert window_transformer.evaluate(block_aggregate) is True
 
@@ -97,8 +97,8 @@ def test_evaluate_false(schema_loader, window_transformer, block_aggregate):
     init_memory_store(schema_loader.get_schema_object('Sessions.memory'))
     block_aggregate.restore({
         'events': 0,
-        '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc),
-        '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc)
+        '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc).isoformat(),
+        '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc).isoformat()
     })
     assert window_transformer.evaluate(block_aggregate) is False
 
@@ -114,8 +114,8 @@ def test_window_transformer(schema_loader, window_transformer, block_aggregate):
 
     block_aggregate.restore({
         'events': 3,
-        '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc),
-        '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc)
+        '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc).isoformat(),
+        '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc).isoformat()
     })
 
     assert window_transformer.evaluate(block_aggregate) is True
@@ -138,8 +138,8 @@ def test_window_transformer_internal_reset(schema_loader, window_transformer, bl
 
     block_aggregate.restore({
         'events': 3,
-        '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc),
-        '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc)
+        '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc).isoformat(),
+        '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc).isoformat()
     })
 
     assert window_transformer.evaluate(block_aggregate) is True
