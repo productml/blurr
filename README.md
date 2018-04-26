@@ -1,4 +1,4 @@
-![Blurr](logo.png)
+![Blurr](docs/images/logo.png)
 
 [![CircleCI](https://circleci.com/gh/productml/blurr/tree/master.svg?style=svg)](https://circleci.com/gh/productml/blurr/tree/master)
 [![Documentation Status](https://readthedocs.org/projects/productml-blurr/badge/?version=latest)](http://productml-blurr.readthedocs.io/en/latest/?badge=latest)
@@ -14,7 +14,7 @@ The DTC is a __data transform definition__ for structured data. The DTC encapsul
 
 ![Blurr Training](docs/images/blurr-in-training.png)
 
-This looks like any other ETL pipeline. At this point, Blurr doesn't do anything special that you cannot do with Spark, for instance. Blurr shines when an offline model pipeline needs to be turned into an online scoring pipeline. 
+This looks like any other ETL pipeline. At this point, Blurr doesn't do anything special that you cannot do with Spark, for instance. Blurr shines when an offline model pipeline needs to be turned into an online scoring pipeline.
 
 ![Blurr Production](docs/images/blurr-in-prod.png)
 
@@ -22,7 +22,7 @@ This looks like any other ETL pipeline. At this point, Blurr doesn't do anything
 
 Blurr is a collection of components built for MLOps, the Blurr Core library is one of them. **Blurr Core ⊆ Blurr**
 
->We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer. The lines are blurred (*cough*). Just like development and operations became DevOps over time   -- Blurr authors
+>We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer. The lines are blurred (*cough*). Just like development and operations became DevOps over time
 
 We see a future where MLOps means teams putting together various technologies to suit their needs. For production ML applications, the __speed of experimentation__ and __iterations__ is the difference between success and failure. The __DTC helps teams iterate on features faster__. The vision for Blurr is to build MLOps components to help ML teams experiment at high speed.
 
@@ -34,9 +34,7 @@ We see a future where MLOps means teams putting together various technologies to
 - [Data Science 'Joel Test'](#data-science-joel-test)
 - [Roadmap](#roadmap)
 
->Coming up with features is difficult, time-consuming, requires expert knowledge. 'Applied machine learning' is basically feature engineering
-
->--- Andrew Ng
+>Coming up with features is difficult, time-consuming, requires expert knowledge. 'Applied machine learning' is basically feature engineering --- Andrew Ng
 
 # Tutorial and Docs
 
@@ -91,6 +89,6 @@ Blurr is currently in Developer Preview. __Stay in touch!__: Star this project o
 - ~~Local transformations only~~
 - ~~Support for custom functions and other python libraries in the DTC~~
 - ~~Spark runner~~
-- ~~S3 support for data sink~~
+- S3 support for data sink
 - DynamoDB as an Intermediate Store
 - Features server
