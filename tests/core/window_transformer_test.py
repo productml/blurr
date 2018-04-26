@@ -33,7 +33,7 @@ def schema_loader():
 
 @fixture
 def stream_transformer(schema_loader, stream_schema_spec):
-    stream_dtc_name = schema_loader.add_schema(stream_schema_spec)
+    stream_dtc_name = schema_loader.add_schema_spec(stream_schema_spec)
     stream_transformer = StreamingTransformer(
         schema_loader.get_schema_object(stream_dtc_name), 'user1')
     stream_transformer.restore({Key('user1', 'state'): {'country': 'US'}})
@@ -42,7 +42,7 @@ def stream_transformer(schema_loader, stream_schema_spec):
 
 @fixture
 def window_transformer(schema_loader, stream_transformer, window_schema_spec):
-    window_dtc_name = schema_loader.add_schema(window_schema_spec)
+    window_dtc_name = schema_loader.add_schema_spec(window_schema_spec)
     return WindowTransformer(
         schema_loader.get_schema_object(window_dtc_name), 'user1',
         Context({
@@ -61,8 +61,8 @@ def block_aggregate(stream_transformer):
 
 
 def test_window_transformer_schema_init(schema_loader, stream_schema_spec, window_schema_spec):
-    schema_loader.add_schema(stream_schema_spec)
-    window_dtc_name = schema_loader.add_schema(window_schema_spec)
+    schema_loader.add_schema_spec(stream_schema_spec)
+    window_dtc_name = schema_loader.add_schema_spec(window_schema_spec)
     window_transformer_schema = WindowTransformerSchema(window_dtc_name, schema_loader)
     anchor_spec = schema_loader.get_schema_spec('ProductMLExample.anchor')
     assert anchor_spec == window_schema_spec['Anchor']

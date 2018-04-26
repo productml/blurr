@@ -7,7 +7,7 @@ from blurr.core.base import BaseSchema, BaseItem
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.type import Type
-from tests.core.base_schema_test import TestSchema
+from tests.core.base_schema_test import MockSchema
 
 
 @fixture
@@ -40,8 +40,8 @@ class TestItem(BaseItem):
 
 def get_test_item(schema_spec: Dict[str, Any]) -> TestItem:
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(schema_spec)
-    schema = TestSchema(name, schema_loader)
+    name = schema_loader.add_schema_spec(schema_spec)
+    schema = MockSchema(name, schema_loader)
     return TestItem(schema, EvaluationContext())
 
 

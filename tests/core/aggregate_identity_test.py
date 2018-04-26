@@ -107,8 +107,8 @@ def records() -> List[Record]:
 def identity_aggregate_schema(identity_aggregate_schema_spec: Dict[str, Any],
                               store_spec: Dict[str, Any]) -> IdentityAggregateSchema:
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(identity_aggregate_schema_spec)
-    schema_loader.add_schema(store_spec, name)
+    name = schema_loader.add_schema_spec(identity_aggregate_schema_spec)
+    schema_loader.add_schema_spec(store_spec, name)
     return IdentityAggregateSchema(name, schema_loader)
 
 

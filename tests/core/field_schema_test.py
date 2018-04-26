@@ -28,7 +28,7 @@ class MockFieldSchema(FieldSchema):
 
 def get_mock_field_schema(schema_spec: Dict[str, Any]) -> MockFieldSchema:
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(schema_spec)
+    name = schema_loader.add_schema_spec(schema_spec)
     return MockFieldSchema(name, schema_loader)
 
 

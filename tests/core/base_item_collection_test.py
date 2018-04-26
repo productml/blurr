@@ -78,7 +78,7 @@ class MockBaseSchemaCollection(BaseSchemaCollection):
 @fixture
 def schema_collection(collection_schema_spec: Dict[str, Any]) -> MockBaseSchemaCollection:
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(collection_schema_spec)
+    name = schema_loader.add_schema_spec(collection_schema_spec)
     return MockBaseSchemaCollection(name, schema_loader, AggregateSchema.ATTRIBUTE_FIELDS)
 
 
@@ -90,7 +90,7 @@ def item_collection(schema_collection: MockBaseSchemaCollection) -> MockBaseItem
 def test_evaluate_needs_evaluation_false(collection_schema_spec: Dict[str, Any]) -> None:
     schema_loader = SchemaLoader()
     collection_schema_spec['When'] = 'False'
-    name = schema_loader.add_schema(collection_schema_spec)
+    name = schema_loader.add_schema_spec(collection_schema_spec)
     schema_collection = MockBaseSchemaCollection(name, schema_loader,
                                                  AggregateSchema.ATTRIBUTE_FIELDS)
     item_collection = MockBaseItemCollection(schema_collection, EvaluationContext())
@@ -114,7 +114,7 @@ def test_evaluate_needs_evaluation_error_does_not_evaluate(
         collection_schema_spec: Dict[str, Any]) -> None:
     schema_loader = SchemaLoader()
     collection_schema_spec['When'] = '1/0'
-    name = schema_loader.add_schema(collection_schema_spec)
+    name = schema_loader.add_schema_spec(collection_schema_spec)
     schema_collection = MockBaseSchemaCollection(name, schema_loader,
                                                  AggregateSchema.ATTRIBUTE_FIELDS)
     item_collection = MockBaseItemCollection(schema_collection, EvaluationContext())
@@ -140,7 +140,7 @@ def test_snapshot_valid(item_collection: MockBaseItemCollection) -> None:
 def test_snapshot_invalid(collection_schema_spec: Dict[str, Any],
                           mock_nested_items: contextmanager) -> None:
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(collection_schema_spec)
+    name = schema_loader.add_schema_spec(collection_schema_spec)
     schema_collection = MockBaseSchemaCollection(name, schema_loader,
                                                  AggregateSchema.ATTRIBUTE_FIELDS)
 
@@ -165,7 +165,7 @@ def test_restore_invalid_snapshot_field(item_collection: MockBaseItemCollection)
 def test_restore_invalid_snapshot_dict(collection_schema_spec: Dict[str, Any],
                                        mock_nested_items: contextmanager) -> None:
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(collection_schema_spec)
+    name = schema_loader.add_schema_spec(collection_schema_spec)
     schema_collection = MockBaseSchemaCollection(name, schema_loader,
                                                  AggregateSchema.ATTRIBUTE_FIELDS)
 
@@ -179,7 +179,7 @@ def test_restore_invalid_snapshot_dict(collection_schema_spec: Dict[str, Any],
 
 def test_get_attribute(collection_schema_spec: Dict[str, Any]) -> None:
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(collection_schema_spec)
+    name = schema_loader.add_schema_spec(collection_schema_spec)
     schema_collection = MockBaseSchemaCollection(name, schema_loader,
                                                  AggregateSchema.ATTRIBUTE_FIELDS)
     item_collection = MockBaseItemCollection(schema_collection, EvaluationContext())
@@ -192,7 +192,7 @@ def test_get_attribute(collection_schema_spec: Dict[str, Any]) -> None:
 def test_get_attribute_invalid(collection_schema_spec: Dict[str, Any],
                                mock_nested_items: contextmanager) -> None:
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(collection_schema_spec)
+    name = schema_loader.add_schema_spec(collection_schema_spec)
     schema_collection = MockBaseSchemaCollection(name, schema_loader,
                                                  AggregateSchema.ATTRIBUTE_FIELDS)
 

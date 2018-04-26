@@ -40,8 +40,8 @@ def store_spec() -> Dict[str, Any]:
 def activity_aggregate_schema(activity_aggregate_schema_spec: Dict[str, Any],
                               store_spec: Dict[str, Any]) -> ActivityAggregateSchema:
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(activity_aggregate_schema_spec)
-    schema_loader.add_schema(store_spec, name)
+    name = schema_loader.add_schema_spec(activity_aggregate_schema_spec)
+    schema_loader.add_schema_spec(store_spec, name)
     return ActivityAggregateSchema(name, schema_loader)
 
 

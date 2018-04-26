@@ -1,7 +1,7 @@
 from typing import Dict
 
 import pytest
-from pytest import fixture
+from pytest import fixture, raises
 
 from blurr.core.type import Type
 from blurr.core.errors import InvalidSchemaError
@@ -59,53 +59,30 @@ def nested_schema_spec() -> Dict:
 @fixture
 def schema_loader(nested_schema_spec) -> SchemaLoader:
     schema_loader = SchemaLoader()
-    schema_loader.add_schema(nested_schema_spec)
+    schema_loader.add_schema_spec(nested_schema_spec)
     return schema_loader
 
 
 def test_add_invalid_schema() -> None:
     schema_loader = SchemaLoader()
 
-    assert schema_loader.add_schema('') is None
-    assert schema_loader.add_schema(['test']) is None
-    assert schema_loader.add_schema({'test': 1}) is None
+    assert schema_loader.add_schema_spec('') is None
+    assert schema_loader.add_schema_spec(['test']) is None
+    assert schema_loader.add_schema_spec({'test': 1}) is None
 
 
 def test_add_valid_simple_schema() -> None:
     schema_loader = SchemaLoader()
 
-    assert schema_loader.add_schema({'Name': 'test'}) == 'test'
-    assert schema_loader.get_schema_spec('test') == {'Name': 'test'}
+    assert schema_loader.add_schema_spec({'Name': 'test', 'Type': 'test_type'}) == 'test'
+    assert schema_loader.get_schema_spec('test') == {'Name': 'test', 'Type': 'test_type'}
 
 
 def test_add_valid_simple_schema_with_parent() -> None:
     schema_loader = SchemaLoader()
 
-    assert schema_loader.add_schema({'Name': 'test'}, 'parent') == 'test'
-    assert schema_loader.get_schema_spec('parent.test') == {'Name': 'test'}
-
-
-def test_add_valid_nested_schema(nested_schema_spec_bad_type: Dict) -> None:
-    schema_loader = SchemaLoader()
-
-    assert schema_loader.add_schema(nested_schema_spec_bad_type) == 'test'
-    assert schema_loader.get_schema_spec('test.test_group') == nested_schema_spec_bad_type[
-        'Aggregates'][0]
-    assert schema_loader.get_schema_spec('test.test_group.country') == nested_schema_spec_bad_type[
-        'Aggregates'][0]['Fields'][0]
-    assert schema_loader.get_schema_spec('test.test_group.events') == nested_schema_spec_bad_type[
-        'Aggregates'][0]['Fields'][1]
-
-
-def test_get_schema_object_error(nested_schema_spec_bad_type: Dict) -> None:
-    schema_loader = SchemaLoader()
-    schema_loader.add_schema(nested_schema_spec_bad_type)
-
-    with pytest.raises(InvalidSchemaError, match='Unknown schema type Blurr:Unknown'):
-        schema_loader.get_schema_object('test')
-
-    with pytest.raises(InvalidSchemaError, match='Type not defined in schema'):
-        schema_loader.get_schema_object('test.test_group')
+    assert schema_loader.add_schema_spec({'Name': 'test', 'Type': 'test_type'}, 'parent') == 'test'
+    assert schema_loader.get_schema_spec('parent.test') == {'Name': 'test', 'Type': 'test_type'}
 
 
 def test_get_schema_object(schema_loader: SchemaLoader) -> None:

@@ -22,7 +22,7 @@ def dynamo_store_spec() -> Dict[str, Any]:
 @fixture
 def store(dynamo_store_spec) -> DynamoStore:
     schema_loader = SchemaLoader()
-    schema_loader.add_schema(dynamo_store_spec)
+    schema_loader.add_schema_spec(dynamo_store_spec)
     dynamo_store = DynamoStore('dynamostore', schema_loader)
     yield dynamo_store
     dynamo_store.table.delete()
@@ -31,7 +31,7 @@ def store(dynamo_store_spec) -> DynamoStore:
 @fixture(scope='session')
 def loaded_store() -> DynamoStore:
     schema_loader = SchemaLoader()
-    schema_loader.add_schema({
+    schema_loader.add_schema_spec({
         'Name': 'dynamostore',
         'Type': 'Blurr:Store:Dynamo',
         'Table': '_unit_test_range' + '_' + str(int(time.time()))
@@ -96,7 +96,7 @@ def test_table_creation_if_not_exist(dynamo_store_spec):
     table_name = '_unit_test_table_creation' + '_' + str(int(time.time()))
     dynamo_store_spec['Table'] = table_name
     schema_loader = SchemaLoader()
-    schema_loader.add_schema(dynamo_store_spec)
+    schema_loader.add_schema_spec(dynamo_store_spec)
 
     dynamodb_client = boto3.client('dynamodb')
     # Check table does not exist

@@ -34,7 +34,7 @@ class Runner(ABC):
         # if self._window_dtc is not None:
         #     validate(self._window_dtc)
 
-        self._stream_dtc_name = self._schema_loader.add_schema(self._stream_dtc)
+        self._stream_dtc_name = self._schema_loader.add_schema_spec(self._stream_dtc)
         self._stream_transformer_schema = self._schema_loader.get_schema_object(
             self._stream_dtc_name)
 
@@ -69,7 +69,7 @@ class Runner(ABC):
         if self._stream_dtc is None:
             return {}
 
-        stream_dtc_name = schema_loader.add_schema(self._stream_dtc)
+        stream_dtc_name = schema_loader.add_schema_spec(self._stream_dtc)
         stream_transformer_schema = schema_loader.get_schema_object(stream_dtc_name)
 
         stream_transformer = StreamingTransformer(stream_transformer_schema, identity)
@@ -106,7 +106,7 @@ class Runner(ABC):
 
         window_data = []
 
-        window_dtc_name = schema_loader.add_schema(self._window_dtc)
+        window_dtc_name = schema_loader.add_schema_spec(self._window_dtc)
         window_transformer_schema = schema_loader.get_schema_object(window_dtc_name)
         window_transformer = WindowTransformer(window_transformer_schema, identity, exec_context)
 

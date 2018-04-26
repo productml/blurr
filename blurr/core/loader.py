@@ -68,7 +68,7 @@ class TypeLoader:
             type_name_enum = Type(type_name)
             return TypeLoader.import_class_by_full_name(type_map[type_name_enum])
         except (KeyError, ValueError):
-            raise InvalidSchemaError('Unknown schema type {}'.format(type_name))
+            raise InvalidSchemaError('Type `{}` not found.'.format(type_name))
 
     @staticmethod
     def import_class_by_full_name(name):
