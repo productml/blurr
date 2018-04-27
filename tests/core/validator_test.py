@@ -3,10 +3,10 @@ from typing import Dict, Any
 import yaml
 from pytest import raises, fixture
 
-from blurr.core.errors import InvalidSchemaError, RequiredAttributeError, InvalidIdentifierError
+from blurr.core.errors import InvalidSchemaError, RequiredAttributeError, InvalidIdentifierError, EmptyAttributeError
 from blurr.core.validator import validate_schema_basics, validate_required, validate_identifier
 from os import linesep
-
+from collections import Counter
 
 @fixture(scope='session')
 def invalid_spec() -> Dict[str, Any]:
@@ -93,17 +93,21 @@ def test_validate_schema_basics_empty_attributes_raises_exception():
         ''')
 
     error = validate_schema_basics('test', spec)
+    assert isinstance(error, InvalidSchemaError)
+    assert len(error.errors) == 5
 
-
-    with raises(
-            InvalidSchemaError,
-            match='`Name:`, `Type:` in section `test` cannot have an empty value.'):
-        validate_schema_basics('test', spec)
+    error_counts = Counter(list(map(lambda x: type(x), error.errors)))
+    assert error_counts[EmptyAttributeError] == 2
+    assert error_counts[RequiredAttributeError] == 2
+    assert error_counts[InvalidIdentifierError] == 1
 
 
 def test_validate_schema_basics_missing_name_type_raises_exception(invalid_spec):
-    with raises(InvalidSchemaError, match='`Name:`, `Type:` missing in section `test`'):
-        validate_schema_basics('test', invalid_spec)
+    error = validate_schema_basics('test', invalid_spec)
+    assert isinstance(error, InvalidSchemaError)
+    assert len(error.errors) == 2
+    assert isinstance(error.errors[0], RequiredAttributeError)
+    assert isinstance(error.errors[1], RequiredAttributeError)
 
 
 def test_validate_schema_basics_invalid_name_raises_exception():
@@ -111,8 +115,8 @@ def test_validate_schema_basics_invalid_name_raises_exception():
         Name: _some /,
         Type: 'integer'
         ''')
-    with raises(
-            InvalidSchemaError,
-            match='`Name: _some /,` in section `test` is invalid. `Name` must '
-                  'not start with `_` and must be a python valid variable name.'):
-        validate_schema_basics('test', spec)
+
+    error = validate_schema_basics('test', spec)
+    assert isinstance(error, InvalidSchemaError)
+    assert len(error.errors) == 1
+    assert isinstance(error.errors[0], InvalidIdentifierError)

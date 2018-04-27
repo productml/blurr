@@ -42,9 +42,12 @@ def validate_schema_basics(fully_qualified_name: str,
         if not value:
             errors.append(EmptyAttributeError(fully_qualified_name, spec, attribute))
 
-    errors.append(validate_required(fully_qualified_name, spec, ATTRIBUTE_NAME, ATTRIBUTE_TYPE))
-    errors.append(validate_identifier(fully_qualified_name, spec, ATTRIBUTE_NAME))
+    required_errors = validate_required(fully_qualified_name, spec, ATTRIBUTE_NAME, ATTRIBUTE_TYPE)
+    if required_errors:
+        errors = errors + required_errors.errors
 
-    errors = filter(None, errors)
+    identifier_error = validate_identifier(fully_qualified_name, spec, ATTRIBUTE_NAME)
+    if identifier_error:
+        errors.append(identifier_error)
 
-    return errors if errors else None
+    return InvalidSchemaError(fully_qualified_name, spec, errors) if errors else None
