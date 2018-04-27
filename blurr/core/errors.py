@@ -6,6 +6,9 @@ from os import linesep
 from typing import List, Dict, Any, Union
 
 
+class GenericSchemaError(Exception):
+    pass
+
 class InvalidSchemaError(Exception, ABC):
     """
     Indicates an error in the schema specification

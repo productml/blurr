@@ -1,15 +1,15 @@
+import os
+import re
 import traceback
 from typing import Dict
 
-import os
-import re
 from yamale import yamale
 from yamale.schema import Data
 from yamale.validators import DefaultValidators, Validator
 from yamale.validators.constraints import Constraint
 
+from blurr.core.errors import GenericSchemaError
 from blurr.core.type import Type
-from blurr.core.errors import InvalidSchemaError
 
 IDENTITY_VALIDATOR_REGEX = re.compile(r'^_|[^\S]')
 
@@ -106,14 +106,14 @@ def _validate_window(dtc_dict: Dict, name: str) -> None:
     try:
         WINDOW_SCHEMA.validate(Data(dtc_dict, name))
     except ValueError as e:
-        raise InvalidSchemaError(str(e))
+        raise GenericSchemaError(str(e))
 
 
 def _validate_streaming(dtc_dict: Dict, name: str) -> None:
     try:
         STREAMING_SCHEMA.validate(Data(dtc_dict, name))
     except ValueError as e:
-        raise InvalidSchemaError(str(e))
+        raise GenericSchemaError(str(e))
 
 
 def is_window_dtc(dtc_dict: Dict) -> bool:
@@ -130,5 +130,5 @@ def validate(dtc_dict: Dict, name='dtc') -> None:
     elif is_streaming_dtc(dtc_dict):
         _validate_streaming(dtc_dict, name)
     else:
-        raise InvalidSchemaError('Document has an invalid DTC \'Type\' {}.'.format(
+        raise GenericSchemaError('Document has an invalid DTC \'Type\' {}.'.format(
             dtc_dict.get('Type', '')))

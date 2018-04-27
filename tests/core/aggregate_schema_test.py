@@ -1,13 +1,12 @@
 from typing import Dict, Any
 
 import pytest
-from pytest import fixture, raises
+from pytest import fixture
 
 from blurr.core.aggregate import AggregateSchema
-from blurr.core.type import Type
-from blurr.core.errors import InvalidSchemaError
+from blurr.core.errors import RequiredAttributeError, GenericSchemaError
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.validator import ATTRIBUTE_NAME
+from blurr.core.type import Type
 
 
 @fixture
@@ -45,7 +44,7 @@ def test_aggregate_schema_initialization_with_store(aggregate_schema_spec, store
     aggregate_schema_spec['Store'] = 'memory'
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema_spec(aggregate_schema_spec)
-    with pytest.raises(InvalidSchemaError, match="user.memory not declared in schema"):
+    with pytest.raises(GenericSchemaError, match="user.memory not declared in schema"):
         MockAggregateSchema(name, schema_loader)
 
     schema_loader.add_schema_spec(store_spec, 'user')
@@ -66,10 +65,8 @@ def test_aggregate_schema_missing_fields_attribute_raises_error(aggregate_schema
 
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema_spec(aggregate_schema_spec)
-
-    with raises(
-            InvalidSchemaError,
-            match='`{field}:` missing in section `{name}`'.format(
-                field=AggregateSchema.ATTRIBUTE_FIELDS,
-                name=aggregate_schema_spec[ATTRIBUTE_NAME])):
-        MockAggregateSchema(name, schema_loader)
+    schema = MockAggregateSchema(name, schema_loader)
+    assert len(schema._errors.errors) == 1
+    error = schema._errors.errors[0]
+    assert isinstance(error, RequiredAttributeError)
+    assert error.attribute == AggregateSchema.ATTRIBUTE_FIELDS

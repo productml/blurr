@@ -1,7 +1,7 @@
 import yaml
 from pytest import raises, mark
 
-from blurr.core.errors import InvalidSchemaError
+from blurr.core.errors import GenericSchemaError
 from blurr.core.syntax.schema_validator import validate, Identifier, Expression
 
 
@@ -47,7 +47,7 @@ def load_example(file):
 
 
 def test_validation_errors_contain_dtc_name_and_schema_location():
-    with raises(InvalidSchemaError, match='Error validating data dtc_name with schema'):
+    with raises(GenericSchemaError, match='Error validating data dtc_name with schema'):
         dtc_dict = load_example('invalid_wrong_version.yml')
         validate(dtc_dict, 'dtc_name')
 
@@ -76,5 +76,5 @@ def test_valid_basic_window_dtc():
     ('invalid_dimension_type.yml', 'Type: \'map\' is not a Valid LabelField Type.'),
 ])
 def test_invalid_schema(test_file: str, err_string: str) -> None:
-    with raises(InvalidSchemaError, match=err_string):
+    with raises(GenericSchemaError, match=err_string):
         validate(load_example(test_file))

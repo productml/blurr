@@ -1,15 +1,15 @@
+from datetime import datetime
 from typing import Dict, Any
 
 import pytest
-from datetime import datetime
 from pytest import fixture
 
-from blurr.core.type import Type
 from blurr.core.errors import IdentityError, TimeError
 from blurr.core.evaluation import Context
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.transformer_streaming import StreamingTransformerSchema, StreamingTransformer
+from blurr.core.type import Type
 
 
 @fixture

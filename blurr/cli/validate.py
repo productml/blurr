@@ -1,9 +1,10 @@
+import sys
 from typing import List
 
-import sys
 import yaml
 
 from blurr.cli.util import get_yml_files, eprint
+from blurr.core import logging
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.syntax.schema_validator import validate
 

@@ -5,11 +5,11 @@ import pytest
 from pytest import raises, fixture
 
 from blurr.core.base import Expression
-from blurr.core.type import Type
 from blurr.core.errors import InvalidExpressionError, MissingAttributeError
 from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.transformer_streaming import StreamingTransformer
+from blurr.core.type import Type
 
 
 @fixture

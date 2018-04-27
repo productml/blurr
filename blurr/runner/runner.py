@@ -1,10 +1,10 @@
+from abc import ABC, abstractmethod
 from datetime import datetime
 from decimal import Decimal
 from json import JSONEncoder
 from typing import List, Optional, Tuple, Any, Union, Dict
 
 import yaml
-from abc import ABC, abstractmethod
 
 from blurr.core import logging
 from blurr.core.aggregate_block import BlockAggregate

@@ -1,4 +1,3 @@
-import logging
 from typing import List
 
 from blurr.cli.cli import cli
@@ -46,6 +45,6 @@ def test_invalid_dtc(capsys):
     code = run_command(['invalid_wrong_version.yml'])
     out, err = capsys.readouterr()
     assert code == 1
-    assert 'Error validating data dtc with schema' in err
-    assert 'Version: \'2088-03-01\' not in (\'2018-03-01\',)' in err
+    assert 'There was an error parsing the document' in err
+    #assert 'Version: \'2088-03-01\' not in (\'2018-03-01\',)' in err
     assert get_running_validation_str('invalid_wrong_version.yml') in out

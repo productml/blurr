@@ -2,12 +2,12 @@ from datetime import datetime, timezone
 
 from pytest import fixture
 
-from blurr.core.anchor import AnchorSchema, Anchor
-from blurr.core.type import Type
-from blurr.core.evaluation import EvaluationContext, Expression
-from blurr.core.schema_loader import SchemaLoader
 from blurr.core.aggregate_block import BlockAggregateSchema, \
     BlockAggregate
+from blurr.core.anchor import AnchorSchema, Anchor
+from blurr.core.evaluation import EvaluationContext, Expression
+from blurr.core.schema_loader import SchemaLoader
+from blurr.core.type import Type
 
 
 @fixture

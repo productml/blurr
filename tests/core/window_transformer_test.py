@@ -6,7 +6,7 @@ from pytest import fixture
 
 from blurr.core.aggregate_block import BlockAggregate
 from blurr.core.anchor import AnchorSchema
-from blurr.core.errors import AnchorBlockNotDefinedError, PrepareWindowMissingBlocksError
+from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import Context
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key

@@ -1,6 +1,5 @@
-from typing import Dict, Type, Any
-
 from abc import ABC
+from typing import Dict, Type, Any
 
 from blurr.core.base import BaseSchemaCollection, BaseItemCollection, BaseItem
 from blurr.core.errors import MissingAttributeError
@@ -50,14 +49,12 @@ class AggregateSchema(BaseSchemaCollection, ABC):
             'Value': 'identity',
             ATTRIBUTE_INTERNAL: True
         }
-        spec[self.ATTRIBUTE_FIELDS].insert(0, identity_field)
 
-        self.schema_loader.add_schema_spec(identity_field, self.fully_qualified_name)
+        if self.ATTRIBUTE_FIELDS in spec:
+            spec[self.ATTRIBUTE_FIELDS].insert(0, identity_field)
+            self.schema_loader.add_schema_spec(identity_field, self.fully_qualified_name)
 
         return super().extend_schema_spec(spec)
-
-    def validate(self):
-        self.validate_required(self.ATTRIBUTE_FIELDS)
 
 
 class Aggregate(BaseItemCollection, ABC):

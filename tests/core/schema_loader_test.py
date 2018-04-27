@@ -1,13 +1,11 @@
 from typing import Dict
 
-import pytest
-from pytest import fixture, raises
+from pytest import fixture
 
-from blurr.core.type import Type
-from blurr.core.errors import InvalidSchemaError
-from blurr.core.schema_loader import SchemaLoader
 from blurr.core.field_simple import IntegerFieldSchema
+from blurr.core.schema_loader import SchemaLoader
 from blurr.core.transformer_streaming import StreamingTransformerSchema
+from blurr.core.type import Type
 
 
 @fixture

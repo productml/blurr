@@ -1,10 +1,10 @@
 from pytest import raises
 
 from blurr.core.aggregate_block import BlockAggregateSchema
-from blurr.core.type import Type
-from blurr.core.errors import InvalidSchemaError
-from blurr.core.schema_loader import SchemaLoader
 from blurr.core.aggregate_window import WindowAggregateSchema
+from blurr.core.errors import GenericSchemaError
+from blurr.core.schema_loader import SchemaLoader
+from blurr.core.type import Type
 
 
 def test_initialization_with_valid_source(schema_loader_with_mem_store: SchemaLoader,
@@ -57,5 +57,5 @@ def test_initialization_with_invalid_source(schema_loader_with_mem_store: Schema
         }]
     })
 
-    with raises(InvalidSchemaError, match=stream_dtc_name + '.session not declared in schema'):
+    with raises(GenericSchemaError, match=stream_dtc_name + '.session not declared in schema'):
         WindowAggregateSchema(name, schema_loader_with_mem_store)

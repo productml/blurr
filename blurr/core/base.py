@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Type, TypeVar, Union, Optional, List
+from typing import Dict, Any, Type, TypeVar, Union
 
 from blurr.core.errors import SnapshotError, SchemaErrorCollection
 from blurr.core.evaluation import Expression, EvaluationContext

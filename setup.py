@@ -3,6 +3,7 @@ import os
 from pipenv.project import Project
 from pipenv.utils import convert_deps_to_pip
 from setuptools import setup, find_packages
+
 '''
 This setup.py script is expected to perform development and final releases using 
 CircleCI (https://circleci.com/gh/productml/blurr).

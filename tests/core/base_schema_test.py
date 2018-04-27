@@ -1,10 +1,10 @@
 from typing import Dict, Any
 
 import yaml
-from pytest import fixture, raises
+from pytest import fixture
 
 from blurr.core.base import BaseSchema, BaseSchemaCollection
-from blurr.core.errors import InvalidSchemaError, SchemaErrorCollection, RequiredAttributeError, EmptyAttributeError
+from blurr.core.errors import RequiredAttributeError, EmptyAttributeError
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 
@@ -68,7 +68,7 @@ def test_schema_collection_valid(schema_collection_spec: Dict[str, Any]):
     assert not schema._errors.has_errors
 
 
-def test_schema_collection_missing_nested_attribute_raises_error(schema_collection_spec: Dict[str, Any]):
+def test_schema_collection_missing_nested_attribute_adds_error(schema_collection_spec: Dict[str, Any]):
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema_spec(schema_collection_spec)
     schema = MockSchemaCollection(name, schema_loader, 'MissingNested')
@@ -78,7 +78,7 @@ def test_schema_collection_missing_nested_attribute_raises_error(schema_collecti
     assert error.attribute == 'MissingNested'
 
 
-def test_schema_collection_empty_nested_attribute_raises_error(schema_collection_spec: Dict[str, Any]):
+def test_schema_collection_empty_nested_attribute_adds_error(schema_collection_spec: Dict[str, Any]):
     del schema_collection_spec['Fields'][0]
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema_spec(schema_collection_spec)

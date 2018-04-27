@@ -1,10 +1,10 @@
 from typing import Dict, Any, List, Tuple, Optional
 
-from blurr.core.errors import InvalidSchemaError
+from blurr.core.errors import GenericSchemaError
+from blurr.core.errors import SchemaErrorCollection
 from blurr.core.loader import TypeLoader
 from blurr.core.type import Type
 from blurr.core.validator import ATTRIBUTE_TYPE, ATTRIBUTE_NAME, validate_schema_basics
-from blurr.core.errors import SchemaErrorCollection
 
 
 class SchemaLoader:
@@ -61,7 +61,7 @@ class SchemaLoader:
         if fully_qualified_name not in self._schema_index:
             spec = self.get_schema_spec(fully_qualified_name)
             if ATTRIBUTE_TYPE not in spec:
-                raise InvalidSchemaError(
+                raise GenericSchemaError(
                     '`Type` not defined in schema `{fqn}`'.format(fqn=fully_qualified_name))
             self._schema_index[fully_qualified_name] = TypeLoader.load_schema(spec[ATTRIBUTE_TYPE])(
                 fully_qualified_name, self)
@@ -101,7 +101,7 @@ class SchemaLoader:
         try:
             return self._spec_index[fully_qualified_name]
         except:
-            raise InvalidSchemaError("{} not declared in schema".format(fully_qualified_name))
+            raise GenericSchemaError("{} not declared in schema".format(fully_qualified_name))
 
     def get_schemas_of_type(self, schema_type: Type) -> List[Tuple[str, Dict[str, Any]]]:
         """
