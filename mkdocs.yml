@@ -1,3 +1,5 @@
+site_name: Blurr Documentation
+copyright: Authors of Blurr
 pages:
 - Home: 'index.md'
 - Playground:
