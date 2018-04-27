@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Type, TypeVar, Union
+from typing import Dict, Any, Type, TypeVar, Union, Optional, List
 
-from blurr.core.errors import SnapshotError
+from blurr.core.errors import SnapshotError, InvalidSchemaError
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
@@ -49,7 +49,7 @@ class BaseSchema(ABC):
         validate_identifier(self.fully_qualified_name, self._spec, attribute)
 
     # @abstractmethod
-    def validate(self):
+    def validate(self, errors) -> List[InvalidSchemaError]:
         """ Contains the validation routines that are to be executed as part of initialization by subclasses"""
         # raise NotImplementedError('Validation for schema must be implemented')
         pass

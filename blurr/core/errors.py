@@ -1,6 +1,7 @@
+from collections import defaultdict
 from enum import Enum
 from os import linesep
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Type
 
 
 class InvalidSchemaError(Exception):
@@ -28,6 +29,18 @@ class InvalidSchemaError(Exception):
             return linesep.join([str(error) for error in self.errors])
         else:
             return '`{}` is contains invalid schema declarations'.format(self.fully_qualified_name)
+
+
+class SchemaErrorCollection:
+    def __init__(self):
+        self.log: Dict[str, List(InvalidSchemaError)] = defaultdict(list)
+
+    def add(self, error: InvalidSchemaError):
+        self.log[error.fully_qualified_name].append(error)
+
+    def merge(self, error_log: 'SchemaErrorCollection'):
+        for k, v in error_log.log.items():
+            self.log[k].extend(v)
 
 
 class RequiredAttributeError(InvalidSchemaError):
