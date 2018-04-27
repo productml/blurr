@@ -12,12 +12,11 @@ ATTRIBUTE_INTERNAL = '_Internal'
 
 def validate_identity(name, spec, attribute):
     if VALIDATOR_IDENTITY_REGEX.findall(spec[attribute]):
-        raise InvalidSchemaError(('`{attribute}: {attribute_value}` in section `{name}` is invalid. '
-                                  '`{attribute}` must not start with `_` '
-                                  'and must be a python valid variable name.').format(
-            attribute=attribute,
-            attribute_value=spec[attribute],
-            name=name))
+        raise InvalidSchemaError(
+            ('`{attribute}: {attribute_value}` in section `{name}` is invalid. '
+             '`{attribute}` must not start with `_` '
+             'and must be a python valid variable name.').format(
+                 attribute=attribute, attribute_value=spec[attribute], name=name))
 
 
 def validate_required(name, spec: Dict[str, Any], *attributes):
@@ -34,8 +33,9 @@ def validate_schema_basics(name, spec: Dict[str, Any]):
 
     empty_attributes = [attribute for attribute, value in spec.items() if not value]
     if empty_attributes:
-        raise InvalidSchemaError('{attributes} in section `{name}` cannot have an empty value.'.format(
-            attributes=', '.join(['`' + f + ':`' for f in empty_attributes]), name=name))
+        raise InvalidSchemaError(
+            '{attributes} in section `{name}` cannot have an empty value.'.format(
+                attributes=', '.join(['`' + f + ':`' for f in empty_attributes]), name=name))
 
     validate_required(name, spec, ATTRIBUTE_NAME, ATTRIBUTE_TYPE)
     validate_identity(name, spec, ATTRIBUTE_NAME)

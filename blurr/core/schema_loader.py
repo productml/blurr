@@ -59,9 +59,10 @@ class SchemaLoader:
         if fully_qualified_name not in self._schema_index:
             spec = self.get_schema_spec(fully_qualified_name)
             if ATTRIBUTE_TYPE not in spec:
-                raise InvalidSchemaError('`Type` not defined in schema `{fqn}`'.format(fqn=fully_qualified_name))
-            self._schema_index[fully_qualified_name] = TypeLoader.load_schema(
-                spec[ATTRIBUTE_TYPE])(fully_qualified_name, self)
+                raise InvalidSchemaError(
+                    '`Type` not defined in schema `{fqn}`'.format(fqn=fully_qualified_name))
+            self._schema_index[fully_qualified_name] = TypeLoader.load_schema(spec[ATTRIBUTE_TYPE])(
+                fully_qualified_name, self)
 
         return self._schema_index[fully_qualified_name]
 

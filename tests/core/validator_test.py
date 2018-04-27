@@ -31,8 +31,7 @@ def test_validate_required_valid(valid_spec):
 
 
 def test_validate_required_missing_attributes_raises_exceptions(invalid_spec):
-    with raises(InvalidSchemaError,
-                match='`Name:`, `Type:` missing in section `test`'):
+    with raises(InvalidSchemaError, match='`Name:`, `Type:` missing in section `test`'):
         validate_required('test', invalid_spec, 'Name', 'Type')
 
 
@@ -41,22 +40,25 @@ def test_validate_identity_valid(valid_spec):
 
 
 def test_validate_identity_invalid_raises_exceptions(invalid_spec):
-    with raises(InvalidSchemaError,
-                match='`Identity1: _illegal_identity` in section `test` is invalid. `Identity1` must '
-                      'not start with `_` and must be a python valid variable name.',
-                message='Identity value starting with `_` did not raise exception'):
+    with raises(
+            InvalidSchemaError,
+            match='`Identity1: _illegal_identity` in section `test` is invalid. `Identity1` must '
+            'not start with `_` and must be a python valid variable name.',
+            message='Identity value starting with `_` did not raise exception'):
         validate_identity('test', invalid_spec, 'Identity1')
 
-        with raises(InvalidSchemaError,
-                    match='`Identity2: _illegal_identity` in section `test` is invalid. `Identity2` must '
-                          'not start with `_` and must be a python valid variable name.',
-                    message='Identity containing spaces did not raise exception'):
+        with raises(
+                InvalidSchemaError,
+                match='`Identity2: _illegal_identity` in section `test` is invalid. `Identity2` must '
+                'not start with `_` and must be a python valid variable name.',
+                message='Identity containing spaces did not raise exception'):
             validate_identity('test', invalid_spec, 'Identity2')
 
-        with raises(InvalidSchemaError,
-                    match='`Identity3: _illegal_identity` in section `test` is invalid. `Identity3` '
-                          'must not start with `_` and must be a python valid variable name.',
-                    message='Identity containing invalid characters did not raise exception'):
+        with raises(
+                InvalidSchemaError,
+                match='`Identity3: _illegal_identity` in section `test` is invalid. `Identity3` '
+                'must not start with `_` and must be a python valid variable name.',
+                message='Identity containing invalid characters did not raise exception'):
             validate_identity('test', invalid_spec, 'Identity3')
 
 
@@ -65,8 +67,9 @@ def test_validate_schema_basics_empty_attributes_raises_exception():
         Name: ''
         Type: ''
         ''')
-    with raises(InvalidSchemaError,
-                match='`Name:`, `Type:` in section `test` cannot have an empty value.'):
+    with raises(
+            InvalidSchemaError,
+            match='`Name:`, `Type:` in section `test` cannot have an empty value.'):
         validate_schema_basics('test', spec)
 
 
@@ -80,6 +83,8 @@ def test_validate_schema_basics_invalid_name_raises_exception():
         Name: _some /,
         Type: 'integer'
         ''')
-    with raises(InvalidSchemaError, match='`Name: _some /,` in section `test` is invalid. `Name` must '
-                      'not start with `_` and must be a python valid variable name.'):
+    with raises(
+            InvalidSchemaError,
+            match='`Name: _some /,` in section `test` is invalid. `Name` must '
+            'not start with `_` and must be a python valid variable name.'):
         validate_schema_basics('test', spec)

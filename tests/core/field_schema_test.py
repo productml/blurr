@@ -1,10 +1,12 @@
 from typing import Dict, Any
 
 import yaml
-from pytest import fixture
+from pytest import fixture, raises
 
+from blurr.core.errors import InvalidSchemaError
 from blurr.core.field import FieldSchema
 from blurr.core.schema_loader import SchemaLoader
+from blurr.core.validator import ATTRIBUTE_NAME
 
 
 @fixture
@@ -49,3 +51,12 @@ def test_field_schema_is_type_of(field_schema_spec):
 
     assert valid_field_schema.is_type_of("Hello") == False
     assert valid_field_schema.is_type_of(1) == True
+
+
+def test_field_schema_missing_value_attribute_raises_error(field_schema_spec):
+    del field_schema_spec[FieldSchema.ATTRIBUTE_VALUE]
+    with raises(InvalidSchemaError,
+                match='`{field}:` missing in section `{name}`'.format(
+                    field=FieldSchema.ATTRIBUTE_VALUE,
+                    name=field_schema_spec[ATTRIBUTE_NAME])):
+        get_mock_field_schema(field_schema_spec)

@@ -5,6 +5,7 @@ from blurr.core.errors import SnapshotError
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
+from blurr.core.validator import validate_required
 
 
 class BaseSchema(ABC):
@@ -23,12 +24,13 @@ class BaseSchema(ABC):
         """
         self.schema_loader: SchemaLoader = schema_loader
         self.fully_qualified_name: str = fully_qualified_name
-        self._spec: Dict[str, Any] = self.schema_loader.get_schema_spec(self.fully_qualified_name)
+        self._spec: Dict[str, Any] = self.extend_schema_spec(
+            self.schema_loader.get_schema_spec(self.fully_qualified_name))
+
+        self.validate()
 
         self.name: str = self._spec[self.ATTRIBUTE_NAME]
         self.type: str = self._spec[self.ATTRIBUTE_TYPE]
-
-        self._spec: Dict[str, Any] = self.extend_schema_spec(self._spec)
 
         self.when: Expression = Expression(
             self._spec[self.ATTRIBUTE_WHEN]) if self.ATTRIBUTE_WHEN in self._spec else None
@@ -37,6 +39,11 @@ class BaseSchema(ABC):
     def extend_schema_spec(self, spec: Dict[str, Any]) -> Dict[str, Any]:
         """ Extends the defined schema specifications at runtime with defaults """
         return spec
+
+    # @abstractmethod
+    def validate(self):
+        # raise NotImplementedError('Validation for schema must be implemented')
+        pass
 
 
 class BaseSchemaCollection(BaseSchema, ABC):
@@ -52,15 +59,19 @@ class BaseSchemaCollection(BaseSchema, ABC):
         :param schema_loader: Schema repository that returns schema spec by fully qualified name
         :param nested_schema_attribute: Name of the attribute that contains the nested elements
         """
+        self._nested_item_attribute = nested_schema_attribute
+
         super().__init__(fully_qualified_name, schema_loader)
 
-        self._nested_item_attribute = nested_schema_attribute
         # Load nested schema items
         self.nested_schema: Dict[str, Type[BaseSchema]] = {
             schema_spec[self.ATTRIBUTE_NAME]: self.schema_loader.get_nested_schema_object(
                 self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
             for schema_spec in self._spec.get(self._nested_item_attribute, [])
         }
+
+    def validate(self):
+        validate_required(self.fully_qualified_name, self._spec, self._nested_item_attribute)
 
 
 BaseItemType = TypeVar('T', bound='BaseItem')

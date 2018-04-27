@@ -44,7 +44,12 @@ class AggregateSchema(BaseSchemaCollection, ABC):
     def extend_schema_spec(self, spec: Dict[str, Any]) -> Dict[str, Any]:
         """ Injects the identity field """
 
-        identity_field = {'Name': '_identity', 'Type': DTCType.STRING, 'Value': 'identity', ATTRIBUTE_INTERNAL: True}
+        identity_field = {
+            'Name': '_identity',
+            'Type': DTCType.STRING,
+            'Value': 'identity',
+            ATTRIBUTE_INTERNAL: True
+        }
         spec[self.ATTRIBUTE_FIELDS].insert(0, identity_field)
 
         self.schema_loader.add_schema_spec(identity_field, self.fully_qualified_name)

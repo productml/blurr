@@ -3,7 +3,7 @@ from typing import Dict, Any
 import yaml
 from pytest import fixture, raises
 
-from blurr.core.base import BaseSchema
+from blurr.core.base import BaseSchema, BaseSchemaCollection
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
@@ -42,3 +42,47 @@ def test_base_schema_with_no_attribute_when(schema_spec: Dict[str, Any]):
     assert test_schema.name == schema_spec[BaseSchema.ATTRIBUTE_NAME]
     assert test_schema.type == schema_spec[BaseSchema.ATTRIBUTE_TYPE]
     assert test_schema.when is None
+
+
+@fixture
+def schema_collection_spec():
+    return yaml.load('''
+        Name: TestAggregate
+        Type: Aggregate
+        When: True == True
+        Fields:
+            - Name: TestField
+              Type: integer
+              Value: 1
+        ''')
+
+
+class MockSchema(BaseSchemaCollection):
+    pass
+
+
+def test_schema_collection_valid(schema_collection_spec: Dict[str, Any]):
+    schema_loader = SchemaLoader()
+    name = schema_loader.add_schema_spec(schema_collection_spec)
+    assert MockSchema(name, schema_loader, 'Fields')
+
+
+def test_schema_collection_missing_nested_attribute_raises_error(
+        schema_collection_spec: Dict[str, Any]):
+    schema_loader = SchemaLoader()
+    name = schema_loader.add_schema_spec(schema_collection_spec)
+
+    with raises(InvalidSchemaError, match='`MissingNested:` missing in section `{}`'.format(name)):
+        return MockSchema(name, schema_loader, 'MissingNested')
+
+
+def test_schema_collection_empty_nested_attribute_raises_error(
+        schema_collection_spec: Dict[str, Any]):
+    schema_loader = SchemaLoader()
+    del schema_collection_spec['Fields'][0]
+
+    with raises(
+            InvalidSchemaError,
+            match='`Fields:` in section `{}` cannot have an empty value.'.format(
+                schema_collection_spec['Name'])):
+        schema_loader.add_schema_spec(schema_collection_spec)

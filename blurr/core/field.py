@@ -1,11 +1,11 @@
-from typing import Any
-
 from abc import ABC, abstractmethod
+from typing import Any
 
 from blurr.core import logging
 from blurr.core.base import BaseSchema, BaseItem
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
+from blurr.core.validator import validate_required
 
 
 class FieldSchema(BaseSchema, ABC):
@@ -26,6 +26,9 @@ class FieldSchema(BaseSchema, ABC):
         super().__init__(fully_qualified_name, schema_loader)
 
         self.value: Expression = Expression(self._spec[self.ATTRIBUTE_VALUE])
+
+    def validate(self):
+        validate_required(self.fully_qualified_name, self._spec, self.ATTRIBUTE_VALUE)
 
     @property
     @abstractmethod
