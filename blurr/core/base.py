@@ -28,7 +28,6 @@ class BaseSchema(ABC):
         self.name: str = self._spec[self.ATTRIBUTE_NAME]
         self.type: str = self._spec[self.ATTRIBUTE_TYPE]
 
-        self.validate()
         self._spec: Dict[str, Any] = self.extend_schema_spec(self._spec)
 
         self.when: Expression = Expression(
@@ -38,10 +37,6 @@ class BaseSchema(ABC):
     def extend_schema_spec(self, spec: Dict[str, Any]) -> Dict[str, Any]:
         """ Extends the defined schema specifications at runtime with defaults """
         return spec
-
-    # TODO  Make this @abstractmethod and implement validate across all inherited schema
-    def validate(self):
-        pass
 
 
 class BaseSchemaCollection(BaseSchema, ABC):
