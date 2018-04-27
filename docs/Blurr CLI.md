@@ -20,8 +20,9 @@ The help command lists all the commands:
 ```
 $ blurr --help
 Usage:
-    blurr validate [--debug] [&lt;DTC&gt; ...]
-    blurr transform [--debug] [--runner=&lt;runner&gt;] [--streaming-dtc=&lt;dtc-file&gt;] [--window-dtc=&lt;dtc-file&gt;] [--data-processor=&lt;data-processor&gt;] (--source=&lt;raw-json-files&gt; | &lt;raw-json-files&gt;)
+    blurr validate [--debug] [<DTC> ...]
+    blurr transform [--debug] [--runner=<runner>] [--streaming-dtc=<dtc-file>] [--window-dtc=<dtc-file>] \
+            [--data-processor=<data-processor>] (--source=<raw-json-files> | <raw-json-files>)
     blurr -h | --help
 
 Commands:
@@ -41,16 +42,16 @@ Commands:
 Options:
     -h --help                   Show this screen.
     --version                   Show version.
-    --runner=&lt;runner&gt;     The runner to use for the transform. Possible values:
-                                local - Transforms done in memory. &lt;default&gt;
+    --runner=<runner>           The runner to use for the transform. Possible values:
+                                local - Transforms done in memory. <default>
                                 spark - Transforms done using spark locally.
-    --streaming-dtc=&lt;dtc-file&gt;  Streaming DTC file to use.
-    --window-dtc=&lt;dtc-file&gt;       Window DTC file to use.
-    --source=&lt;raw-json-files&gt;     List of source files separated by comma
+    --streaming-dtc=<dtc-file>  Streaming DTC file to use.
+    --window-dtc=<dtc-file>     Window DTC file to use.
+    --source=<raw-json-files>   List of source files separated by comma
     --debug                             Output debug logs.
-    --data-processor=&lt;data-processor&gt;   Data processor to use to process each record.
+    --data-processor=<data-processor>   Data processor to use to process each record.
                                         Possible values:
-                                        simple - One event dictionary per line in the source file(s). &lt;default&gt;
+                                        simple - One event dictionary per line in the source file(s). <default>
                                         ipfix - Processor for IpFix format.
 ```
 
