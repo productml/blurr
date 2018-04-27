@@ -5,7 +5,7 @@ from blurr.core.aggregate import Aggregate, AggregateSchema
 from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.aggregate_block import BlockAggregate
+from blurr.core.aggregate_block import BlockAggregate, BlockAggregateSchema
 from blurr.core.store_key import Key
 from blurr.core.base import BaseItem
 from blurr.core.type import Type
@@ -21,7 +21,7 @@ class WindowAggregateSchema(AggregateSchema):
         super().__init__(fully_qualified_name, schema_loader)
         self.window_value = self._spec[self.ATTRIBUTE_WINDOW_VALUE]
         self.window_type = self._spec[self.ATTRIBUTE_WINDOW_TYPE]
-        self.source = self.schema_loader.get_schema_object(self._spec[self.ATTRIBUTE_SOURCE])
+        self.source: BlockAggregateSchema = self.schema_loader.get_schema_object(self._spec[self.ATTRIBUTE_SOURCE])
 
 
 class _WindowSource:
@@ -53,7 +53,7 @@ class WindowAggregate(Aggregate):
         should be generated.
         """
         # evaluate window first which sets the correct window in the store
-        store = self._schema.source.store
+        store = self._schema.schema_loader.get_schema_object(self._schema.source.store_fq_name)
         if Type.is_type_equal(self._schema.window_type, Type.DAY) or Type.is_type_equal(
                 self._schema.window_type, Type.HOUR):
             block_list = self._load_blocks(

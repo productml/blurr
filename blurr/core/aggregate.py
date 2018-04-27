@@ -1,4 +1,4 @@
-from typing import Dict, Type, Any
+from typing import Dict, Type, Any, Optional
 
 from abc import ABC
 
@@ -27,18 +27,10 @@ class AggregateSchema(BaseSchemaCollection, ABC):
         :param spec: Schema specifications for the field
         """
         super().__init__(fully_qualified_name, schema_loader, self.ATTRIBUTE_FIELDS)
-        self.store = None
-        if self.ATTRIBUTE_STORE in self._spec:
-            self.store = self._load_store(self._spec[self.ATTRIBUTE_STORE])
-
-    def _load_store(self, store_name: str) -> 'Store':
-        """
-        Load a store into the Aggregate
-        :param store_name: The name of the store
-        """
-        store_fq_name = self.schema_loader.get_fully_qualified_name(
-            self.schema_loader.get_transformer_name(self.fully_qualified_name), store_name)
-        return self.schema_loader.get_schema_object(store_fq_name)
+        self.store_name = self._spec.get(self.ATTRIBUTE_STORE, None)
+        self.store_fq_name = None
+        if self.store_name:
+            self.store_fq_name = self.schema_loader.get_fully_qualified_name(self.schema_loader.get_transformer_name(self.fully_qualified_name), self.store_name)
 
     def extend_schema(self, spec: Dict[str, Any]) -> Dict[str, Any]:
         """ Injects the identity field """
@@ -77,6 +69,11 @@ class Aggregate(BaseItemCollection, ABC):
             name: TypeLoader.load_item(item_schema.type)(item_schema, self._evaluation_context)
             for name, item_schema in self._schema.nested_schema.items()
         }
+        # TODO: Currently store object is being loaded from SchemaLoader just because it handles the
+        # singleton aspect of it. This should ideally be taken out handled separately.
+        self._store = None
+        if self._schema.store_fq_name:
+            self._store = self._schema.schema_loader.get_schema_object(self._schema.store_fq_name)
 
     @property
     def _nested_items(self) -> Dict[str, Type[BaseItem]]:
@@ -96,8 +93,8 @@ class Aggregate(BaseItemCollection, ABC):
         Persists the current data group
         :param timestamp: Optional timestamp to include in the Key construction
         """
-        if self._schema.store:
-            self._schema.store.save(Key(self._identity, self._name, timestamp), self._snapshot)
+        if self._store:
+            self._store.save(Key(self._identity, self._name, timestamp), self._snapshot)
 
     def __getattr__(self, item: str) -> Any:
         """
