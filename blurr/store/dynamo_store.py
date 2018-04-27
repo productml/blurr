@@ -1,11 +1,9 @@
-from datetime import datetime
 from typing import Any, Dict, List, Tuple
 
 import boto3
 from boto3.dynamodb.conditions import Key as DynamoKey
 from dateutil import parser
 
-from blurr.core.field_complex import Map
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store import Store, Key
 
@@ -66,16 +64,20 @@ class DynamoStore(Store):
         return key.group + (key.PARTITION + key.timestamp.isoformat() if key.timestamp else '')
 
     @staticmethod
-    def clean_key(item: Dict[str, Any]) -> Dict[str, Any]:
+    def clean_for_get(item: Dict[str, Any]) -> Dict[str, Any]:
         item.pop('partition_key', None)
         item.pop('range_key', None)
         return item
+
+    @staticmethod
+    def clean_item_for_save(item: Dict[str, Any]) -> Dict[str, Any]:
+        return {k: v for k, v in item.items() if v}
 
     def prepare_record(self, record: Dict[str, Any]) -> Tuple[Key, Any]:
         dimensions = record['range_key'].split(Key.PARTITION)
         key = Key(record['partition_key'], dimensions[0], None
                   if len(dimensions) == 1 else parser.parse(dimensions[1]))
-        return key, self.clean_key(record)
+        return key, self.clean_for_get(record)
 
     def get(self, key: Key) -> Any:
         item = self.table.get_item(Key={
@@ -86,12 +88,15 @@ class DynamoStore(Store):
         if not item:
             return None
 
-        return self.clean_key(item)
+        return self.clean_for_get(item)
 
     def get_range(self, start: Key, end: Key = None, count: int = 0) -> List[Tuple[Key, Any]]:
 
         if end and count:
             raise ValueError('Only one of `end` or `count` can be set')
+
+        if end is not None and end < start:
+            start, end = end, start
 
         dimension_key_condition = DynamoKey('range_key')
 
@@ -113,6 +118,9 @@ class DynamoStore(Store):
         records = [self.prepare_record(item)
                    for item in response['Items']] if 'Items' in response else []
 
+        if not records:
+            return records
+
         # Ignore the starting record because `between` includes the records that match the boundary condition
         if records[0][0] == start or records[0][0] == end:
             del records[0]
@@ -130,7 +138,7 @@ class DynamoStore(Store):
     def save(self, key: Key, item: Any) -> None:
         item['partition_key'] = key.identity
         item['range_key'] = self.dimensions(key)
-        self.table.put_item(Item=item)
+        self.table.put_item(Item=self.clean_item_for_save(item))
 
     def delete(self, key: Key) -> None:
         pass

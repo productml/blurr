@@ -6,7 +6,7 @@ from blurr.core.type import Type
 from blurr.core.evaluation import Expression
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.aggregate_block import BlockAggregateSchema
-
+from blurr.core.validator import ATTRIBUTE_INTERNAL
 
 @fixture
 def block_aggregate_schema_spec() -> Dict[str, Any]:
@@ -26,17 +26,20 @@ def match_fields(fields):
     expected_fields = [{
         'Name': '_identity',
         'Type': Type.STRING,
-        'Value': 'identity'
+        'Value': 'identity',
+        ATTRIBUTE_INTERNAL: True
     }, {
         'Name': '_start_time',
         'Type': Type.DATETIME,
         'Value': 'time if user._start_time is None else time if time < '
-        'user._start_time else user._start_time'
+        'user._start_time else user._start_time',
+        ATTRIBUTE_INTERNAL: True
     }, {
         'Name': '_end_time',
         'Type': Type.DATETIME,
         'Value': 'time if user._end_time is None else time if time > '
-        'user._end_time else user._end_time'
+        'user._end_time else user._end_time',
+        ATTRIBUTE_INTERNAL: True
     }, {
         'Name': 'event_count',
         'Type': Type.INTEGER,

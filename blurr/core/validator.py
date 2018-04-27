@@ -7,6 +7,8 @@ VALIDATOR_IDENTITY_REGEX = re.compile(r'^_|[^\S]')
 
 ATTRIBUTE_NAME = 'Name'
 ATTRIBUTE_TYPE = 'Type'
+ATTRIBUTE_INTERNAL = '_Internal'
+
 
 def validate_identity(name, spec, attribute):
     if VALIDATOR_IDENTITY_REGEX.findall(spec[attribute]):
@@ -26,6 +28,10 @@ def validate_required(name, spec: Dict[str, Any], *attributes):
 
 
 def validate_schema_basics(name, spec: Dict[str, Any]):
+    # If the spec has been added by Blurr, ignore validation
+    if ATTRIBUTE_INTERNAL in spec:
+        return
+
     empty_attributes = [attribute for attribute, value in spec.items() if not value]
     if empty_attributes:
         raise InvalidSchemaError('{attributes} in section `{name}` cannot have an empty value.'.format(

@@ -9,6 +9,7 @@ from blurr.core.loader import TypeLoader
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
 from blurr.core.type import Type as DTCType
+from blurr.core.validator import ATTRIBUTE_INTERNAL
 
 
 class AggregateSchema(BaseSchemaCollection, ABC):
@@ -43,10 +44,10 @@ class AggregateSchema(BaseSchemaCollection, ABC):
     def extend_schema_spec(self, spec: Dict[str, Any]) -> Dict[str, Any]:
         """ Injects the identity field """
 
-        identity_field = {'Name': '_identity', 'Type': DTCType.STRING, 'Value': 'identity'}
+        identity_field = {'Name': '_identity', 'Type': DTCType.STRING, 'Value': 'identity', ATTRIBUTE_INTERNAL: True}
         spec[self.ATTRIBUTE_FIELDS].insert(0, identity_field)
 
-        self.schema_loader.add_schema_spec(identity_field, self.fully_qualified_name, True)
+        self.schema_loader.add_schema_spec(identity_field, self.fully_qualified_name)
 
         return super().extend_schema_spec(spec)
 

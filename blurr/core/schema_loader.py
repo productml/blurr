@@ -2,8 +2,8 @@ from typing import Dict, Any, List, Tuple, Optional
 
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.loader import TypeLoader
-from blurr.core.validator import ATTRIBUTE_TYPE, ATTRIBUTE_NAME, validate_schema_basics
 from blurr.core.type import Type
+from blurr.core.validator import ATTRIBUTE_TYPE, ATTRIBUTE_NAME, validate_schema_basics
 
 
 class SchemaLoader:
@@ -17,8 +17,7 @@ class SchemaLoader:
         self._schema_index: Dict[str, 'BaseSchema'] = {}
 
     def add_schema_spec(self, spec: Dict[str, Any],
-                        fully_qualified_parent_name: str = None,
-                        skip_validation: bool = False) -> Optional[str]:
+                        fully_qualified_parent_name: str = None) -> Optional[str]:
         """
         Add a schema dictionary to the schema loader. The given schema is stored
         against fully_qualified_parent_name + ITEM_SEPARATOR('.') + schema.name.
@@ -37,15 +36,15 @@ class SchemaLoader:
             fully_qualified_parent_name, name)
 
         # Ensure that basic validation for each spec part is done before it is added to spec cache
-        if isinstance(spec, dict) and not skip_validation:
+        if isinstance(spec, dict):
             validate_schema_basics(fully_qualified_name, spec)
 
         self._spec_index[fully_qualified_name] = spec
         for key, val in spec.items():
             if isinstance(val, list):
                 for item in val:
-                    self.add_schema_spec(item, fully_qualified_name, skip_validation)
-            self.add_schema_spec(val, fully_qualified_name, skip_validation)
+                    self.add_schema_spec(item, fully_qualified_name)
+            self.add_schema_spec(val, fully_qualified_name)
 
         return spec[ATTRIBUTE_NAME]
 

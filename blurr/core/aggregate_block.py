@@ -3,8 +3,8 @@ from typing import Dict, Any, List
 from blurr.core.aggregate import Aggregate, AggregateSchema
 from blurr.core.evaluation import Expression
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.store_key import Key
 from blurr.core.type import Type
+from blurr.core.validator import ATTRIBUTE_INTERNAL
 
 
 class BlockAggregateSchema(AggregateSchema):
@@ -30,7 +30,7 @@ class BlockAggregateSchema(AggregateSchema):
 
         # Add new field schema to the schema loader
         for field_schema in predefined_field:
-            self.schema_loader.add_schema_spec(field_schema, self.fully_qualified_name, True)
+            self.schema_loader.add_schema_spec(field_schema, self.fully_qualified_name)
 
         return super().extend_schema_spec(spec)
 
@@ -47,14 +47,16 @@ class BlockAggregateSchema(AggregateSchema):
                 'Type': Type.DATETIME,
                 'Value': ('time if {aggregate}._start_time is None else time '
                           'if time < {aggregate}._start_time else {aggregate}._start_time'
-                          ).format(aggregate=name_in_context)
+                          ).format(aggregate=name_in_context),
+                ATTRIBUTE_INTERNAL: True
             },
             {
                 'Name': '_end_time',
                 'Type': Type.DATETIME,
                 'Value': ('time if {aggregate}._end_time is None else time '
                           'if time > {aggregate}._end_time else {aggregate}._end_time'
-                          ).format(aggregate=name_in_context)
+                          ).format(aggregate=name_in_context),
+                ATTRIBUTE_INTERNAL: True
             },
         ]
 
