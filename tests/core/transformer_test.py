@@ -54,12 +54,12 @@ def schema_loader() -> SchemaLoader:
 
 @fixture
 def test_transformer(schema_loader: SchemaLoader, schema_spec: Dict[str, Any]) -> MockTransformer:
-    name = schema_loader.add_schema(schema_spec)
+    name = schema_loader.add_schema_spec(schema_spec)
     return MockTransformer(MockTransformerSchema(name, schema_loader), 'user1')
 
 
 def test_transformer_schema_init(schema_loader: SchemaLoader, schema_spec: Dict[str, Any]) -> None:
-    name = schema_loader.add_schema(schema_spec)
+    name = schema_loader.add_schema_spec(schema_spec)
     test_transformer_schema = MockTransformerSchema(name, schema_loader)
     assert test_transformer_schema.version == '2018-03-01'
     assert test_transformer_schema.type == Type.BLURR_TRANSFORM_STREAMING

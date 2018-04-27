@@ -1,24 +1,23 @@
-from typing import Dict, Any, List, Tuple, Optional, Union
+from typing import Dict, Any, List, Tuple, Optional
 
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.loader import TypeLoader
 from blurr.core.type import Type
+from blurr.core.validator import ATTRIBUTE_TYPE, ATTRIBUTE_NAME, validate_schema_basics
 
 
 class SchemaLoader:
     """
     Provides functionality to operate on the schema using fully qualified names.
     """
-    ATTRIBUTE_NAME = 'Name'
-    ATTRIBUTE_TYPE = 'Type'
     ITEM_SEPARATOR = '.'
 
     def __init__(self):
-        self._spec = {}
-        self._object_cache: Dict[str, 'BaseSchema'] = {}
+        self._spec_index: Dict[str, Any] = {}
+        self._schema_index: Dict[str, 'BaseSchema'] = {}
 
-    def add_schema(self, spec: Dict[str, Any],
-                   fully_qualified_parent_name: str = None) -> Optional[str]:
+    def add_schema_spec(self, spec: Dict[str, Any],
+                        fully_qualified_parent_name: str = None) -> Optional[str]:
         """
         Add a schema dictionary to the schema loader. The given schema is stored
         against fully_qualified_parent_name + ITEM_SEPARATOR('.') + schema.name.
@@ -29,21 +28,25 @@ class SchemaLoader:
         None is returned if the given spec is not a dictionary or the spec does not
         contain a 'name' key.
         """
-        if not isinstance(spec, dict) or self.ATTRIBUTE_NAME not in spec:
+        if not isinstance(spec, dict) or ATTRIBUTE_NAME not in spec:
             return None
 
-        name = spec[self.ATTRIBUTE_NAME]
+        name = spec[ATTRIBUTE_NAME]
         fully_qualified_name = name if fully_qualified_parent_name is None else self.get_fully_qualified_name(
             fully_qualified_parent_name, name)
 
-        self._spec[fully_qualified_name] = spec
+        # Ensure that basic validation for each spec part is done before it is added to spec cache
+        if isinstance(spec, dict):
+            validate_schema_basics(fully_qualified_name, spec)
+
+        self._spec_index[fully_qualified_name] = spec
         for key, val in spec.items():
             if isinstance(val, list):
                 for item in val:
-                    self.add_schema(item, fully_qualified_name)
-            self.add_schema(val, fully_qualified_name)
+                    self.add_schema_spec(item, fully_qualified_name)
+            self.add_schema_spec(val, fully_qualified_name)
 
-        return spec[self.ATTRIBUTE_NAME]
+        return spec[ATTRIBUTE_NAME]
 
     # Using forward reference to avoid cyclic dependency.
     def get_schema_object(self, fully_qualified_name: str) -> 'BaseSchema':
@@ -53,14 +56,14 @@ class SchemaLoader:
         :return: An initialized schema object
         """
 
-        if fully_qualified_name not in self._object_cache:
+        if fully_qualified_name not in self._schema_index:
             spec = self.get_schema_spec(fully_qualified_name)
-            if self.ATTRIBUTE_TYPE not in spec:
-                raise InvalidSchemaError('Type not defined in schema')
-            self._object_cache[fully_qualified_name] = TypeLoader.load_schema(
-                spec[self.ATTRIBUTE_TYPE])(fully_qualified_name, self)
+            if ATTRIBUTE_TYPE not in spec:
+                raise InvalidSchemaError('`Type` not defined in schema `{fqn}`'.format(fqn=fully_qualified_name))
+            self._schema_index[fully_qualified_name] = TypeLoader.load_schema(
+                spec[ATTRIBUTE_TYPE])(fully_qualified_name, self)
 
-        return self._object_cache[fully_qualified_name]
+        return self._schema_index[fully_qualified_name]
 
     def get_nested_schema_object(self, fully_qualified_parent_name: str,
                                  nested_item_name: str) -> 'BaseSchema':
@@ -93,7 +96,7 @@ class SchemaLoader:
         :return: Schema dictionary.
         """
         try:
-            return self._spec[fully_qualified_name]
+            return self._spec_index[fully_qualified_name]
         except:
             raise InvalidSchemaError("{} not declared in schema".format(fully_qualified_name))
 
@@ -106,8 +109,8 @@ class SchemaLoader:
         """
 
         return [(fq_name, schema)
-                for fq_name, schema in self._spec.items()
-                if Type.is_type_equal(schema.get(self.ATTRIBUTE_TYPE, ''), schema_type)]
+                for fq_name, schema in self._spec_index.items()
+                if Type.is_type_equal(schema.get(ATTRIBUTE_TYPE, ''), schema_type)]
 
     @staticmethod
     def get_transformer_name(fully_qualified_name: str) -> str:

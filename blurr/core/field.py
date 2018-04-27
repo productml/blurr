@@ -24,6 +24,7 @@ class FieldSchema(BaseSchema, ABC):
 
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
+
         self.value: Expression = Expression(self._spec[self.ATTRIBUTE_VALUE])
 
     @property

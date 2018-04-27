@@ -9,7 +9,7 @@ from blurr.core.aggregate_window import WindowAggregateSchema
 
 def test_initialization_with_valid_source(schema_loader_with_mem_store: SchemaLoader,
                                           mem_store_name: str, stream_dtc_name: str):
-    schema_loader_with_mem_store.add_schema({
+    schema_loader_with_mem_store.add_schema_spec({
         'Type': Type.BLURR_AGGREGATE_BLOCK,
         'Name': 'session',
         'Store': mem_store_name,
@@ -21,7 +21,7 @@ def test_initialization_with_valid_source(schema_loader_with_mem_store: SchemaLo
             },
         ],
     }, stream_dtc_name)
-    name = schema_loader_with_mem_store.add_schema({
+    name = schema_loader_with_mem_store.add_schema_spec({
         'Type': Type.BLURR_AGGREGATE_WINDOW,
         'Name': 'test_window_name',
         'WindowType': Type.DAY,
@@ -44,7 +44,7 @@ def test_initialization_with_valid_source(schema_loader_with_mem_store: SchemaLo
 def test_initialization_with_invalid_source(schema_loader_with_mem_store: SchemaLoader,
                                             stream_dtc_name: str):
 
-    name = schema_loader_with_mem_store.add_schema({
+    name = schema_loader_with_mem_store.add_schema_spec({
         'Type': Type.BLURR_AGGREGATE_WINDOW,
         'Name': 'test_window_name',
         'WindowType': Type.DAY,

@@ -17,7 +17,7 @@ def schema_loader():
 
 @fixture
 def anchor_schema_max_one(schema_loader: SchemaLoader) -> AnchorSchema:
-    name = schema_loader.add_schema({
+    name = schema_loader.add_schema_spec({
         'Condition': True,
         'Max': 1,
         'Name': 'anchor',
@@ -28,7 +28,7 @@ def anchor_schema_max_one(schema_loader: SchemaLoader) -> AnchorSchema:
 
 @fixture
 def anchor_schema_max_two(schema_loader: SchemaLoader) -> AnchorSchema:
-    name = schema_loader.add_schema({
+    name = schema_loader.add_schema_spec({
         'Condition': True,
         'Max': 2,
         'Name': 'anchor',
@@ -39,7 +39,7 @@ def anchor_schema_max_two(schema_loader: SchemaLoader) -> AnchorSchema:
 
 @fixture
 def block_schema(schema_loader: SchemaLoader) -> BlockAggregateSchema:
-    name = schema_loader.add_schema({
+    name = schema_loader.add_schema_spec({
         'Type': Type.BLURR_AGGREGATE_BLOCK,
         'Name': 'session',
         'Fields': [

@@ -18,9 +18,6 @@ def aggregate_schema_spec() -> Dict[str, Any]:
             'Name': 'event_count',
             'Type': Type.INTEGER,
             'Value': 5
-        }, {
-            'Name': 'missing_type',
-            'Value': 'test'
         }]
     }
 
@@ -36,21 +33,21 @@ class MockAggregateSchema(AggregateSchema):
 
 def test_aggregate_schema_contains_identity_field(aggregate_schema_spec):
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(aggregate_schema_spec)
+    name = schema_loader.add_schema_spec(aggregate_schema_spec)
 
     aggregate_schema = MockAggregateSchema(name, schema_loader)
-    assert len(aggregate_schema.nested_schema) == 3
+    assert len(aggregate_schema.nested_schema) == 2
     assert '_identity' in aggregate_schema.nested_schema
 
 
 def test_aggregate_schema_initialization_with_store(aggregate_schema_spec, store_spec):
     aggregate_schema_spec['Store'] = 'memory'
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(aggregate_schema_spec)
+    name = schema_loader.add_schema_spec(aggregate_schema_spec)
     with pytest.raises(InvalidSchemaError, match="user.memory not declared in schema"):
         MockAggregateSchema(name, schema_loader)
 
-    schema_loader.add_schema(store_spec, 'user')
+    schema_loader.add_schema_spec(store_spec, 'user')
     aggregate_schema = MockAggregateSchema(name, schema_loader)
     assert aggregate_schema.store is not None
     assert aggregate_schema.store.name == 'memory'
@@ -58,16 +55,6 @@ def test_aggregate_schema_initialization_with_store(aggregate_schema_spec, store
 
 def test_aggregate_schema_initialization_without_store(aggregate_schema_spec):
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(aggregate_schema_spec)
+    name = schema_loader.add_schema_spec(aggregate_schema_spec)
     aggregate_schema = MockAggregateSchema(name, schema_loader)
     assert aggregate_schema.store is None
-
-
-def test_field_without_type_defaults_to_string(aggregate_schema_spec):
-    schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(aggregate_schema_spec)
-    aggregate_schema = MockAggregateSchema(name, schema_loader)
-    missing_type_field = aggregate_schema.nested_schema['missing_type']
-
-    assert Type.is_type_equal(missing_type_field.type, Type.STRING)
-    assert missing_type_field.type_object is str
