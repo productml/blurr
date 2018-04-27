@@ -4,7 +4,7 @@ import yaml
 from pytest import fixture, raises
 
 from blurr.core.base import BaseSchema, BaseSchemaCollection
-from blurr.core.errors import InvalidSchemaError
+from blurr.core.errors import InvalidSchemaError, SchemaErrorCollection, RequiredAttributeError, EmptyAttributeError
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 
@@ -64,25 +64,31 @@ class MockSchemaCollection(BaseSchemaCollection):
 def test_schema_collection_valid(schema_collection_spec: Dict[str, Any]):
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema_spec(schema_collection_spec)
-    assert MockSchemaCollection(name, schema_loader, 'Fields')
+    schema = MockSchemaCollection(name, schema_loader, 'Fields')
+    assert not schema._errors.has_errors
 
 
-def test_schema_collection_missing_nested_attribute_raises_error(
-        schema_collection_spec: Dict[str, Any]):
+def test_schema_collection_missing_nested_attribute_raises_error(schema_collection_spec: Dict[str, Any]):
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema_spec(schema_collection_spec)
+    schema = MockSchemaCollection(name, schema_loader, 'MissingNested')
+    assert len(schema._errors.errors) == 1
+    error = schema._errors.errors[0]
+    assert isinstance(error, RequiredAttributeError)
+    assert error.attribute == 'MissingNested'
 
-    with raises(InvalidSchemaError, match='`MissingNested:` missing in section `{}`'.format(name)):
-        return MockSchemaCollection(name, schema_loader, 'MissingNested')
 
-
-def test_schema_collection_empty_nested_attribute_raises_error(
-        schema_collection_spec: Dict[str, Any]):
-    schema_loader = SchemaLoader()
+def test_schema_collection_empty_nested_attribute_raises_error(schema_collection_spec: Dict[str, Any]):
     del schema_collection_spec['Fields'][0]
+    schema_loader = SchemaLoader()
+    name = schema_loader.add_schema_spec(schema_collection_spec)
+    assert len(schema_loader._errors.errors) == 1
+    error = schema_loader._errors.errors[0]
+    assert isinstance(error, EmptyAttributeError)
+    assert error.attribute == 'Fields'
 
-    with raises(
-            InvalidSchemaError,
-            match='`Fields:` in section `{}` cannot have an empty value.'.format(
-                schema_collection_spec['Name'])):
-        schema_loader.add_schema_spec(schema_collection_spec)
+    schema = MockSchemaCollection(name, schema_loader, 'Fields')
+    assert len(schema._errors.errors) == 1
+    error = schema._errors.errors[0]
+    assert isinstance(error, RequiredAttributeError)
+    assert error.attribute == 'Fields'

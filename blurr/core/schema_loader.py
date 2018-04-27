@@ -4,6 +4,7 @@ from blurr.core.errors import InvalidSchemaError
 from blurr.core.loader import TypeLoader
 from blurr.core.type import Type
 from blurr.core.validator import ATTRIBUTE_TYPE, ATTRIBUTE_NAME, validate_schema_basics
+from blurr.core.errors import SchemaErrorCollection
 
 
 class SchemaLoader:
@@ -15,6 +16,7 @@ class SchemaLoader:
     def __init__(self):
         self._spec_index: Dict[str, Any] = {}
         self._schema_index: Dict[str, 'BaseSchema'] = {}
+        self._errors: SchemaErrorCollection = SchemaErrorCollection()
 
     def add_schema_spec(self, spec: Dict[str, Any],
                         fully_qualified_parent_name: str = None) -> Optional[str]:
@@ -37,7 +39,7 @@ class SchemaLoader:
 
         # Ensure that basic validation for each spec part is done before it is added to spec cache
         if isinstance(spec, dict):
-            validate_schema_basics(fully_qualified_name, spec)
+            self._errors.add(validate_schema_basics(fully_qualified_name, spec))
 
         self._spec_index[fully_qualified_name] = spec
         for key, val in spec.items():

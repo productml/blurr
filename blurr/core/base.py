@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Type, TypeVar, Union, Optional, List
 
-from blurr.core.errors import SnapshotError, InvalidSchemaError
+from blurr.core.errors import SnapshotError, SchemaErrorCollection
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
@@ -26,7 +26,9 @@ class BaseSchema(ABC):
         self.fully_qualified_name: str = fully_qualified_name
         self._spec: Dict[str, Any] = self.schema_loader.get_schema_spec(self.fully_qualified_name)
 
-        self.validate()
+        self._errors: SchemaErrorCollection = SchemaErrorCollection()
+        self._errors = self.validate(self._errors)
+
         self._spec: Dict[str, Any] = self.extend_schema_spec(self._spec)
 
         self.name: str = self._spec[self.ATTRIBUTE_NAME]
@@ -40,19 +42,17 @@ class BaseSchema(ABC):
         """ Extends the defined schema specifications at runtime with defaults """
         return spec
 
-    def validate_required(self, *attributes):
+    def validate_required(self, *attributes) -> SchemaErrorCollection:
         """ Validates that the schema contains a series of required attributes """
-        validate_required(self.fully_qualified_name, self._spec, *attributes)
+        return validate_required(self.fully_qualified_name, self._spec, *attributes)
 
-    def validate_identity(self, attribute):
+    def validate_identity(self, *attributes) -> SchemaErrorCollection:
         """ Validates that a schema attribute can be a python valid identifier """
-        validate_identifier(self.fully_qualified_name, self._spec, attribute)
+        return validate_identifier(self.fully_qualified_name, self._spec, *attributes)
 
-    # @abstractmethod
-    def validate(self, errors) -> List[InvalidSchemaError]:
+    def validate(self, errors: SchemaErrorCollection) -> SchemaErrorCollection:
         """ Contains the validation routines that are to be executed as part of initialization by subclasses"""
-        # raise NotImplementedError('Validation for schema must be implemented')
-        pass
+        return errors
 
 
 class BaseSchemaCollection(BaseSchema, ABC):
@@ -79,8 +79,9 @@ class BaseSchemaCollection(BaseSchema, ABC):
             for schema_spec in self._spec.get(self._nested_item_attribute, [])
         }
 
-    def validate(self):
-        self.validate_required(self._nested_item_attribute)
+    def validate(self, errors: SchemaErrorCollection) -> SchemaErrorCollection:
+        errors.add(self.validate_required(self._nested_item_attribute))
+        return super().validate(errors)
 
 
 BaseItemType = TypeVar('T', bound='BaseItem')
