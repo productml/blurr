@@ -13,4 +13,3 @@ pages:
     - 'DTC Snippets': 'DTC Snippets.md'
 - Using Blurr:
     - 'CLI': 'Blurr CLI.md'
-    - 'Release Notes': 'about/release-notes.md'
