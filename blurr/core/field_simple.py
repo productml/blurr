@@ -1,7 +1,9 @@
 from datetime import datetime
 from typing import Any
+
 from dateutil import parser
-from blurr.core.field import FieldSchema, Field
+
+from blurr.core.field import FieldSchema
 
 
 class IntegerFieldSchema(FieldSchema):

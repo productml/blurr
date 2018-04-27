@@ -5,10 +5,9 @@ Usage:
 """
 import csv
 import json
+from collections import defaultdict
 from datetime import datetime
 from typing import List, Optional, Any, Dict, Tuple
-
-from collections import defaultdict
 
 from blurr.core.record import Record
 from blurr.core.syntax.schema_validator import validate

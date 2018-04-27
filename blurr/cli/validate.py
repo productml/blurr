@@ -1,6 +1,6 @@
+import sys
 from typing import List
 
-import sys
 import yaml
 
 from blurr.cli.util import get_yml_files, eprint
