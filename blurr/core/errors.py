@@ -50,19 +50,19 @@ class EmptyAttributeError(InvalidSchemaError):
 
 class InvalidIdentifierError(InvalidSchemaError):
     class Reason(Enum):
-        STARTS_WITH_UNDERSCORE = 'Identifiers starting with underscore `_` are reserved.'
-        INVALID_PYTHON_IDENTIFIER = 'Identifiers must be valid Python identifiers.'
+        STARTS_WITH_UNDERSCORE = 'Identifiers starting with underscore `_` are reserved'
+        INVALID_PYTHON_IDENTIFIER = 'Identifiers must be valid Python identifiers'
 
     def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
                  reason: 'Reason', *args, **kwargs):
         super().__init__(fully_qualified_name, spec, *args, **kwargs)
         self.attribute = attribute
         self.reason = reason
-        self.message = '`{attribute}: {attribute_value}` in section `{name}` is invalid. {reason}.'.format(
+        self.message = '`{attribute}: {value}` in section `{name}` is invalid. {reason}.'.format(
             attribute=self.attribute,
-            attribute_value=self.spec[self.attribute],
+            value=self.spec[self.attribute],
             name=self.fully_qualified_name,
-            reason=reason)
+            reason=reason.value)
 
 
 class InvalidExpressionError(Exception):

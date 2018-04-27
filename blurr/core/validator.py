@@ -19,7 +19,7 @@ def validate_identifier(fully_qualified_name: str, spec: Dict[str, Any],
     elif not value.isidentifier():
         reason = InvalidIdentifierError.Reason.INVALID_PYTHON_IDENTIFIER
 
-    return InvalidIdentifierError(fully_qualified_name, attribute, reason) if reason else None
+    return InvalidIdentifierError(fully_qualified_name, spec, attribute, reason) if reason else None
 
 
 def validate_required(fully_qualified_name: str, spec: Dict[str, Any],

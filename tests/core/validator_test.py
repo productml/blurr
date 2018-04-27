@@ -3,8 +3,9 @@ from typing import Dict, Any
 import yaml
 from pytest import raises, fixture
 
-from blurr.core.errors import InvalidSchemaError, RequiredAttributeError
+from blurr.core.errors import InvalidSchemaError, RequiredAttributeError, InvalidIdentifierError
 from blurr.core.validator import validate_schema_basics, validate_required, validate_identifier
+from os import linesep
 
 
 @fixture(scope='session')
@@ -12,7 +13,6 @@ def invalid_spec() -> Dict[str, Any]:
     return yaml.load('''
             Identity1: _illegal_identity
             Identity2: some space
-            Identity3: contains*&^&^&*characters   
             Value: 2  
             ''')
 
@@ -30,7 +30,7 @@ def test_validate_required_valid(valid_spec):
     assert validate_required('test', valid_spec, 'Name', 'Type') is None
 
 
-def test_validate_required_missing_attributes_raises_exceptions(invalid_spec):
+def test_validate_required_missing_attributes(invalid_spec):
     error = validate_required('test', invalid_spec, 'Name', 'Type')
 
     assert isinstance(error, InvalidSchemaError)
@@ -48,32 +48,42 @@ def test_validate_required_missing_attributes_raises_exceptions(invalid_spec):
                 message='Error message did not match expected pattern'):
         raise name_error
 
+    with raises(InvalidSchemaError, match='Attribute `Name` must be present under `test`.' + linesep +
+                                          'Attribute `Type` must be present under `test`.',
+                message='Error message did not match expected pattern'):
+        raise error
+
 
 def test_validate_identity_valid(valid_spec):
     assert validate_identifier('test', valid_spec, 'Name') is None
 
 
-def test_validate_identity_invalid_raises_exceptions(invalid_spec):
+def test_validate_identity_with_underscore(invalid_spec):
+
+    error = validate_identifier('test', invalid_spec, 'Identity1')
+
+    assert isinstance(error, InvalidIdentifierError)
+    assert error.fully_qualified_name == 'test', 'Fully qualified name not set in the error object'
+    assert error.spec == invalid_spec, 'Spec is not set in the error object'
+    assert error.attribute == 'Identity1'
+    assert error.reason == InvalidIdentifierError.Reason.STARTS_WITH_UNDERSCORE
+
     with raises(
-            InvalidSchemaError,
-            match='`Identity1: _illegal_identity` in section `test` is invalid. `Identity1` must '
-            'not start with `_` and must be a python valid variable name.',
-            message='Identity value starting with `_` did not raise exception'):
-        validate_identifier('test', invalid_spec, 'Identity1')
+            InvalidIdentifierError,
+            match='`Identity1: _illegal_identity` in section `test` is invalid. '
+                  'Identifiers starting with underscore `_` are reserved.',
+            message='Message does not correctly reflect the reason'):
+        raise error
 
-        with raises(
-                InvalidSchemaError,
-                match='`Identity2: _illegal_identity` in section `test` is invalid. `Identity2` must '
-                'not start with `_` and must be a python valid variable name.',
-                message='Identity containing spaces did not raise exception'):
-            validate_identifier('test', invalid_spec, 'Identity2')
+    error = validate_identifier('test', invalid_spec, 'Identity2')
+    assert error.reason == InvalidIdentifierError.Reason.INVALID_PYTHON_IDENTIFIER
 
-        with raises(
-                InvalidSchemaError,
-                match='`Identity3: _illegal_identity` in section `test` is invalid. `Identity3` '
-                'must not start with `_` and must be a python valid variable name.',
-                message='Identity containing invalid characters did not raise exception'):
-            validate_identifier('test', invalid_spec, 'Identity3')
+    with raises(
+            InvalidIdentifierError,
+            match='`Identity2: some space` in section `test` is invalid. '
+                  'Identifiers must be valid Python identifiers.',
+            message='Message does not correctly reflect the reason'):
+        raise error
 
 
 def test_validate_schema_basics_empty_attributes_raises_exception():
@@ -81,6 +91,10 @@ def test_validate_schema_basics_empty_attributes_raises_exception():
         Name: ''
         Type: ''
         ''')
+
+    error = validate_schema_basics('test', spec)
+
+
     with raises(
             InvalidSchemaError,
             match='`Name:`, `Type:` in section `test` cannot have an empty value.'):
@@ -100,5 +114,5 @@ def test_validate_schema_basics_invalid_name_raises_exception():
     with raises(
             InvalidSchemaError,
             match='`Name: _some /,` in section `test` is invalid. `Name` must '
-            'not start with `_` and must be a python valid variable name.'):
+                  'not start with `_` and must be a python valid variable name.'):
         validate_schema_basics('test', spec)
