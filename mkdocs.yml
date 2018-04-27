@@ -1,0 +1,14 @@
+pages:
+- Home: 'index.md'
+- Playground:
+    - 'Streaming DTC Tutorial': 'Streaming DTC Tutorial.md'
+    - 'Window DTC Tutorial': 'Window DTC Tutorial.md'
+    - 'Offer AI Example': 'examples/offer-ai/offer-ai-walkthrough.md'
+    - 'Frequently Bought Together Example': 'examples/frequently-bought-together/fbt-walkthrough.md'
+    - 'Raw Event Formats': 'Raw event formats.md'
+- Data Transform Config (DTC):
+    - 'DTC Overview': 'Data Transform Config (DTC).md'
+    - 'DTC Snippets': 'DTC Snippets.md'
+- Using Blurr:
+    - 'CLI': 'Blurr CLI.md'
+    - 'Release Notes': 'about/release-notes.md'
