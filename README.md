@@ -49,7 +49,9 @@ Preparing data for specific use cases using Blurr
 
 # Use Blurr
 
-We interact with Blurr using a Command Line Interface (CLI). Blurr is installed via pip:
+One way to interact with Blurr is by using a Command Line Interface (CLI). The CLI is used to run blurr
+locally and is a great way of validating and testing the DTCs before deploying them in 
+production. 
 
 `$ pip install blurr`
 

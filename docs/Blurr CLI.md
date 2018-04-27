@@ -1,6 +1,10 @@
 # Installing the Command Line Interface (CLI)
 
-We interact with Blurr using a Command Line Interface (CLI). Blurr is installed via pip:
+One way to interact with Blurr is by using a Command Line Interface (CLI). The CLI is used to run blurr
+locally and is a great way of validating and testing the DTCs before deploying them in 
+production. 
+
+Blurr is installed via pip:
 
 `$ pip install blurr`
 
@@ -12,102 +16,43 @@ The help command lists all the commands:
 
 `$ blurr --help`
 
-# Working with DTCs
-
-DTCs are the central part of blurr. There are several CLI commands to validate and test DTCs
-
-## Validate
-
-The validate command will check whether a DTC is valid.
-
-`$ blurr validate weekly_rollup.dtc`
-
-## Transform
-
-The transform command will apply the DTC to a source of event data.
-
-Example:
-
+## Usage
 ```
-$ blurr transform \
-     --streaming-dtc ./dtcs/sessionize-dtc.yml \
-     --window-dtc ./dtcs/windowing-dtc.yml \
-     --source file://path
-```
+$ blurr --help
+Usage:
+    blurr validate [--debug] [&lt;DTC&gt; ...]
+    blurr transform [--debug] [--runner=&lt;runner&gt;] [--streaming-dtc=&lt;dtc-file&gt;] [--window-dtc=&lt;dtc-file&gt;] [--data-processor=&lt;data-processor&gt;] (--source=&lt;raw-json-files&gt; | &lt;raw-json-files&gt;)
+    blurr -h | --help
 
-## Debug
+Commands:
+    validate        Runs syntax validation on the list of DTC files provided. If
+                    no files are provided then all *.dtc files in the current
+                    directory are validated.
+    transform       Runs blurr to process the given raw log file. This command
+                    can be run with the following combinations:
+                    1. No DTC provided - The current directory is searched for
+                    DTCs. First streaming and the first window DTC are used.
+                    2. Only streaming DTC given - Transform outputs the result of
+                    applying the DTC on the raw data file.
+                    3. Both streaming and window DTC are provided - Transform
+                    outputs the final result of applying the streaming and window
+                    DTC on the raw data file.
 
-Print logs for debugging using the `--debug` option
-
-`blurr transform --streaming-dtc=streaming-dtc.yml --window-dtc=window-dtc.yml raw-data-window.json --debug`
-
-## Supported data sources
-
-Valid sources of data are:
-
-Type | Description | URI example
----- | ----------- | -----------
-`text` | A text file | `file://<path>`
-`internet` | An internet resource | http://blurr.ai/data-example.log
-`S3` | AWS S3 location | `s3://bucket/key`
-
-## Supported data destinations
-
-Transformed data is output to `stdout`. Data destination details are defined inside the DTC.
-
-More destinations will be supported in the future, please create [an issue](https://github.com/productml/blurr/issues/new) to request for a specific data destination! Or better yet, contribute to Blurr and build it!
-
-# Deploying Blurr on AWS
-
-The deploy command is used to rollout an instance of Blurr. Currently, only AWS is supported.
-
-`$ blurr deploy config.json`
-
-## Configuration File
-
-Blurr configuration can become a bit verbose, and some data formats (such as lists or dicts) are not supported in the command line. For those cases, the CLI allows passing a JSON configuration file with all the required parameters:
-
-```
-{
-   "dtcs":{
-      "include":"./*-dtc.yml"
-   },
-   "sources":[
-      {
-         "type":"s3",
-         "uri":"s3://bucket/key"
-      }
-   ]}
+Options:
+    -h --help                   Show this screen.
+    --version                   Show version.
+    --runner=&lt;runner&gt;     The runner to use for the transform. Possible values:
+                                local - Transforms done in memory. &lt;default&gt;
+                                spark - Transforms done using spark locally.
+    --streaming-dtc=&lt;dtc-file&gt;  Streaming DTC file to use.
+    --window-dtc=&lt;dtc-file&gt;       Window DTC file to use.
+    --source=&lt;raw-json-files&gt;     List of source files separated by comma
+    --debug                             Output debug logs.
+    --data-processor=&lt;data-processor&gt;   Data processor to use to process each record.
+                                        Possible values:
+                                        simple - One event dictionary per line in the source file(s). &lt;default&gt;
+                                        ipfix - Processor for IpFix format.
 ```
 
-Available options are:
+Please create [an issue](https://github.com/productml/blurr/issues/new) to request for a new feature! Or better yet, contribute to Blurr and build it!
 
-`dtcs`: The set of DTCs to be part of the deployment
-
-`sources`: URIs for the data sources to be transformed (TODO: how many sources can we define in the config?)
-
-## The deploy command
-
-Blurr gets deployed as a Cloudformation Stack. After a successful deployment we should see a stack named Blurr in the Cloudformation console.
-
-TODO: add image
-
-We can override the name of the stack using the `--stack-name` option:
-
-`$ blurr deploy config.json --stack-name blurr-staging`
-
-We can check the configuration of a blurr stack at any time using the config command:
-
-`$ blurr config --stack-name blurr-staging`
-
-If you feel more comfortable deploying Blurr by yourself it is possible to export the Cloudformation template from the command line:
-
-`$ blurr export-cfn config.json --out cfn-template.zip`
-
-## Updating Configuration
-
-Configuration can be updated using `update-config` command:
-
-`$ blurr update-config --stack-name blurr-prod`
-
-TODO: don't we need to provide the new config as an argument?
