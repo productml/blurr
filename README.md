@@ -6,6 +6,17 @@
 [![PyPI version](https://badge.fury.io/py/blurr.svg)](https://badge.fury.io/py/blurr)
 [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/productml/blurr/master?filepath=examples%2Ftutorial)
 
+# Table of contents
+
+- [What is Blurr](#what-is-blurr)
+- [Is Blurr for you?](#is-blurr-for-you)
+- [Blurr is MLOps](#blurr-is-mlops)
+- [Tutorial & Docs](#tutorial-and-docs)
+- [Try Blurr](#try-blurr)
+- [Contribute](#contribute-to-blurr)
+- [Data Science 'Joel Test'](#data-science-joel-test)
+- [Roadmap](#roadmap)
+
 # What is Blurr?
 
 Blurr transforms structured, streaming `raw data` into `features` for model training and prediction using a `high-level expressive YAML-based language` called the Data Transform Configuration (DTC).
@@ -18,7 +29,16 @@ This looks like any other ETL pipeline. At this point, Blurr doesn't do anything
 
 ![Blurr Production](docs/images/blurr-in-prod.png)
 
-## Blurr is MLOps
+# Is Blurr for you?
+
+Blurr is for you if:
+
+1. You are well on your way to the ML 'curve of enlightenment', and are looking for ways to do online scoring
+TODO: define online scoring
+
+2. You self-identify as a data scientist, a data engineer, or an ML engineer. But you believe that these distinctions are temporary. With the right tools, these are all one person. `data science`, `operations`, and `engineering` working together with minimal dependencies is critical to success of production ML efforts.    
+
+# Blurr is MLOps
 
 Blurr is a collection of components built for MLOps, the Blurr Core library is one of them. **Blurr Core ⊆ Blurr**
 
@@ -26,17 +46,9 @@ Blurr is a collection of components built for MLOps, the Blurr Core library is o
 
 We see a future where MLOps means teams putting together various technologies to suit their needs. For production ML applications, the __speed of experimentation__ and __iterations__ is the difference between success and failure. The __DTC helps teams iterate on features faster__. The vision for Blurr is to build MLOps components to help ML teams experiment at high speed.
 
-# Table of contents
-
-- [Tutorial & Docs](#tutorial-and-docs)
-- [Try Blurr](#try-blurr)
-- [Contribute](#contribute-to-blurr)
-- [Data Science 'Joel Test'](#data-science-joel-test)
-- [Roadmap](#roadmap)
+# Tutorial and Docs
 
 >Coming up with features is difficult, time-consuming, requires expert knowledge. 'Applied machine learning' is basically feature engineering --- Andrew Ng
-
-# Tutorial and Docs
 
 [Read the docs](http://productml-blurr.readthedocs.io/en/latest/)
 
