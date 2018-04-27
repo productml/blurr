@@ -9,16 +9,13 @@ from typing import List, Dict, Any, Union
 class GenericSchemaError(Exception):
     pass
 
+
 class InvalidSchemaError(Exception, ABC):
     """
     Indicates an error in the schema specification
     """
 
-    def __init__(self,
-                 fully_qualified_name: str,
-                 spec: Dict[str, Any],
-                 attribute: str,
-                 *args,
+    def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str, *args,
                  **kwargs):
         super().__init__(*args, **kwargs)
         self.fully_qualified_name = fully_qualified_name
@@ -32,7 +29,8 @@ class SchemaErrorCollection:
         for arg in args:
             self.add(arg)
 
-    def add(self, item: Union[InvalidSchemaError, List[InvalidSchemaError], 'SchemaErrorCollection']):
+    def add(self,
+            item: Union[InvalidSchemaError, List[InvalidSchemaError], 'SchemaErrorCollection']):
         if isinstance(item, InvalidSchemaError):
             self.log[item.fully_qualified_name].append(item)
 
@@ -51,7 +49,8 @@ class SchemaErrorCollection:
             self.log[k].extend(v)
 
     def __str__(self):
-        return linesep.join([str(error) for error in self.log.values()]) if len(self.log) > 0 else ''
+        return linesep.join(
+            [str(error) for error in self.log.values()]) if len(self.log) > 0 else ''
 
     def __getitem__(self, item):
         return self.log.__getitem__(item)

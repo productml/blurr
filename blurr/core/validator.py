@@ -18,11 +18,13 @@ def validate_identifier(fully_qualified_name: str, spec: Dict[str, Any],
         value = spec[attribute]
 
         if value.startswith('_'):
-            errors.add(InvalidIdentifierError(fully_qualified_name, spec, attribute,
-                                              InvalidIdentifierError.Reason.STARTS_WITH_UNDERSCORE))
+            errors.add(
+                InvalidIdentifierError(fully_qualified_name, spec, attribute,
+                                       InvalidIdentifierError.Reason.STARTS_WITH_UNDERSCORE))
         elif not value.isidentifier():
-            errors.add(InvalidIdentifierError(fully_qualified_name, spec, attribute,
-                                              InvalidIdentifierError.Reason.INVALID_PYTHON_IDENTIFIER))
+            errors.add(
+                InvalidIdentifierError(fully_qualified_name, spec, attribute,
+                                       InvalidIdentifierError.Reason.INVALID_PYTHON_IDENTIFIER))
 
     return errors
 
@@ -54,8 +56,11 @@ def validate_schema_basics(fully_qualified_name: str,
     errors = SchemaErrorCollection()
 
     if ATTRIBUTE_INTERNAL not in spec:
-        errors.add([EmptyAttributeError(fully_qualified_name, spec, attribute)
-                    for attribute, value in spec.items() if not value])
+        errors.add([
+            EmptyAttributeError(fully_qualified_name, spec, attribute)
+            for attribute, value in spec.items()
+            if not value
+        ])
         errors.add(validate_required(fully_qualified_name, spec, ATTRIBUTE_NAME, ATTRIBUTE_TYPE))
         errors.add(validate_identifier(fully_qualified_name, spec, ATTRIBUTE_NAME))
 

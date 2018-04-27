@@ -40,8 +40,10 @@ def test_validate_required_missing_attributes(invalid_spec):
     assert error.spec == invalid_spec, 'Spec is not set in the error object'
     assert error.attribute == 'Name'
 
-    with raises(RequiredAttributeError, match='Attribute `Name` must be present under `test`.',
-                message='Error message did not match expected pattern'):
+    with raises(
+            RequiredAttributeError,
+            match='Attribute `Name` must be present under `test`.',
+            message='Error message did not match expected pattern'):
         raise error
 
 
@@ -63,7 +65,7 @@ def test_validate_identity_with_underscore(invalid_spec):
     with raises(
             InvalidIdentifierError,
             match='`Identity1: _illegal_identity` in section `test` is invalid. '
-                  'Identifiers starting with underscore `_` are reserved.',
+            'Identifiers starting with underscore `_` are reserved.',
             message='Message does not correctly reflect the reason'):
         raise error
 
@@ -73,7 +75,7 @@ def test_validate_identity_with_underscore(invalid_spec):
     with raises(
             InvalidIdentifierError,
             match='`Identity2: some space` in section `test` is invalid. '
-                  'Identifiers must be valid Python identifiers.',
+            'Identifiers must be valid Python identifiers.',
             message='Message does not correctly reflect the reason'):
         raise error
 
