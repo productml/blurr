@@ -1,12 +1,12 @@
+from collections import Counter
 from typing import Dict, Any
 
 import yaml
 from pytest import raises, fixture
 
-from blurr.core.errors import InvalidSchemaError, RequiredAttributeError, InvalidIdentifierError, EmptyAttributeError
+from blurr.core.errors import RequiredAttributeError, InvalidIdentifierError, EmptyAttributeError
 from blurr.core.validator import validate_schema_basics, validate_required, validate_identifier
-from os import linesep
-from collections import Counter
+
 
 @fixture(scope='session')
 def invalid_spec() -> Dict[str, Any]:
@@ -27,41 +27,33 @@ def valid_spec() -> Dict[str, Any]:
 
 
 def test_validate_required_valid(valid_spec):
-    assert validate_required('test', valid_spec, 'Name', 'Type') is None
+    assert not validate_required('test', valid_spec, 'Name', 'Type').has_errors
 
 
 def test_validate_required_missing_attributes(invalid_spec):
-    error = validate_required('test', invalid_spec, 'Name', 'Type')
+    error_collection = validate_required('test', invalid_spec, 'Name', 'Type')
+    assert len(error_collection['test']) == 2, 'Errors are not grouped by fully qualified name'
 
-    assert isinstance(error, InvalidSchemaError)
-    assert len(error.errors) == 2, 'Does not contain the correct number of nested RequiredAttributeErrors'
+    error = error_collection['test'][0]
+    assert isinstance(error, RequiredAttributeError)
     assert error.fully_qualified_name == 'test', 'Fully qualified name not set in the error object'
     assert error.spec == invalid_spec, 'Spec is not set in the error object'
-
-    name_error: RequiredAttributeError = error.errors[0]
-    assert isinstance(name_error, RequiredAttributeError)
-    assert name_error.fully_qualified_name == 'test', 'Fully qualified name not set in the error object'
-    assert name_error.spec == invalid_spec, 'Spec is not set in the error object'
-    assert name_error.attribute == 'Name'
+    assert error.attribute == 'Name'
 
     with raises(RequiredAttributeError, match='Attribute `Name` must be present under `test`.',
-                message='Error message did not match expected pattern'):
-        raise name_error
-
-    with raises(InvalidSchemaError, match='Attribute `Name` must be present under `test`.' + linesep +
-                                          'Attribute `Type` must be present under `test`.',
                 message='Error message did not match expected pattern'):
         raise error
 
 
 def test_validate_identity_valid(valid_spec):
-    assert validate_identifier('test', valid_spec, 'Name') is None
+    assert not validate_identifier('test', valid_spec, 'Name').has_errors
 
 
 def test_validate_identity_with_underscore(invalid_spec):
+    error_collection = validate_identifier('test', invalid_spec, 'Identity1', 'Identity2')
+    assert len(error_collection.errors) == 2, 'Errors are not grouped by fully qualified name'
 
-    error = validate_identifier('test', invalid_spec, 'Identity1')
-
+    error = error_collection['test'][0]
     assert isinstance(error, InvalidIdentifierError)
     assert error.fully_qualified_name == 'test', 'Fully qualified name not set in the error object'
     assert error.spec == invalid_spec, 'Spec is not set in the error object'
@@ -75,7 +67,7 @@ def test_validate_identity_with_underscore(invalid_spec):
             message='Message does not correctly reflect the reason'):
         raise error
 
-    error = validate_identifier('test', invalid_spec, 'Identity2')
+    error = error_collection['test'][1]
     assert error.reason == InvalidIdentifierError.Reason.INVALID_PYTHON_IDENTIFIER
 
     with raises(
@@ -92,22 +84,20 @@ def test_validate_schema_basics_empty_attributes_raises_exception():
         Type: ''
         ''')
 
-    error = validate_schema_basics('test', spec)
-    assert isinstance(error, InvalidSchemaError)
-    assert len(error.errors) == 5
+    error_collection = validate_schema_basics('test', spec)
+    assert len(error_collection.errors) == 5, 'Errors are not grouped by fully qualified name'
 
-    error_counts = Counter(list(map(lambda x: type(x), error.errors)))
+    error_counts = Counter(list(map(lambda x: type(x), error_collection['test'])))
     assert error_counts[EmptyAttributeError] == 2
     assert error_counts[RequiredAttributeError] == 2
     assert error_counts[InvalidIdentifierError] == 1
 
 
 def test_validate_schema_basics_missing_name_type_raises_exception(invalid_spec):
-    error = validate_schema_basics('test', invalid_spec)
-    assert isinstance(error, InvalidSchemaError)
-    assert len(error.errors) == 2
-    assert isinstance(error.errors[0], RequiredAttributeError)
-    assert isinstance(error.errors[1], RequiredAttributeError)
+    error_collection = validate_schema_basics('test', invalid_spec)
+    assert len(error_collection.errors) == 2
+    assert isinstance(error_collection.errors[0], RequiredAttributeError)
+    assert isinstance(error_collection.errors[1], RequiredAttributeError)
 
 
 def test_validate_schema_basics_invalid_name_raises_exception():
@@ -117,6 +107,5 @@ def test_validate_schema_basics_invalid_name_raises_exception():
         ''')
 
     error = validate_schema_basics('test', spec)
-    assert isinstance(error, InvalidSchemaError)
     assert len(error.errors) == 1
     assert isinstance(error.errors[0], InvalidIdentifierError)

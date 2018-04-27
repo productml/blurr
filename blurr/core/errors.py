@@ -1,10 +1,12 @@
+from abc import ABC
 from collections import defaultdict
 from enum import Enum
+from itertools import chain
 from os import linesep
-from typing import List, Dict, Any, Type
+from typing import List, Dict, Any, Union
 
 
-class InvalidSchemaError(Exception):
+class InvalidSchemaError(Exception, ABC):
     """
     Indicates an error in the schema specification
     """
@@ -12,52 +14,66 @@ class InvalidSchemaError(Exception):
     def __init__(self,
                  fully_qualified_name: str,
                  spec: Dict[str, Any],
-                 errors: List['InvalidSchemaError'] = None,
-                 message: str = None,
+                 attribute: str,
                  *args,
                  **kwargs):
         super().__init__(*args, **kwargs)
         self.fully_qualified_name = fully_qualified_name
         self.spec = spec
-        self.errors = errors
-        self.message = message
-
-    def __str__(self):
-        if self.message:
-            return self.message
-        elif self.errors:
-            return linesep.join([str(error) for error in self.errors])
-        else:
-            return '`{}` is contains invalid schema declarations'.format(self.fully_qualified_name)
+        self.attribute = attribute
 
 
 class SchemaErrorCollection:
-    def __init__(self):
+    def __init__(self, *args):
         self.log: Dict[str, List(InvalidSchemaError)] = defaultdict(list)
+        for arg in args:
+            self.add(arg)
 
-    def add(self, error: InvalidSchemaError):
-        self.log[error.fully_qualified_name].append(error)
+    def add(self, item: Union[InvalidSchemaError, List[InvalidSchemaError], 'SchemaErrorCollection']):
+        if isinstance(item, InvalidSchemaError):
+            self.log[item.fully_qualified_name].append(item)
 
-    def merge(self, error_log: 'SchemaErrorCollection'):
-        for k, v in error_log.log.items():
+        elif isinstance(item, list):
+            for i in item:
+                self.add(i)
+
+        elif isinstance(item, type(self)):
+            self.merge(item)
+
+    def merge(self, item: 'SchemaErrorCollection'):
+        if not item:
+            return
+
+        for k, v in item.log.items():
             self.log[k].extend(v)
+
+    def __str__(self):
+        return linesep.join([str(error) for error in self.log.values()]) if len(self.log) > 0 else ''
+
+    def __getitem__(self, item):
+        return self.log.__getitem__(item)
+
+    def __contains__(self, item):
+        return self.log.__contains__(item)
+
+    @property
+    def errors(self) -> List[InvalidSchemaError]:
+        return list(chain.from_iterable(self.log.values()))
+
+    @property
+    def has_errors(self) -> bool:
+        return len(self.log) > 0
 
 
 class RequiredAttributeError(InvalidSchemaError):
-    def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str, *args,
-                 **kwargs):
-        super().__init__(fully_qualified_name, spec, *args, **kwargs)
-        self.attribute = attribute
-        self.message = 'Attribute `{}` must be present under `{}`.'.format(self.attribute,
-                                                                           self.fully_qualified_name)
+    def __str__(self):
+        return 'Attribute `{}` must be present under `{}`.'.format(self.attribute,
+                                                                   self.fully_qualified_name)
 
 
 class EmptyAttributeError(InvalidSchemaError):
-    def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str, *args,
-                 **kwargs):
-        super().__init__(fully_qualified_name, spec, *args, **kwargs)
-        self.attribute = attribute
-        self.message = 'Attribute `{}` under `{}` cannot be left empty.'.format(
+    def __str__(self):
+        return 'Attribute `{}` under `{}` cannot be left empty.'.format(
             self.attribute, self.fully_qualified_name)
 
 
@@ -68,14 +84,15 @@ class InvalidIdentifierError(InvalidSchemaError):
 
     def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
                  reason: 'Reason', *args, **kwargs):
-        super().__init__(fully_qualified_name, spec, *args, **kwargs)
-        self.attribute = attribute
+        super().__init__(fully_qualified_name, spec, attribute, *args, **kwargs)
         self.reason = reason
-        self.message = '`{attribute}: {value}` in section `{name}` is invalid. {reason}.'.format(
+
+    def __str__(self):
+        return '`{attribute}: {value}` in section `{name}` is invalid. {reason}.'.format(
             attribute=self.attribute,
             value=self.spec[self.attribute],
             name=self.fully_qualified_name,
-            reason=reason.value)
+            reason=self.reason.value)
 
 
 class InvalidExpressionError(Exception):
