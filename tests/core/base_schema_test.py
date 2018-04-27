@@ -57,14 +57,14 @@ def schema_collection_spec():
         ''')
 
 
-class MockSchema(BaseSchemaCollection):
+class MockSchemaCollection(BaseSchemaCollection):
     pass
 
 
 def test_schema_collection_valid(schema_collection_spec: Dict[str, Any]):
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema_spec(schema_collection_spec)
-    assert MockSchema(name, schema_loader, 'Fields')
+    assert MockSchemaCollection(name, schema_loader, 'Fields')
 
 
 def test_schema_collection_missing_nested_attribute_raises_error(
@@ -73,7 +73,7 @@ def test_schema_collection_missing_nested_attribute_raises_error(
     name = schema_loader.add_schema_spec(schema_collection_spec)
 
     with raises(InvalidSchemaError, match='`MissingNested:` missing in section `{}`'.format(name)):
-        return MockSchema(name, schema_loader, 'MissingNested')
+        return MockSchemaCollection(name, schema_loader, 'MissingNested')
 
 
 def test_schema_collection_empty_nested_attribute_raises_error(

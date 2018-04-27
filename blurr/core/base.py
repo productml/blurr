@@ -5,7 +5,7 @@ from blurr.core.errors import SnapshotError
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
-from blurr.core.validator import validate_required
+from blurr.core.validator import validate_required, validate_identity
 
 
 class BaseSchema(ABC):
@@ -24,10 +24,10 @@ class BaseSchema(ABC):
         """
         self.schema_loader: SchemaLoader = schema_loader
         self.fully_qualified_name: str = fully_qualified_name
-        self._spec: Dict[str, Any] = self.extend_schema_spec(
-            self.schema_loader.get_schema_spec(self.fully_qualified_name))
+        self._spec: Dict[str, Any] = self.schema_loader.get_schema_spec(self.fully_qualified_name)
 
         self.validate()
+        self._spec: Dict[str, Any] = self.extend_schema_spec(self._spec)
 
         self.name: str = self._spec[self.ATTRIBUTE_NAME]
         self.type: str = self._spec[self.ATTRIBUTE_TYPE]
@@ -40,8 +40,17 @@ class BaseSchema(ABC):
         """ Extends the defined schema specifications at runtime with defaults """
         return spec
 
+    def validate_required(self, *attributes):
+        """ Validates that the schema contains a series of required attributes """
+        validate_required(self.fully_qualified_name, self._spec, *attributes)
+
+    def validate_identity(self, attribute):
+        """ Validates that a schema attribute can be a python valid identifier """
+        validate_identity(self.fully_qualified_name, self._spec, attribute)
+
     # @abstractmethod
     def validate(self):
+        """ Contains the validation routines that are to be executed as part of initialization by subclasses"""
         # raise NotImplementedError('Validation for schema must be implemented')
         pass
 
@@ -71,7 +80,7 @@ class BaseSchemaCollection(BaseSchema, ABC):
         }
 
     def validate(self):
-        validate_required(self.fully_qualified_name, self._spec, self._nested_item_attribute)
+        self.validate_required(self._nested_item_attribute)
 
 
 BaseItemType = TypeVar('T', bound='BaseItem')

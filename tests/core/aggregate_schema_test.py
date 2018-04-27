@@ -1,12 +1,13 @@
 from typing import Dict, Any
 
 import pytest
-from pytest import fixture
+from pytest import fixture, raises
 
 from blurr.core.aggregate import AggregateSchema
 from blurr.core.type import Type
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.schema_loader import SchemaLoader
+from blurr.core.validator import ATTRIBUTE_NAME
 
 
 @fixture
@@ -58,3 +59,16 @@ def test_aggregate_schema_initialization_without_store(aggregate_schema_spec):
     name = schema_loader.add_schema_spec(aggregate_schema_spec)
     aggregate_schema = MockAggregateSchema(name, schema_loader)
     assert aggregate_schema.store is None
+
+
+def test_aggregate_schema_missing_fields_attribute_raises_error(aggregate_schema_spec):
+    del aggregate_schema_spec[AggregateSchema.ATTRIBUTE_FIELDS]
+
+    schema_loader = SchemaLoader()
+    name = schema_loader.add_schema_spec(aggregate_schema_spec)
+
+    with raises(InvalidSchemaError,
+                match='`{field}:` missing in section `{name}`'.format(
+                    field=AggregateSchema.ATTRIBUTE_FIELDS,
+                    name=aggregate_schema_spec[ATTRIBUTE_NAME])):
+        MockAggregateSchema(name, schema_loader)
