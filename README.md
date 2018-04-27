@@ -29,7 +29,7 @@ We see a future where MLOps means teams putting together various technologies to
 # Table of contents
 
 - [Tutorial & Docs](#tutorial-and-docs)
-- [Install](#use-blurr)
+- [Try Blurr](#try-blurr)
 - [Contribute](#contribute-to-blurr)
 - [Data Science 'Joel Test'](#data-science-joel-test)
 - [Roadmap](#roadmap)
@@ -45,9 +45,9 @@ We see a future where MLOps means teams putting together various technologies to
 
 Preparing data for specific use cases using Blurr
 
-[Dynamic in-game offers (Offer AI)](examples/offer-ai/offer-ai-walkthrough.md) | [Frequently Bought Together](examples/frequently-bought-together/fbt-walkthrough.md)
+[Dynamic in-game offers (Offer AI)](docs/examples/offer-ai/offer-ai-walkthrough.md) | [Frequently Bought Together](docs/examples/frequently-bought-together/fbt-walkthrough.md)
 
-# Use Blurr
+# Try Blurr
 
 We interact with Blurr using a Command Line Interface (CLI). Blurr is installed via pip:
 
