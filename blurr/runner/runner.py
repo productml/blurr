@@ -165,11 +165,13 @@ class Runner(ABC):
 
     @staticmethod
     def _get_store(schema_loader: SchemaLoader) -> Store:
-        store_schemas = schema_loader.get_schemas_of_type([Type.BLURR_STORE_MEMORY, Type.BLURR_STORE_DYNAMO])
+        store_schemas = schema_loader.get_schemas_of_type(
+            [Type.BLURR_STORE_MEMORY, Type.BLURR_STORE_DYNAMO])
         return schema_loader.get_store(store_schemas[0][0])
 
     @staticmethod
-    def _get_streaming_transformer_schema(schema_loader: SchemaLoader) -> StreamingTransformerSchema:
+    def _get_streaming_transformer_schema(
+            schema_loader: SchemaLoader) -> StreamingTransformerSchema:
         streaming_transformer_schema = schema_loader.get_schemas_of_type(
             [Type.BLURR_TRANSFORM_STREAMING])
         return schema_loader.get_schema_object(streaming_transformer_schema[0][0])

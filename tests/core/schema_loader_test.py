@@ -132,7 +132,7 @@ def test_get_fully_qualified_name() -> None:
 def test_get_schemas_of_type(schema_loader: SchemaLoader, nested_schema_spec: Dict) -> None:
     assert schema_loader.get_schemas_of_type(
         [Type.INTEGER]) == [('test.test_group.events',
-                           nested_schema_spec['Aggregates'][0]['Fields'][1])]
+                             nested_schema_spec['Aggregates'][0]['Fields'][1])]
 
 
 def test_get_transformer_name() -> None:

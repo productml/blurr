@@ -20,7 +20,7 @@ def dynamo_store_spec() -> Dict[str, Any]:
 
 
 @fixture
-def store(dynamo_store_spec) -> DynamoStore:
+def store(dynamo_store_spec: Dict[str, Any]) -> DynamoStore:
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(dynamo_store_spec)
     dynamo_store = schema_loader.get_store(name)
@@ -92,7 +92,27 @@ def loaded_store() -> DynamoStore:
     dynamo_store._table.delete()
 
 
-def test_table_creation_if_not_exist(dynamo_store_spec):
+def test_schema_init(dynamo_store_spec: Dict[str, Any]) -> None:
+    schema_loader = SchemaLoader()
+    name = schema_loader.add_schema(dynamo_store_spec)
+    store_schema = schema_loader.get_schema_object(name)
+    assert store_schema.name == dynamo_store_spec['Name']
+    assert store_schema.table_name == dynamo_store_spec['Table']
+    assert store_schema.rcu == 5
+    assert store_schema.wcu == 5
+
+
+def test_schema_init_with_read_write_units(dynamo_store_spec: Dict[str, Any]) -> None:
+    dynamo_store_spec['ReadCapacityUnits'] = 10
+    dynamo_store_spec['WriteCapacityUnits'] = 10
+    schema_loader = SchemaLoader()
+    name = schema_loader.add_schema(dynamo_store_spec)
+    store_schema = schema_loader.get_schema_object(name)
+    assert store_schema.rcu == 10
+    assert store_schema.wcu == 10
+
+
+def test_table_creation_if_not_exist(dynamo_store_spec: Dict[str, Any]) -> None:
     table_name = '_unit_test_table_creation' + '_' + str(int(time.time()))
     dynamo_store_spec['Table'] = table_name
     schema_loader = SchemaLoader()

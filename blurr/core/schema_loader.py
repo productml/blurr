@@ -66,9 +66,9 @@ class SchemaLoader:
 
     def get_store(self, fully_qualified_name: str) -> 'Store':
         """
-        Used to generate a schema object from the given fully_qualified_name.
-        :param fully_qualified_name: The fully qualified name of the object needed.
-        :return: An initialized schema object
+        Used to generate a store object from the given fully_qualified_name.
+        :param fully_qualified_name: The fully qualified name of the store object needed.
+        :return: An initialized store object
         """
 
         if fully_qualified_name not in self._store_cache:
@@ -118,8 +118,8 @@ class SchemaLoader:
     def get_schemas_of_type(self, schema_types: List[Type]) -> List[Tuple[str, Dict[str, Any]]]:
         """
         Returns a list of fully qualified names and schema dictionary tuples for
-        the schema type provided.
-        :param type: Schema type.
+        the schema types provided.
+        :param schema_types: Schema types.
         :return: List of fully qualified names and schema dictionary tuples.
         """
 
