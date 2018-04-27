@@ -48,23 +48,21 @@ def test_aggregate_schema_initialization_with_store(aggregate_schema_spec, store
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(aggregate_schema_spec)
     with pytest.raises(InvalidSchemaError, match="user.memory not declared in schema"):
-        mock_agg = MockAggregateSchema(name, schema_loader)
-        assert schema_loader.get_schema_object(mock_agg.store_fq_name)
+        MockAggregateSchema(name, schema_loader)
 
     schema_loader.add_schema(store_spec, 'user')
     aggregate_schema = MockAggregateSchema(name, schema_loader)
-    store = schema_loader.get_schema_object(mock_agg.store_fq_name)
+    store = schema_loader.get_store(aggregate_schema.store_schema.fully_qualified_name)
     assert store is not None
-    assert store.name == 'memory'
-    assert aggregate_schema.store_name == 'memory'
+    assert store._schema.name == 'memory'
+    assert aggregate_schema.store_schema.name == 'memory'
 
 
 def test_aggregate_schema_initialization_without_store(aggregate_schema_spec):
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema(aggregate_schema_spec)
     aggregate_schema = MockAggregateSchema(name, schema_loader)
-    assert aggregate_schema.store_name is None
-    assert aggregate_schema.store_fq_name is None
+    assert aggregate_schema.store_schema is None
 
 
 def test_field_without_type_defaults_to_string(aggregate_schema_spec):

@@ -16,6 +16,7 @@ class SchemaLoader:
     def __init__(self):
         self._spec = {}
         self._object_cache: Dict[str, 'BaseSchema'] = {}
+        self._store_cache: Dict[str, 'Store'] = {}
 
     def add_schema(self, spec: Dict[str, Any],
                    fully_qualified_parent_name: str = None) -> Optional[str]:
@@ -56,11 +57,28 @@ class SchemaLoader:
         if fully_qualified_name not in self._object_cache:
             spec = self.get_schema_spec(fully_qualified_name)
             if self.ATTRIBUTE_TYPE not in spec:
-                raise InvalidSchemaError('Type not defined in schema')
+                raise InvalidSchemaError(
+                    'Type not defined in schema for {}'.format(fully_qualified_name))
             self._object_cache[fully_qualified_name] = TypeLoader.load_schema(
                 spec[self.ATTRIBUTE_TYPE])(fully_qualified_name, self)
 
         return self._object_cache[fully_qualified_name]
+
+    def get_store(self, fully_qualified_name: str) -> 'Store':
+        """
+        Used to generate a schema object from the given fully_qualified_name.
+        :param fully_qualified_name: The fully qualified name of the object needed.
+        :return: An initialized schema object
+        """
+
+        if fully_qualified_name not in self._store_cache:
+            schema = self.get_schema_object(fully_qualified_name)
+            if not Type.is_store_type(schema.type):
+                raise ValueError('{} does not have a store type.'.format(fully_qualified_name))
+
+            self._store_cache[fully_qualified_name] = TypeLoader.load_item(schema.type)(schema)
+
+        return self._store_cache[fully_qualified_name]
 
     def get_nested_schema_object(self, fully_qualified_parent_name: str,
                                  nested_item_name: str) -> 'BaseSchema':
@@ -97,7 +115,7 @@ class SchemaLoader:
         except:
             raise InvalidSchemaError("{} not declared in schema".format(fully_qualified_name))
 
-    def get_schemas_of_type(self, schema_type: Type) -> List[Tuple[str, Dict[str, Any]]]:
+    def get_schemas_of_type(self, schema_types: List[Type]) -> List[Tuple[str, Dict[str, Any]]]:
         """
         Returns a list of fully qualified names and schema dictionary tuples for
         the schema type provided.
@@ -107,7 +125,7 @@ class SchemaLoader:
 
         return [(fq_name, schema)
                 for fq_name, schema in self._spec.items()
-                if Type.is_type_equal(schema.get(self.ATTRIBUTE_TYPE, ''), schema_type)]
+                if Type.is_type_in(schema.get(self.ATTRIBUTE_TYPE, ''), schema_types)]
 
     @staticmethod
     def get_transformer_name(fully_qualified_name: str) -> str:

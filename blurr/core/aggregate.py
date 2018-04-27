@@ -7,6 +7,7 @@ from blurr.core.errors import MissingAttributeError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.loader import TypeLoader
 from blurr.core.schema_loader import SchemaLoader
+from blurr.core.store import StoreSchema
 from blurr.core.store_key import Key
 from blurr.core.type import Type as DTCType
 
@@ -27,10 +28,10 @@ class AggregateSchema(BaseSchemaCollection, ABC):
         :param spec: Schema specifications for the field
         """
         super().__init__(fully_qualified_name, schema_loader, self.ATTRIBUTE_FIELDS)
-        self.store_name = self._spec.get(self.ATTRIBUTE_STORE, None)
-        self.store_fq_name = None
-        if self.store_name:
-            self.store_fq_name = self.schema_loader.get_fully_qualified_name(self.schema_loader.get_transformer_name(self.fully_qualified_name), self.store_name)
+        store_name = self._spec.get(self.ATTRIBUTE_STORE, None)
+        self.store_schema: StoreSchema = None
+        if store_name:
+            self.store_schema = self.schema_loader.get_nested_schema_object(self.schema_loader.get_transformer_name(self.fully_qualified_name), store_name)
 
     def extend_schema(self, spec: Dict[str, Any]) -> Dict[str, Any]:
         """ Injects the identity field """
@@ -72,8 +73,8 @@ class Aggregate(BaseItemCollection, ABC):
         # TODO: Currently store object is being loaded from SchemaLoader just because it handles the
         # singleton aspect of it. This should ideally be taken out handled separately.
         self._store = None
-        if self._schema.store_fq_name:
-            self._store = self._schema.schema_loader.get_schema_object(self._schema.store_fq_name)
+        if self._schema.store_schema:
+            self._store = self._schema.schema_loader.get_store(self._schema.store_schema.fully_qualified_name)
 
     @property
     def _nested_items(self) -> Dict[str, Type[BaseItem]]:

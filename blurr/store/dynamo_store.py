@@ -5,11 +5,19 @@ from boto3.dynamodb.conditions import Key as DynamoKey
 from dateutil import parser
 
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.store import Store, Key
+from blurr.core.store import Store, Key, StoreSchema
 
-ATTRIBUTE_TABLE = 'Table'
-ATTRIBUTE_READ_CAPACITY_UNITS = 'ReadCapacityUnits'
-ATTRIBUTE_WRITE_CAPACITY_UNITS = 'WriteCapacityUnits'
+
+class DynamoStoreSchema(StoreSchema):
+    ATTRIBUTE_TABLE = 'Table'
+    ATTRIBUTE_READ_CAPACITY_UNITS = 'ReadCapacityUnits'
+    ATTRIBUTE_WRITE_CAPACITY_UNITS = 'WriteCapacityUnits'
+
+    def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
+        super().__init__(fully_qualified_name, schema_loader)
+        self.table_name = self._spec[self.ATTRIBUTE_TABLE]
+        self.rcu = self._spec.get(self.ATTRIBUTE_READ_CAPACITY_UNITS, 5)
+        self.wcu = self._spec.get(self.ATTRIBUTE_WRITE_CAPACITY_UNITS, 5)
 
 
 class DynamoStore(Store):
@@ -17,23 +25,17 @@ class DynamoStore(Store):
     In-memory store implementation
     """
 
-    def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
-        super().__init__(fully_qualified_name, schema_loader)
-        spec = schema_loader.get_schema_spec(fully_qualified_name)
-        self.table_name = spec[ATTRIBUTE_TABLE]
-        self.rcu = spec.get(ATTRIBUTE_READ_CAPACITY_UNITS, 5)
-        self.wcu = spec.get(ATTRIBUTE_WRITE_CAPACITY_UNITS, 5)
-
-        self.dynamodb_resource = boto3.resource('dynamodb')
-
-        self.table = self.dynamodb_resource.Table(self.table_name)
+    def __init__(self, schema: DynamoStoreSchema) -> None:
+        self._schema = schema
+        self._dynamodb_resource = boto3.resource('dynamodb')
+        self._table = self._dynamodb_resource.Table(self._schema.table_name)
 
         # Test that the table exists.  Create a new one otherwise
         try:
-            self.table.creation_date_time
-        except self.dynamodb_resource.meta.client.exceptions.ResourceNotFoundException:
-            self.table = self.dynamodb_resource.create_table(
-                TableName=self.table_name,
+            self._table.creation_date_time
+        except self._dynamodb_resource.meta.client.exceptions.ResourceNotFoundException:
+            self._table = self._dynamodb_resource.create_table(
+                TableName=self._schema.table_name,
                 KeySchema=[
                     {
                         'AttributeName': 'partition_key',
@@ -52,12 +54,12 @@ class DynamoStore(Store):
                     'AttributeType': 'S'
                 }],
                 ProvisionedThroughput={
-                    'ReadCapacityUnits': self.rcu,
-                    'WriteCapacityUnits': self.wcu
+                    'ReadCapacityUnits': self._schema.rcu,
+                    'WriteCapacityUnits': self._schema.wcu
                 })
             # Wait until the table creation is complete
-            self.table.meta.client.get_waiter('table_exists').wait(
-                TableName=self.table_name, WaiterConfig={'Delay': 5})
+            self._table.meta.client.get_waiter('table_exists').wait(
+                TableName=self._schema.table_name, WaiterConfig={'Delay': 5})
 
     @staticmethod
     def dimensions(key: Key):
@@ -80,7 +82,7 @@ class DynamoStore(Store):
         return key, self.clean_for_get(record)
 
     def get(self, key: Key) -> Any:
-        item = self.table.get_item(Key={
+        item = self._table.get_item(Key={
             'partition_key': key.identity,
             'range_key': self.dimensions(key)
         }).get('Item', None)
@@ -108,7 +110,7 @@ class DynamoStore(Store):
                 self.dimensions(start)) if count > 0 else dimension_key_condition.lt(
                     self.dimensions(start))
 
-        response = self.table.query(
+        response = self._table.query(
             Limit=abs(count) if count else 1000,
             KeyConditionExpression=DynamoKey('partition_key').eq(start.identity) &
             dimension_key_condition,
@@ -131,14 +133,14 @@ class DynamoStore(Store):
         return records
 
     def get_all(self, identity: str) -> Dict[Key, Any]:
-        response = self.table.query(KeyConditionExpression=DynamoKey('partition_key').eq(identity))
+        response = self._table.query(KeyConditionExpression=DynamoKey('partition_key').eq(identity))
         return dict([self.prepare_record(item)
                      for item in response['Items']] if 'Items' in response else [])
 
     def save(self, key: Key, item: Any) -> None:
         item['partition_key'] = key.identity
         item['range_key'] = self.dimensions(key)
-        self.table.put_item(Item=self.clean_item_for_save(item))
+        self._table.put_item(Item=self.clean_item_for_save(item))
 
     def delete(self, key: Key) -> None:
         pass

@@ -1,12 +1,16 @@
 from typing import Any, List, Tuple, Dict
 
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 
 from blurr.core.base import BaseSchema
 from blurr.core.store_key import Key
 
 
-class Store(BaseSchema):
+class StoreSchema(BaseSchema):
+    pass
+
+
+class Store(ABC):
     """ Base Store that allows for data to be persisted during / after transformation """
 
     @abstractmethod

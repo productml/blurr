@@ -53,7 +53,7 @@ class WindowAggregate(Aggregate):
         should be generated.
         """
         # evaluate window first which sets the correct window in the store
-        store = self._schema.schema_loader.get_schema_object(self._schema.source.store_fq_name)
+        store = self._schema.schema_loader.get_store(self._schema.source.store_schema.fully_qualified_name)
         if Type.is_type_equal(self._schema.window_type, Type.DAY) or Type.is_type_equal(
                 self._schema.window_type, Type.HOUR):
             block_list = self._load_blocks(
