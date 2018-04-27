@@ -55,8 +55,8 @@ def test_field_schema_is_type_of(field_schema_spec):
 
 def test_field_schema_missing_value_attribute_raises_error(field_schema_spec):
     del field_schema_spec[FieldSchema.ATTRIBUTE_VALUE]
-    with raises(InvalidSchemaError,
-                match='`{field}:` missing in section `{name}`'.format(
-                    field=FieldSchema.ATTRIBUTE_VALUE,
-                    name=field_schema_spec[ATTRIBUTE_NAME])):
+    with raises(
+            InvalidSchemaError,
+            match='`{field}:` missing in section `{name}`'.format(
+                field=FieldSchema.ATTRIBUTE_VALUE, name=field_schema_spec[ATTRIBUTE_NAME])):
         get_mock_field_schema(field_schema_spec)

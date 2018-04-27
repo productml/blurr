@@ -1,8 +1,68 @@
+from enum import Enum
+from os import linesep
+from typing import List, Dict, Any
+
+
 class InvalidSchemaError(Exception):
     """
     Indicates an error in the schema specification
     """
-    pass
+
+    def __init__(self,
+                 fully_qualified_name: str,
+                 spec: Dict[str, Any],
+                 errors: List['InvalidSchemaError'] = None,
+                 message: str = None,
+                 *args,
+                 **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fully_qualified_name = fully_qualified_name
+        self.spec = spec
+        self.errors = errors
+        self.message = message
+
+    def __str__(self):
+        if self.message:
+            return self.message
+        elif self.errors:
+            return linesep.join([str(error) for error in self.errors])
+        else:
+            return '`{}` is contains invalid schema declarations'.format(self.fully_qualified_name)
+
+
+class RequiredAttributeError(InvalidSchemaError):
+    def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str, *args,
+                 **kwargs):
+        super().__init__(fully_qualified_name, spec, *args, **kwargs)
+        self.attribute = attribute
+        self.message = 'Attribute `{}` must be present under `{}`.'.format(self.attribute,
+                                                                           self.fully_qualified_name)
+
+
+class EmptyAttributeError(InvalidSchemaError):
+    def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str, *args,
+                 **kwargs):
+        super().__init__(fully_qualified_name, spec, *args, **kwargs)
+        self.attribute = attribute
+        self.message = 'Attribute `{}` under `{}` cannot be left empty.'.format(
+            self.attribute, self.fully_qualified_name)
+
+
+class InvalidIdentifierError(InvalidSchemaError):
+    class Reason(Enum):
+        STARTS_WITH_UNDERSCORE = 'Identifiers starting with underscore `_` are reserved.'
+        INVALID_PYTHON_IDENTIFIER = 'Identifiers must be valid Python identifiers.'
+
+    def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
+                 reason: 'Reason', *args, **kwargs):
+        super().__init__(fully_qualified_name, spec, *args, **kwargs)
+        self.attribute = attribute
+        self.reason = reason
+        self.message = '`{attribute}: {attribute_value}` in section `{name}` is invalid. {reason}.'.format(
+            attribute=self.attribute,
+            attribute_value=self.spec[self.attribute],
+            name=self.fully_qualified_name,
+            reason=reason)
 
 
 class InvalidExpressionError(Exception):

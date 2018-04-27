@@ -67,8 +67,9 @@ def test_aggregate_schema_missing_fields_attribute_raises_error(aggregate_schema
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema_spec(aggregate_schema_spec)
 
-    with raises(InvalidSchemaError,
-                match='`{field}:` missing in section `{name}`'.format(
-                    field=AggregateSchema.ATTRIBUTE_FIELDS,
-                    name=aggregate_schema_spec[ATTRIBUTE_NAME])):
+    with raises(
+            InvalidSchemaError,
+            match='`{field}:` missing in section `{name}`'.format(
+                field=AggregateSchema.ATTRIBUTE_FIELDS,
+                name=aggregate_schema_spec[ATTRIBUTE_NAME])):
         MockAggregateSchema(name, schema_loader)

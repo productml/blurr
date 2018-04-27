@@ -5,7 +5,7 @@ from blurr.core.errors import SnapshotError
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
-from blurr.core.validator import validate_required, validate_identity
+from blurr.core.validator import validate_required, validate_identifier
 
 
 class BaseSchema(ABC):
@@ -46,7 +46,7 @@ class BaseSchema(ABC):
 
     def validate_identity(self, attribute):
         """ Validates that a schema attribute can be a python valid identifier """
-        validate_identity(self.fully_qualified_name, self._spec, attribute)
+        validate_identifier(self.fully_qualified_name, self._spec, attribute)
 
     # @abstractmethod
     def validate(self):
