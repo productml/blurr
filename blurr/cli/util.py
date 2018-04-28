@@ -1,7 +1,7 @@
-from typing import List, Tuple
-
 import os
 import sys
+from typing import List, Tuple
+
 import yaml
 
 from blurr.core.syntax.schema_validator import is_streaming_dtc, is_window_dtc

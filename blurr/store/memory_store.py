@@ -1,6 +1,5 @@
-from typing import Any, Dict, List, Tuple
-
 from datetime import datetime, timezone
+from typing import Any, Dict, List, Tuple
 
 from dateutil import parser
 

@@ -1,6 +1,5 @@
-from typing import Any, List, Tuple, Dict
-
 from abc import abstractmethod
+from typing import Any, List, Tuple, Dict
 
 from blurr.core.base import BaseSchema
 from blurr.core.store_key import Key

@@ -2,8 +2,8 @@ from typing import List, Optional
 
 from blurr.cli.util import get_stream_window_dtc_files, get_yml_files, eprint
 from blurr.cli.validate import get_valid_yml_files
-from blurr.runner.local_runner import LocalRunner
 from blurr.runner.data_processor import IpfixDataProcessor, SimpleJsonDataProcessor, DataProcessor
+from blurr.runner.local_runner import LocalRunner
 from blurr.runner.spark_runner import SparkRunner
 
 RUNNER_CLASS = {
