@@ -202,4 +202,5 @@ def test_activity_aggregate_schema_non_integer_separative_by_inactive_attribute_
     activity_aggregate_schema_spec[ActivityAggregateSchema.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS] = -1
     schema = get_schema(activity_aggregate_schema_spec, store_spec)
 
-    assert 'Must be an integer greater than 0.' in str(schema.errors[0])
+    assert int == schema.errors[0].type
+    assert 1 == schema.errors[0].min

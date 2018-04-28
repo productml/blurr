@@ -5,7 +5,7 @@ from blurr.core.errors import SnapshotError, SchemaErrorCollection, InvalidSchem
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
-from blurr.core.validator import validate_required, validate_identifier
+from blurr.core.validator import validate_required, validate_identifier, validate_number
 
 
 class BaseSchema(ABC):
@@ -61,7 +61,7 @@ class BaseSchema(ABC):
     def validate_number(self, attribute: str, value_type: Union[Type[int], Type[float]] = int,
                         minimum: Optional[Union[int, float]] = None, maximum: Optional[Union[int, float]] = None):
         self.add_errors(
-            validate_identifier(self.fully_qualified_name, self._spec, attribute, value_type, minimum, maximum))
+            validate_number(self.fully_qualified_name, self._spec, attribute, value_type, minimum, maximum))
 
     @abstractmethod
     def validate_schema_spec(self) -> None:

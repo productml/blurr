@@ -94,10 +94,10 @@ class InvalidNumberError(InvalidSchemaError):
         self.max = maximum
 
     def __str__(self):
-        return 'Attribute `{attr}` under `{fqn}` must be of type {type}. {less_than} {greater_than}'.format(
-            attr=self.attribute, fqn=self.fully_qualified_name, type=self.type,
-            greater_than=('Must be greater than ' + self.min) if self.min else '',
-            less_than=('Must be lesser than ' + self.max) if self.max else '')
+        return 'Attribute `{attr}` under `{fqn}` must be of type `{type}`. {less_than} {greater_than}'.format(
+            attr=self.attribute, fqn=self.fully_qualified_name, type=self.type.__name__,
+            greater_than=('Must be greater than ' + str(self.min)) if self.min else '',
+            less_than=('Must be lesser than ' + (self.max)) if self.max else '')
 
 
 class InvalidIdentifierError(InvalidSchemaError):
