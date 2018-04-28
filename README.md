@@ -33,8 +33,9 @@ This looks like any other ETL pipeline. At this point, Blurr doesn't do anything
 
 Blurr is for you if:
 
-1. You are well on your way to the ML 'curve of enlightenment', and are looking for ways to do online scoring
-TODO: define online scoring
+1. You are well on your way on the ML 'curve of enlightenment', and are thinking about how to do online scoring
+
+![Curve](docs/images/curve.png)
 
 2. You self-identify as a data scientist, a data engineer, or an ML engineer. But you believe that these distinctions are temporary. With the right tools, these are all one person. `data science`, `operations`, and `engineering` working together with minimal dependencies is critical to success of production ML efforts.    
 
@@ -45,6 +46,8 @@ Blurr is a collection of components built for MLOps, the Blurr Core library is o
 >We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer. The lines are blurred (*cough*). Just like development and operations became DevOps over time
 
 We see a future where MLOps means teams putting together various technologies to suit their needs. For production ML applications, the __speed of experimentation__ and __iterations__ is the difference between success and failure. The __DTC helps teams iterate on features faster__. The vision for Blurr is to build MLOps components to help ML teams experiment at high speed.
+
+[How to build AI culture: go through the curve of enlightenment](https://hackernoon.com/how-to-build-ai-culture-go-through-the-curve-of-enlightenment-21c239c1d5a7)
 
 # Tutorial and Docs
 
@@ -86,7 +89,7 @@ Please sign the [Contributor License Agreement](https://docs.google.com/forms/d/
 
 # Data Science 'Joel Test'
 
-Inspired by the (old school) [Joel Test](https://www.joelonsoftware.com/2000/08/09/the-joel-test-12-steps-to-better-code/) to rate software teams, here's our version for data science teams. What's your score? We'd love to know!
+Inspired by the (old school) [Joel Test](https://www.joelonsoftware.com/2000/08/09/the-joel-test-12-steps-to-better-code/) to rate software teams, here's our version for data science teams. What's your score?
 
 1. Data pipelines are versioned and reproducible
 2. Pipelines (re)build in one step
