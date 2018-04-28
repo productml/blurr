@@ -3,7 +3,7 @@ from collections import defaultdict
 from enum import Enum
 from itertools import chain
 from os import linesep
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Any, Union, Type
 
 
 class GenericSchemaError(Exception):
@@ -85,6 +85,21 @@ class EmptyAttributeError(InvalidSchemaError):
             self.attribute, self.fully_qualified_name)
 
 
+class InvalidNumberError(InvalidSchemaError):
+    def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
+                 value_type: Type, minimum: Any, maximum: Any, *args, **kwargs):
+        super().__init__(fully_qualified_name, spec, attribute, *args, **kwargs)
+        self.type = value_type
+        self.min = minimum
+        self.max = maximum
+
+    def __str__(self):
+        return 'Attribute `{attr}` under `{fqn}` must be of type {type}. {less_than} {greater_than}'.format(
+            attr=self.attribute, fqn=self.fully_qualified_name, type=self.type,
+            greater_than=('Must be greater than ' + self.min) if self.min else '',
+            less_than=('Must be lesser than ' + self.max) if self.max else '')
+
+
 class InvalidIdentifierError(InvalidSchemaError):
     class Reason(Enum):
         STARTS_WITH_UNDERSCORE = 'Identifiers starting with underscore `_` are reserved'
@@ -98,7 +113,7 @@ class InvalidIdentifierError(InvalidSchemaError):
     def __str__(self):
         return '`{attribute}: {value}` in section `{name}` is invalid. {reason}.'.format(
             attribute=self.attribute,
-            value=self.spec[self.attribute],
+            value=self.spec.get(self.attribute, '*missing*'),
             name=self.fully_qualified_name,
             reason=self.reason.value)
 

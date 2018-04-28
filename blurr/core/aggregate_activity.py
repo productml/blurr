@@ -2,7 +2,6 @@ from datetime import timedelta
 
 from blurr.core.aggregate import AggregateSchema
 from blurr.core.aggregate_block import BlockAggregate, BlockAggregateSchema
-from blurr.core.errors import SchemaErrorCollection
 from blurr.core.schema_loader import SchemaLoader
 
 
@@ -15,12 +14,14 @@ class ActivityAggregateSchema(BlockAggregateSchema):
         super().__init__(fully_qualified_name, schema_loader)
 
         self.separation_interval: timedelta = timedelta(
-            seconds=int(self._spec[
-                            self.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS])) if self.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS in self._spec else None
+            seconds=int(self._spec[self.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS])
+            if self._spec.get(self.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS, '').isdigit()
+            else 0)
 
     def validate_schema_spec(self) -> None:
         super(AggregateSchema, self).validate_schema_spec()
         self.validate_required(self.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS)
+        self.validate_number(self.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS, int, 1, None)
 
 
 class ActivityAggregate(BlockAggregate):

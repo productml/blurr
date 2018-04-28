@@ -48,8 +48,8 @@ def test_field_schema_default_value(field_schema_spec):
 def test_field_schema_is_type_of(field_schema_spec):
     valid_field_schema = get_mock_field_schema(field_schema_spec)
 
-    assert valid_field_schema.is_type_of("Hello") == False
-    assert valid_field_schema.is_type_of(1) == True
+    assert False is valid_field_schema.is_type_of("Hello")
+    assert True is valid_field_schema.is_type_of(1)
 
 
 def test_field_schema_missing_value_attribute_adds_error(field_schema_spec):

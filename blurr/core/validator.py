@@ -1,6 +1,7 @@
-from typing import Dict, Any
+from typing import Dict, Any, Type, Optional, Union
 
-from blurr.core.errors import InvalidIdentifierError, RequiredAttributeError, EmptyAttributeError, SchemaErrorCollection
+from blurr.core.errors import InvalidIdentifierError, RequiredAttributeError, EmptyAttributeError, \
+    SchemaErrorCollection, InvalidNumberError
 
 ATTRIBUTE_NAME = 'Name'
 ATTRIBUTE_TYPE = 'Type'
@@ -38,6 +39,21 @@ def validate_required(fully_qualified_name: str, spec: Dict[str, Any],
             errors.add(RequiredAttributeError(fully_qualified_name, spec, attribute))
 
     return errors
+
+
+def validate_number(fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
+                    value_type: Union[Type[int], Type[float]] = int,
+                    minimum: Optional[Union[int, float]] = None,
+                    maximum: Optional[Union[int, float]] = None) -> Optional[InvalidNumberError]:
+    if attribute not in spec:
+        return
+
+    try:
+        value = value_type(spec[attribute])
+        if (minimum and value < minimum) or (maximum and value > maximum):
+            raise Exception()
+    except:
+        return InvalidNumberError(fully_qualified_name, spec, attribute, value_type, minimum, maximum)
 
 
 def validate_schema_basics(fully_qualified_name: str,

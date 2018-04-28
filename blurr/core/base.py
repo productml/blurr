@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Type, TypeVar, Union, List
+from typing import Dict, Any, Type, TypeVar, Union, List, Optional
 
 from blurr.core.errors import SnapshotError, SchemaErrorCollection, InvalidSchemaError
 from blurr.core.evaluation import Expression, EvaluationContext
@@ -57,6 +57,11 @@ class BaseSchema(ABC):
     def validate_identity(self, *attributes) -> None:
         """ Validates that a schema attribute can be a python valid identifier """
         self.add_errors(validate_identifier(self.fully_qualified_name, self._spec, *attributes))
+
+    def validate_number(self, attribute: str, value_type: Union[Type[int], Type[float]] = int,
+                        minimum: Optional[Union[int, float]] = None, maximum: Optional[Union[int, float]] = None):
+        self.add_errors(
+            validate_identifier(self.fully_qualified_name, self._spec, attribute, value_type, minimum, maximum))
 
     @abstractmethod
     def validate_schema_spec(self) -> None:
