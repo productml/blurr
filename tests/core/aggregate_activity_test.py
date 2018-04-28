@@ -183,7 +183,6 @@ def test_activity_aggregate_schema_missing_separate_by_inactive_attribute_adds_e
     schema_loader.add_schema_spec(store_spec, name)
     schema = ActivityAggregateSchema(name, schema_loader)
 
-    assert len(schema.errors) == 1
-    error = schema.errors[0]
-    assert isinstance(error, RequiredAttributeError)
-    assert error.attribute == ActivityAggregateSchema.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS
+    assert 1 == len(schema.errors)
+    assert isinstance(schema.errors[0], RequiredAttributeError)
+    assert ActivityAggregateSchema.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS == schema.errors[0].attribute
