@@ -1,6 +1,7 @@
 from typing import Dict, Any, List
 
 from blurr.core.aggregate import Aggregate, AggregateSchema
+from blurr.core.errors import SchemaErrorCollection
 from blurr.core.evaluation import Expression
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.type import Type
@@ -21,16 +22,21 @@ class BlockAggregateSchema(AggregateSchema):
         self.split: Expression = Expression(
             self._spec[self.ATTRIBUTE_SPLIT]) if self.ATTRIBUTE_SPLIT in self._spec else None
 
+    def validate(self, errors: SchemaErrorCollection) -> SchemaErrorCollection:
+        errors.add(self.validate_required(self.ATTRIBUTE_SPLIT))
+        return super().validate(errors)
+
     def extend_schema_spec(self, spec: Dict[str, Any]) -> Dict[str, Any]:
         """ Injects the block start and end times """
 
-        # Add new fields to the schema spec
-        predefined_field = self._build_time_fields_spec(spec[self.ATTRIBUTE_NAME])
-        spec[self.ATTRIBUTE_FIELDS][0:0] = predefined_field
+        if self.ATTRIBUTE_FIELDS in spec:
+            # Add new fields to the schema spec
+            predefined_field = self._build_time_fields_spec(spec[self.ATTRIBUTE_NAME])
+            spec[self.ATTRIBUTE_FIELDS][0:0] = predefined_field
 
-        # Add new field schema to the schema loader
-        for field_schema in predefined_field:
-            self.schema_loader.add_schema_spec(field_schema, self.fully_qualified_name)
+            # Add new field schema to the schema loader
+            for field_schema in predefined_field:
+                self.schema_loader.add_schema_spec(field_schema, self.fully_qualified_name)
 
         return super().extend_schema_spec(spec)
 
