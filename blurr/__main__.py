@@ -1,11 +1,11 @@
 """
 Usage:
-    blurr validate_schema_spec [--debug] [<DTC> ...]
+    blurr validate [--debug] [<DTC> ...]
     blurr transform [--debug] [--runner=<runner>] [--streaming-dtc=<dtc-file>] [--window-dtc=<dtc-file>] [--data-processor=<data-processor>] (--source=<raw-json-files> | <raw-json-files>)
     blurr -h | --help
 
 Commands:
-    validate_schema_spec        Runs syntax validation on the list of DTC files provided. If
+    validate        Runs syntax validation on the list of DTC files provided. If
                     no files are provided then all *.dtc files in the current
                     directory are validated.
     transform       Runs blurr to process the given raw log file. This command

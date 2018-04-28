@@ -14,7 +14,7 @@ def run_command(stream_dtc_file: Optional[str],
                 data_processor: Optional[str] = None) -> int:
     return cli({
         'transform': True,
-        'validate_schema_spec': False,
+        'validate': False,
         '--runner': runner,
         '--streaming-dtc': stream_dtc_file,
         '--window-dtc': window_dtc_file,

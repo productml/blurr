@@ -121,7 +121,7 @@ As more events are processed the value of session_stats.valid_session will maint
 
 # Per event validation
 
-Some ways to validate_schema_spec individual events for things like missing field values, reuse fields etc are:
+Some ways to validate individual events for things like missing field values, reuse fields etc are:
 
 - Create a variable (`VariableAggregate`) with the required clean up on the event field
 - Use `When` in `Field` for validation conditions
