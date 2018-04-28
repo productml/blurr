@@ -1,7 +1,6 @@
-from typing import Any, Dict
-
 from copy import copy
 from enum import Enum
+from typing import Any, Dict
 
 from blurr.core import logging
 from blurr.core.errors import InvalidExpressionError, MissingAttributeError

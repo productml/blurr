@@ -1,6 +1,5 @@
-from typing import Dict, Type, Any
-
 from abc import ABC
+from typing import Dict, Type, Any
 
 from blurr.core.base import BaseSchemaCollection, BaseItemCollection, BaseItem
 from blurr.core.errors import MissingAttributeError

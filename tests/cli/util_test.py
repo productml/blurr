@@ -1,7 +1,6 @@
+import os
 from typing import Any
 from unittest import mock
-
-import os
 
 from blurr.cli.util import get_yml_files, get_stream_window_dtc_files
 
