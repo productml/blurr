@@ -14,11 +14,11 @@ echo "installing blurr..."
 pip install blurr
 
 echo "validating streaming template..."
-blurr validate streaming-dtc.yml
+blurr validate_schema_spec streaming-dtc.yml
 
 
 echo "validating window template..."
-blurr validate window-dtc.yml
+blurr validate_schema_spec window-dtc.yml
 
 
 echo "generating session_data_tutorial_1.log..."

@@ -7,22 +7,22 @@ from dateutil import parser
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store import Store, Key
 
-ATTRIBUTE_TABLE = 'Table'
-ATTRIBUTE_READ_CAPACITY_UNITS = 'ReadCapacityUnits'
-ATTRIBUTE_WRITE_CAPACITY_UNITS = 'WriteCapacityUnits'
-
 
 class DynamoStore(Store):
     """
     In-memory store implementation
     """
 
+    ATTRIBUTE_TABLE = 'Table'
+    ATTRIBUTE_READ_CAPACITY_UNITS = 'ReadCapacityUnits'
+    ATTRIBUTE_WRITE_CAPACITY_UNITS = 'WriteCapacityUnits'
+
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
         spec = schema_loader.get_schema_spec(fully_qualified_name)
-        self.table_name = spec[ATTRIBUTE_TABLE]
-        self.rcu = spec.get(ATTRIBUTE_READ_CAPACITY_UNITS, 5)
-        self.wcu = spec.get(ATTRIBUTE_WRITE_CAPACITY_UNITS, 5)
+        self.table_name = spec[self.ATTRIBUTE_TABLE]
+        self.rcu = spec.get(self.ATTRIBUTE_READ_CAPACITY_UNITS, 5)
+        self.wcu = spec.get(self.ATTRIBUTE_WRITE_CAPACITY_UNITS, 5)
 
         self.dynamodb_resource = boto3.resource('dynamodb')
 
@@ -59,6 +59,9 @@ class DynamoStore(Store):
             self.table.meta.client.get_waiter('table_exists').wait(
                 TableName=self.table_name, WaiterConfig={'Delay': 5})
 
+    def validate_schema_spec(self) -> None:
+        self.validate_required(self.ATTRIBUTE_TABLE)
+
     @staticmethod
     def dimensions(key: Key):
         return key.group + (key.PARTITION + key.timestamp.isoformat() if key.timestamp else '')
@@ -76,7 +79,7 @@ class DynamoStore(Store):
     def prepare_record(self, record: Dict[str, Any]) -> Tuple[Key, Any]:
         dimensions = record['range_key'].split(Key.PARTITION)
         key = Key(record['partition_key'], dimensions[0], None
-                  if len(dimensions) == 1 else parser.parse(dimensions[1]))
+        if len(dimensions) == 1 else parser.parse(dimensions[1]))
         return key, self.clean_for_get(record)
 
     def get(self, key: Key) -> Any:
@@ -106,12 +109,12 @@ class DynamoStore(Store):
         else:
             dimension_key_condition = dimension_key_condition.gt(
                 self.dimensions(start)) if count > 0 else dimension_key_condition.lt(
-                    self.dimensions(start))
+                self.dimensions(start))
 
         response = self.table.query(
             Limit=abs(count) if count else 1000,
             KeyConditionExpression=DynamoKey('partition_key').eq(start.identity) &
-            dimension_key_condition,
+                                   dimension_key_condition,
             ScanIndexForward=count >= 0,
         )
 

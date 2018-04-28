@@ -66,7 +66,7 @@ def test_aggregate_schema_missing_fields_attribute_raises_error(aggregate_schema
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema_spec(aggregate_schema_spec)
     schema = MockAggregateSchema(name, schema_loader)
-    assert len(schema._errors.errors) == 1
-    error = schema._errors.errors[0]
+    assert len(schema.errors) == 1
+    error = schema.errors[0]
     assert isinstance(error, RequiredAttributeError)
     assert error.attribute == AggregateSchema.ATTRIBUTE_FIELDS

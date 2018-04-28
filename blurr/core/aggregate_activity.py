@@ -18,9 +18,9 @@ class ActivityAggregateSchema(BlockAggregateSchema):
             seconds=int(self._spec[
                             self.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS])) if self.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS in self._spec else None
 
-    def validate(self, errors: SchemaErrorCollection) -> SchemaErrorCollection:
-        errors.add(self.validate_required(self.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS))
-        return super(AggregateSchema, self).validate(errors)
+    def validate_schema_spec(self) -> None:
+        super(AggregateSchema, self).validate_schema_spec()
+        self.validate_required(self.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS)
 
 
 class ActivityAggregate(BlockAggregate):

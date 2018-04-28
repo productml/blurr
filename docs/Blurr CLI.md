@@ -14,13 +14,13 @@ The help command lists all the commands:
 
 # Working with DTCs
 
-DTCs are the central part of blurr. There are several CLI commands to validate and test DTCs
+DTCs are the central part of blurr. There are several CLI commands to validate_schema_spec and test DTCs
 
 ## Validate
 
-The validate command will check whether a DTC is valid.
+The validate_schema_spec command will check whether a DTC is valid.
 
-`$ blurr validate weekly_rollup.dtc`
+`$ blurr validate_schema_spec weekly_rollup.dtc`
 
 ## Transform
 

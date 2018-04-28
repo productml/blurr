@@ -20,9 +20,9 @@ class BlockAggregateSchema(AggregateSchema):
         self.split: Expression = Expression(
             self._spec[self.ATTRIBUTE_SPLIT]) if self.ATTRIBUTE_SPLIT in self._spec else None
 
-    def validate(self, errors: SchemaErrorCollection) -> SchemaErrorCollection:
-        errors.add(self.validate_required(self.ATTRIBUTE_SPLIT))
-        return super().validate(errors)
+    def validate_schema_spec(self) -> None:
+        super().validate_schema_spec()
+        self.validate_required(self.ATTRIBUTE_SPLIT)
 
     def extend_schema_spec(self, spec: Dict[str, Any]) -> Dict[str, Any]:
         """ Injects the block start and end times """

@@ -101,30 +101,30 @@ def test_aggregate_final_state(activity_aggregate_schema: ActivityAggregateSchem
     assert len(store_state) == 3
     assert store_state.get(
         Key('user1', 'activity_aggr', datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc))) == {
-            '_identity': 'user1',
-            '_start_time': datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc).isoformat(),
-            '_end_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc).isoformat(),
-            'sum': 111,
-            'count': 3
-        }
+               '_identity': 'user1',
+               '_start_time': datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc).isoformat(),
+               '_end_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc).isoformat(),
+               'sum': 111,
+               'count': 3
+           }
 
     assert store_state.get(
         Key('user1', 'activity_aggr', datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc))) == {
-            '_identity': 'user1',
-            '_start_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc).isoformat(),
-            '_end_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc).isoformat(),
-            'sum': 1000,
-            'count': 1
-        }
+               '_identity': 'user1',
+               '_start_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc).isoformat(),
+               '_end_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc).isoformat(),
+               'sum': 1000,
+               'count': 1
+           }
 
     assert store_state.get(
         Key('user1', 'activity_aggr', datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc))) == {
-            '_identity': 'user1',
-            '_start_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc).isoformat(),
-            '_end_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc).isoformat(),
-            'sum': 10000,
-            'count': 1
-        }
+               '_identity': 'user1',
+               '_start_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc).isoformat(),
+               '_end_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc).isoformat(),
+               'sum': 10000,
+               'count': 1
+           }
 
 
 def test_evaluate_no_separation(activity_aggregate_schema: ActivityAggregateSchema,
@@ -174,7 +174,8 @@ def test_evaluate_separate_on_inactivity(activity_aggregate_schema: ActivityAggr
     assert len(store_state) == 2
 
 
-def test_activity_aggregate_schema_missing_separate_by_inactive_attribute_adds_error(activity_aggregate_schema_spec, store_spec):
+def test_activity_aggregate_schema_missing_separate_by_inactive_attribute_adds_error(activity_aggregate_schema_spec,
+                                                                                     store_spec):
     del activity_aggregate_schema_spec[ActivityAggregateSchema.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS]
 
     schema_loader = SchemaLoader()
@@ -182,7 +183,7 @@ def test_activity_aggregate_schema_missing_separate_by_inactive_attribute_adds_e
     schema_loader.add_schema_spec(store_spec, name)
     schema = ActivityAggregateSchema(name, schema_loader)
 
-    assert len(schema._errors.errors) == 1
-    error = schema._errors.errors[0]
+    assert len(schema.errors) == 1
+    error = schema.errors[0]
     assert isinstance(error, RequiredAttributeError)
     assert error.attribute == ActivityAggregateSchema.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS

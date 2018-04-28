@@ -80,7 +80,7 @@ def test_block_aggregate_schema_missing_split_attribute_adds_error(block_aggrega
     name = schema_loader.add_schema_spec(block_aggregate_schema_spec)
     schema = BlockAggregateSchema(name, schema_loader)
 
-    assert len(schema._errors.errors) == 1
-    error = schema._errors.errors[0]
+    assert len(schema.errors) == 1
+    error = schema.errors[0]
     assert isinstance(error, RequiredAttributeError)
     assert error.attribute == BlockAggregateSchema.ATTRIBUTE_SPLIT

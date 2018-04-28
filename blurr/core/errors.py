@@ -59,7 +59,7 @@ class SchemaErrorCollection:
             [str(error) for error in self.log.values()]) if len(self.log) > 0 else ''
 
     def __getitem__(self, item):
-        return self.log.__getitem__(item)
+        return self.log.get(item, None)
 
     def __contains__(self, item):
         return self.log.__contains__(item)

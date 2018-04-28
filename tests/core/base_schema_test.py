@@ -19,7 +19,8 @@ def schema_spec():
 
 
 class MockSchema(BaseSchema):
-    pass
+    def validate_schema_spec(self) -> None:
+        pass
 
 
 def get_test_schema(schema_spec: Dict[str, Any]) -> MockSchema:
@@ -65,7 +66,7 @@ def test_schema_collection_valid(schema_collection_spec: Dict[str, Any]):
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema_spec(schema_collection_spec)
     schema = MockSchemaCollection(name, schema_loader, 'Fields')
-    assert not schema._errors.has_errors
+    assert not schema.errors
 
 
 def test_schema_collection_missing_nested_attribute_adds_error(
@@ -73,8 +74,8 @@ def test_schema_collection_missing_nested_attribute_adds_error(
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema_spec(schema_collection_spec)
     schema = MockSchemaCollection(name, schema_loader, 'MissingNested')
-    assert len(schema._errors.errors) == 1
-    error = schema._errors.errors[0]
+    assert len(schema.errors) == 1
+    error = schema.errors[0]
     assert isinstance(error, RequiredAttributeError)
     assert error.attribute == 'MissingNested'
 
@@ -87,10 +88,4 @@ def test_schema_collection_empty_nested_attribute_adds_error(
     assert len(schema_loader._errors.errors) == 1
     error = schema_loader._errors.errors[0]
     assert isinstance(error, EmptyAttributeError)
-    assert error.attribute == 'Fields'
-
-    schema = MockSchemaCollection(name, schema_loader, 'Fields')
-    assert len(schema._errors.errors) == 1
-    error = schema._errors.errors[0]
-    assert isinstance(error, RequiredAttributeError)
     assert error.attribute == 'Fields'

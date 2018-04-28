@@ -5,7 +5,7 @@ from blurr.cli.validate import validate_command
 
 
 def cli(arguments: Dict[str, Any]) -> int:
-    if arguments['validate']:
+    if arguments['validate_schema_spec']:
         return validate_command(arguments['<DTC>'])
     elif arguments['transform']:
         source = []

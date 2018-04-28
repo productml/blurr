@@ -56,7 +56,7 @@ def test_field_schema_missing_value_attribute_adds_error(field_schema_spec):
     del field_schema_spec[FieldSchema.ATTRIBUTE_VALUE]
     schema = get_mock_field_schema(field_schema_spec)
 
-    assert len(schema._errors.errors) == 1
-    error = schema._errors.errors[0]
+    assert len(schema.errors) == 1
+    error = schema.errors[0]
     assert isinstance(error, RequiredAttributeError)
     assert error.attribute == FieldSchema.ATTRIBUTE_VALUE
