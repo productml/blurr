@@ -22,6 +22,12 @@ class InvalidSchemaError(Exception, ABC):
         self.spec = spec
         self.attribute = attribute
 
+    def __repr__(self):
+        return '{cls}: FQN: {fqn}, Attribute: {attribute}'.format(
+            cls=self.__class__.__name__,
+            fqn=self.fully_qualified_name,
+            attribute=self.attribute)
+
 
 class SchemaErrorCollection:
     def __init__(self, *args):

@@ -1,17 +1,26 @@
 from datetime import timedelta
 
+from blurr.core.aggregate import AggregateSchema
 from blurr.core.aggregate_block import BlockAggregate, BlockAggregateSchema
+from blurr.core.errors import SchemaErrorCollection
 from blurr.core.schema_loader import SchemaLoader
 
 
 class ActivityAggregateSchema(BlockAggregateSchema):
+    """ Aggregates activity into blocks by partitioning around periods of inactivity """
+
     ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS = 'SeparateByInactiveSeconds'
 
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
 
         self.separation_interval: timedelta = timedelta(
-            seconds=int(self._spec[self.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS]))
+            seconds=int(self._spec[
+                            self.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS])) if self.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS in self._spec else None
+
+    def validate(self, errors: SchemaErrorCollection) -> SchemaErrorCollection:
+        errors.add(self.validate_required(self.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS))
+        return super(AggregateSchema, self).validate(errors)
 
 
 class ActivityAggregate(BlockAggregate):

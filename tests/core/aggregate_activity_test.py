@@ -5,6 +5,7 @@ from dateutil import parser
 from pytest import fixture
 
 from blurr.core.aggregate_activity import ActivityAggregate, ActivityAggregateSchema
+from blurr.core.errors import RequiredAttributeError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
@@ -171,3 +172,17 @@ def test_evaluate_separate_on_inactivity(activity_aggregate_schema: ActivityAggr
 
     store_state = activity_aggregate._schema.store.get_all(identity)
     assert len(store_state) == 2
+
+
+def test_activity_aggregate_schema_missing_separate_by_inactive_attribute_adds_error(activity_aggregate_schema_spec, store_spec):
+    del activity_aggregate_schema_spec[ActivityAggregateSchema.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS]
+
+    schema_loader = SchemaLoader()
+    name = schema_loader.add_schema_spec(activity_aggregate_schema_spec)
+    schema_loader.add_schema_spec(store_spec, name)
+    schema = ActivityAggregateSchema(name, schema_loader)
+
+    assert len(schema._errors.errors) == 1
+    error = schema._errors.errors[0]
+    assert isinstance(error, RequiredAttributeError)
+    assert error.attribute == ActivityAggregateSchema.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS

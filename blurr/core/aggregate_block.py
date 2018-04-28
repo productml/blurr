@@ -9,9 +9,7 @@ from blurr.core.validator import ATTRIBUTE_INTERNAL
 
 
 class BlockAggregateSchema(AggregateSchema):
-    """
-    Aggregates that handles the block rollup aggregation
-    """
+    """ Rolls up records into aggregate blocks.  Blocks are created when the split condition executes to true.  """
 
     ATTRIBUTE_SPLIT = 'Split'
 

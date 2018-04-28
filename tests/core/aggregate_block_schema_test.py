@@ -16,7 +16,7 @@ def block_aggregate_schema_spec() -> Dict[str, Any]:
         'Type': Type.BLURR_AGGREGATE_BLOCK,
         'Name': 'user',
         'Filter': 'source.event_id in ["app_launched", "user_updated"]',
-        'Split': False,
+        'Split': True,
         'Fields': [{
             'Name': 'event_count',
             'Type': Type.INTEGER,
@@ -74,6 +74,8 @@ def test_block_aggregate_schema_with_split_initialization(block_aggregate_schema
 
 
 def test_block_aggregate_schema_missing_split_attribute_adds_error(block_aggregate_schema_spec):
+    del block_aggregate_schema_spec[BlockAggregateSchema.ATTRIBUTE_SPLIT]
+
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema_spec(block_aggregate_schema_spec)
     schema = BlockAggregateSchema(name, schema_loader)
