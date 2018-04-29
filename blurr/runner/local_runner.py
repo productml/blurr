@@ -5,10 +5,9 @@ Usage:
 """
 import csv
 import json
+from collections import defaultdict
 from datetime import datetime
 from typing import List, Optional, Any, Dict, Tuple
-
-from collections import defaultdict
 
 from blurr.core.record import Record
 from blurr.core.syntax.schema_validator import validate
@@ -45,10 +44,8 @@ class LocalRunner(Runner):
         identity_records = defaultdict(list)
         for file in local_json_files:
             with open(file) as f:
-                for data_str in f:
-                    for identity, time_record in self.get_per_identity_records(
-                            data_str, data_processor):
-                        identity_records[identity].append(time_record)
+                for identity, record_with_datetime in self.get_per_identity_records(f, data_processor):
+                    identity_records[identity].append(record_with_datetime)
         return identity_records
 
     def execute(self, identity_records: Dict[str, List[Tuple[datetime, Record]]]) -> Any:
