@@ -24,18 +24,18 @@ class BaseSchema(ABC):
         """
         self.schema_loader: SchemaLoader = schema_loader
         self.fully_qualified_name: str = fully_qualified_name
-        self._spec: Dict[str, Any] = self.schema_loader.get_schema_spec(self.fully_qualified_name)
+        self.spec: Dict[str, Any] = self.schema_loader.get_schema_spec(self.fully_qualified_name)
 
         self.validate_schema_spec()
 
         self.extend_schema_spec()
 
-        self.name: str = self._spec[self.ATTRIBUTE_NAME]
-        self.type: str = self._spec[self.ATTRIBUTE_TYPE]
+        self.name: str = self.spec[self.ATTRIBUTE_NAME]
+        self.type: str = self.spec[self.ATTRIBUTE_TYPE]
 
         self.when: Expression = Expression(
-            self._spec[self.ATTRIBUTE_WHEN]) if self.ATTRIBUTE_WHEN in self._spec else None
-        self.description: str = self._spec.get(self.ATTRIBUTE_DESCRIPTION, None)
+            self.spec[self.ATTRIBUTE_WHEN]) if self.ATTRIBUTE_WHEN in self.spec else None
+        self.description: str = self.spec.get(self.ATTRIBUTE_DESCRIPTION, None)
 
     def extend_schema_spec(self) -> None:
         """ Extends the defined schema specifications at runtime with defaults """
@@ -52,11 +52,11 @@ class BaseSchema(ABC):
 
     def validate_required(self, *attributes) -> None:
         """ Validates that the schema contains a series of required attributes """
-        self.add_errors(validate_required(self.fully_qualified_name, self._spec, *attributes))
+        self.add_errors(validate_required(self.fully_qualified_name, self.spec, *attributes))
 
     def validate_identity(self, *attributes) -> None:
         """ Validates that a schema attribute can be a python valid identifier """
-        self.add_errors(validate_identifier(self.fully_qualified_name, self._spec, *attributes))
+        self.add_errors(validate_identifier(self.fully_qualified_name, self.spec, *attributes))
 
     def validate_number(self,
                         attribute: str,
@@ -64,7 +64,7 @@ class BaseSchema(ABC):
                         minimum: Optional[Union[int, float]] = None,
                         maximum: Optional[Union[int, float]] = None):
         self.add_errors(
-            validate_number(self.fully_qualified_name, self._spec, attribute, value_type, minimum,
+            validate_number(self.fully_qualified_name, self.spec, attribute, value_type, minimum,
                             maximum))
 
     @abstractmethod
@@ -94,7 +94,7 @@ class BaseSchemaCollection(BaseSchema, ABC):
         self.nested_schema: Dict[str, Type[BaseSchema]] = {
             schema_spec[self.ATTRIBUTE_NAME]: self.schema_loader.get_nested_schema_object(
                 self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
-            for schema_spec in self._spec.get(self._nested_item_attribute, [])
+            for schema_spec in self.spec.get(self._nested_item_attribute, [])
         }
 
     def validate_schema_spec(self) -> None:

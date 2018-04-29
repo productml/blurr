@@ -19,8 +19,8 @@ class StreamingTransformerSchema(TransformerSchema):
         super().__init__(fully_qualified_name, schema_loader)
 
         if not self.errors:
-            self.identity = Expression(self._spec[self.ATTRIBUTE_IDENTITY])
-            self.time = Expression(self._spec[self.ATTRIBUTE_TIME])
+            self.identity = Expression(self.spec[self.ATTRIBUTE_IDENTITY])
+            self.time = Expression(self.spec[self.ATTRIBUTE_TIME])
 
     def validate_schema_spec(self) -> None:
         super().validate_schema_spec()

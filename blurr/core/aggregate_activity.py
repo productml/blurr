@@ -14,7 +14,7 @@ class ActivityAggregateSchema(BlockAggregateSchema):
 
         if not self.errors:
             self.separation_interval: timedelta = timedelta(
-                seconds=int(self._spec[self.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS]))
+                seconds=int(self.spec[self.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS]))
 
     def validate_schema_spec(self) -> None:
         super(BlockAggregateSchema, self).validate_schema_spec()

@@ -31,9 +31,9 @@ class WindowTransformerSchema(TransformerSchema):
     def extend_schema_spec(self) -> None:
         super().extend_schema_spec()
         if not self.errors:
-            self._spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_NAME] = 'anchor'
-            self._spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_TYPE] = Type.ANCHOR
-            self.schema_loader.add_schema_spec(self._spec[self.ATTRIBUTE_ANCHOR], self.fully_qualified_name)
+            self.spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_NAME] = 'anchor'
+            self.spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_TYPE] = Type.ANCHOR
+            self.schema_loader.add_schema_spec(self.spec[self.ATTRIBUTE_ANCHOR], self.fully_qualified_name)
 
 
 class WindowTransformer(Transformer):

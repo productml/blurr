@@ -21,7 +21,7 @@ class IdentityAggregateSchema(AggregateSchema):
         self.dimension_fields: Dict[str, FieldSchema] = {
             schema_spec[self.ATTRIBUTE_NAME]: self.schema_loader.get_nested_schema_object(
                 self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
-            for schema_spec in self._spec.get(self.ATTRIBUTE_DIMENSIONS, [])
+            for schema_spec in self.spec.get(self.ATTRIBUTE_DIMENSIONS, [])
         }
 
     def validate_schema_spec(self) -> None:
