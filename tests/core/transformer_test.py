@@ -3,7 +3,7 @@ from typing import Dict, Any
 import pytest
 from pytest import fixture
 
-from blurr.core.errors import MissingAttributeError
+from blurr.core.errors import MissingAttributeError, RequiredAttributeError
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.transformer import TransformerSchema, Transformer
 from blurr.core.type import Type
@@ -84,3 +84,18 @@ def test_transformer_get_item(test_transformer: MockTransformer) -> None:
 def test_transformer_get_item_missing(test_transformer: MockTransformer) -> None:
     with pytest.raises(MissingAttributeError, match='missing_group not defined in test'):
         assert test_transformer['missing_group']
+
+
+def test_transformer_schema_missing_version_attribute_adds_error(schema_loader: SchemaLoader,
+                                                                 schema_spec: Dict[str, Any]):
+    del schema_spec[TransformerSchema.ATTRIBUTE_VERSION]
+    del schema_spec[TransformerSchema.ATTRIBUTE_AGGREGATES]
+
+    name = schema_loader.add_schema_spec(schema_spec)
+    schema = MockTransformerSchema(name, schema_loader)
+
+    assert 2 == len(schema.errors)
+    assert isinstance(schema.errors[0], RequiredAttributeError)
+    assert TransformerSchema.ATTRIBUTE_AGGREGATES == schema.errors[0].attribute
+    assert isinstance(schema.errors[1], RequiredAttributeError)
+    assert TransformerSchema.ATTRIBUTE_VERSION == schema.errors[1].attribute

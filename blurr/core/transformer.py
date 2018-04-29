@@ -1,6 +1,6 @@
 from abc import ABC
 from copy import copy
-from typing import Dict
+from typing import Dict, Type
 
 from blurr.core.aggregate import Aggregate
 from blurr.core.base import BaseItemCollection, BaseSchemaCollection
@@ -8,6 +8,7 @@ from blurr.core.errors import MissingAttributeError
 from blurr.core.loader import TypeLoader
 from blurr.core.schema_context import SchemaContext
 from blurr.core.schema_loader import SchemaLoader
+from blurr.core.store import Store
 
 
 class TransformerSchema(BaseSchemaCollection, ABC):
@@ -19,18 +20,25 @@ class TransformerSchema(BaseSchemaCollection, ABC):
     ATTRIBUTE_VERSION = 'Version'
     ATTRIBUTE_AGGREGATES = 'Aggregates'
     ATTRIBUTE_IMPORT = 'Import'
+    ATTRIBUTE_STORES = 'Stores'
 
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader, self.ATTRIBUTE_AGGREGATES)
 
-        # Load the schema specific attributes
-        self.version = self._spec[self.ATTRIBUTE_VERSION]
+        if not self.errors:
+            self.version = self._spec[self.ATTRIBUTE_VERSION]
+            self.stores: Dict[str, Type[Store]] = {
+                schema_spec[self.ATTRIBUTE_NAME]: self.schema_loader.get_nested_schema_object(
+                    self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
+                for schema_spec in self._spec.get(self.ATTRIBUTE_STORES, [])
+            }
+
         self.import_list = self._spec.get(self.ATTRIBUTE_IMPORT, [])
         self.schema_context = SchemaContext(self.import_list)
 
     def validate_schema_spec(self) -> None:
         super().validate_schema_spec()
-        self.validate_required(self.ATTRIBUTE_AGGREGATES, self.ATTRIBUTE_VERSION)
+        self.validate_required(self.ATTRIBUTE_VERSION)
 
 
 class Transformer(BaseItemCollection, ABC):
