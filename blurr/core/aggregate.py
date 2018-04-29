@@ -56,6 +56,10 @@ class AggregateSchema(BaseSchemaCollection, ABC):
 
         return super().extend_schema_spec(spec)
 
+    def validate_schema_spec(self) -> None:
+        super(AggregateSchema, self).validate_schema_spec()
+        self.validate_required(self.ATTRIBUTE_STORE)
+
 
 class Aggregate(BaseItemCollection, ABC):
     """
