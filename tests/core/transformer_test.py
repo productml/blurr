@@ -5,7 +5,6 @@ from pytest import fixture
 
 from blurr.core.errors import MissingAttributeError
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.store_key import Key
 from blurr.core.transformer import TransformerSchema, Transformer
 from blurr.core.type import Type
 
@@ -16,14 +15,9 @@ def schema_spec() -> Dict[str, Any]:
         'Name': 'test',
         'Type': Type.BLURR_TRANSFORM_STREAMING,
         'Version': '2018-03-01',
-        'Stores': [{
-            'Name': 'memstore',
-            'Type': Type.BLURR_STORE_MEMORY
-        }],
         'Aggregates': [{
             'Name': 'test_group',
-            'Type': Type.BLURR_AGGREGATE_IDENTITY,
-            'Store': 'memstore',
+            'Type': Type.BLURR_AGGREGATE_VARIABLE,
             'Fields': [{
                 "Type": "integer",
                 "Name": "events",
@@ -63,7 +57,6 @@ def test_transformer_schema_init(schema_loader: SchemaLoader, schema_spec: Dict[
     test_transformer_schema = MockTransformerSchema(name, schema_loader)
     assert test_transformer_schema.version == '2018-03-01'
     assert test_transformer_schema.type == Type.BLURR_TRANSFORM_STREAMING
-    assert test_transformer_schema.stores['memstore'].type == Type.BLURR_STORE_MEMORY
 
 
 def test_transformer_init(test_transformer) -> None:
@@ -73,18 +66,6 @@ def test_transformer_init(test_transformer) -> None:
         'test_group': test_transformer._aggregates['test_group']
     }
     assert test_transformer._evaluation_context.local_context == {}
-
-
-def test_transformer_finalize(test_transformer: MockTransformer,
-                              schema_loader: SchemaLoader) -> None:
-    store = schema_loader.get_schema_object('test.memstore')
-
-    test_transformer.finalize()
-    assert store.get(Key('user1', 'test_group')) is None
-
-    test_transformer.evaluate()
-    test_transformer.finalize()
-    assert store.get(Key('user1', 'test_group')) == {'_identity': 'user1', 'events': 1}
 
 
 def test_transformer_get_attr(test_transformer: MockTransformer) -> None:

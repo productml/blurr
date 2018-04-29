@@ -41,7 +41,9 @@ def validate_required(fully_qualified_name: str, spec: Dict[str, Any],
     return errors
 
 
-def validate_number(fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
+def validate_number(fully_qualified_name: str,
+                    spec: Dict[str, Any],
+                    attribute: str,
                     value_type: Union[Type[int], Type[float]] = int,
                     minimum: Optional[Union[int, float]] = None,
                     maximum: Optional[Union[int, float]] = None) -> Optional[InvalidNumberError]:
@@ -53,7 +55,8 @@ def validate_number(fully_qualified_name: str, spec: Dict[str, Any], attribute: 
         if (minimum and value < minimum) or (maximum and value > maximum):
             raise Exception()
     except:
-        return InvalidNumberError(fully_qualified_name, spec, attribute, value_type, minimum, maximum)
+        return InvalidNumberError(fully_qualified_name, spec, attribute, value_type, minimum,
+                                  maximum)
 
 
 def validate_schema_basics(fully_qualified_name: str,

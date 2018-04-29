@@ -1,7 +1,6 @@
 from typing import Dict, Any, List
 
 from blurr.core.aggregate import Aggregate, AggregateSchema
-from blurr.core.errors import SchemaErrorCollection
 from blurr.core.evaluation import Expression
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.type import Type

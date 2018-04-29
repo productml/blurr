@@ -3,7 +3,6 @@ from typing import Any
 
 from blurr.core import logging
 from blurr.core.base import BaseSchema, BaseItem
-from blurr.core.errors import SchemaErrorCollection
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 

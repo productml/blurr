@@ -58,10 +58,14 @@ class BaseSchema(ABC):
         """ Validates that a schema attribute can be a python valid identifier """
         self.add_errors(validate_identifier(self.fully_qualified_name, self._spec, *attributes))
 
-    def validate_number(self, attribute: str, value_type: Union[Type[int], Type[float]] = int,
-                        minimum: Optional[Union[int, float]] = None, maximum: Optional[Union[int, float]] = None):
+    def validate_number(self,
+                        attribute: str,
+                        value_type: Union[Type[int], Type[float]] = int,
+                        minimum: Optional[Union[int, float]] = None,
+                        maximum: Optional[Union[int, float]] = None):
         self.add_errors(
-            validate_number(self.fully_qualified_name, self._spec, attribute, value_type, minimum, maximum))
+            validate_number(self.fully_qualified_name, self._spec, attribute, value_type, minimum,
+                            maximum))
 
     @abstractmethod
     def validate_schema_spec(self) -> None:

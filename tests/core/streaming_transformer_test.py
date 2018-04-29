@@ -8,6 +8,7 @@ from blurr.core.errors import IdentityError, TimeError
 from blurr.core.evaluation import Context
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
+from blurr.core.store_key import Key
 from blurr.core.transformer_streaming import StreamingTransformerSchema, StreamingTransformer
 from blurr.core.type import Type
 
@@ -132,3 +133,18 @@ def test_streaming_transformer_evaluate(schema_loader: SchemaLoader,
     transformer.evaluate(Record())
 
     assert transformer._snapshot == {'test_group': {'_identity': 'user1', 'events': 1}}
+
+
+def test_streaming_transformer_finalize(schema_loader: SchemaLoader,
+                                        schema_spec: Dict[str, Any]) -> None:
+    streaming_dtc = schema_loader.add_schema_spec(schema_spec)
+    transformer_schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
+    transformer = StreamingTransformer(transformer_schema, 'user1')
+    store = schema_loader.get_schema_object('test.memstore')
+
+    transformer.finalize()
+    assert store.get(Key('user1', 'test_group')) is None
+
+    transformer.evaluate(Record())
+    transformer.finalize()
+    assert store.get(Key('user1', 'test_group')) == {'_identity': 'user1', 'events': 1}

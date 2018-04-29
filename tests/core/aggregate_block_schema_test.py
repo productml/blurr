@@ -30,6 +30,7 @@ def schema_spec() -> Dict[str, Any]:
 def store_spec() -> Dict[str, Any]:
     return {'Name': 'memstore', 'Type': Type.BLURR_STORE_MEMORY}
 
+
 def match_fields(fields):
     expected_fields = [{
         'Name': '_identity',
@@ -40,13 +41,13 @@ def match_fields(fields):
         'Name': '_start_time',
         'Type': Type.DATETIME,
         'Value': 'time if user._start_time is None else time if time < '
-                 'user._start_time else user._start_time',
+        'user._start_time else user._start_time',
         ATTRIBUTE_INTERNAL: True
     }, {
         'Name': '_end_time',
         'Type': Type.DATETIME,
         'Value': 'time if user._end_time is None else time if time > '
-                 'user._end_time else user._end_time',
+        'user._end_time else user._end_time',
         ATTRIBUTE_INTERNAL: True
     }, {
         'Name': 'event_count',

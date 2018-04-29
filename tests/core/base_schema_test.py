@@ -80,7 +80,8 @@ def test_schema_collection_missing_nested_attribute_adds_error(
     assert 'MissingNested' == schema.errors[0].attribute
 
 
-def test_schema_collection_empty_nested_attribute_adds_error(schema_collection_spec: Dict[str, Any]):
+def test_schema_collection_empty_nested_attribute_adds_error(
+        schema_collection_spec: Dict[str, Any]):
     del schema_collection_spec['Fields'][0]
     schema_loader = SchemaLoader()
     schema_loader.add_schema_spec(schema_collection_spec)

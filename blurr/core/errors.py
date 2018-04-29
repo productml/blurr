@@ -24,9 +24,7 @@ class InvalidSchemaError(Exception, ABC):
 
     def __repr__(self):
         return '{cls}: FQN: {fqn}, Attribute: {attribute}'.format(
-            cls=self.__class__.__name__,
-            fqn=self.fully_qualified_name,
-            attribute=self.attribute)
+            cls=self.__class__.__name__, fqn=self.fully_qualified_name, attribute=self.attribute)
 
 
 class SchemaErrorCollection:
@@ -95,7 +93,9 @@ class InvalidNumberError(InvalidSchemaError):
 
     def __str__(self):
         return 'Attribute `{attr}` under `{fqn}` must be of type `{type}`. {less_than} {greater_than}'.format(
-            attr=self.attribute, fqn=self.fully_qualified_name, type=self.type.__name__,
+            attr=self.attribute,
+            fqn=self.fully_qualified_name,
+            type=self.type.__name__,
             greater_than=('Must be greater than ' + str(self.min)) if self.min else '',
             less_than=('Must be lesser than ' + (self.max)) if self.max else '')
 

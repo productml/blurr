@@ -1,9 +1,11 @@
 from datetime import datetime
+from typing import Dict, Type
 
 from blurr.core.base import Expression
 from blurr.core.errors import IdentityError, TimeError
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
+from blurr.core.store import Store
 from blurr.core.transformer import Transformer, TransformerSchema
 
 
@@ -14,12 +16,24 @@ class StreamingTransformerSchema(TransformerSchema):
 
     ATTRIBUTE_IDENTITY = 'Identity'
     ATTRIBUTE_TIME = 'Time'
+    ATTRIBUTE_STORES = 'Stores'
 
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
 
         self.identity = Expression(self._spec[self.ATTRIBUTE_IDENTITY])
         self.time = Expression(self._spec[self.ATTRIBUTE_TIME])
+
+        # Load list of stores from the schema
+        self.stores: Dict[str, Type[Store]] = {
+            schema_spec[self.ATTRIBUTE_NAME]: self.schema_loader.get_nested_schema_object(
+                self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
+            for schema_spec in self._spec.get(self.ATTRIBUTE_STORES, [])
+        }
+
+    def validate_schema_spec(self) -> None:
+        super().validate_schema_spec()
+        self.validate_required(self.ATTRIBUTE_IDENTITY, self.ATTRIBUTE_TIME, self.ATTRIBUTE_STORES)
 
     def get_identity(self, record: Record) -> str:
         """

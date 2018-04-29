@@ -1,6 +1,5 @@
 from datetime import timedelta
 
-from blurr.core.aggregate import AggregateSchema
 from blurr.core.aggregate_block import BlockAggregate, BlockAggregateSchema
 from blurr.core.schema_loader import SchemaLoader
 

@@ -110,14 +110,10 @@ def test_anchor_condition(anchor_schema_max_one: AnchorSchema, block_item: Block
 
 
 def test_anchor_schema_missing_condition_max_attribute_adds_error(schema_loader: SchemaLoader):
-    name = schema_loader.add_schema_spec({
-        'Name': 'anchor',
-        'Type': Type.ANCHOR
-    })
+    name = schema_loader.add_schema_spec({'Name': 'anchor', 'Type': Type.ANCHOR})
     schema = AnchorSchema(name, schema_loader)
 
     assert 2 == len(schema.errors)
     assert isinstance(schema.errors[0], RequiredAttributeError)
     assert AnchorSchema.ATTRIBUTE_CONDITION == schema.errors[0].attribute
     assert AnchorSchema.ATTRIBUTE_MAX == schema.errors[1].attribute
-
