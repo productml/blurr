@@ -26,7 +26,7 @@ class BaseSchema(ABC):
         self.fully_qualified_name: str = fully_qualified_name
         self._spec: Dict[str, Any] = self.schema_loader.get_schema_spec(self.fully_qualified_name)
 
-        self._errors = self.validate_schema_spec()
+        self.validate_schema_spec()
 
         self._spec: Dict[str, Any] = self.extend_schema_spec(self._spec)
 
