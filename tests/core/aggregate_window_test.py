@@ -3,11 +3,11 @@ from datetime import datetime, timezone
 import pytest
 from pytest import fixture
 
-from blurr.core.type import Type
+from blurr.core.aggregate_window import WindowAggregateSchema, WindowAggregate
 from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import EvaluationContext, Context
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.aggregate_window import WindowAggregateSchema, WindowAggregate
+from blurr.core.type import Type
 
 
 @fixture
