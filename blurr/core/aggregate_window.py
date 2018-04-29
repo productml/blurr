@@ -11,16 +11,21 @@ from blurr.core.type import Type
 
 
 class WindowAggregateSchema(AggregateSchema):
-
     ATTRIBUTE_WINDOW_VALUE = 'WindowValue'
     ATTRIBUTE_WINDOW_TYPE = 'WindowType'
     ATTRIBUTE_SOURCE = 'Source'
 
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
-        self.window_value = self._spec[self.ATTRIBUTE_WINDOW_VALUE]
-        self.window_type = self._spec[self.ATTRIBUTE_WINDOW_TYPE]
-        self.source = self.schema_loader.get_schema_object(self._spec[self.ATTRIBUTE_SOURCE])
+        if not self.errors:
+            self.window_value = self._spec[self.ATTRIBUTE_WINDOW_VALUE]
+            self.window_type = self._spec[self.ATTRIBUTE_WINDOW_TYPE]
+            self.source = self.schema_loader.get_schema_object(self._spec[self.ATTRIBUTE_SOURCE])
+
+    def validate_schema_spec(self) -> None:
+        super().validate_schema_spec()
+        self.validate_required(self.ATTRIBUTE_WINDOW_TYPE, self.ATTRIBUTE_WINDOW_VALUE, self.ATTRIBUTE_SOURCE)
+        self.validate_number(self.ATTRIBUTE_WINDOW_VALUE, int, 1, None)
 
 
 class _WindowSource:
