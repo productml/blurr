@@ -25,7 +25,7 @@ class WindowAggregateSchema(AggregateSchema):
     def validate_schema_spec(self) -> None:
         super().validate_schema_spec()
         self.validate_required(self.ATTRIBUTE_WINDOW_TYPE, self.ATTRIBUTE_WINDOW_VALUE, self.ATTRIBUTE_SOURCE)
-        self.validate_number(self.ATTRIBUTE_WINDOW_VALUE, int, 1, None)
+        self.validate_number(self.ATTRIBUTE_WINDOW_VALUE, int)
 
 
 class _WindowSource:
