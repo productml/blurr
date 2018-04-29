@@ -12,6 +12,7 @@ class ActivityAggregateSchema(BlockAggregateSchema):
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
 
+        # TODO The try catch will not be required in the future when we block initialization when errors are raised at validation
         try:
             value = int(self._spec[self.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS])
             self.separation_interval: timedelta = timedelta(seconds=value)
