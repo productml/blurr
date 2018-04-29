@@ -156,7 +156,8 @@ def test_streaming_transformer_schema_missing_attributes_adds_error(schema_loade
     del schema_spec[StreamingTransformerSchema.ATTRIBUTE_IDENTITY]
     del schema_spec[StreamingTransformerSchema.ATTRIBUTE_TIME]
     del schema_spec[StreamingTransformerSchema.ATTRIBUTE_STORES]
-    del schema_spec[StreamingTransformerSchema.ATTRIBUTE_AGGREGATES][0][AggregateSchema.ATTRIBUTE_STORE]
+    del schema_spec[StreamingTransformerSchema.ATTRIBUTE_AGGREGATES][0][
+        AggregateSchema.ATTRIBUTE_STORE]
     schema_spec[StreamingTransformerSchema.ATTRIBUTE_AGGREGATES][0][
         AggregateSchema.ATTRIBUTE_TYPE] = Type.BLURR_AGGREGATE_VARIABLE
 

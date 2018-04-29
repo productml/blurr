@@ -63,9 +63,9 @@ def test_initialization_with_invalid_source(schema_loader_with_mem_store: Schema
         WindowAggregateSchema(name, schema_loader_with_mem_store)
 
 
-def test_window_aggregate_schema_missing_attributes_adds_error(schema_loader_with_mem_store: SchemaLoader,
-                                          aggregate_block_schema_spec: Dict[str, Any],
-                                          window_schema_spec: Dict[str, Any], stream_dtc_name: str):
+def test_window_aggregate_schema_missing_attributes_adds_error(
+        schema_loader_with_mem_store: SchemaLoader, aggregate_block_schema_spec: Dict[str, Any],
+        window_schema_spec: Dict[str, Any], stream_dtc_name: str):
     del window_schema_spec[WindowAggregateSchema.ATTRIBUTE_WINDOW_TYPE]
     del window_schema_spec[WindowAggregateSchema.ATTRIBUTE_WINDOW_VALUE]
     del window_schema_spec[WindowAggregateSchema.ATTRIBUTE_SOURCE]

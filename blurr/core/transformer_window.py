@@ -21,14 +21,18 @@ class WindowTransformerSchema(TransformerSchema):
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
 
-        self.anchor = self.schema_loader.get_schema_object(self.fully_qualified_name + '.anchor')
+        if not self.errors:
+            self.anchor = self.schema_loader.get_schema_object(self.fully_qualified_name + '.anchor')
+
+    def validate_schema_spec(self) -> None:
+        super().validate_schema_spec()
+        self.validate_required(self.ATTRIBUTE_ANCHOR)
 
     def extend_schema_spec(self, spec: Dict[str, Any]) -> Dict[str, Any]:
-        # Inject name and type for Anchor as expected by BaseSchema
-        spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_NAME] = 'anchor'
-        spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_TYPE] = Type.ANCHOR
-
-        self.schema_loader.add_schema_spec(spec[self.ATTRIBUTE_ANCHOR], self.fully_qualified_name)
+        if not self.errors:
+            spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_NAME] = 'anchor'
+            spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_TYPE] = Type.ANCHOR
+            self.schema_loader.add_schema_spec(spec[self.ATTRIBUTE_ANCHOR], self.fully_qualified_name)
 
         return super().extend_schema_spec(spec)
 
