@@ -23,19 +23,18 @@ class BlockAggregateSchema(AggregateSchema):
         super().validate_schema_spec()
         self.validate_required(self.ATTRIBUTE_STORE, self.ATTRIBUTE_SPLIT)
 
-    def extend_schema_spec(self, spec: Dict[str, Any]) -> Dict[str, Any]:
+    def extend_schema_spec(self) -> None:
         """ Injects the block start and end times """
+        super().extend_schema_spec()
 
-        if self.ATTRIBUTE_FIELDS in spec:
+        if self.ATTRIBUTE_FIELDS in self._spec:
             # Add new fields to the schema spec
-            predefined_field = self._build_time_fields_spec(spec[self.ATTRIBUTE_NAME])
-            spec[self.ATTRIBUTE_FIELDS][0:0] = predefined_field
+            predefined_field = self._build_time_fields_spec(self._spec[self.ATTRIBUTE_NAME])
+            self._spec[self.ATTRIBUTE_FIELDS][1:1] = predefined_field
 
             # Add new field schema to the schema loader
             for field_schema in predefined_field:
                 self.schema_loader.add_schema_spec(field_schema, self.fully_qualified_name)
-
-        return super().extend_schema_spec(spec)
 
     @staticmethod
     def _build_time_fields_spec(name_in_context: str) -> List[Dict[str, Any]]:

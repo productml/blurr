@@ -28,7 +28,7 @@ class BaseSchema(ABC):
 
         self.validate_schema_spec()
 
-        self._spec: Dict[str, Any] = self.extend_schema_spec(self._spec)
+        self.extend_schema_spec()
 
         self.name: str = self._spec[self.ATTRIBUTE_NAME]
         self.type: str = self._spec[self.ATTRIBUTE_TYPE]
@@ -37,9 +37,9 @@ class BaseSchema(ABC):
             self._spec[self.ATTRIBUTE_WHEN]) if self.ATTRIBUTE_WHEN in self._spec else None
         self.description: str = self._spec.get(self.ATTRIBUTE_DESCRIPTION, None)
 
-    def extend_schema_spec(self, spec: Dict[str, Any]) -> Dict[str, Any]:
+    def extend_schema_spec(self) -> None:
         """ Extends the defined schema specifications at runtime with defaults """
-        return spec
+        pass
 
     def add_errors(self, *errors: Union[InvalidSchemaError, SchemaErrorCollection]) -> None:
         """ Adds errors to the error repository in schema laoder """
