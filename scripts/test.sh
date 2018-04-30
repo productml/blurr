@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 set -e
 
@@ -7,7 +7,7 @@ if [ ! -d "blurr/core" ]; then
     exit 1
 fi
 
-sh scripts/start_dynamodb.sh
+bash scripts/start_dynamodb.sh
 
 # Check if DynamoDB is running.
 status="$(ps aux | grep DynamoDBLocal.jar | grep java)"
@@ -19,5 +19,8 @@ fi
 echo "running tests..."
 export PYTHONPATH=`pwd`:$SPARK_HOME/python/lib/pyspark.zip:$SPARK_HOME/python/lib/py4j-0.10.4-src.zip:$PYTHONPATH
 pipenv run pytest -v --cov=blurr
+
+
+bash scripts/stop_dynamodb.sh
 
 echo "Done."

@@ -9,6 +9,7 @@ from pytest import fixture
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
 from blurr.store.dynamo_store import DynamoStore
+from tests.store.dynamo.utils import DYNAMODB_KWARGS
 
 
 @fixture
@@ -20,20 +21,12 @@ def dynamo_store_spec() -> Dict[str, Any]:
     }
 
 
-BOTO3_DYNAMODB_KWARGS = {
-    "endpoint_url": 'http://localhost:25877',
-    'region_name': 'us-west-2',
-    'aws_access_key_id': "anything",
-    'aws_secret_access_key': "anything"
-}
+def override_boto3_dynamodb_resource(db_kwargs=DYNAMODB_KWARGS) -> Any:
+    return boto3.resource('dynamodb', **db_kwargs)
 
 
-def override_boto3_dynamodb_resource() -> Any:
-    return boto3.resource('dynamodb', **BOTO3_DYNAMODB_KWARGS)
-
-
-def get_boto3_dynamodb_client() -> Any:
-    return boto3.client('dynamodb', **BOTO3_DYNAMODB_KWARGS)
+def get_boto3_dynamodb_client(db_kwargs=DYNAMODB_KWARGS) -> Any:
+    return boto3.client('dynamodb', **db_kwargs)
 
 
 @fixture

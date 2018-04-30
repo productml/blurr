@@ -7,7 +7,7 @@ jobs:
       - checkout
       - run:
           name: build
-          command: sh build.sh
+          command: bash build.sh
   deploy:
     docker:
       - image: productml/spark-builder:0.35
