@@ -8,6 +8,7 @@ from blurr.core.field_simple import IntegerFieldSchema
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.transformer_streaming import StreamingTransformerSchema
 from blurr.core.type import Type
+from blurr.store.memory_store import MemoryStore
 
 
 @fixture
@@ -137,3 +138,40 @@ def test_get_schemas_of_type(schema_loader: SchemaLoader, nested_schema_spec: Di
 
 def test_get_transformer_name() -> None:
     assert SchemaLoader.get_transformer_name('test.child1.child2') == 'test'
+
+
+def test_get_store_error_not_declared(schema_loader: SchemaLoader):
+    with pytest.raises(InvalidSchemaError, match='test.memstore not declared in schema'):
+        schema_loader.get_store('test.memstore')
+
+
+def test_get_store_error_not_defined(schema_loader: SchemaLoader):
+    with pytest.raises(InvalidSchemaError, match='test.memstore not declared in schema'):
+        schema_loader.get_store('test.memstore')
+
+
+def test_get_store_error_missing_type(nested_schema_spec: Dict) -> None:
+    nested_schema_spec['Store'] = {
+        'Name': 'memstore'
+    }
+    schema_loader = SchemaLoader()
+    schema_loader.add_schema(nested_schema_spec)
+    with pytest.raises(InvalidSchemaError, match='Type not defined in schema for test.memstore'):
+        schema_loader.get_store('test.memstore')
+
+
+def test_get_store_error_wrong_type(nested_schema_spec: Dict) -> None:
+    schema_loader = SchemaLoader()
+    schema_loader.add_schema(nested_schema_spec)
+    with pytest.raises(InvalidSchemaError, match='test.test_group does not have a store type'):
+        schema_loader.get_store('test.test_group')
+
+
+def test_get_store_success(nested_schema_spec: Dict) -> None:
+    nested_schema_spec['Store'] = {
+        'Name': 'memstore',
+        'Type': Type.BLURR_STORE_MEMORY
+    }
+    schema_loader = SchemaLoader()
+    schema_loader.add_schema(nested_schema_spec)
+    assert isinstance(schema_loader.get_store('test.memstore'), MemoryStore)

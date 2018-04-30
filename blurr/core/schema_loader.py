@@ -74,7 +74,7 @@ class SchemaLoader:
         if fully_qualified_name not in self._store_cache:
             schema = self.get_schema_object(fully_qualified_name)
             if not Type.is_store_type(schema.type):
-                raise ValueError('{} does not have a store type.'.format(fully_qualified_name))
+                raise InvalidSchemaError('{} does not have a store type.'.format(fully_qualified_name))
 
             self._store_cache[fully_qualified_name] = TypeLoader.load_item(schema.type)(schema)
 
