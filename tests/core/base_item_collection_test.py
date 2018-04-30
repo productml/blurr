@@ -4,8 +4,8 @@ from unittest import mock
 
 from pytest import fixture, raises
 
-from blurr.core.base import BaseItemCollection, BaseItem, BaseSchemaCollection
 from blurr.core.aggregate import AggregateSchema
+from blurr.core.base import BaseItemCollection, BaseItem, BaseSchemaCollection
 from blurr.core.errors import SnapshotError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.loader import TypeLoader

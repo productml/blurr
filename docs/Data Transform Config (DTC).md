@@ -46,13 +46,13 @@ At the end of a transform, data is persisted in the store. The Data Transform Li
 
 ```YAML
 Stores:
-   - Type: Blurr:Store:MemoryStore
+   - Type: Blurr:Store:Memory
      Name: hello_world_store
 ```
 
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
-Type | The destination data store | `Blurr:Store:MemoryStore`. More Stores such as S3 and DynamoDB coming soon | Required
+Type | The destination data store | `Blurr:Store:Memory`. More Stores such as S3 and DynamoDB coming soon | Required
 Name | Name of the store, used for internal referencing within the DTC | Any `string` | Required
 
 
@@ -99,14 +99,14 @@ Aggregates defines groups of data that are either in a one-to-one relationship w
 
 There are 3 types of Aggregates in a Streaming DTC.
 
-### IdentityAggregate
+### Identity Aggregate
 
-`Blurr:Aggregate:IdentityAggregate`. Fields in the IdentityAggregates are in a one-to-one relationship with the identity.  There is a single record that stores these fields and change to these fields overwrite the previous value.  There are no historical records kept for state changes.
+`Blurr:Aggregate:Identity`. Fields in the Identity Aggregates are in a one-to-one relationship with the identity.  There is a single record that stores these fields and change to these fields overwrite the previous value.  There are no historical records kept for state changes.
 
 ```yaml
 Aggregates:
 
-  - Type: Blurr:Aggregate:IdentityAggregate
+  - Type: Blurr:Aggregate:Identity
     Name: user
     Store: offer_ai_dynamo
     When: source.event_id in ['app_launched', 'user_updated']
@@ -123,14 +123,14 @@ Aggregates:
 
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
-Type | Type of Aggregate | `Blurr:Aggregate:IdentityAggregate`, `Blurr:Aggregate:BlockAggregate`, `Blurr:Aggregate:VariableAggregate` | Required
+Type | Type of Aggregate | `Blurr:Aggregate:Identity`, `Blurr:Aggregate:Block`, `Blurr:Aggregate:Variable` | Required
 Name | Name of the Aggregate | Any `string`, unique within the DTC | Required
 Store | Name of the Store in which to create the Aggregate  | Stores defined in the DTC | Required
 When | Boolean expression that defines which raw events to process | Any `boolean` expression | Optional
 
-A `Aggregate` contains `fields` for the information being stored. IdentityAggregate fields are especially useful for data that is relatively static over time - like a user's country.
+An `Aggregate` contains `fields` for the information being stored. `Identity Aggregate` fields are especially useful for data that is relatively static over time - like a user's country.
 
- Each field in an IdentityAggregate has 3 properties.
+ Each field in an Identity Aggregate has 3 properties.
 
  Key |  Description | Allowed values | Required
  --- | ------------ | -------------- | --------
@@ -140,7 +140,7 @@ A `Aggregate` contains `fields` for the information being stored. IdentityAggreg
 
  All fields in the Aggregate are encapsulated in a Aggregate object. The object is available in the DTL, which is the python environment processing the DTC. Field values can be accessed using `AggregateName.FieldName`
 
-An `IdentityAggregate` can also has `Dimensions` to split the aggregation along those dimensions. `Dimensions` are also a 
+An `Identity Aggregate` can also have `Dimensions` to split the aggregation along those dimensions. `Dimensions` are also a 
 list of `Fields` with only `integer`, `boolean` and `string` types supported. Each raw event that is evaluated should
  contain the data needed to determine all the `Dimensions` specified.
 
@@ -148,7 +148,7 @@ Example:
 ```yaml
 Aggregates:
 
-  - Type: Blurr:Aggregate:IdentityAggregate
+  - Type: Blurr:Aggregate:Identity
     Name: user
     Store: offer_ai_dynamo
     When: source.event_id in ['app_launched', 'user_updated']
@@ -168,13 +168,13 @@ Aggregates:
         Value: source.country
 ```
 
-### BlockAggregate
+### Block Aggregate
 
-`Blurr:Aggregate:BlockAggregate`. Fields in the BlockAggregates are in a one-to-many relationship with the identity.  These fields are aggregated together in blocks based on the split condition specified.
+`Blurr:Aggregate:Block`. Fields in the Block Aggregates are in a one-to-many relationship with the identity.  These fields are aggregated together in blocks based on the split condition specified.
 
 ```YAML
 
-- Type: Blurr:Aggregate:BlockAggregate
+- Type: Blurr:Aggregate:Block
   Name: session
   When: source.app_version > '3.7'
   Split: source.session_id != session.id
@@ -189,14 +189,14 @@ Aggregates:
 
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
-Type | Type of Aggregate | `Blurr:Aggregate:IdentityAggregate`, `Blurr:Aggregate:BlockAggregate`, `Blurr:Aggregate:VariableAggregate` | Required
+Type | Type of Aggregate | `Blurr:Aggregate:Identity`, `Blurr:Aggregate:Block`, `Blurr:Aggregate:Variable` | Required
 Name | Name of the Aggregate | Any, unique within the DTC | Required
 When | Boolean expression that defines which raw events to process | Any `boolean` expression | Optional
 Split | Boolean expression that defines when a new block should be created | Any `boolean` expression | Required
 
 All fields in the Aggregate are encapsulated in a Aggregate object. The object is available in the DTL, which is a python environment processing the DTC. Field values can be accessed using `AggregateName.FieldName`
 
-Each field in an BlockAggregate has 4 properties.
+Each field in an Block Aggregate has 4 properties.
 
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
@@ -205,16 +205,16 @@ Type | Type of data being stored | `integer`, `boolean`, `string`, `datetime`, `
 Value | Value of the field | Any python expression, and must match the Type | Required  
 When | Boolean expression that defines which raw events to process | Any `boolean` expression | Optional
 
-### ActivityAggregate
-`Blurr:Aggregate:ActivityAggregate`.Activity Aggregate is a specialization of the Block Aggregate where the inactivity based `Split` condition is 
+### Activity Aggregate
+`Blurr:Aggregate:Activity`.Activity Aggregate is a specialization of the Block Aggregate where the inactivity based `Split` condition is 
 specified by  `SeparateByInactiveSeconds`.
 
 ### Variable
 
-`Blurr:Aggregate:VariableAggregate`. Variable Aggregates are temporary variables that can be used in other data blocks. Variables aim to reduce code duplication and improve readability. They are useful for cleansing / modifying / typecasting source elements and representing complex filter conditions that evaluate to a binary value.
+`Blurr:Aggregate:Variable`. Variable Aggregates are temporary variables that can be used in other data blocks. Variables aim to reduce code duplication and improve readability. They are useful for cleansing / modifying / typecasting source elements and representing complex filter conditions that evaluate to a binary value.
 
 ```yaml
-- Type: Blurr:Aggregate:VariableAggregate
+- Type: Blurr:Aggregate:Variable
   Name: vars
   Fields:
     - Name: item_price_micro
@@ -284,13 +284,13 @@ When the number of blocks that satisfy the anchor condition is more than the max
 
 ```YAML
 Stores:
-   - Type: Blurr:Store:MemoryStore
+   - Type: Blurr:Store:Memory
      Name: hello_world_store
 ```
 
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
-Type | The destination data store | `Blurr:Store:MemoryStore`. More Stores such as S3 and DynamoDB coming soon | Required
+Type | The destination data store | `Blurr:Store:Memory`. More Stores such as S3 and DynamoDB coming soon | Required
 Name | Name of the store, used for internal referencing within the DTC | Any `string` | Required
 
 
@@ -299,17 +299,17 @@ Name | Name of the store, used for internal referencing within the DTC | Any `st
 All Aggregate operations that are performed in a window DTC can only use the following available data:
 
 1. Anchor block - Block that satisfies the anchor condition. The fields from the anchor block can be accessed as `anchor.FieldName`.
-2. IdentityAggregate - Identity aggregates available from the source Streaming DTC. The fields from an IdentityAggregate can be accessed as `StreamingDTCName.IdentityAggregateName.Field Name`.
-3. A window of blocks around the anchor block - A list of blocks from a BlockAggregate before or after the anchor block based on the window defined. A field from the list of blocks is referenced as `WindowName.FieldName`.
+2. Identity Aggregate - Identity aggregates available from the source Streaming DTC. The fields from an Identity Aggregate can be accessed as `StreamingDTCName.IdentityAggregateName.Field Name`.
+3. A window of blocks around the anchor block - A list of blocks from a Block Aggregate before or after the anchor block based on the window defined. A field from the list of blocks is referenced as `WindowName.FieldName`.
 
-### WindowAggregate
+### Window Aggregate
 
 ```yaml
 
 Aggregates:
 
   Aggregates:
-   - Type: Blurr:Aggregate:WindowAggregate
+   - Type: Blurr:Aggregate:Window
      Name: last_session
         # Defines a processing window for the rollup. Supported window types are Day, Hour and Count
      WindowType: count
@@ -330,17 +330,17 @@ Aggregates:
 
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
-Type | Type of Aggregate | `Blurr:Aggregate:WindowAggregate`, `Blurr:Aggregate:VariableAggregate` | Required
+Type | Type of Aggregate | `Blurr:Aggregate:Window`, `Blurr:Aggregate:Variable` | Required
 Name | Name of the Aggregate | Any `string`, unique within the DTC | Required
-WindowType | The type of window to use around the anchor block | `day`, `hour`, `count` | Optional. A WindowAggregate can be defined without a Window
-WindowValue | The number of days, hours or blocks to window around the anchor block | Integer | Optional. A WindowAggregate can be defined without a Window
-Source | The BlockAggregate (defined in the Streaming DTC) on which the window operations should be performed | Valid BlockAggregate | Required
+WindowType | The type of window to use around the anchor block | `day`, `hour`, `count` | Optional. A Window Aggregate can be defined without a Window
+WindowValue | The number of days, hours or blocks to window around the anchor block | Integer | Optional. A Window Aggregate can be defined without a Window
+Source | The Block Aggregate (defined in the Streaming DTC) on which the window operations should be performed | Valid Block Aggregate | Required
 
 All functions defined on windows work on a list of values. For e.g. if a session contains a `games_played` field and a `last_week` window is defined on it, then `last_week.games_played` represents the list of values from last week's sessions.
 
-**Important: Window operations using `WindowAggregate` do not include the Anchor block itself.**
+**Important: Window operations using `Window Aggregate` do not include the Anchor block itself.**
 
-Each field in a WindowAggregate has 3 properties.
+Each field in a Window Aggregate has 3 properties.
 
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
@@ -354,7 +354,7 @@ The Variable Aggregate works exactly the same as in the Streaming DTC.
 
 ## Order of Aggregates
 
-Aggregates can be defined in any order. However, if field values are referenced within the DTC, they must be defined in the order in which they are referenced. For example, if a `BlockAggregate` uses a `Variable`, then the `Variable` Aggregate should be defined before the `BlockAggregate` so that the `Variable` is processed first and available to the `BlockAggregate` when the `BlockAggregate` is being processed.
+Aggregates can be defined in any order. However, if field values are referenced within the DTC, they must be defined in the order in which they are referenced. For example, if a `Block Aggregate` uses a `Variable`, then the `Variable` Aggregate should be defined before the `Block Aggregate` so that the `Variable` is processed first and available to the `Block Aggregate` when the `Block Aggregate` is being processed.
 
 # Processing field values
 
