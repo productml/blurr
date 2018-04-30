@@ -27,13 +27,7 @@ The DTC is a __data transform definition__ for structured data. The DTC encapsul
 
 This looks like any other ETL pipeline. At this point, Blurr doesn't do anything special that you cannot do with Spark, for instance. Blurr shines when an offline model pipeline needs to be turned into an online scoring pipeline.
 
-<<<<<<< HEAD
-Stores:
-   - Type: Blurr:Store:Memory
-     Name: hello_world_store
-=======
 ![Blurr Production](docs/images/blurr-in-prod.png)
->>>>>>> master
 
 # Is Blurr for you?
 
@@ -41,13 +35,7 @@ Blurr is for you if:
 
 1. You are well on your way on the ML 'curve of enlightenment', and are thinking about how to do online scoring
 
-<<<<<<< HEAD
- - Type: Blurr:Aggregate:Block
-   Name: session_stats
-   Store: hello_world_store
-=======
 ![Curve](docs/images/curve.png)
->>>>>>> master
 
 2. You self-identify as a data scientist, a data engineer, or an ML engineer. But you believe that these distinctions are temporary. With the right tools, these are all one person. `data science`, `operations`, and `engineering` working together with minimal dependencies is critical to success of production ML efforts.    
 
