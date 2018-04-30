@@ -1,0 +1,34 @@
+Type: 'Blurr:Transform:Streaming'
+Version: '2018-03-01'
+Description: New York Store Exchange Transformations
+Name: nyse
+
+Import:
+  - { Module: datetime, Identifiers: [ datetime ] }
+
+Identity: source.symbol
+
+Time: datetime.strptime(source.date, '%Y-%m-%d')
+
+Stores:
+  - Type: 'Blurr:Store:Memory'
+    Name: memory
+
+Aggregates:
+  - Type: 'Blurr:Aggregate:Block'
+    Name: stats
+    Store: memory
+    Split: True
+    When: source.symbol in ['AAPL', 'MSFT', 'GOOG', 'FB']
+    Fields:
+      - Name: close
+        Type: float
+        Value: source.close
+
+      - Name: volatility
+        Type: float
+        Value: (float(source.high) / float(source.low)) - 1
+
+      - Name: volume
+        Type: float
+        Value: source.volume
