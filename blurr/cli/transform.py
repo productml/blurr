@@ -2,8 +2,8 @@ from typing import List, Optional
 
 from blurr.cli.util import get_stream_window_dtc_files, get_yml_files, eprint
 from blurr.cli.validate import get_valid_yml_files
+from blurr.runner.data_processor import IpfixDataProcessor, SimpleJsonDataProcessor, DataProcessor
 from blurr.runner.local_runner import LocalRunner
-from blurr.runner.data_processor import IpfixDataProcessor, SimpleJsonDataProcessor
 from blurr.runner.spark_runner import SparkRunner
 
 RUNNER_CLASS = {
@@ -41,9 +41,27 @@ def transform(runner: Optional[str], stream_dtc_file: Optional[str], window_dtc_
             runner, list(DATA_PROCESSOR_CLASS.keys())))
         return 1
 
-    runner = RUNNER_CLASS[runner](raw_json_files, stream_dtc_file, window_dtc_file,
-                                  DATA_PROCESSOR_CLASS[data_processor]())
-    out = runner.execute()
+    data_processor_obj = DATA_PROCESSOR_CLASS[data_processor]()
+    if runner == 'local':
+        return transform_local(stream_dtc_file, window_dtc_file, raw_json_files, data_processor_obj)
+    else:
+        return transform_spark(stream_dtc_file, window_dtc_file, raw_json_files, data_processor_obj)
+
+
+def transform_spark(stream_dtc_file: Optional[str], window_dtc_file: Optional[str],
+                    raw_json_files: List[str], data_processor: DataProcessor) -> int:
+    runner = SparkRunner(stream_dtc_file, window_dtc_file)
+    out = runner.execute(runner.get_record_rdd_from_json_files(raw_json_files, data_processor))
+    runner.print_output(out)
+
+    return 0
+
+
+def transform_local(stream_dtc_file: Optional[str], window_dtc_file: Optional[str],
+                    raw_json_files: List[str], data_processor: DataProcessor) -> int:
+    runner = LocalRunner(stream_dtc_file, window_dtc_file)
+    out = runner.execute(
+        runner.get_identity_records_from_json_files(raw_json_files, data_processor))
     runner.print_output(out)
 
     return 0

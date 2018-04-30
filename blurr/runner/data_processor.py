@@ -1,7 +1,6 @@
 import json
-from typing import List, Dict
-
 from abc import ABC, abstractmethod
+from typing import List, Dict
 
 from blurr.core.record import Record
 
@@ -15,6 +14,11 @@ class DataProcessor(ABC):
 class SimpleJsonDataProcessor(DataProcessor):
     def process_data(self, data_string: str) -> List[Record]:
         return [Record(json.loads(data_string))]
+
+
+class SimpleDictionaryDataProcessor(DataProcessor):
+    def process_data(self, data_dict: Dict) -> List[Record]:
+        return [Record(data_dict)]
 
 
 class IpfixDataProcessor(DataProcessor):

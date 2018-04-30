@@ -1,4 +1,4 @@
-![Blurr](logo.png)
+![Blurr](docs/images/logo.png)
 
 [![CircleCI](https://circleci.com/gh/productml/blurr/tree/master.svg?style=svg)](https://circleci.com/gh/productml/blurr/tree/master)
 [![Documentation Status](https://readthedocs.org/projects/productml-blurr/badge/?version=latest)](http://productml-blurr.readthedocs.io/en/latest/?badge=latest)
@@ -6,113 +6,64 @@
 [![PyPI version](https://badge.fury.io/py/blurr.svg)](https://badge.fury.io/py/blurr)
 [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/productml/blurr/master?filepath=examples%2Ftutorial)
 
-# What is Blurr?
-
-Blurr transforms structured, streaming `raw data` into `features` for model training and prediction using a `high-level expressive YAML-based language` called the Data Transform Configuration (DTC).
-
-## Blurr vs. stream/batch processors
-
-The DTC is a __data transform definition__ for structured data. The DTC encapsulates the *business logic* of data transforms and Blurr orchestrates the *execution* of data transforms.
-
-Blurr is processor-agnostic, so DTCs can be run by event processors such as Spark.
-
-1. Blurr is to Spark as [Hibernate](http://hibernate.org/) is to databases
-2. Blurr can be used on Spark in the same way as SparkSQL
-3. Blurr is WORAIS (Write Once, Run on Any Infrastructure Stack)
-
-Because real world infrastructure is extremely diverse, Blurr is designed to run on virtually any infrastructure stack that runs Python 3.6+.
-
-[Give us feedback on the metaphors](https://docs.google.com/forms/d/e/1FAIpQLSf5wqW7M4IibJU-NYDEZ-rx0TvJYMkTiV_hehZgKV6a6HvXaA/viewform) and help improve Blurr!
-
-## The future of MLOps
-
->We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer. The lines are blurred (*cough*). Just like development and operations became DevOps over time
-
->--- Blurr authors
-
-Blurr is a collection of components built for MLOps, the DTC is one of them. **DTC ⊆ Blurr**
-
-We see a future where MLOps means teams putting together various technologies to suit their needs. For production ML applications, the __speed of experimentation__ and __iterations__ is the difference between success and failure. The DTC helps teams iterate on features faster. The vision for Blurr is to build MLOps components to help ML teams experiment at high speed.
-
 # Table of contents
 
-- [DTC at a glance](#dtc-at-a-glance)
+- [What is Blurr](#what-is-blurr)
+- [Is Blurr for you?](#is-blurr-for-you)
+- [Blurr is MLOps](#blurr-is-mlops)
 - [Tutorial & Docs](#tutorial-and-docs)
-- [Install](#use-blurr)
+- [Try Blurr](#try-blurr)
 - [Contribute](#contribute-to-blurr)
 - [Data Science 'Joel Test'](#data-science-joel-test)
 - [Roadmap](#roadmap)
 
->Coming up with features is difficult, time-consuming, requires expert knowledge. 'Applied machine learning' is basically feature engineering
+# What is Blurr?
 
->--- Andrew Ng
+Blurr transforms structured, streaming `raw data` into `features` for model training and prediction using a `high-level expressive YAML-based language` called the Data Transform Configuration (DTC).
 
-# DTC at a glance
+The DTC is a __data transform definition__ for structured data. The DTC encapsulates the *business logic* of data transforms and Blurr orchestrates the *execution* of data transforms. Blurr is runner-agnostic, so DTCs can be run by event processors such as Spark, Spark Streaming or Flink.
 
-Raw data like this
+![Blurr Training](docs/images/blurr-in-training.png)
 
-```javascript
-{ "user_id": "09C1", "session_id": "915D", "country" : "US", "event_id": "game_start" }
-{ "user_id": "09C1", "session_id": "915D", "country" : "US", "event_id": "game_end", "won": 1 }
-{ "user_id": "09C1", "session_id": "915D", "country" : "US", "event_id": "game_start" }
-{ "user_id": "09C1", "session_id": "915D", "country" : "US", "event_id": "game_end", "won": 1 }
-{ "user_id": "B6FA", "session_id": "D043", "country" : "US", "event_id": "game_start" }
-{ "user_id": "B6FA", "session_id": "D043", "country" : "US", "event_id": "game_end", "won": 1 }
-{ "user_id": "09C1", "session_id": "T8KA", "country" : "UK", "event_id": "game_start" }
-{ "user_id": "09C1", "session_id": "T8KA", "country" : "UK", "event_id": "game_end", "won": 1 }
-```
+This looks like any other ETL pipeline. At this point, Blurr doesn't do anything special that you cannot do with Spark, for instance. Blurr shines when an offline model pipeline needs to be turned into an online scoring pipeline.
 
-turns into
-
-session_id |  user_id | games_played | games_won
---- | ------------ | -------------- | --------
-915D | 09C1 | 2 | 2
-D043 | B6FA | 1 | 1
-T8KA | 09C1 | 1 | 1
-
-using this DTC
-
-```yaml
-
-Type: Blurr:Transform:Streaming
-Version: '2018-03-01'
-Name : sessions
-
+<<<<<<< HEAD
 Stores:
    - Type: Blurr:Store:Memory
      Name: hello_world_store
+=======
+![Blurr Production](docs/images/blurr-in-prod.png)
+>>>>>>> master
 
-Identity: source.user_id
+# Is Blurr for you?
 
-Time: parser.parse(source.timestamp)
+Blurr is for you if:
 
-Aggregates:
+1. You are well on your way on the ML 'curve of enlightenment', and are thinking about how to do online scoring
 
+<<<<<<< HEAD
  - Type: Blurr:Aggregate:Block
    Name: session_stats
    Store: hello_world_store
+=======
+![Curve](docs/images/curve.png)
+>>>>>>> master
 
-   Split: source.session_id != session_stats.session_id
+2. You self-identify as a data scientist, a data engineer, or an ML engineer. But you believe that these distinctions are temporary. With the right tools, these are all one person. `data science`, `operations`, and `engineering` working together with minimal dependencies is critical to success of production ML efforts.    
 
-   Fields:
+# Blurr is MLOps
 
-     - Name: session_id
-       Type: string
-       Value: source.session_id
+Blurr is a collection of components built for MLOps, the Blurr Core library is one of them. **Blurr Core ⊆ Blurr**
 
-     - Name: games_played
-       Type: integer
-       When: source.event_id == 'game_start'
-       Value: session_stats.games_played + 1
+>We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer. The lines are blurred (*cough*). Just like development and operations became DevOps over time
 
-     - Name: games_won
-       Type: integer
-       When: source.event_id == 'game_end' and source.won == '1'
-       Value: session_stats.games_won + 1
+We see a future where MLOps means teams putting together various technologies to suit their needs. For production ML applications, the __speed of experimentation__ and __iterations__ is the difference between success and failure. The __DTC helps teams iterate on features faster__. The vision for Blurr is to build MLOps components to help ML teams experiment at high speed.
 
-```
+[How to build AI culture: go through the curve of enlightenment](https://hackernoon.com/how-to-build-ai-culture-go-through-the-curve-of-enlightenment-21c239c1d5a7)
 
 # Tutorial and Docs
+
+>Coming up with features is difficult, time-consuming, requires expert knowledge. 'Applied machine learning' is basically feature engineering --- Andrew Ng
 
 [Read the docs](http://productml-blurr.readthedocs.io/en/latest/)
 
@@ -121,11 +72,13 @@ Aggregates:
 
 Preparing data for specific use cases using Blurr
 
-[Dynamic in-game offers (Offer AI)](examples/offer-ai/offer-ai-walkthrough.md) | [Frequently Bought Together](examples/frequently-bought-together/fbt-walkthrough.md)
+[Dynamic in-game offers (Offer AI)](docs/examples/offer-ai/offer-ai-walkthrough.md) | [Frequently Bought Together](docs/examples/frequently-bought-together/fbt-walkthrough.md)
 
-# Use Blurr
+# Try Blurr
 
-We interact with Blurr using a Command Line Interface (CLI). Blurr is installed via pip:
+One way to interact with Blurr is by using a Command Line Interface (CLI). The CLI is used to run blurr
+locally and is a great way of validating and testing the DTCs before deploying them in 
+production. 
 
 `$ pip install blurr`
 
@@ -142,7 +95,7 @@ $ blurr transform \
 
 # Contribute to Blurr
 
-Welcome to the Blurr community! We are so glad that you share our passion for making data management and machine learning accessible to everyone.
+Welcome to the Blurr community! We are so glad that you share our passion for building MLOps!
 
 Please create a [new issue](https://github.com/productml/blurr/issues/new) to begin a discussion. Alternatively, feel free to pick up an existing issue!
 
@@ -150,7 +103,7 @@ Please sign the [Contributor License Agreement](https://docs.google.com/forms/d/
 
 # Data Science 'Joel Test'
 
-Inspired by the (old school) [Joel Test](https://www.joelonsoftware.com/2000/08/09/the-joel-test-12-steps-to-better-code/) to rate software teams, here's our version for data science teams. What's your score? We'd love to know!
+Inspired by the (old school) [Joel Test](https://www.joelonsoftware.com/2000/08/09/the-joel-test-12-steps-to-better-code/) to rate software teams, here's our version for data science teams. What's your score?
 
 1. Data pipelines are versioned and reproducible
 2. Pipelines (re)build in one step
@@ -158,15 +111,13 @@ Inspired by the (old school) [Joel Test](https://www.joelonsoftware.com/2000/08/
 4. Successful ML is a long game. You play it like it is
 5. Kaizen. Experimentation and iterations are a way of life
 
-
-
 # Roadmap
 
-Blurr is currently in developer preview. __Stay in touch!__: Star this project or email hello@blurr.ai
+Blurr is currently in Developer Preview. __Stay in touch!__: Star this project or email hello@blurr.ai
 
 - ~~Local transformations only~~
 - ~~Support for custom functions and other python libraries in the DTC~~
-- Spark runner
-- S3-S3 data transformations
-- Add DynamoDB as a Store
+- ~~Spark runner~~
+- S3 support for data sink
+- DynamoDB as an Intermediate Store
 - Features server

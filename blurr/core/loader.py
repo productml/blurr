@@ -1,9 +1,8 @@
+import importlib
 from typing import Any, Union
 
-import importlib
-
-from blurr.core.type import Type
 from blurr.core.errors import InvalidSchemaError
+from blurr.core.type import Type
 
 ITEM_MAP = {
     Type.BLURR_TRANSFORM_STREAMING: 'blurr.core.transformer_streaming.StreamingTransformer',
@@ -35,6 +34,7 @@ SCHEMA_MAP = {
     Type.BLURR_AGGREGATE_VARIABLE: 'blurr.core.aggregate_variable.VariableAggregateSchema',
     Type.BLURR_AGGREGATE_WINDOW: 'blurr.core.aggregate_window.WindowAggregateSchema',
     Type.BLURR_STORE_MEMORY: 'blurr.store.memory_store.MemoryStore',
+    Type.BLURR_STORE_DYNAMO: 'blurr.store.dynamo_store.DynamoStore',
     Type.ANCHOR: 'blurr.core.anchor.AnchorSchema',
     Type.DAY: 'blurr.core.window.WindowSchema',
     Type.HOUR: 'blurr.core.window.WindowSchema',

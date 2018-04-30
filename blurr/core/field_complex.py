@@ -1,4 +1,3 @@
-import typing
 from typing import Any
 
 from blurr.core.field import FieldSchema, ComplexTypeBase

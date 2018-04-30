@@ -1,7 +1,6 @@
-from typing import Any, Dict
-
 from copy import copy
 from enum import Enum
+from typing import Any, Dict
 
 from blurr.core import logging
 from blurr.core.errors import InvalidExpressionError, MissingAttributeError
@@ -139,12 +138,8 @@ class Expression:
                             evaluation_context.local_context)
 
             elif self.type == ExpressionType.EXEC:
-                # Passing None as the local context as we want exec to extend the global context
-                # and not the local context. If an empty local context is passed then exec ends up
-                # extending the local context instead.
-                local_context = None if len(
-                    evaluation_context.local_context) == 0 else evaluation_context.local_context
-                return exec(self.code_object, evaluation_context.global_context, local_context)
+                return exec(self.code_object, evaluation_context.global_context,
+                            evaluation_context.local_context)
 
         except Exception as err:
             # Evaluation exceptions are expected because of missing fields in the source 'Record'.

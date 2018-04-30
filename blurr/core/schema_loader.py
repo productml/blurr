@@ -1,4 +1,4 @@
-from typing import Dict, Any, List, Tuple, Optional, Union
+from typing import Dict, Any, List, Tuple, Optional
 
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.loader import TypeLoader

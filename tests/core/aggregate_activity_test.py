@@ -5,11 +5,11 @@ from dateutil import parser
 from pytest import fixture
 
 from blurr.core.aggregate_activity import ActivityAggregate, ActivityAggregateSchema
-from blurr.core.type import Type
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
+from blurr.core.type import Type
 
 
 @fixture
@@ -96,13 +96,13 @@ def test_aggregate_final_state(activity_aggregate_schema: ActivityAggregateSchem
 
     activity_aggregate.finalize()
 
-    store_state = activity_aggregate._schema.store.get_all()
+    store_state = activity_aggregate._schema.store.get_all(identity)
     assert len(store_state) == 3
     assert store_state.get(
         Key('user1', 'activity_aggr', datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc))) == {
             '_identity': 'user1',
-            '_start_time': datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc),
-            '_end_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc),
+            '_start_time': datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc).isoformat(),
+            '_end_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc).isoformat(),
             'sum': 111,
             'count': 3
         }
@@ -110,8 +110,8 @@ def test_aggregate_final_state(activity_aggregate_schema: ActivityAggregateSchem
     assert store_state.get(
         Key('user1', 'activity_aggr', datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc))) == {
             '_identity': 'user1',
-            '_start_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc),
-            '_end_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc),
+            '_start_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc).isoformat(),
+            '_end_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc).isoformat(),
             'sum': 1000,
             'count': 1
         }
@@ -119,8 +119,8 @@ def test_aggregate_final_state(activity_aggregate_schema: ActivityAggregateSchem
     assert store_state.get(
         Key('user1', 'activity_aggr', datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc))) == {
             '_identity': 'user1',
-            '_start_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc),
-            '_end_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc),
+            '_start_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc).isoformat(),
+            '_end_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc).isoformat(),
             'sum': 10000,
             'count': 1
         }
@@ -135,19 +135,19 @@ def test_evaluate_no_separation(activity_aggregate_schema: ActivityAggregateSche
     activity_aggregate = ActivityAggregate(activity_aggregate_schema, identity, evaluation_context)
     evaluation_context.global_add(activity_aggregate._schema.name, activity_aggregate)
 
-    store_state = activity_aggregate._schema.store.get_all()
+    store_state = activity_aggregate._schema.store.get_all(identity)
     assert len(store_state) == 0
 
     evaluate_event(activity_events[0], activity_aggregate)
     activity_aggregate.persist()
 
-    store_state = activity_aggregate._schema.store.get_all()
+    store_state = activity_aggregate._schema.store.get_all(identity)
     assert len(store_state) == 1
 
     evaluate_event(activity_events[1], activity_aggregate)
     activity_aggregate.persist()
 
-    store_state = activity_aggregate._schema.store.get_all()
+    store_state = activity_aggregate._schema.store.get_all(identity)
     assert len(store_state) == 1
 
 
@@ -163,11 +163,11 @@ def test_evaluate_separate_on_inactivity(activity_aggregate_schema: ActivityAggr
     evaluate_event(activity_events[2], activity_aggregate)
     activity_aggregate.persist()
 
-    store_state = activity_aggregate._schema.store.get_all()
+    store_state = activity_aggregate._schema.store.get_all(identity)
     assert len(store_state) == 1
 
     evaluate_event(activity_events[3], activity_aggregate)
     activity_aggregate.persist()
 
-    store_state = activity_aggregate._schema.store.get_all()
+    store_state = activity_aggregate._schema.store.get_all(identity)
     assert len(store_state) == 2
