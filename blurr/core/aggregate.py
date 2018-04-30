@@ -84,13 +84,13 @@ class Aggregate(BaseItemCollection, ABC):
         """
         return self._fields
 
-    def finalize(self) -> None:
+    def run_finalize(self) -> None:
         """
         Saves the current state of the Aggregate in the store as the final rites
         """
-        self.persist()
+        self._persist()
 
-    def persist(self, timestamp=None) -> None:
+    def _persist(self, timestamp=None) -> None:
         """
         Persists the current data group
         :param timestamp: Optional timestamp to include in the Key construction

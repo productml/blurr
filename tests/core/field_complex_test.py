@@ -126,7 +126,7 @@ def test_field_evaluation(aggregate: Aggregate) -> None:
     assert len(aggregate.set_field) == 0
     assert len(aggregate.list_field) == 0
 
-    aggregate.evaluate()
+    aggregate.run_evaluate()
 
     assert len(aggregate.map_field) == 3
     assert aggregate.map_field['incr'] == 10
@@ -145,13 +145,13 @@ def test_field_reset(aggregate: Aggregate) -> None:
     assert len(aggregate.set_field) == 0
     assert len(aggregate.list_field) == 0
 
-    aggregate.evaluate()
+    aggregate.run_evaluate()
 
     assert len(aggregate.map_field) == 3
     assert len(aggregate.set_field) == 3
     assert len(aggregate.list_field) == 3
 
-    aggregate.reset()
+    aggregate.run_reset()
 
     assert len(aggregate.map_field) == 0
     assert len(aggregate.set_field) == 0
@@ -161,12 +161,12 @@ def test_field_reset(aggregate: Aggregate) -> None:
 def test_field_multiple_evaluation_type_cast_map(aggregate: Aggregate) -> None:
     assert len(aggregate.map_field_cast) == 0
 
-    aggregate.evaluate()
+    aggregate.run_evaluate()
 
     assert len(aggregate.map_field_cast) == 1
     assert aggregate.map_field_cast['incr'] == 10
 
-    aggregate.evaluate()
+    aggregate.run_evaluate()
 
     assert len(aggregate.map_field_cast) == 1
     assert aggregate.map_field_cast['incr'] == 20
@@ -175,12 +175,12 @@ def test_field_multiple_evaluation_type_cast_map(aggregate: Aggregate) -> None:
 def test_field_multiple_evaluation_type_cast_list(aggregate: Aggregate) -> None:
     assert len(aggregate.list_field_cast) == 0
 
-    aggregate.evaluate()
+    aggregate.run_evaluate()
 
     assert len(aggregate.list_field_cast) == 1
     assert aggregate.list_field_cast == [0]
 
-    aggregate.evaluate()
+    aggregate.run_evaluate()
 
     assert len(aggregate.list_field_cast) == 3
     assert aggregate.list_field_cast == [0, 1, 1]
@@ -189,12 +189,12 @@ def test_field_multiple_evaluation_type_cast_list(aggregate: Aggregate) -> None:
 def test_field_multiple_evaluation_type_cast_set(aggregate: Aggregate) -> None:
     assert len(aggregate.set_field_cast) == 0
 
-    aggregate.evaluate()
+    aggregate.run_evaluate()
 
     assert len(aggregate.set_field_cast) == 1
     assert aggregate.set_field_cast == {0}
 
-    aggregate.evaluate()
+    aggregate.run_evaluate()
 
     assert len(aggregate.set_field_cast) == 3
     assert aggregate.set_field_cast == {0, 1, 2}
