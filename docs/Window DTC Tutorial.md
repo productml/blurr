@@ -59,7 +59,7 @@ Anchor:
   Condition: source.event_id == "game_start" and source.boost == True
 
 Aggregates:
-  - Type: Blurr:Aggregate:WindowAggregate
+  - Type: Blurr:Aggregate:Window
     Name: last_7_days
     Window:
       Type: day
@@ -71,7 +71,7 @@ Aggregates:
        Type: float
        Value: sum(source.games_played) / len(source.session_id)
 
-  - Type: Blurr:Aggregate:WindowAggregate
+  - Type: Blurr:Aggregate:Window
     Name: next_3_days
     Window:
       Type: day
@@ -136,11 +136,11 @@ Our Window DTC performs 2 different aggregations:
 * Over all sessions 7 days __before__ the Anchor Point.
 * Over all sessions 3 days __before__ the Anchor Point.
 
-How each aggregated is calculated is defined by `WindowAggregate` Aggregates:
+How each aggregate is calculated is defined in the `Window Aggregates`:
 
 
 ```yaml
-- Type: Blurr:Aggregate:WindowAggregate
+- Type: Blurr:Aggregate:Window
     Name: last_7_days
     Window:
       Type: day
@@ -153,7 +153,7 @@ How each aggregated is calculated is defined by `WindowAggregate` Aggregates:
        Value: sum(source.games_played) / len(source.session_id)
 ```
 
-This `WindowAggregate` is responsible of aggregating data for the __previous 7 days__ before the boost activation.
+This `Window Aggregate` is responsible for aggregating data over the __previous 7 days__ before the boost activation.
 
 #### Window
 
@@ -174,7 +174,7 @@ In this case the input is session data produced in `session_stats` Aggregate in 
 ```yaml
 # excerpt from Streaming DTC
 Aggregates:
- - Type: Blurr:Aggregate:BlockAggregate
+ - Type: Blurr:Aggregate:Block
    Name: session_stats
 ```
 

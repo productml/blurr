@@ -3,13 +3,13 @@ from typing import Dict, Any
 
 from pytest import fixture
 
-from blurr.core.type import Type
+from blurr.core.aggregate_block import BlockAggregateSchema, \
+    BlockAggregate
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.field import Field
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.aggregate_block import BlockAggregateSchema, \
-    BlockAggregate
 from blurr.core.store_key import Key
+from blurr.core.type import Type
 
 
 @fixture

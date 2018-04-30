@@ -4,7 +4,7 @@ In this tutorial we'll learn how Blurr performs basic data aggregation. The foll
 
 * The _Data Transform Configuration_ document (DTC)
 * The basic blocks of a DTC: `Header`, `Store`, `Identity` and `Aggregates`
-* How events are processed and aggregated one by one by a `BlockAggregate` Aggregate
+* How events are processed and aggregated one by one by a `Block Aggregate`
 * How `Identity` and `Split` are used to create new records.
 
 Try the code from this example [launching a Jupyter Notebook](https://mybinder.org/v2/gh/productml/blurr/master?filepath=examples%2Ftutorial).
@@ -69,7 +69,7 @@ Version: '2018-03-01'
 Name : sessions
 
 Store:
-   - Type: Blurr:Store:MemoryStore
+   - Type: Blurr:Store:Memory
      Name: hello_world_store
 
 Identity: source.user_id
@@ -78,7 +78,7 @@ Time: parser.parse(source.timestamp)
 
 Aggregates:
 
- - Type: Blurr:Aggregate:BlockAggregate
+ - Type: Blurr:Aggregate:Block
    Name: session_stats
    Store: hello_world_store
 
@@ -119,7 +119,7 @@ Further in this series of tutorials we'll introduce different types of DTCs, suc
 
 ```yaml
 Store:
-   - Type: Blurr:Store:MemoryStore
+   - Type: Blurr:Store:Memory
      Name: hello_world_store
 ```
 
@@ -150,18 +150,18 @@ Among other things, Blurr uses `Time` to internally generates `start_time` and `
 
 ### 2.5. Aggregates
 
-This is where the magic happens. Aggregates define the nature of the transformation. Our example has a single Aggregate of type `BlockAggregate`. Different types of Aggregates will be introduced in the next tutorials.
+This is where the magic happens. Aggregates define the nature of the transformation. Our example has a single Aggregate of type `Block Aggregate`. Different types of Aggregates will be introduced in the next tutorials.
 
 We'll learn how the transformation happens in the next section by examining the flow of data event by event.
 
 
 ## 3. Data Flow
 
-Events are processed one by one, and then aggregated as defined in the `BlockAggregate` Aggregate:
+Events are processed one by one, and then aggregated as defined in the `Block Aggregate`:
 
 ```yaml
 Aggregates:
- - Type: Blurr:Aggregate:BlockAggregate
+ - Type: Blurr:Aggregate:Block
    Name: session_stats
    Store: hello_world_store
 
@@ -184,7 +184,7 @@ Aggregates:
        Value: session_stats.games_won + 1
 ```
 
-In order to understand how `BlockAggregate` aggregates data we'll use the sequence of events from the initial section.
+In order to understand how `Block Aggregate` aggregates data we'll use the sequence of events from the initial section.
 
 ### 3.1. First Event : `game_start`
 
@@ -302,7 +302,7 @@ There's an element of the Aggregate we haven't covered yet, `Split`:
 Split: source.session_id != session_stats.session_id
 ```
 
-Splitting is a key component of event aggregation. A `BlockAggregate` always contains a `Split` expression, defining __when a new record has to be created__ in the store.
+Splitting is a key component of event aggregation. A `Block Aggregate` always contains a `Split` expression, defining __when a new record has to be created__ in the store.
 
 `Split` is evaluated for every event. In all the previous events the result of this evaluation was `False`,  but for this case it evaluates to `True`:
 

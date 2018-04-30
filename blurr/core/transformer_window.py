@@ -1,12 +1,11 @@
 from typing import Dict, Optional, Any
 
-from blurr.core.anchor import Anchor
+from blurr.core.aggregate_block import BlockAggregate
 from blurr.core.aggregate_window import WindowAggregate
-from blurr.core.errors import AnchorBlockNotDefinedError, \
-    PrepareWindowMissingBlocksError
+from blurr.core.anchor import Anchor
+from blurr.core.errors import AnchorBlockNotDefinedError
 from blurr.core.evaluation import Context, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.aggregate_block import BlockAggregate
 from blurr.core.transformer import Transformer, TransformerSchema
 from blurr.core.type import Type
 

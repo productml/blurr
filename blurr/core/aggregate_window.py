@@ -2,12 +2,11 @@ from datetime import datetime, timedelta
 from typing import Any, List, Tuple
 
 from blurr.core.aggregate import Aggregate, AggregateSchema
+from blurr.core.aggregate_block import BlockAggregate, BlockAggregateSchema
 from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.aggregate_block import BlockAggregate, BlockAggregateSchema
 from blurr.core.store_key import Key
-from blurr.core.base import BaseItem
 from blurr.core.type import Type
 
 

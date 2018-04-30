@@ -35,9 +35,9 @@ Options:
                                         ipfix - Processor for IpFix format.
 """
 import logging
+import os
 import sys
 
-import os
 from docopt import docopt
 
 from blurr.cli.cli import cli

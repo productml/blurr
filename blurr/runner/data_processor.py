@@ -1,7 +1,6 @@
 import json
-from typing import List, Dict
-
 from abc import ABC, abstractmethod
+from typing import List, Dict
 
 from blurr.core.record import Record
 

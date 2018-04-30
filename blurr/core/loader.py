@@ -1,9 +1,8 @@
+import importlib
 from typing import Any, Union
 
-import importlib
-
-from blurr.core.type import Type
 from blurr.core.errors import InvalidSchemaError
+from blurr.core.type import Type
 
 ITEM_MAP = {
     Type.BLURR_TRANSFORM_STREAMING: 'blurr.core.transformer_streaming.StreamingTransformer',

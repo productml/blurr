@@ -1,15 +1,15 @@
+import os
+import re
 import traceback
 from typing import Dict
 
-import os
-import re
 from yamale import yamale
 from yamale.schema import Data
 from yamale.validators import DefaultValidators, Validator
 from yamale.validators.constraints import Constraint
 
-from blurr.core.type import Type
 from blurr.core.errors import InvalidSchemaError
+from blurr.core.type import Type
 
 IDENTITY_VALIDATOR_REGEX = re.compile(r'^_|[^\S]')
 

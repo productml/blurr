@@ -1,12 +1,10 @@
+from abc import ABC
 from copy import copy
 from typing import Dict, Type
 
-from abc import ABC
-
-from blurr.core.base import BaseItemCollection, BaseSchemaCollection, BaseItem
 from blurr.core.aggregate import Aggregate
-from blurr.core.errors import MissingAttributeError, IdentityError
-from blurr.core.evaluation import Context, EvaluationContext, Expression
+from blurr.core.base import BaseItemCollection, BaseSchemaCollection
+from blurr.core.errors import MissingAttributeError
 from blurr.core.loader import TypeLoader
 from blurr.core.schema_context import SchemaContext
 from blurr.core.schema_loader import SchemaLoader
