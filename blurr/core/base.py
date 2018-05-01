@@ -42,11 +42,11 @@ class BaseSchema(ABC):
         """ Extends the defined schema specifications at runtime with defaults """
         return spec
 
-    def validate_required(self, *attributes) -> SchemaErrorCollection:
+    def validate_required_attributes(self, *attributes) -> SchemaErrorCollection:
         """ Validates that the schema contains a series of required attributes """
         return validate_required_attributes(self.fully_qualified_name, self._spec, *attributes)
 
-    def validate_identity(self, *attributes) -> SchemaErrorCollection:
+    def validate_python_identifier_attributes(self, *attributes) -> SchemaErrorCollection:
         """ Validates that a schema attribute can be a python valid identifier """
         return validate_python_identifier_attributes(self.fully_qualified_name, self._spec, *attributes)
 
@@ -81,7 +81,7 @@ class BaseSchemaCollection(BaseSchema, ABC):
         }
 
     def validate(self, errors: SchemaErrorCollection) -> SchemaErrorCollection:
-        errors.add(self.validate_required(self._nested_item_attribute))
+        errors.add(self.validate_required_attributes(self._nested_item_attribute))
         return super().validate(errors)
 
 
