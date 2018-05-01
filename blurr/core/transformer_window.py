@@ -28,13 +28,12 @@ class WindowTransformerSchema(TransformerSchema):
         super().validate_schema_spec()
         self.validate_required_attributes(self.ATTRIBUTE_ANCHOR)
 
-    def extend_schema_spec(self, spec: Dict[str, Any]) -> Dict[str, Any]:
+    def extend_schema_spec(self) -> None:
+        super().extend_schema_spec()
         if not self.errors:
-            spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_NAME] = 'anchor'
-            spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_TYPE] = Type.ANCHOR
-            self.schema_loader.add_schema_spec(spec[self.ATTRIBUTE_ANCHOR], self.fully_qualified_name)
-
-        return super().extend_schema_spec(spec)
+            self._spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_NAME] = 'anchor'
+            self._spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_TYPE] = Type.ANCHOR
+            self.schema_loader.add_schema_spec(self._spec[self.ATTRIBUTE_ANCHOR], self.fully_qualified_name)
 
 
 class WindowTransformer(Transformer):
