@@ -60,7 +60,7 @@ class DynamoStore(Store):
                 TableName=self.table_name, WaiterConfig={'Delay': 5})
 
     def validate_schema_spec(self) -> None:
-        self.validate_required(self.ATTRIBUTE_TABLE)
+        self.validate_required_attributes(self.ATTRIBUTE_TABLE)
 
     @staticmethod
     def dimensions(key: Key):

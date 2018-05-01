@@ -38,7 +38,7 @@ class TransformerSchema(BaseSchemaCollection, ABC):
 
     def validate_schema_spec(self) -> None:
         super().validate_schema_spec()
-        self.validate_required(self.ATTRIBUTE_VERSION)
+        self.validate_required_attributes(self.ATTRIBUTE_VERSION)
 
 
 class Transformer(BaseItemCollection, ABC):

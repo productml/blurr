@@ -21,7 +21,7 @@ class BlockAggregateSchema(AggregateSchema):
 
     def validate_schema_spec(self) -> None:
         super().validate_schema_spec()
-        self.validate_required(self.ATTRIBUTE_STORE, self.ATTRIBUTE_SPLIT)
+        self.validate_required_attributes(self.ATTRIBUTE_STORE, self.ATTRIBUTE_SPLIT)
 
     def extend_schema_spec(self) -> None:
         """ Injects the block start and end times """

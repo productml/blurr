@@ -5,7 +5,7 @@ from blurr.core.errors import SnapshotError, SchemaErrorCollection, InvalidSchem
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
-from blurr.core.validator import validate_required_attributes, validate_python_identifier_attributes, validate_number
+from blurr.core.validator import validate_required_attributes, validate_python_identifier_attributes, validate_number_attribute
 
 
 class BaseSchema(ABC):
@@ -50,22 +50,22 @@ class BaseSchema(ABC):
         """ Returns a list of errors raised by this schema """
         return self.schema_loader.get_errors(self.fully_qualified_name)
 
-    def validate_required(self, *attributes) -> None:
+    def validate_required_attributes(self, *attributes) -> None:
         """ Validates that the schema contains a series of required attributes """
         self.add_errors(validate_required_attributes(self.fully_qualified_name, self.spec, *attributes))
 
-    def validate_identity(self, *attributes) -> None:
+    def validate_python_identifier_attributes(self, *attributes) -> None:
         """ Validates that a schema attribute can be a python valid identifier """
         self.add_errors(validate_python_identifier_attributes(self.fully_qualified_name, self.spec, *attributes))
 
-    def validate_number(self,
-                        attribute: str,
-                        value_type: Union[Type[int], Type[float]] = int,
-                        minimum: Optional[Union[int, float]] = None,
-                        maximum: Optional[Union[int, float]] = None):
+    def validate_number_attribute(self,
+                                  attribute: str,
+                                  value_type: Union[Type[int], Type[float]] = int,
+                                  minimum: Optional[Union[int, float]] = None,
+                                  maximum: Optional[Union[int, float]] = None):
         self.add_errors(
-            validate_number(self.fully_qualified_name, self.spec, attribute, value_type, minimum,
-                            maximum))
+            validate_number_attribute(self.fully_qualified_name, self.spec, attribute, value_type, minimum,
+                                      maximum))
 
     @abstractmethod
     def validate_schema_spec(self) -> None:
@@ -99,7 +99,7 @@ class BaseSchemaCollection(BaseSchema, ABC):
         }
 
     def validate_schema_spec(self) -> None:
-        self.validate_required(self._nested_item_attribute)
+        self.validate_required_attributes(self._nested_item_attribute)
 
 
 BaseItemType = TypeVar('T', bound='BaseItem')
