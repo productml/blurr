@@ -24,7 +24,7 @@ class AnchorSchema(BaseSchema):
         self.max = self._spec[self.ATTRIBUTE_MAX] if self.ATTRIBUTE_MAX in self._spec else None
 
     def validate_schema_spec(self) -> None:
-        self.validate_required(self.ATTRIBUTE_CONDITION, self.ATTRIBUTE_MAX)
+        self.validate_required_attributes(self.ATTRIBUTE_CONDITION, self.ATTRIBUTE_MAX)
 
 
 class Anchor(BaseItem):

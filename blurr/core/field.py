@@ -27,7 +27,7 @@ class FieldSchema(BaseSchema, ABC):
         self.value: Expression = Expression(self._spec.get(self.ATTRIBUTE_VALUE, None))
 
     def validate_schema_spec(self) -> None:
-        self.validate_required(self.ATTRIBUTE_VALUE)
+        self.validate_required_attributes(self.ATTRIBUTE_VALUE)
 
     @property
     @abstractmethod

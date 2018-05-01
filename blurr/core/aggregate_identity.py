@@ -26,7 +26,7 @@ class IdentityAggregateSchema(AggregateSchema):
 
     def validate_schema_spec(self) -> None:
         super().validate_schema_spec()
-        self.validate_required(self.ATTRIBUTE_STORE)
+        self.validate_required_attributes(self.ATTRIBUTE_STORE)
 
 
 class IdentityAggregate(Aggregate):

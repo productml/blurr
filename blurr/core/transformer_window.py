@@ -26,7 +26,7 @@ class WindowTransformerSchema(TransformerSchema):
 
     def validate_schema_spec(self) -> None:
         super().validate_schema_spec()
-        self.validate_required(self.ATTRIBUTE_ANCHOR)
+        self.validate_required_attributes(self.ATTRIBUTE_ANCHOR)
 
     def extend_schema_spec(self, spec: Dict[str, Any]) -> Dict[str, Any]:
         if not self.errors:

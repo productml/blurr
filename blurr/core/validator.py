@@ -41,12 +41,12 @@ def validate_required_attributes(fully_qualified_name: str, spec: Dict[str, Any]
     return errors
 
 
-def validate_number(fully_qualified_name: str,
-                    spec: Dict[str, Any],
-                    attribute: str,
-                    value_type: Union[Type[int], Type[float]] = int,
-                    minimum: Optional[Union[int, float]] = None,
-                    maximum: Optional[Union[int, float]] = None) -> Optional[InvalidNumberError]:
+def validate_number_attribute(fully_qualified_name: str,
+                              spec: Dict[str, Any],
+                              attribute: str,
+                              value_type: Union[Type[int], Type[float]] = int,
+                              minimum: Optional[Union[int, float]] = None,
+                              maximum: Optional[Union[int, float]] = None) -> Optional[InvalidNumberError]:
     if attribute not in spec:
         return
 

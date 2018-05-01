@@ -24,7 +24,7 @@ class StreamingTransformerSchema(TransformerSchema):
 
     def validate_schema_spec(self) -> None:
         super().validate_schema_spec()
-        self.validate_required(self.ATTRIBUTE_IDENTITY, self.ATTRIBUTE_TIME, self.ATTRIBUTE_STORES)
+        self.validate_required_attributes(self.ATTRIBUTE_IDENTITY, self.ATTRIBUTE_TIME, self.ATTRIBUTE_STORES)
 
     def get_identity(self, record: Record) -> str:
         """

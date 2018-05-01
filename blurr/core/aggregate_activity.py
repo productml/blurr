@@ -18,8 +18,8 @@ class ActivityAggregateSchema(BlockAggregateSchema):
 
     def validate_schema_spec(self) -> None:
         super(BlockAggregateSchema, self).validate_schema_spec()
-        self.validate_required(self.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS)
-        self.validate_number(self.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS, int, 1)
+        self.validate_required_attributes(self.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS)
+        self.validate_number_attribute(self.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS, int, 1)
 
 
 class ActivityAggregate(BlockAggregate):
