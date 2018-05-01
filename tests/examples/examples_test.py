@@ -1,5 +1,4 @@
 import pytest
-import snapshottest
 import json
 from typing import Any
 
@@ -33,7 +32,7 @@ def get_file_text(file_path) -> str:
        'docs/examples/tutorial/tutorial2-window-dtc.yml',
        'docs/examples/tutorial/tutorial2-data.log'), "docs/examples/tutorial/tutorial2-output.log")]
 )
-def test_example_dtc_output(input_files, output_file, capsys, snapshot):
+def test_example_dtc_output(input_files, output_file, capsys):
     stream_dtc_file, window_dtc_file, raw_json_file = input_files
     assert cli({
         'transform': True,
