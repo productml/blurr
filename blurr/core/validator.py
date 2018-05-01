@@ -7,8 +7,8 @@ ATTRIBUTE_TYPE = 'Type'
 ATTRIBUTE_INTERNAL = '_Internal'
 
 
-def validate_identifier(fully_qualified_name: str, spec: Dict[str, Any],
-                        *attributes: str) -> SchemaErrorCollection:
+def validate_python_identifier_attributes(fully_qualified_name: str, spec: Dict[str, Any],
+                                          *attributes: str) -> SchemaErrorCollection:
     """ Validates a set of attributes as identifiers in a spec """
     errors = SchemaErrorCollection()
     for attribute in attributes:
@@ -29,8 +29,8 @@ def validate_identifier(fully_qualified_name: str, spec: Dict[str, Any],
     return errors
 
 
-def validate_required(fully_qualified_name: str, spec: Dict[str, Any],
-                      *attributes: str) -> SchemaErrorCollection:
+def validate_required_attributes(fully_qualified_name: str, spec: Dict[str, Any],
+                                 *attributes: str) -> SchemaErrorCollection:
     """ Validates to ensure that a set of attributes are present in spec """
     errors = SchemaErrorCollection()
     for attribute in attributes:
@@ -61,7 +61,7 @@ def validate_schema_basics(fully_qualified_name: str,
             for attribute, value in spec.items()
             if not value
         ])
-        errors.add(validate_required(fully_qualified_name, spec, ATTRIBUTE_NAME, ATTRIBUTE_TYPE))
-        errors.add(validate_identifier(fully_qualified_name, spec, ATTRIBUTE_NAME))
+        errors.add(validate_required_attributes(fully_qualified_name, spec, ATTRIBUTE_NAME, ATTRIBUTE_TYPE))
+        errors.add(validate_python_identifier_attributes(fully_qualified_name, spec, ATTRIBUTE_NAME))
 
     return errors

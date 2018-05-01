@@ -5,7 +5,7 @@ from blurr.core.errors import SnapshotError, SchemaErrorCollection
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
-from blurr.core.validator import validate_required, validate_identifier
+from blurr.core.validator import validate_required_attributes, validate_python_identifier_attributes
 
 
 class BaseSchema(ABC):
@@ -44,11 +44,11 @@ class BaseSchema(ABC):
 
     def validate_required(self, *attributes) -> SchemaErrorCollection:
         """ Validates that the schema contains a series of required attributes """
-        return validate_required(self.fully_qualified_name, self._spec, *attributes)
+        return validate_required_attributes(self.fully_qualified_name, self._spec, *attributes)
 
     def validate_identity(self, *attributes) -> SchemaErrorCollection:
         """ Validates that a schema attribute can be a python valid identifier """
-        return validate_identifier(self.fully_qualified_name, self._spec, *attributes)
+        return validate_python_identifier_attributes(self.fully_qualified_name, self._spec, *attributes)
 
     def validate(self, errors: SchemaErrorCollection) -> SchemaErrorCollection:
         """ Contains the validation routines that are to be executed as part of initialization by subclasses"""
@@ -68,6 +68,7 @@ class BaseSchemaCollection(BaseSchema, ABC):
         :param schema_loader: Schema repository that returns schema spec by fully qualified name
         :param nested_schema_attribute: Name of the attribute that contains the nested elements
         """
+        # Nested Items must be initialized before base init so that the validation routine finds it
         self._nested_item_attribute = nested_schema_attribute
 
         super().__init__(fully_qualified_name, schema_loader)
