@@ -16,6 +16,9 @@ class MemoryStore(Store):
         super().__init__(fully_qualified_name, schema_loader)
         self._cache: Dict[Key, Any] = dict()
 
+    def validate_schema_spec(self) -> None:
+        pass
+
     def load(self):
         pass
 

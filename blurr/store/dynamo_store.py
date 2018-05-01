@@ -7,22 +7,22 @@ from dateutil import parser
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store import Store, Key
 
-ATTRIBUTE_TABLE = 'Table'
-ATTRIBUTE_READ_CAPACITY_UNITS = 'ReadCapacityUnits'
-ATTRIBUTE_WRITE_CAPACITY_UNITS = 'WriteCapacityUnits'
-
 
 class DynamoStore(Store):
     """
     In-memory store implementation
     """
 
+    ATTRIBUTE_TABLE = 'Table'
+    ATTRIBUTE_READ_CAPACITY_UNITS = 'ReadCapacityUnits'
+    ATTRIBUTE_WRITE_CAPACITY_UNITS = 'WriteCapacityUnits'
+
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
         spec = schema_loader.get_schema_spec(fully_qualified_name)
-        self.table_name = spec[ATTRIBUTE_TABLE]
-        self.rcu = spec.get(ATTRIBUTE_READ_CAPACITY_UNITS, 5)
-        self.wcu = spec.get(ATTRIBUTE_WRITE_CAPACITY_UNITS, 5)
+        self.table_name = spec[self.ATTRIBUTE_TABLE]
+        self.rcu = spec.get(self.ATTRIBUTE_READ_CAPACITY_UNITS, 5)
+        self.wcu = spec.get(self.ATTRIBUTE_WRITE_CAPACITY_UNITS, 5)
 
         self.dynamodb_resource = boto3.resource('dynamodb')
 
@@ -58,6 +58,9 @@ class DynamoStore(Store):
             # Wait until the table creation is complete
             self.table.meta.client.get_waiter('table_exists').wait(
                 TableName=self.table_name, WaiterConfig={'Delay': 5})
+
+    def validate_schema_spec(self) -> None:
+        self.validate_required_attributes(self.ATTRIBUTE_TABLE)
 
     @staticmethod
     def dimensions(key: Key):

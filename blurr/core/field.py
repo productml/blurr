@@ -3,7 +3,6 @@ from typing import Any
 
 from blurr.core import logging
 from blurr.core.base import BaseSchema, BaseItem
-from blurr.core.errors import SchemaErrorCollection
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 
@@ -27,9 +26,8 @@ class FieldSchema(BaseSchema, ABC):
 
         self.value: Expression = Expression(self._spec.get(self.ATTRIBUTE_VALUE, None))
 
-    def validate(self, errors: SchemaErrorCollection) -> SchemaErrorCollection:
-        errors.add(self.validate_required_attributes(self.ATTRIBUTE_VALUE))
-        return super().validate(errors)
+    def validate_schema_spec(self) -> None:
+        self.validate_required_attributes(self.ATTRIBUTE_VALUE)
 
     @property
     @abstractmethod

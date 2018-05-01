@@ -45,9 +45,9 @@ class Runner(ABC):
         # This causes a problem when running the code on spark
         # as the validation yml file is inside the archived package
         # and yamale is not able to read that.
-        # validate(self._stream_dtc)
+        # validate_schema_spec(self._stream_dtc)
         # if self._window_dtc is not None:
-        #     validate(self._window_dtc)
+        #     validate_schema_spec(self._window_dtc)
 
     def execute_per_identity_records(self,
                                      identity_records: Tuple[str, List[Tuple[datetime, Record]]]

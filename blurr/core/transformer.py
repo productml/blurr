@@ -18,25 +18,27 @@ class TransformerSchema(BaseSchemaCollection, ABC):
     """
 
     ATTRIBUTE_VERSION = 'Version'
-    ATTRIBUTE_STORES = 'Stores'
     ATTRIBUTE_AGGREGATES = 'Aggregates'
     ATTRIBUTE_IMPORT = 'Import'
+    ATTRIBUTE_STORES = 'Stores'
 
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader, self.ATTRIBUTE_AGGREGATES)
 
-        # Load the schema specific attributes
-        self.version = self._spec[self.ATTRIBUTE_VERSION]
-
-        # Load list of stores from the schema
-        self.stores: Dict[str, Type[Store]] = {
-            schema_spec[self.ATTRIBUTE_NAME]: self.schema_loader.get_nested_schema_object(
-                self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
-            for schema_spec in self._spec.get(self.ATTRIBUTE_STORES, [])
-        }
+        if not self.errors:
+            self.version = self._spec[self.ATTRIBUTE_VERSION]
+            self.stores: Dict[str, Type[Store]] = {
+                schema_spec[self.ATTRIBUTE_NAME]: self.schema_loader.get_nested_schema_object(
+                    self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
+                for schema_spec in self._spec.get(self.ATTRIBUTE_STORES, [])
+            }
 
         self.import_list = self._spec.get(self.ATTRIBUTE_IMPORT, [])
         self.schema_context = SchemaContext(self.import_list)
+
+    def validate_schema_spec(self) -> None:
+        super().validate_schema_spec()
+        self.validate_required_attributes(self.ATTRIBUTE_VERSION)
 
 
 class Transformer(BaseItemCollection, ABC):

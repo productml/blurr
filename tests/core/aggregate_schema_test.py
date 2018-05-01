@@ -60,13 +60,13 @@ def test_aggregate_schema_initialization_without_store(aggregate_schema_spec):
     assert aggregate_schema.store is None
 
 
-def test_aggregate_schema_missing_fields_attribute_raises_error(aggregate_schema_spec):
+def test_aggregate_schema_missing_attributes_adds_error(aggregate_schema_spec):
     del aggregate_schema_spec[AggregateSchema.ATTRIBUTE_FIELDS]
 
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema_spec(aggregate_schema_spec)
     schema = MockAggregateSchema(name, schema_loader)
-    assert len(schema._errors.errors) == 1
-    error = schema._errors.errors[0]
-    assert isinstance(error, RequiredAttributeError)
-    assert error.attribute == AggregateSchema.ATTRIBUTE_FIELDS
+
+    assert 1 == len(schema.errors)
+    assert isinstance(schema.errors[0], RequiredAttributeError)
+    assert AggregateSchema.ATTRIBUTE_FIELDS == schema.errors[0].attribute

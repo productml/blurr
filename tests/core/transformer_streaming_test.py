@@ -4,10 +4,12 @@ from typing import Dict, Any
 import pytest
 from pytest import fixture
 
-from blurr.core.errors import IdentityError, TimeError
+from blurr.core.aggregate import AggregateSchema
+from blurr.core.errors import IdentityError, TimeError, RequiredAttributeError
 from blurr.core.evaluation import Context
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
+from blurr.core.store_key import Key
 from blurr.core.transformer_streaming import StreamingTransformerSchema, StreamingTransformer
 from blurr.core.type import Type
 
@@ -132,3 +134,40 @@ def test_streaming_transformer_evaluate(schema_loader: SchemaLoader,
     transformer.evaluate(Record())
 
     assert transformer._snapshot == {'test_group': {'_identity': 'user1', 'events': 1}}
+
+
+def test_streaming_transformer_finalize(schema_loader: SchemaLoader,
+                                        schema_spec: Dict[str, Any]) -> None:
+    streaming_dtc = schema_loader.add_schema_spec(schema_spec)
+    transformer_schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
+    transformer = StreamingTransformer(transformer_schema, 'user1')
+    store = schema_loader.get_schema_object('test.memstore')
+
+    transformer.finalize()
+    assert store.get(Key('user1', 'test_group')) is None
+
+    transformer.evaluate(Record())
+    transformer.finalize()
+    assert store.get(Key('user1', 'test_group')) == {'_identity': 'user1', 'events': 1}
+
+
+def test_streaming_transformer_schema_missing_attributes_adds_error(schema_loader: SchemaLoader,
+                                                                    schema_spec: Dict[str, Any]):
+    del schema_spec[StreamingTransformerSchema.ATTRIBUTE_IDENTITY]
+    del schema_spec[StreamingTransformerSchema.ATTRIBUTE_TIME]
+    del schema_spec[StreamingTransformerSchema.ATTRIBUTE_STORES]
+    del schema_spec[StreamingTransformerSchema.ATTRIBUTE_AGGREGATES][0][
+        AggregateSchema.ATTRIBUTE_STORE]
+    schema_spec[StreamingTransformerSchema.ATTRIBUTE_AGGREGATES][0][
+        AggregateSchema.ATTRIBUTE_TYPE] = Type.BLURR_AGGREGATE_VARIABLE
+
+    streaming_dtc = schema_loader.add_schema_spec(schema_spec)
+    schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
+
+    assert 3 == len(schema.errors)
+    assert isinstance(schema.errors[0], RequiredAttributeError)
+    assert StreamingTransformerSchema.ATTRIBUTE_IDENTITY == schema.errors[0].attribute
+    assert isinstance(schema.errors[1], RequiredAttributeError)
+    assert StreamingTransformerSchema.ATTRIBUTE_TIME == schema.errors[1].attribute
+    assert isinstance(schema.errors[2], RequiredAttributeError)
+    assert StreamingTransformerSchema.ATTRIBUTE_STORES == schema.errors[2].attribute
