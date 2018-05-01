@@ -5,7 +5,7 @@ import yaml
 from pytest import raises, fixture
 
 from blurr.core.errors import RequiredAttributeError, InvalidIdentifierError, EmptyAttributeError
-from blurr.core.validator import validate_schema_basics, validate_required, validate_identifier
+from blurr.core.validator import validate_schema_basics, validate_required_attributes, validate_python_identifier_attributes
 
 
 @fixture(scope='session')
@@ -27,11 +27,11 @@ def valid_spec() -> Dict[str, Any]:
 
 
 def test_validate_required_valid(valid_spec):
-    assert not validate_required('test', valid_spec, 'Name', 'Type').has_errors
+    assert not validate_required_attributes('test', valid_spec, 'Name', 'Type').has_errors
 
 
 def test_validate_required_missing_attributes(invalid_spec):
-    error_collection = validate_required('test', invalid_spec, 'Name', 'Type')
+    error_collection = validate_required_attributes('test', invalid_spec, 'Name', 'Type')
     assert len(error_collection['test']) == 2, 'Errors are not grouped by fully qualified name'
 
     error = error_collection['test'][0]
@@ -48,11 +48,11 @@ def test_validate_required_missing_attributes(invalid_spec):
 
 
 def test_validate_identity_valid(valid_spec):
-    assert not validate_identifier('test', valid_spec, 'Name').has_errors
+    assert not validate_python_identifier_attributes('test', valid_spec, 'Name').has_errors
 
 
 def test_validate_identity_with_underscore(invalid_spec):
-    error_collection = validate_identifier('test', invalid_spec, 'Identity1', 'Identity2')
+    error_collection = validate_python_identifier_attributes('test', invalid_spec, 'Identity1', 'Identity2')
     assert len(error_collection.errors) == 2, 'Errors are not grouped by fully qualified name'
 
     error = error_collection['test'][0]
