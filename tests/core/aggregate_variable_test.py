@@ -39,7 +39,7 @@ def test_variable_aggregate_initialization(schema_spec):
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema_spec(schema_spec)
     schema = VariableAggregateSchema(name, schema_loader)
-    assert match_fields(schema.spec['Fields'])
+    assert match_fields(schema._spec['Fields'])
 
     loader_spec = schema_loader.get_schema_spec(name)
     assert match_fields(loader_spec['Fields'])

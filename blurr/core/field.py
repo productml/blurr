@@ -24,7 +24,7 @@ class FieldSchema(BaseSchema, ABC):
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
 
-        self.value: Expression = Expression(self.spec.get(self.ATTRIBUTE_VALUE, None))
+        self.value: Expression = Expression(self._spec.get(self.ATTRIBUTE_VALUE, None))
 
     def validate_schema_spec(self) -> None:
         self.validate_required_attributes(self.ATTRIBUTE_VALUE)

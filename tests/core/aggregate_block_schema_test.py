@@ -62,7 +62,7 @@ def test_block_aggregate_schema_initialization(schema_spec, store_spec):
     name = schema_loader.add_schema_spec(schema_spec)
     schema_loader.add_schema_spec(store_spec, name)
     schema = BlockAggregateSchema(name, schema_loader)
-    assert match_fields(schema.spec['Fields'])
+    assert match_fields(schema._spec['Fields'])
 
     loader_spec = schema_loader.get_schema_spec(name)
     assert match_fields(loader_spec['Fields'])

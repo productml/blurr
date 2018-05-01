@@ -28,8 +28,8 @@ class AggregateSchema(BaseSchemaCollection, ABC):
         """
         super().__init__(fully_qualified_name, schema_loader, self.ATTRIBUTE_FIELDS)
         self.store = None
-        if self.ATTRIBUTE_STORE in self.spec:
-            self.store = self._load_store(self.spec[self.ATTRIBUTE_STORE])
+        if self.ATTRIBUTE_STORE in self._spec:
+            self.store = self._load_store(self._spec[self.ATTRIBUTE_STORE])
 
     def _load_store(self, store_name: str) -> 'Store':
         """
@@ -51,8 +51,8 @@ class AggregateSchema(BaseSchemaCollection, ABC):
             ATTRIBUTE_INTERNAL: True
         }
 
-        if self.ATTRIBUTE_FIELDS in self.spec:
-            self.spec[self.ATTRIBUTE_FIELDS].insert(0, identity_field)
+        if self.ATTRIBUTE_FIELDS in self._spec:
+            self._spec[self.ATTRIBUTE_FIELDS].insert(0, identity_field)
             self.schema_loader.add_schema_spec(identity_field, self.fully_qualified_name)
 
 
