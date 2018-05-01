@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from decimal import Decimal
 from json import JSONEncoder
-from typing import List, Optional, Tuple, Any, Union, Dict
+from typing import List, Optional, Tuple, Any, Union, Dict, Iterable, Generator
 
 import yaml
 
@@ -49,20 +49,6 @@ class Runner(ABC):
         # if self._window_dtc is not None:
         #     validate(self._window_dtc)
 
-        schema_loader = SchemaLoader()
-        stream_dtc_name = schema_loader.add_schema_spec(self._stream_dtc)
-        stream_transformer_schema: StreamingTransformerSchema = schema_loader.get_schema_object(
-            stream_dtc_name)
-
-        # Extract out the expressions needed and store it as class members. When an object of this
-        # class is being used in a execution environment like Spark the class members need to be
-        # pickle-able. Have SchemaLoader or StreamingTransformerSchema as class members made it
-        # hard to ensure that as they can end up loading classes that cannot be pickled such as
-        # boto3.
-        self._id_expr = stream_transformer_schema.identity
-        self._time_expr = stream_transformer_schema.time
-        self._context = stream_transformer_schema.schema_context.context
-
     def execute_per_identity_records(self,
                                      identity_records: Tuple[str, List[Tuple[datetime, Record]]]
                                      ) -> List[Union[Tuple[Key, Any], Tuple[str, Any]]]:
@@ -78,23 +64,20 @@ class Runner(ABC):
         else:
             return [(identity, window_data)]
 
-    def get_per_identity_records(self, event_str: str, data_processor: DataProcessor
-                                 ) -> List[Tuple[str, Tuple[datetime, Record]]]:
-        record_list = []
-        for record in data_processor.process_data(event_str):
-            try:
-                self._context.add_record(record)
-                # TODO: Improve on this (perhaps use the functions defined in
-                # StreamingTransformerSchema)
-                id = self._id_expr.evaluate(self._context)
-                time = self._time_expr.evaluate(self._context)
-                if not id or not time or not isinstance(time, datetime):
-                    continue
-                record_list.append((id, (time, record)))
-                self._context.remove_record()
-            except Exception as err:
-                logging.debug('{} in parsing Record.'.format(err))
-        return record_list
+    def get_per_identity_records(self, events: Iterable, data_processor: DataProcessor
+                                 ) -> Generator[Tuple[str, Tuple[datetime, Record]], None, None]:
+        schema_loader = SchemaLoader()
+        stream_dtc_name = schema_loader.add_schema_spec(self._stream_dtc)
+        stream_transformer_schema: StreamingTransformerSchema = schema_loader.get_schema_object(
+            stream_dtc_name)
+        for event in events:
+            for record in data_processor.process_data(event):
+                try:
+                    id = stream_transformer_schema.get_identity(record)
+                    time = stream_transformer_schema.get_time(record)
+                    yield (id, (time, record))
+                except Exception as err:
+                    logging.debug('{} in parsing Record.'.format(err))
 
     def _execute_stream_dtc(self, identity_events: List[Tuple[datetime, Record]], identity: str,
                             schema_loader: SchemaLoader) -> Dict[Key, Any]:
