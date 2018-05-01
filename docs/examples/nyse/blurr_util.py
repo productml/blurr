@@ -1,4 +1,4 @@
-git pimport json
+import json
 
 from IPython.display import HTML, display
 
