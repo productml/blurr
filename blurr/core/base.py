@@ -58,7 +58,7 @@ class BaseSchema(ABC):
         """ Validates that a schema attribute can be a python valid identifier """
         self.add_errors(validate_python_identifier_attributes(self.fully_qualified_name, self.spec, *attributes))
 
-    def validate_number_attribute(self, 
+    def validate_number_attribute(self,
                                   attribute: str,
                                   value_type: Union[Type[int], Type[float]] = int,
                                   minimum: Optional[Union[int, float]] = None,
