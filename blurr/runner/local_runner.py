@@ -44,7 +44,8 @@ class LocalRunner(Runner):
         identity_records = defaultdict(list)
         for file in local_json_files:
             with open(file) as f:
-                for identity, record_with_datetime in self.get_per_identity_records(f, data_processor):
+                for identity, record_with_datetime in self.get_per_identity_records(
+                        f, data_processor):
                     identity_records[identity].append(record_with_datetime)
         return identity_records
 

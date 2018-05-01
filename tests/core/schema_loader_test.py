@@ -131,7 +131,7 @@ def test_get_fully_qualified_name() -> None:
 
 
 def test_get_schemas_of_type(schema_loader: SchemaLoader, nested_schema_spec: Dict) -> None:
-    assert schema_loader.get_schemas_of_type(
+    assert schema_loader.get_schema_specs_of_type(
         [Type.INTEGER]) == [('test.test_group.events',
                              nested_schema_spec['Aggregates'][0]['Fields'][1])]
 
@@ -151,9 +151,7 @@ def test_get_store_error_not_defined(schema_loader: SchemaLoader):
 
 
 def test_get_store_error_missing_type(nested_schema_spec: Dict) -> None:
-    nested_schema_spec['Store'] = {
-        'Name': 'memstore'
-    }
+    nested_schema_spec['Store'] = {'Name': 'memstore'}
     schema_loader = SchemaLoader()
     schema_loader.add_schema(nested_schema_spec)
     with pytest.raises(InvalidSchemaError, match='Type not defined in schema for test.memstore'):
@@ -168,10 +166,21 @@ def test_get_store_error_wrong_type(nested_schema_spec: Dict) -> None:
 
 
 def test_get_store_success(nested_schema_spec: Dict) -> None:
-    nested_schema_spec['Store'] = {
-        'Name': 'memstore',
-        'Type': Type.BLURR_STORE_MEMORY
-    }
+    nested_schema_spec['Store'] = {'Name': 'memstore', 'Type': Type.BLURR_STORE_MEMORY}
     schema_loader = SchemaLoader()
     schema_loader.add_schema(nested_schema_spec)
     assert isinstance(schema_loader.get_store('test.memstore'), MemoryStore)
+
+
+def test_get_all_stores(nested_schema_spec: Dict) -> None:
+    nested_schema_spec['Store'] = {'Name': 'memstore', 'Type': Type.BLURR_STORE_MEMORY}
+    schema_loader = SchemaLoader()
+    schema_loader.add_schema(nested_schema_spec)
+
+    # No store instantiated yet.
+    assert schema_loader.get_all_stores() == []
+    assert isinstance(schema_loader.get_store('test.memstore'), MemoryStore)
+
+    stores = schema_loader.get_all_stores()
+    assert len(stores) == 1
+    assert isinstance(stores[0], MemoryStore)

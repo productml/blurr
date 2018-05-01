@@ -74,11 +74,18 @@ class SchemaLoader:
         if fully_qualified_name not in self._store_cache:
             schema = self.get_schema_object(fully_qualified_name)
             if not Type.is_store_type(schema.type):
-                raise InvalidSchemaError('{} does not have a store type.'.format(fully_qualified_name))
+                raise InvalidSchemaError(
+                    '{} does not have a store type.'.format(fully_qualified_name))
 
             self._store_cache[fully_qualified_name] = TypeLoader.load_item(schema.type)(schema)
 
         return self._store_cache[fully_qualified_name]
+
+    def get_all_stores(self) -> List['Store']:
+        """
+        Returns a list of stores that have been instantiated.
+        """
+        return list(self._store_cache.values())
 
     def get_nested_schema_object(self, fully_qualified_parent_name: str,
                                  nested_item_name: str) -> 'BaseSchema':
@@ -115,7 +122,8 @@ class SchemaLoader:
         except:
             raise InvalidSchemaError("{} not declared in schema".format(fully_qualified_name))
 
-    def get_schemas_of_type(self, schema_types: List[Type]) -> List[Tuple[str, Dict[str, Any]]]:
+    def get_schema_specs_of_type(self,
+                                 schema_types: List[Type]) -> List[Tuple[str, Dict[str, Any]]]:
         """
         Returns a list of fully qualified names and schema dictionary tuples for
         the schema types provided.
