@@ -110,7 +110,7 @@ def loaded_store() -> DynamoStore:
 
 def test_schema_init(dynamo_store_spec: Dict[str, Any]) -> None:
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(dynamo_store_spec)
+    name = schema_loader.add_schema_spec(dynamo_store_spec)
     store_schema = schema_loader.get_schema_object(name)
     assert store_schema.name == dynamo_store_spec['Name']
     assert store_schema.table_name == dynamo_store_spec['Table']
@@ -122,7 +122,7 @@ def test_schema_init_with_read_write_units(dynamo_store_spec: Dict[str, Any]) ->
     dynamo_store_spec['ReadCapacityUnits'] = 10
     dynamo_store_spec['WriteCapacityUnits'] = 10
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(dynamo_store_spec)
+    name = schema_loader.add_schema_spec(dynamo_store_spec)
     store_schema = schema_loader.get_schema_object(name)
     assert store_schema.rcu == 10
     assert store_schema.wcu == 10
