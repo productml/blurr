@@ -1,25 +1,20 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 set -e
 
 echo "checking requirements..."
 pipenv  --version > /dev/null
-
+java -version > /dev/null
 
 echo "installing dependencies..."
 pipenv install --dev --ignore-pipfile
-
 
 echo "formatting and validating code..."
 pipenv run yapf -i -r .
 # TODO: fix mypy errors
 # pipenv run mypy blurr/*/*.py --ignore-missing-imports --disallow-untyped-defs --disallow-untyped-calls
 
-
-echo "running tests..."
-export PYTHONPATH=`pwd`:$SPARK_HOME/python/lib/pyspark.zip:$SPARK_HOME/python/lib/py4j-0.10.4-src.zip:$PYTHONPATH
-pipenv run pytest -v --cov=blurr
-
+sh scripts/test.sh
 
 echo "building package..."
 pipenv run python setup.py sdist

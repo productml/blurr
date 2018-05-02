@@ -22,12 +22,12 @@ class DynamoStoreSchema(StoreSchema):
 
 class DynamoStore(Store):
     """
-    In-memory store implementation
+    Dynamo store implementation
     """
 
     def __init__(self, schema: DynamoStoreSchema) -> None:
         self._schema = schema
-        self._dynamodb_resource = boto3.resource('dynamodb')
+        self._dynamodb_resource = DynamoStore.get_dynamodb_resource()
         self._table = self._dynamodb_resource.Table(self._schema.table_name)
 
         # Test that the table exists.  Create a new one otherwise
@@ -60,6 +60,11 @@ class DynamoStore(Store):
             # Wait until the table creation is complete
             self._table.meta.client.get_waiter('table_exists').wait(
                 TableName=self._schema.table_name, WaiterConfig={'Delay': 5})
+
+    @staticmethod
+    # This is separate out as a separate function so that this can be mocked in unit tests.
+    def get_dynamodb_resource() -> Any:
+        return boto3.resource('dynamodb')
 
     @staticmethod
     def dimensions(key: Key):
