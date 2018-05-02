@@ -46,7 +46,7 @@ class WindowAggregate(Aggregate):
         super().__init__(schema, identity, evaluation_context)
         self._window_source = None
 
-    def prepare_window(self, start_time: datetime) -> None:
+    def _prepare_window(self, start_time: datetime) -> None:
         """
         Prepares window if any is specified.
         :param start_time: The anchor block start_time from where the window
@@ -105,10 +105,10 @@ class WindowAggregate(Aggregate):
         :return: List of BlockAggregate
         """
         return [
-            BlockAggregate(self._schema.source, self._identity, EvaluationContext()).restore(block)
-            for (_, block) in blocks
+            BlockAggregate(self._schema.source, self._identity,
+                           EvaluationContext()).run_restore(block) for (_, block) in blocks
         ]
 
-    def evaluate(self) -> None:
+    def run_evaluate(self) -> None:
         self._evaluation_context.local_context.add('source', self._window_source)
-        super().evaluate()
+        super().run_evaluate()

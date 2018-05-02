@@ -79,7 +79,7 @@ def test_aggregate_persist_without_store(aggregate_schema_without_store):
         schema=aggregate_schema_without_store,
         identity="12345",
         evaluation_context=EvaluationContext())
-    aggregate.persist()
+    aggregate._persist()
 
 
 def test_aggregate_persist_with_store(aggregate_schema_with_store):
@@ -89,7 +89,7 @@ def test_aggregate_persist_with_store(aggregate_schema_with_store):
         evaluation_context=EvaluationContext())
     dt = datetime.now()
     dt.replace(tzinfo=timezone.utc)
-    aggregate.persist(dt)
+    aggregate._persist(dt)
     snapshot_aggregate = aggregate._store.get(Key(identity="12345", group="user", timestamp=dt))
     assert snapshot_aggregate is not None
     assert snapshot_aggregate == aggregate._snapshot
@@ -100,7 +100,7 @@ def test_aggregate_finalize(aggregate_schema_with_store):
         schema=aggregate_schema_with_store,
         identity="12345",
         evaluation_context=EvaluationContext())
-    aggregate.finalize()
+    aggregate.run_finalize()
     snapshot_aggregate = aggregate._store.get(Key(identity="12345", group="user"))
     assert snapshot_aggregate is not None
     assert snapshot_aggregate == aggregate._snapshot

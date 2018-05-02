@@ -52,14 +52,14 @@ def window_aggregate(window_aggregate_schema: WindowAggregateSchema) -> WindowAg
 def test_window_type_day_positive(window_aggregate: WindowAggregate) -> None:
     window_aggregate._schema.window_type = Type.DAY
     window_aggregate._schema.window_value = 1
-    window_aggregate.prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
+    window_aggregate._prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
     assert window_aggregate._window_source.events == [4, 5]
 
 
 def test_window_type_day_negative(window_aggregate: WindowAggregate) -> None:
     window_aggregate._schema.window_type = Type.DAY
     window_aggregate._schema.window_value = -1
-    window_aggregate.prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
+    window_aggregate._prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
     assert window_aggregate._window_source.events == [1, 2]
 
 
@@ -67,7 +67,7 @@ def test_window_type_day_zero_value(window_aggregate: WindowAggregate) -> None:
     window_aggregate._schema.window_type = Type.DAY
     window_aggregate._schema.window_value = 0
     with pytest.raises(PrepareWindowMissingBlocksError, match='No matching blocks found'):
-        window_aggregate.prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
+        window_aggregate._prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
     assert window_aggregate._window_source.events == []
 
 
@@ -75,19 +75,19 @@ def test_window_type_hour_positive(window_aggregate: WindowAggregate) -> None:
     window_aggregate._schema.window_type = Type.HOUR
     window_aggregate._schema.window_value = 1
     with pytest.raises(PrepareWindowMissingBlocksError, match='No matching blocks found'):
-        window_aggregate.prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
+        window_aggregate._prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
     assert window_aggregate._window_source.events == []
 
     window_aggregate._schema.window_type = Type.HOUR
     window_aggregate._schema.window_value = 2
-    window_aggregate.prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
+    window_aggregate._prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
     assert window_aggregate._window_source.events == [4]
 
 
 def test_window_type_hour_negative(window_aggregate: WindowAggregate) -> None:
     window_aggregate._schema.window_type = Type.HOUR
     window_aggregate._schema.window_value = -24
-    window_aggregate.prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
+    window_aggregate._prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
     assert window_aggregate._window_source.events == [1, 2]
 
 
@@ -97,21 +97,21 @@ def test_window_type_hour_zero_value(window_aggregate: WindowAggregate) -> None:
     with pytest.raises(
             PrepareWindowMissingBlocksError,
             match='test_window_name WindowAggregate: No matching blocks found'):
-        window_aggregate.prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
+        window_aggregate._prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
     assert window_aggregate._window_source.events == []
 
 
 def test_window_type_count_positive(window_aggregate: WindowAggregate) -> None:
     window_aggregate._schema.window_type = Type.COUNT
     window_aggregate._schema.window_value = -1
-    window_aggregate.prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
+    window_aggregate._prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
     assert window_aggregate._window_source.events == [2]
 
 
 def test_window_type_count_negative(window_aggregate: WindowAggregate) -> None:
     window_aggregate._schema.window_type = Type.COUNT
     window_aggregate._schema.window_value = 1
-    window_aggregate.prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
+    window_aggregate._prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
     assert window_aggregate._window_source.events == [4]
 
 
@@ -121,13 +121,13 @@ def test_window_type_count_missing_sesssions(window_aggregate: WindowAggregate) 
     with pytest.raises(
             PrepareWindowMissingBlocksError,
             match='test_window_name WindowAggregate: Expecting 20 but found 3 blocks'):
-        window_aggregate.prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
+        window_aggregate._prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
     assert window_aggregate._window_source.events == [4, 5, 6]
 
 
 def test_evaluate(window_aggregate):
     window_aggregate._schema.window_type = Type.DAY
     window_aggregate._schema.window_value = 1
-    window_aggregate.prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
-    window_aggregate.evaluate()
+    window_aggregate._prepare_window(datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc))
+    window_aggregate.run_evaluate()
     assert window_aggregate.total_events == 9

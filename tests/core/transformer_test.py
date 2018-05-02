@@ -78,11 +78,11 @@ def test_transformer_finalize(test_transformer: MockTransformer,
                               schema_loader: SchemaLoader) -> None:
     store = schema_loader.get_store('test.memstore')
 
-    test_transformer.finalize()
+    test_transformer.run_finalize()
     assert store.get(Key('user1', 'test_group')) is None
 
-    test_transformer.evaluate()
-    test_transformer.finalize()
+    test_transformer.run_evaluate()
+    test_transformer.run_finalize()
     assert store.get(Key('user1', 'test_group')) == {'_identity': 'user1', 'events': 1}
 
 
