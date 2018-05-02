@@ -77,7 +77,7 @@ def test_transformer_init(test_transformer) -> None:
 
 def test_transformer_finalize(test_transformer: MockTransformer,
                               schema_loader: SchemaLoader) -> None:
-    store = schema_loader.get_schema_object('test.memstore')
+    store = schema_loader.get_store('test.memstore')
 
     test_transformer.finalize()
     assert store.get(Key('user1', 'test_group')) is None

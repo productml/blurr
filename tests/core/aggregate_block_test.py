@@ -80,7 +80,7 @@ def test_block_aggregate_schema_evaluate_without_split(block_aggregate_schema_sp
     })
 
     # aggregate snapshot should not exist in store
-    assert block_aggregate_schema.store.get(
+    assert block_aggregate._store.get(
         Key(identity=block_aggregate._identity,
             group=block_aggregate._name,
             timestamp=block_aggregate._start_time)) is None
@@ -117,6 +117,6 @@ def test_block_aggregate_schema_evaluate_with_split(block_aggregate_schema_spec,
     })
 
     # Check aggregate snapshot present in store
-    assert block_aggregate_schema.store.get(
+    assert block_aggregate._store.get(
         Key(identity=block_aggregate._identity, group=block_aggregate._name,
             timestamp=time)) == current_snapshot

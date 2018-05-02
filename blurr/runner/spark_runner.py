@@ -48,7 +48,8 @@ class SparkRunner(Runner):
                                        data_processor: DataProcessor = SimpleJsonDataProcessor(),
                                        spark_session: Optional['SparkSession'] = None) -> 'RDD':
         spark_context = get_spark_session(spark_session).sparkContext
-        raw_records: 'RDD' = spark_context.union([spark_context.textFile(file) for file in json_files])
+        raw_records: 'RDD' = spark_context.union(
+            [spark_context.textFile(file) for file in json_files])
         return raw_records.mapPartitions(
             lambda x: self.get_per_identity_records(x, data_processor)).groupByKey().mapValues(list)
 
