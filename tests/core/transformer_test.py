@@ -94,8 +94,8 @@ def test_transformer_schema_missing_version_attribute_adds_error(schema_loader: 
     name = schema_loader.add_schema_spec(schema_spec)
     schema = MockTransformerSchema(name, schema_loader)
 
-    assert 2 == len(schema.errors)
+    assert len(schema.errors) == 2
     assert isinstance(schema.errors[0], RequiredAttributeError)
-    assert TransformerSchema.ATTRIBUTE_AGGREGATES == schema.errors[0].attribute
+    assert schema.errors[0].attribute == TransformerSchema.ATTRIBUTE_AGGREGATES
     assert isinstance(schema.errors[1], RequiredAttributeError)
-    assert TransformerSchema.ATTRIBUTE_VERSION == schema.errors[1].attribute
+    assert schema.errors[1].attribute == TransformerSchema.ATTRIBUTE_VERSION

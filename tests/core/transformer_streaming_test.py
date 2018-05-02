@@ -164,10 +164,10 @@ def test_streaming_transformer_schema_missing_attributes_adds_error(schema_loade
     streaming_dtc = schema_loader.add_schema_spec(schema_spec)
     schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
 
-    assert 3 == len(schema.errors)
+    assert len(schema.errors) == 3
     assert isinstance(schema.errors[0], RequiredAttributeError)
-    assert StreamingTransformerSchema.ATTRIBUTE_IDENTITY == schema.errors[0].attribute
+    assert schema.errors[0].attribute == StreamingTransformerSchema.ATTRIBUTE_IDENTITY
     assert isinstance(schema.errors[1], RequiredAttributeError)
-    assert StreamingTransformerSchema.ATTRIBUTE_TIME == schema.errors[1].attribute
+    assert  schema.errors[1].attribute == StreamingTransformerSchema.ATTRIBUTE_TIME
     assert isinstance(schema.errors[2], RequiredAttributeError)
-    assert StreamingTransformerSchema.ATTRIBUTE_STORES == schema.errors[2].attribute
+    assert schema.errors[2].attribute == StreamingTransformerSchema.ATTRIBUTE_STORES

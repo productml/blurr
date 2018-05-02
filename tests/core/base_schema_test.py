@@ -11,20 +11,20 @@ from blurr.core.schema_loader import SchemaLoader
 
 @fixture
 def schema_spec():
-    return yaml.load('''
-        Name: TestField
-        Type: integer
-        When: True == True
-        ''')
+    return {
+        'Name': 'TestField',
+        'Type': 'integer',
+        'When': 'True == True'
+    }
 
 
 @fixture
 def invalid_schema_spec():
-    return yaml.load('''
-        Name: _TestField
-        Type: integer
-        When: ''
-        ''')
+    return {
+        'Name': '_TestField',
+        'Type': 'integer',
+        'When': ''
+    }
 
 
 class MockSchema(BaseSchema):
@@ -94,9 +94,9 @@ def test_schema_collection_missing_nested_attribute_adds_error(
     name = schema_loader.add_schema_spec(schema_collection_spec)
     schema = MockSchemaCollection(name, schema_loader, 'MissingNested')
 
-    assert 1 == len(schema.errors)
+    assert len(schema.errors) == 1
     assert isinstance(schema.errors[0], RequiredAttributeError)
-    assert 'MissingNested' == schema.errors[0].attribute
+    assert schema.errors[0].attribute == 'MissingNested'
 
 
 def test_schema_collection_empty_nested_attribute_adds_error(

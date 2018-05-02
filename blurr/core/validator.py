@@ -20,7 +20,7 @@ def validate_python_identifier_attributes(fully_qualified_name: str, spec: Dict[
     ]
 
     for attribute in attributes:
-        if attribute not in spec or ATTRIBUTE_INTERNAL in spec:
+        if attribute not in spec or spec.get(ATTRIBUTE_INTERNAL, False):
             continue
 
         for check in checks:

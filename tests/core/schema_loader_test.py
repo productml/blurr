@@ -85,6 +85,29 @@ def test_add_valid_simple_schema_with_parent() -> None:
     assert schema_loader.get_schema_spec('parent.test') == {'Name': 'test', 'Type': 'test_type'}
 
 
+def test_add_valid_nested_schema(nested_schema_spec_bad_type: Dict) -> None:
+    schema_loader = SchemaLoader()
+
+    assert schema_loader.add_schema_spec(nested_schema_spec_bad_type) == 'test'
+    assert schema_loader.get_schema_spec('test.test_group') == nested_schema_spec_bad_type[
+        'Aggregates'][0]
+    assert schema_loader.get_schema_spec('test.test_group.country') == nested_schema_spec_bad_type[
+        'Aggregates'][0]['Fields'][0]
+    assert schema_loader.get_schema_spec('test.test_group.events') == nested_schema_spec_bad_type[
+        'Aggregates'][0]['Fields'][1]
+
+
+def test_get_schema_object_error(nested_schema_spec_bad_type: Dict) -> None:
+    schema_loader = SchemaLoader()
+    schema_loader.add_schema_spec(nested_schema_spec_bad_type)
+
+    with raises(GenericSchemaError, match='Type `Blurr:Unknown` not found.'):
+        schema_loader.get_schema_object('test')
+
+    with raises(GenericSchemaError, match='`Type` not defined in schema `test.test_group`'):
+        schema_loader.get_schema_object('test.test_group')
+
+
 def test_get_schema_object(schema_loader: SchemaLoader) -> None:
     assert isinstance(schema_loader.get_schema_object('test'), StreamingTransformerSchema) is True
     field_schema = schema_loader.get_schema_object('test.test_group.events')
