@@ -123,7 +123,7 @@ def test_schema_initialization(identity_aggregate_schema_spec: Dict[str, Any],
 def evaluate_event(record: Record, aggregate: IdentityAggregate) -> None:
     aggregate._evaluation_context.global_add('source', record)
     aggregate._evaluation_context.global_add('time', parser.parse(record.event_time))
-    aggregate.evaluate()
+    aggregate.run_evaluate()
 
 
 def test_split_by_label_valid(identity_aggregate_schema_spec: Dict[str, Any],
@@ -151,7 +151,7 @@ def test_split_by_label_valid(identity_aggregate_schema_spec: Dict[str, Any],
     assert identity_aggregate._dimension_fields['label'].value == 'b'
 
     evaluate_event(records[2], identity_aggregate)
-    identity_aggregate.persist()
+    identity_aggregate._persist()
     store_state = identity_aggregate._store.get_all(identity)
 
     assert identity_aggregate._dimension_fields['label'].value == 'a'
@@ -160,7 +160,7 @@ def test_split_by_label_valid(identity_aggregate_schema_spec: Dict[str, Any],
     # Check for final state
     evaluate_event(records[3], identity_aggregate)
     evaluate_event(records[4], identity_aggregate)
-    identity_aggregate.persist()
+    identity_aggregate._persist()
     assert identity_aggregate._dimension_fields['label'].value == 'c'
     store_state = identity_aggregate._store.get_all(identity)
     assert len(store_state) == 3
@@ -205,7 +205,7 @@ def test_split_when_label_evaluates_to_none(identity_aggregate_schema_spec: Dict
     evaluate_event(records[2], identity_aggregate)
     assert identity_aggregate._dimension_fields['label'].value == 'b'
 
-    identity_aggregate.finalize()
+    identity_aggregate.run_finalize()
 
     store_state = identity_aggregate._store.get_all(identity)
     assert len(store_state) == 1
@@ -234,7 +234,7 @@ def test_two_key_fields_in_aggregate(
     for event in records:
         evaluate_event(event, identity_aggregate)
 
-    identity_aggregate.finalize()
+    identity_aggregate.run_finalize()
 
     store_state = identity_aggregate._store.get_all('user1')
     assert len(store_state) == 3

@@ -15,6 +15,8 @@ def test_invalid_identifiers():
     assert not validator._is_valid('identifier with spaces')
     assert not validator._is_valid('identifier_with\t_tabs')
     assert not validator._is_valid('identifier_with\n_new_lines')
+    assert not validator._is_valid('_identifier_with_underscore')
+    assert not validator._is_valid('run_identifier_run')
 
 
 def test_valid_expression():

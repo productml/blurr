@@ -11,7 +11,7 @@ from yamale.validators.constraints import Constraint
 from blurr.core.errors import InvalidSchemaError
 from blurr.core.type import Type
 
-IDENTITY_VALIDATOR_REGEX = re.compile(r'^_|[^\S]')
+IDENTITY_VALIDATOR_REGEX = re.compile(r'^_|^run_|[^\S]')
 
 
 class StringExclude(Constraint):

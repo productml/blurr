@@ -40,7 +40,7 @@ def test_field_initialization(test_field_schema):
 
 def test_field_evaluate_with_needs_evaluation(test_field_schema):
     field = MockField(test_field_schema, EvaluationContext())
-    field.evaluate()
+    field.run_evaluate()
 
     assert field.value == 5
 
@@ -55,7 +55,7 @@ def test_field_evaluate_without_needs_evaluation():
     })
     field_schema = MockFieldSchema(name, schema_loader)
     field = MockField(field_schema, EvaluationContext())
-    field.evaluate()
+    field.run_evaluate()
 
     assert field.value == 0
 
@@ -66,7 +66,7 @@ def test_field_evaluate_incorrect_typecast_to_type_default(caplog):
     name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': Type.INTEGER, 'Value': '"Hi"'})
     field_schema = IntegerFieldSchema(name, schema_loader)
     field = Field(field_schema, EvaluationContext())
-    field.evaluate()
+    field.run_evaluate()
 
     assert field.value == 0
     assert ('ValueError in casting Hi to Type.INTEGER for field max_attempts. Error: invalid '
@@ -83,7 +83,7 @@ def test_field_evaluate_implicit_typecast_integer():
     })
     field_schema = IntegerFieldSchema(name, schema_loader)
     field = Field(field_schema, EvaluationContext())
-    field.evaluate()
+    field.run_evaluate()
 
     assert field._snapshot == 23
 
@@ -93,7 +93,7 @@ def test_field_evaluate_implicit_typecast_float():
     name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': Type.FLOAT, 'Value': '23'})
     field_schema = FloatFieldSchema(name, schema_loader)
     field = Field(field_schema, EvaluationContext())
-    field.evaluate()
+    field.run_evaluate()
 
     assert field._snapshot == 23.0
 
@@ -103,7 +103,7 @@ def test_field_evaluate_implicit_typecast_bool():
     name = schema_loader.add_schema({'Name': 'max_attempts', 'Type': Type.BOOLEAN, 'Value': '1+2'})
     field_schema = BooleanFieldSchema(name, schema_loader)
     field = Field(field_schema, EvaluationContext())
-    field.evaluate()
+    field.run_evaluate()
 
     assert field._snapshot is True
 
@@ -112,21 +112,21 @@ def test_field_snapshot(test_field_schema):
     field = MockField(test_field_schema, EvaluationContext())
     assert field._snapshot == 0
 
-    field.evaluate()
+    field.run_evaluate()
     assert field._snapshot == 5
 
 
 def test_field_restore(test_field_schema):
     field = MockField(test_field_schema, EvaluationContext())
-    field.restore(5)
+    field.run_restore(5)
     assert field.value == 5
 
 
 def test_field_reset(test_field_schema):
     field = MockField(test_field_schema, EvaluationContext())
-    field.restore(5)
+    field.run_restore(5)
     assert field.value == 5
-    field.reset()
+    field.run_reset()
     assert field.value == 0
 
 
@@ -140,7 +140,7 @@ def test_set_field_snapshot_encoding():
     field_schema = SetFieldSchema(name, schema_loader)
     field = Field(field_schema, EvaluationContext())
     field._evaluation_context.global_add('test', field.value)
-    field.evaluate()
+    field.run_evaluate()
 
     assert field.value == {0, 1}
     assert field._snapshot
@@ -157,7 +157,7 @@ def test_set_field_snapshot_decoding():
     })
     field_schema = SetFieldSchema(name, schema_loader)
     field = Field(field_schema, EvaluationContext())
-    field.restore([2, 3])
+    field.run_restore([2, 3])
 
     assert field.value == {2, 3}
     assert field._snapshot

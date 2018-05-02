@@ -110,7 +110,7 @@ def test_streaming_transformer_evaluate_time_error(schema_loader: SchemaLoader,
     transformer_schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
     transformer = StreamingTransformer(transformer_schema, 'user1')
     with pytest.raises(NameError, match='name \'datetime\' is not defined'):
-        assert transformer.evaluate(Record())
+        assert transformer.run_evaluate(Record())
 
 
 def test_streaming_transformer_evaluate_user_mismatch(schema_loader: SchemaLoader,
@@ -121,7 +121,7 @@ def test_streaming_transformer_evaluate_user_mismatch(schema_loader: SchemaLoade
     with pytest.raises(
             IdentityError,
             match='Identity in transformer \(user2\) and new record \(user1\) do not match'):
-        assert transformer.evaluate(Record())
+        assert transformer.run_evaluate(Record())
 
 
 def test_streaming_transformer_evaluate(schema_loader: SchemaLoader,
@@ -129,6 +129,6 @@ def test_streaming_transformer_evaluate(schema_loader: SchemaLoader,
     streaming_dtc = schema_loader.add_schema(schema_spec)
     transformer_schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
     transformer = StreamingTransformer(transformer_schema, 'user1')
-    transformer.evaluate(Record())
+    transformer.run_evaluate(Record())
 
     assert transformer._snapshot == {'test_group': {'_identity': 'user1', 'events': 1}}

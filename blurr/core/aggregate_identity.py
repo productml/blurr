@@ -44,7 +44,7 @@ class IdentityAggregate(Aggregate):
         })
         self._key = None
 
-    def evaluate(self) -> None:
+    def run_evaluate(self) -> None:
         if not self._needs_evaluation:
             return
 
@@ -52,26 +52,26 @@ class IdentityAggregate(Aggregate):
             return
 
         if self._key and not self._compare_dimensions_to_fields():
-            self.persist()
+            self._persist()
             self._init_state_from_key()
 
-        super().evaluate()
+        super().run_evaluate()
         self._key = self._prepare_key()
 
     def _init_state_from_key(self):
         self._key = self._prepare_key()
         snapshot = self._store.get(self._key)
         if snapshot:
-            self.restore(snapshot)
+            self.run_restore(snapshot)
         else:
-            self.reset()
+            self.run_reset()
 
     def _evaluate_dimension_fields(self) -> bool:
         """
         Evaluates the dimension fields. Returns False if any of the fields could not be evaluated.
         """
         for _, item in self._dimension_fields.items():
-            item.evaluate()
+            item.run_evaluate()
             if item.eval_error:
                 return False
         return True
@@ -92,6 +92,6 @@ class IdentityAggregate(Aggregate):
 
         return Key(self._identity, self._name, timestamp)
 
-    def persist(self, timestamp=None) -> None:
+    def _persist(self, timestamp=None) -> None:
         # TODO Refactor keys when refactoring store
         self._store.save(self._key, self._snapshot)
