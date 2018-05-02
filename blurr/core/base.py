@@ -38,11 +38,12 @@ class BaseSchema(ABC):
         self.description: str = self._spec.get(self.ATTRIBUTE_DESCRIPTION, None)
 
     def extend_schema_spec(self) -> None:
-        """ Extends the defined schema specifications at runtime with defaults """
+        """ Extends the defined schema specifications at runtime with defaults. When this method is being extended,
+        the first line should always be:  ```super().extend_schema_spec()``` """
         pass
 
     def add_errors(self, *errors: Union[InvalidSchemaError, SchemaErrorCollection]) -> None:
-        """ Adds errors to the error repository in schema laoder """
+        """ Adds errors to the error repository in schema loader """
         self.schema_loader.add_errors(*errors)
 
     @property
@@ -50,27 +51,25 @@ class BaseSchema(ABC):
         """ Returns a list of errors raised by this schema """
         return self.schema_loader.get_errors(self.fully_qualified_name)
 
-    def validate_required_attributes(self, *attributes) -> None:
+    def validate_required_attributes(self, *attributes: str) -> None:
         """ Validates that the schema contains a series of required attributes """
         self.add_errors(validate_required_attributes(self.fully_qualified_name, self._spec, *attributes))
-
-    def validate_python_identifier_attributes(self, *attributes) -> None:
-        """ Validates that a schema attribute can be a python valid identifier """
-        self.add_errors(validate_python_identifier_attributes(self.fully_qualified_name, self._spec, *attributes))
 
     def validate_number_attribute(self,
                                   attribute: str,
                                   value_type: Union[Type[int], Type[float]] = int,
                                   minimum: Optional[Union[int, float]] = None,
                                   maximum: Optional[Union[int, float]] = None):
+        """ Validates that the attribute contains a numeric value within boundaries if specified """
         self.add_errors(
             validate_number_attribute(self.fully_qualified_name, self._spec, attribute, value_type, minimum,
                                       maximum))
 
-    @abstractmethod
     def validate_schema_spec(self) -> None:
-        """ Contains the validation routines that are to be executed as part of initialization by subclasses"""
-        raise NotImplementedError('Schema spec validation must be implemented.')
+        """ Contains the validation routines that are to be executed as part of initialization by subclasses.
+        When this method is being extended, the first line should always be: ```super().validate_schema_spec()``` """
+
+        self.add_errors(validate_python_identifier_attributes(self.fully_qualified_name, self._spec, self.ATTRIBUTE_NAME))
 
 
 class BaseSchemaCollection(BaseSchema, ABC):
