@@ -1,7 +1,7 @@
-from typing import Dict, Any, Type, Optional, Union
+from typing import Dict, Any, Type, Optional, Union, List, Tuple, Callable
 
 from blurr.core.errors import InvalidIdentifierError, RequiredAttributeError, EmptyAttributeError, \
-    SchemaErrorCollection, InvalidNumberError
+    SchemaErrorCollection, InvalidNumberError, InvalidSchemaError
 
 ATTRIBUTE_NAME = 'Name'
 ATTRIBUTE_TYPE = 'Type'
@@ -9,23 +9,24 @@ ATTRIBUTE_INTERNAL = '_Internal'
 
 
 def validate_python_identifier_attributes(fully_qualified_name: str, spec: Dict[str, Any],
-                                          *attributes: str) -> SchemaErrorCollection:
+                                          *attributes: str) -> List[InvalidIdentifierError]:
     """ Validates a set of attributes as identifiers in a spec """
-    errors = SchemaErrorCollection()
+    errors: List[InvalidIdentifierError] = []
+
+    checks: List[Tuple[Callable, InvalidIdentifierError.Reason]] = [
+        (lambda x: x.startswith('_'), InvalidIdentifierError.Reason.STARTS_WITH_UNDERSCORE),
+        (lambda x: x.startswith('run_'), InvalidIdentifierError.Reason.STARTS_WITH_RUN),
+        (lambda x: not x.isidentifier(), InvalidIdentifierError.Reason.INVALID_PYTHON_IDENTIFIER),
+    ]
+
     for attribute in attributes:
         if attribute not in spec:
             continue
 
-        value = spec[attribute]
-
-        if value.startswith('_'):
-            errors.add(
-                InvalidIdentifierError(fully_qualified_name, spec, attribute,
-                                       InvalidIdentifierError.Reason.STARTS_WITH_UNDERSCORE))
-        elif not value.isidentifier():
-            errors.add(
-                InvalidIdentifierError(fully_qualified_name, spec, attribute,
-                                       InvalidIdentifierError.Reason.INVALID_PYTHON_IDENTIFIER))
+        for check in checks:
+            if check[0](spec[attribute]):
+                errors.append(InvalidIdentifierError(fully_qualified_name, spec, attribute, check[1]))
+                break
 
     return errors
 

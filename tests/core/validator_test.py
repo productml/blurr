@@ -48,14 +48,14 @@ def test_validate_required_missing_attributes(invalid_spec):
 
 
 def test_validate_identity_valid(valid_spec):
-    assert not validate_python_identifier_attributes('test', valid_spec, 'Name').has_errors
+    assert not validate_python_identifier_attributes('test', valid_spec, 'Name')
 
 
 def test_validate_identity_with_underscore(invalid_spec):
     error_collection = validate_python_identifier_attributes('test', invalid_spec, 'Identity1', 'Identity2')
-    assert len(error_collection.errors) == 2, 'Errors are not grouped by fully qualified name'
+    assert len(error_collection) == 2, 'Errors are not grouped by fully qualified name'
 
-    error = error_collection['test'][0]
+    error = error_collection[0]
     assert isinstance(error, InvalidIdentifierError)
     assert error.fully_qualified_name == 'test', 'Fully qualified name not set in the error object'
     assert error.spec == invalid_spec, 'Spec is not set in the error object'
@@ -69,7 +69,7 @@ def test_validate_identity_with_underscore(invalid_spec):
             message='Message does not correctly reflect the reason'):
         raise error
 
-    error = error_collection['test'][1]
+    error = error_collection[1]
     assert error.reason == InvalidIdentifierError.Reason.INVALID_PYTHON_IDENTIFIER
 
     with raises(
