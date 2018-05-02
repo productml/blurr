@@ -21,8 +21,11 @@ class WindowTransformerSchema(TransformerSchema):
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
 
-        if not self.errors:
+        # TODO Improve this validation in the text round.
+        try:
             self.anchor = self.schema_loader.get_schema_object(self.fully_qualified_name + '.anchor')
+        except:
+            self.anchor = None
 
     def validate_schema_spec(self) -> None:
         super().validate_schema_spec()

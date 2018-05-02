@@ -25,13 +25,12 @@ class TransformerSchema(BaseSchemaCollection, ABC):
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader, self.ATTRIBUTE_AGGREGATES)
 
-        if not self.errors:
-            self.version = self._spec[self.ATTRIBUTE_VERSION]
-            self.stores: Dict[str, Type[Store]] = {
-                schema_spec[self.ATTRIBUTE_NAME]: self.schema_loader.get_nested_schema_object(
-                    self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
-                for schema_spec in self._spec.get(self.ATTRIBUTE_STORES, [])
-            }
+        self.version = self._spec.get(self.ATTRIBUTE_VERSION, None)
+        self.stores: Dict[str, Type[Store]] = {
+            schema_spec[self.ATTRIBUTE_NAME]: self.schema_loader.get_nested_schema_object(
+                self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
+            for schema_spec in self._spec.get(self.ATTRIBUTE_STORES, [])
+        }
 
         self.import_list = self._spec.get(self.ATTRIBUTE_IMPORT, [])
         self.schema_context = SchemaContext(self.import_list)

@@ -12,9 +12,9 @@ class ActivityAggregateSchema(BlockAggregateSchema):
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
 
-        if not self.errors:
-            self.separation_interval: timedelta = timedelta(
-                seconds=int(self._spec.get(self.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS, 0)))
+        inactive_seconds = self._spec.get(self.ATTRIBUTE_SEPARATE_BY_INACTIVE_SECONDS, 0)
+        self.separation_interval: timedelta = timedelta(
+            seconds=int(inactive_seconds) if str(inactive_seconds).isdigit() else 0)
 
     def validate_schema_spec(self) -> None:
         super(BlockAggregateSchema, self).validate_schema_spec()
