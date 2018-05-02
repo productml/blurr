@@ -43,9 +43,9 @@ class LocalRunner(Runner):
     ) -> Dict[str, List[Tuple[datetime, Record]]]:
         identity_records = defaultdict(list)
         for file in local_json_files:
-            with open(file) as f:
+            with open(file) as file_stream:
                 for identity, record_with_datetime in self.get_per_identity_records(
-                        f, data_processor):
+                        file_stream, data_processor):
                     identity_records[identity].append(record_with_datetime)
         return identity_records
 
