@@ -20,12 +20,13 @@ echo "building package..."
 pipenv run python setup.py sdist
 pipenv run python setup.py bdist_wheel
 
-
-if [ ! -z "$CIRCLECI" ];
-# post-build commands to execute on CircleCI only
+echo "CIRCLECI=$CIRCLECI"
+if [ "$CIRCLECI" == "true" ];
 then
     echo "publishing coverage report..."
     pipenv run coveralls
+else
+    echo "build not running in circleci, coverage not published."
 fi
 
 
