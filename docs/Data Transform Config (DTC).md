@@ -135,10 +135,10 @@ An `Aggregate` contains `fields` for the information being stored. `Identity Agg
  Key |  Description | Allowed values | Required
  --- | ------------ | -------------- | --------
  Name | Name of the field | Any `string` | Required
- Type | Type of data being stored | `integer`, `boolean`, `string`, `datetime`, `float`, `map`, `list`, `set` | Optional. If Type is not set, the DTL uses `string` as the default type
+ Type | Type of data being stored | `integer`, `boolean`, `string`, `datetime`, `float`, `map`, `list`, `set` | Required
  Value | Value of the field | Any python expression, and must match the Type | Required  
 
- All fields in the Aggregate are encapsulated in a Aggregate object. The object is available in the DTL, which is the python environment processing the DTC. Field values can be accessed using `AggregateName.FieldName`
+All fields in the Aggregate are encapsulated in a Aggregate object. The object is available in the DTL, which is the python environment processing the DTC. Field values can be accessed using `AggregateName.FieldName`
 
 An `Identity Aggregate` can also have `Dimensions` to split the aggregation along those dimensions. `Dimensions` are also a 
 list of `Fields` with only `integer`, `boolean` and `string` types supported. Each raw event that is evaluated should
@@ -201,7 +201,7 @@ Each field in an Block Aggregate has 4 properties.
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
 Name | Name of the field | Any `string` | Required
-Type | Type of data being stored | `integer`, `boolean`, `string`, `datetime`, `float`, `map`, `list`, `set` | Optional. If Type is not set, the DTL uses `string` as the default type
+Type | Type of data being stored | `integer`, `boolean`, `string`, `datetime`, `float`, `map`, `list`, `set` | Required
 Value | Value of the field | Any python expression, and must match the Type | Required  
 When | Boolean expression that defines which raw events to process | Any `boolean` expression | Optional
 
@@ -345,7 +345,7 @@ Each field in a Window Aggregate has 3 properties.
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
 Name | Name of the field | Any `string` | Required
-Type | Type of data being stored | `integer`, `boolean`, `string`, `datetime`, `float`, `map`, `list`, `set` | Optional. If Type is not set, the DTL uses `string` as the default type
+Type | Type of data being stored | `integer`, `boolean`, `string`, `datetime`, `float`, `map`, `list`, `set` | Required
 Value | Value of the field | Any python expression, and must match the Type | Required
 
 ### Variable
@@ -370,7 +370,7 @@ Field values are not recorded when:
 
 ## Types
 
-If a type is not specified for a field, it is assumed that it is a `string`. The following types are supported.
+The following types are supported.
 
 Type |  Description | Expected format | Default
 --- | ------------ | -------------- | --------
