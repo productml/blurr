@@ -54,7 +54,8 @@ class BaseSchema(ABC):
 
     def validate_required_attributes(self, *attributes: str) -> None:
         """ Validates that the schema contains a series of required attributes """
-        self.add_errors(validate_required_attributes(self.fully_qualified_name, self._spec, *attributes))
+        self.add_errors(
+            validate_required_attributes(self.fully_qualified_name, self._spec, *attributes))
 
     def validate_number_attribute(self,
                                   attribute: str,
@@ -63,15 +64,17 @@ class BaseSchema(ABC):
                                   maximum: Optional[Union[int, float]] = None):
         """ Validates that the attribute contains a numeric value within boundaries if specified """
         self.add_errors(
-            validate_number_attribute(self.fully_qualified_name, self._spec, attribute, value_type, minimum,
-                                      maximum))
+            validate_number_attribute(self.fully_qualified_name, self._spec, attribute, value_type,
+                                      minimum, maximum))
 
     def validate_schema_spec(self) -> None:
         """ Contains the validation routines that are to be executed as part of initialization by subclasses.
         When this method is being extended, the first line should always be: ```super().validate_schema_spec()``` """
-        self.add_errors(validate_empty_attributes(self.fully_qualified_name, self._spec, *self._spec.keys()))
         self.add_errors(
-            validate_python_identifier_attributes(self.fully_qualified_name, self._spec, self.ATTRIBUTE_NAME))
+            validate_empty_attributes(self.fully_qualified_name, self._spec, *self._spec.keys()))
+        self.add_errors(
+            validate_python_identifier_attributes(self.fully_qualified_name, self._spec,
+                                                  self.ATTRIBUTE_NAME))
 
 
 class BaseSchemaCollection(BaseSchema, ABC):

@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Any
+from typing import Dict, Optional
 
 from blurr.core.aggregate_block import BlockAggregate
 from blurr.core.aggregate_window import WindowAggregate
@@ -23,7 +23,8 @@ class WindowTransformerSchema(TransformerSchema):
 
         # TODO Improve this validation in the text round.
         try:
-            self.anchor = self.schema_loader.get_schema_object(self.fully_qualified_name + '.anchor')
+            self.anchor = self.schema_loader.get_schema_object(
+                self.fully_qualified_name + '.anchor')
         except:
             self.anchor = None
 
@@ -36,7 +37,8 @@ class WindowTransformerSchema(TransformerSchema):
         if not self.errors:
             self._spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_NAME] = 'anchor'
             self._spec[self.ATTRIBUTE_ANCHOR][self.ATTRIBUTE_TYPE] = Type.ANCHOR
-            self.schema_loader.add_schema_spec(self._spec[self.ATTRIBUTE_ANCHOR], self.fully_qualified_name)
+            self.schema_loader.add_schema_spec(self._spec[self.ATTRIBUTE_ANCHOR],
+                                               self.fully_qualified_name)
 
 
 class WindowTransformer(Transformer):

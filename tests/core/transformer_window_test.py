@@ -153,7 +153,8 @@ def test_window_transformer_internal_reset(schema_loader, window_transformer, bl
     assert snapshot['last_day'] == {'_identity': 'user1', 'total_events': 3}
 
 
-def test_window_transformer_schema_missing_attributes_adds_error(schema_loader, stream_schema_spec, window_schema_spec):
+def test_window_transformer_schema_missing_attributes_adds_error(schema_loader, stream_schema_spec,
+                                                                 window_schema_spec):
     del window_schema_spec[WindowTransformerSchema.ATTRIBUTE_ANCHOR]
     schema_loader.add_schema_spec(stream_schema_spec)
     window_dtc_name = schema_loader.add_schema_spec(window_schema_spec)

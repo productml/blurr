@@ -25,7 +25,8 @@ def validate_python_identifier_attributes(fully_qualified_name: str, spec: Dict[
 
         for check in checks:
             if check[0](spec[attribute]):
-                errors.append(InvalidIdentifierError(fully_qualified_name, spec, attribute, check[1]))
+                errors.append(
+                    InvalidIdentifierError(fully_qualified_name, spec, attribute, check[1]))
                 break
 
     return errors
@@ -51,12 +52,13 @@ def validate_empty_attributes(fully_qualified_name: str, spec: Dict[str, Any],
     ]
 
 
-def validate_number_attribute(fully_qualified_name: str,
-                              spec: Dict[str, Any],
-                              attribute: str,
-                              value_type: Union[Type[int], Type[float]] = int,
-                              minimum: Optional[Union[int, float]] = None,
-                              maximum: Optional[Union[int, float]] = None) -> Optional[InvalidNumberError]:
+def validate_number_attribute(
+        fully_qualified_name: str,
+        spec: Dict[str, Any],
+        attribute: str,
+        value_type: Union[Type[int], Type[float]] = int,
+        minimum: Optional[Union[int, float]] = None,
+        maximum: Optional[Union[int, float]] = None) -> Optional[InvalidNumberError]:
     if attribute not in spec:
         return
 

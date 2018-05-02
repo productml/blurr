@@ -1,4 +1,4 @@
-from typing import Dict, Any, List, Tuple, Optional, Union
+from typing import Dict, Any, List, Optional, Union
 
 from blurr.core.errors import GenericSchemaError, InvalidSchemaError
 from blurr.core.errors import SchemaErrorCollection
@@ -40,7 +40,9 @@ class SchemaLoader:
 
         # Ensure that basic validation for each spec part is done before it is added to spec cache
         if isinstance(spec, dict):
-            self._error_cache.add(validate_required_attributes(fully_qualified_name, spec, ATTRIBUTE_NAME, ATTRIBUTE_TYPE))
+            self._error_cache.add(
+                validate_required_attributes(fully_qualified_name, spec, ATTRIBUTE_NAME,
+                                             ATTRIBUTE_TYPE))
 
         self._spec_cache[fully_qualified_name] = spec
         for key, val in spec.items():

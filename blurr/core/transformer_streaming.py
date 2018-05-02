@@ -18,12 +18,15 @@ class StreamingTransformerSchema(TransformerSchema):
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
 
-        self.identity = Expression(self._spec[self.ATTRIBUTE_IDENTITY]) if self.ATTRIBUTE_IDENTITY in self._spec else None
-        self.time = Expression(self._spec[self.ATTRIBUTE_TIME]) if self.ATTRIBUTE_TIME in self._spec else None
+        self.identity = Expression(
+            self._spec[self.ATTRIBUTE_IDENTITY]) if self.ATTRIBUTE_IDENTITY in self._spec else None
+        self.time = Expression(
+            self._spec[self.ATTRIBUTE_TIME]) if self.ATTRIBUTE_TIME in self._spec else None
 
     def validate_schema_spec(self) -> None:
         super().validate_schema_spec()
-        self.validate_required_attributes(self.ATTRIBUTE_IDENTITY, self.ATTRIBUTE_TIME, self.ATTRIBUTE_STORES)
+        self.validate_required_attributes(self.ATTRIBUTE_IDENTITY, self.ATTRIBUTE_TIME,
+                                          self.ATTRIBUTE_STORES)
 
     def get_identity(self, record: Record) -> str:
         """

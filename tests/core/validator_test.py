@@ -54,12 +54,13 @@ def test_validate_python_identifier_attributes_valid(valid_spec):
 
 def test_validate_python_identifier_attributes_internal(invalid_spec):
     invalid_spec[ATTRIBUTE_INTERNAL] = True
-    assert not validate_python_identifier_attributes('test', invalid_spec, 'Identity1', 'Identity2', 'Identity3')
+    assert not validate_python_identifier_attributes('test', invalid_spec, 'Identity1', 'Identity2',
+                                                     'Identity3')
 
 
 def test_validate_python_identifier_attributes_with_error_conditions(invalid_spec):
-    error_collection = validate_python_identifier_attributes('test', invalid_spec, 'Identity1', 'Identity2',
-                                                             'Identity3')
+    error_collection = validate_python_identifier_attributes('test', invalid_spec, 'Identity1',
+                                                             'Identity2', 'Identity3')
     assert len(error_collection) == 3, 'Errors are not grouped by fully qualified name'
 
     error = error_collection[0]
@@ -72,7 +73,7 @@ def test_validate_python_identifier_attributes_with_error_conditions(invalid_spe
     with raises(
             InvalidIdentifierError,
             match='`Identity1: _illegal_identity` in section `test` is invalid. '
-                  'Identifiers starting with underscore `_` are reserved.',
+            'Identifiers starting with underscore `_` are reserved.',
             message='Message does not correctly reflect the reason'):
         raise error
 
@@ -82,7 +83,7 @@ def test_validate_python_identifier_attributes_with_error_conditions(invalid_spe
     with raises(
             InvalidIdentifierError,
             match='`Identity2: some space` in section `test` is invalid. '
-                  'Identifiers must be valid Python identifiers.',
+            'Identifiers must be valid Python identifiers.',
             message='Message does not correctly reflect the reason'):
         raise error
 
@@ -92,7 +93,7 @@ def test_validate_python_identifier_attributes_with_error_conditions(invalid_spe
     with raises(
             InvalidIdentifierError,
             match='`Identity3: run_reserved` in section `test` is invalid. '
-                  'Identifiers starting with `run_` are reserved.',
+            'Identifiers starting with `run_` are reserved.',
             message='Message does not correctly reflect the reason'):
         raise error
 

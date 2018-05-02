@@ -4,7 +4,7 @@ import sys
 from typing import Dict, Any
 
 import yaml
-from pytest import mark, fixture
+from pytest import fixture
 
 from blurr.core.base import BaseSchema, BaseItem
 from blurr.core.evaluation import EvaluationContext

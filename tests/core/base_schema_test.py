@@ -53,7 +53,8 @@ def test_base_schema_with_no_attribute_when(schema_spec: Dict[str, Any]):
     assert test_schema.when is None
 
 
-def test_base_schema_validate_schema_spec_missing_type_and_empty_when(invalid_schema_spec: Dict[str, Any]):
+def test_base_schema_validate_schema_spec_missing_type_and_empty_when(
+        invalid_schema_spec: Dict[str, Any]):
     schema = get_test_schema(invalid_schema_spec)
 
     assert len(schema.errors) == 2
