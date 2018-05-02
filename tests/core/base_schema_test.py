@@ -19,8 +19,7 @@ def schema_spec():
 
 
 class MockSchema(BaseSchema):
-    def validate_schema_spec(self) -> None:
-        pass
+    pass
 
 
 def get_test_schema(schema_spec: Dict[str, Any]) -> MockSchema:
@@ -84,9 +83,9 @@ def test_schema_collection_empty_nested_attribute_adds_error(
         schema_collection_spec: Dict[str, Any]):
     del schema_collection_spec['Fields'][0]
     schema_loader = SchemaLoader()
-    schema_loader.add_schema_spec(schema_collection_spec)
+    name = schema_loader.add_schema_spec(schema_collection_spec)
+    schema = MockSchemaCollection(name, schema_loader, 'Fields')
 
-    assert len(schema_loader._errors.errors) == 1
-    error = schema_loader._errors.errors[0]
-    assert isinstance(error, EmptyAttributeError)
-    assert error.attribute == 'Fields'
+    assert len(schema.errors) == 1
+    assert isinstance(schema.errors[0], EmptyAttributeError)
+    assert schema.errors[0].attribute == 'Fields'

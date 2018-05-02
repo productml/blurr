@@ -103,9 +103,8 @@ class InvalidNumberError(InvalidSchemaError):
 class InvalidIdentifierError(InvalidSchemaError):
     class Reason(Enum):
         STARTS_WITH_UNDERSCORE = 'Identifiers starting with underscore `_` are reserved'
-        STARTS_WITH_RUN = 'Identifiers starting with underscore `run_` are reserved'
+        STARTS_WITH_RUN = 'Identifiers starting with `run_` are reserved'
         INVALID_PYTHON_IDENTIFIER = 'Identifiers must be valid Python identifiers'
-
 
     def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
                  reason: 'Reason', *args, **kwargs):

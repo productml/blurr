@@ -1,23 +1,24 @@
-from collections import Counter
 from typing import Dict, Any
 
 import yaml
 from pytest import raises, fixture
 
 from blurr.core.errors import RequiredAttributeError, InvalidIdentifierError, EmptyAttributeError
-from blurr.core.validator import validate_schema_basics, validate_required_attributes, validate_python_identifier_attributes
+from blurr.core.validator import validate_required_attributes, \
+    validate_python_identifier_attributes, ATTRIBUTE_INTERNAL, validate_empty_attributes
 
 
-@fixture(scope='session')
+@fixture
 def invalid_spec() -> Dict[str, Any]:
     return yaml.load('''
             Identity1: _illegal_identity
             Identity2: some space
+            Identity3: run_reserved
             Value: 2  
             ''')
 
 
-@fixture(scope='session')
+@fixture
 def valid_spec() -> Dict[str, Any]:
     return yaml.load('''
             Name: valid_name
@@ -27,14 +28,14 @@ def valid_spec() -> Dict[str, Any]:
 
 
 def test_validate_required_valid(valid_spec):
-    assert not validate_required_attributes('test', valid_spec, 'Name', 'Type').has_errors
+    assert not validate_required_attributes('test', valid_spec, 'Name', 'Type')
 
 
 def test_validate_required_missing_attributes(invalid_spec):
     error_collection = validate_required_attributes('test', invalid_spec, 'Name', 'Type')
-    assert len(error_collection['test']) == 2, 'Errors are not grouped by fully qualified name'
+    assert len(error_collection) == 2, 'Errors are not grouped by fully qualified name'
 
-    error = error_collection['test'][0]
+    error = error_collection[0]
     assert isinstance(error, RequiredAttributeError)
     assert error.fully_qualified_name == 'test', 'Fully qualified name not set in the error object'
     assert error.spec == invalid_spec, 'Spec is not set in the error object'
@@ -47,13 +48,19 @@ def test_validate_required_missing_attributes(invalid_spec):
         raise error
 
 
-def test_validate_identity_valid(valid_spec):
+def test_validate_python_identifier_attributes_valid(valid_spec):
     assert not validate_python_identifier_attributes('test', valid_spec, 'Name')
 
 
-def test_validate_identity_with_underscore(invalid_spec):
-    error_collection = validate_python_identifier_attributes('test', invalid_spec, 'Identity1', 'Identity2')
-    assert len(error_collection) == 2, 'Errors are not grouped by fully qualified name'
+def test_validate_python_identifier_attributes_internal(invalid_spec):
+    invalid_spec[ATTRIBUTE_INTERNAL] = True
+    assert not validate_python_identifier_attributes('test', invalid_spec, 'Identity1', 'Identity2', 'Identity3')
+
+
+def test_validate_python_identifier_attributes_with_error_conditions(invalid_spec):
+    error_collection = validate_python_identifier_attributes('test', invalid_spec, 'Identity1', 'Identity2',
+                                                             'Identity3')
+    assert len(error_collection) == 3, 'Errors are not grouped by fully qualified name'
 
     error = error_collection[0]
     assert isinstance(error, InvalidIdentifierError)
@@ -65,7 +72,7 @@ def test_validate_identity_with_underscore(invalid_spec):
     with raises(
             InvalidIdentifierError,
             match='`Identity1: _illegal_identity` in section `test` is invalid. '
-            'Identifiers starting with underscore `_` are reserved.',
+                  'Identifiers starting with underscore `_` are reserved.',
             message='Message does not correctly reflect the reason'):
         raise error
 
@@ -75,39 +82,32 @@ def test_validate_identity_with_underscore(invalid_spec):
     with raises(
             InvalidIdentifierError,
             match='`Identity2: some space` in section `test` is invalid. '
-            'Identifiers must be valid Python identifiers.',
+                  'Identifiers must be valid Python identifiers.',
+            message='Message does not correctly reflect the reason'):
+        raise error
+
+    error = error_collection[2]
+    assert error.reason == InvalidIdentifierError.Reason.STARTS_WITH_RUN
+
+    with raises(
+            InvalidIdentifierError,
+            match='`Identity3: run_reserved` in section `test` is invalid. '
+                  'Identifiers starting with `run_` are reserved.',
             message='Message does not correctly reflect the reason'):
         raise error
 
 
-def test_validate_schema_basics_empty_attributes_raises_exception():
+def test_validate_schema_empty_attributes():
     spec = yaml.load('''
         Name: ''
         Type: ''
         ''')
 
-    error_collection = validate_schema_basics('test', spec)
-    assert len(error_collection.errors) == 5, 'Errors are not grouped by fully qualified name'
+    errors = validate_empty_attributes('test', spec, *spec.keys())
+    assert len(errors) == 2, 'Errors are not grouped by fully qualified name'
 
-    error_counts = Counter(list(map(lambda x: type(x), error_collection['test'])))
-    assert error_counts[EmptyAttributeError] == 2
-    assert error_counts[RequiredAttributeError] == 2
-    assert error_counts[InvalidIdentifierError] == 1
-
-
-def test_validate_schema_basics_missing_name_type_raises_exception(invalid_spec):
-    error_collection = validate_schema_basics('test', invalid_spec)
-    assert len(error_collection.errors) == 2
-    assert isinstance(error_collection.errors[0], RequiredAttributeError)
-    assert isinstance(error_collection.errors[1], RequiredAttributeError)
-
-
-def test_validate_schema_basics_invalid_name_raises_exception():
-    spec = yaml.load('''
-        Name: _some /,
-        Type: 'integer'
-        ''')
-
-    error = validate_schema_basics('test', spec)
-    assert len(error.errors) == 1
-    assert isinstance(error.errors[0], InvalidIdentifierError)
+    with raises(
+            EmptyAttributeError,
+            match='Attribute `Name` under `test` cannot be left empty.',
+            message='Error message did not match expected pattern'):
+        raise errors[0]

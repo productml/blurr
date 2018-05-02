@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Type, TypeVar, Union, List, Optional
 
-from blurr.core.errors import SnapshotError, SchemaErrorCollection, InvalidSchemaError
+from blurr.core.errors import SnapshotError, InvalidSchemaError
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
-from blurr.core.validator import validate_required_attributes, validate_python_identifier_attributes, validate_number_attribute
+from blurr.core.validator import validate_required_attributes, validate_python_identifier_attributes, \
+    validate_number_attribute, validate_empty_attributes
 
 
 class BaseSchema(ABC):
@@ -42,7 +43,7 @@ class BaseSchema(ABC):
         the first line should always be:  ```super().extend_schema_spec()``` """
         pass
 
-    def add_errors(self, *errors: Union[InvalidSchemaError, SchemaErrorCollection]) -> None:
+    def add_errors(self, *errors: Union[InvalidSchemaError, List[InvalidSchemaError]]) -> None:
         """ Adds errors to the error repository in schema loader """
         self.schema_loader.add_errors(*errors)
 
@@ -68,8 +69,9 @@ class BaseSchema(ABC):
     def validate_schema_spec(self) -> None:
         """ Contains the validation routines that are to be executed as part of initialization by subclasses.
         When this method is being extended, the first line should always be: ```super().validate_schema_spec()``` """
-
-        self.add_errors(validate_python_identifier_attributes(self.fully_qualified_name, self._spec, self.ATTRIBUTE_NAME))
+        self.add_errors(validate_empty_attributes(self.fully_qualified_name, self._spec, *self._spec.keys()))
+        self.add_errors(
+            validate_python_identifier_attributes(self.fully_qualified_name, self._spec, self.ATTRIBUTE_NAME))
 
 
 class BaseSchemaCollection(BaseSchema, ABC):
@@ -98,6 +100,7 @@ class BaseSchemaCollection(BaseSchema, ABC):
         }
 
     def validate_schema_spec(self) -> None:
+        super().validate_schema_spec()
         self.validate_required_attributes(self._nested_item_attribute)
 
 

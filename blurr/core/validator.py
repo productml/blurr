@@ -1,7 +1,7 @@
 from typing import Dict, Any, Type, Optional, Union, List, Tuple, Callable
 
 from blurr.core.errors import InvalidIdentifierError, RequiredAttributeError, EmptyAttributeError, \
-    SchemaErrorCollection, InvalidNumberError, InvalidSchemaError
+    InvalidNumberError
 
 ATTRIBUTE_NAME = 'Name'
 ATTRIBUTE_TYPE = 'Type'
@@ -20,7 +20,7 @@ def validate_python_identifier_attributes(fully_qualified_name: str, spec: Dict[
     ]
 
     for attribute in attributes:
-        if attribute not in spec:
+        if attribute not in spec or ATTRIBUTE_INTERNAL in spec:
             continue
 
         for check in checks:
@@ -32,14 +32,23 @@ def validate_python_identifier_attributes(fully_qualified_name: str, spec: Dict[
 
 
 def validate_required_attributes(fully_qualified_name: str, spec: Dict[str, Any],
-                                 *attributes: str) -> SchemaErrorCollection:
+                                 *attributes: str) -> List[RequiredAttributeError]:
     """ Validates to ensure that a set of attributes are present in spec """
-    errors = SchemaErrorCollection()
-    for attribute in attributes:
-        if not spec.get(attribute, None):
-            errors.add(RequiredAttributeError(fully_qualified_name, spec, attribute))
+    return [
+        RequiredAttributeError(fully_qualified_name, spec, attribute)
+        for attribute in attributes
+        if attribute not in spec
+    ]
 
-    return errors
+
+def validate_empty_attributes(fully_qualified_name: str, spec: Dict[str, Any],
+                              *attributes: str) -> List[EmptyAttributeError]:
+    """ Validates to ensure that a set of attributes do not contain empty values """
+    return [
+        EmptyAttributeError(fully_qualified_name, spec, attribute)
+        for attribute in attributes
+        if not spec.get(attribute, None)
+    ]
 
 
 def validate_number_attribute(fully_qualified_name: str,
@@ -58,30 +67,3 @@ def validate_number_attribute(fully_qualified_name: str,
     except:
         return InvalidNumberError(fully_qualified_name, spec, attribute, value_type, minimum,
                                   maximum)
-
-
-def validate_schema_basics(fully_qualified_name: str,
-                           spec: Dict[str, Any]) -> SchemaErrorCollection:
-    """
-    Validates the basic requirements of a schema block
-        1. Items may not have empty value
-        2. `Name` and `Type` must be defined
-        3. `Name` must have a value that passes as a valid python identity and must not start with '_'
-
-    :param fully_qualified_name: Fully qualified name of the block
-    :param spec: The spec of the schema block being validated
-    :return: A collection of validation errors that have been found.  If no errors are found,
-                and empty collection is returned
-    """
-    errors = SchemaErrorCollection()
-
-    if ATTRIBUTE_INTERNAL not in spec:
-        errors.add([
-            EmptyAttributeError(fully_qualified_name, spec, attribute)
-            for attribute, value in spec.items()
-            if not value
-        ])
-        errors.add(validate_required_attributes(fully_qualified_name, spec, ATTRIBUTE_NAME, ATTRIBUTE_TYPE))
-        errors.add(validate_python_identifier_attributes(fully_qualified_name, spec, ATTRIBUTE_NAME))
-
-    return errors
