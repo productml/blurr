@@ -60,7 +60,7 @@ class IdentityAggregate(Aggregate):
 
     def _init_state_from_key(self):
         self._key = self._prepare_key()
-        snapshot = self._schema.store.get(self._key)
+        snapshot = self._store.get(self._key)
         if snapshot:
             self.run_restore(snapshot)
         else:
@@ -94,4 +94,4 @@ class IdentityAggregate(Aggregate):
 
     def _persist(self, timestamp=None) -> None:
         # TODO Refactor keys when refactoring store
-        self._schema.store.save(self._key, self._snapshot)
+        self._store.save(self._key, self._snapshot)

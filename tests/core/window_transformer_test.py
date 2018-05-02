@@ -84,7 +84,7 @@ def test_evaluate_prepare_window_error(window_transformer, block_aggregate):
 
 
 def test_evaluate_prepare_window(schema_loader, window_transformer, block_aggregate):
-    init_memory_store(schema_loader.get_schema_object('Sessions.memory'))
+    init_memory_store(schema_loader.get_store('Sessions.memory'))
     block_aggregate.run_restore({
         'events': 3,
         '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc).isoformat(),
@@ -94,7 +94,7 @@ def test_evaluate_prepare_window(schema_loader, window_transformer, block_aggreg
 
 
 def test_evaluate_false(schema_loader, window_transformer, block_aggregate):
-    init_memory_store(schema_loader.get_schema_object('Sessions.memory'))
+    init_memory_store(schema_loader.get_store('Sessions.memory'))
     block_aggregate.run_restore({
         'events': 0,
         '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc).isoformat(),
@@ -110,7 +110,7 @@ def test_evaluate_missing_block_error(window_transformer):
 
 
 def test_window_transformer(schema_loader, window_transformer, block_aggregate):
-    init_memory_store(schema_loader.get_schema_object('Sessions.memory'))
+    init_memory_store(schema_loader.get_store('Sessions.memory'))
 
     block_aggregate.run_restore({
         'events': 3,
@@ -133,7 +133,7 @@ def test_window_transformer(schema_loader, window_transformer, block_aggregate):
 
 
 def test_window_transformer_internal_reset(schema_loader, window_transformer, block_aggregate):
-    init_memory_store(schema_loader.get_schema_object('Sessions.memory'))
+    init_memory_store(schema_loader.get_store('Sessions.memory'))
     window_transformer._anchor._schema.max = None
 
     block_aggregate.run_restore({
