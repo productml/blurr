@@ -63,7 +63,6 @@ def test_transformer_schema_init(schema_loader: SchemaLoader, schema_spec: Dict[
     test_transformer_schema = MockTransformerSchema(name, schema_loader)
     assert test_transformer_schema.version == '2018-03-01'
     assert test_transformer_schema.type == Type.BLURR_TRANSFORM_STREAMING
-    assert test_transformer_schema.stores['memstore'].type == Type.BLURR_STORE_MEMORY
 
 
 def test_transformer_init(test_transformer) -> None:
