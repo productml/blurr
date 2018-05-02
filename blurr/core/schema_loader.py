@@ -122,8 +122,7 @@ class SchemaLoader:
         except:
             raise InvalidSchemaError("{} not declared in schema".format(fully_qualified_name))
 
-    def get_schema_specs_of_type(self,
-                                 schema_types: List[Type]) -> List[Tuple[str, Dict[str, Any]]]:
+    def get_schema_specs_of_type(self, *schema_types: Type) -> Dict[str, Dict[str, Any]]:
         """
         Returns a list of fully qualified names and schema dictionary tuples for
         the schema types provided.
@@ -131,9 +130,11 @@ class SchemaLoader:
         :return: List of fully qualified names and schema dictionary tuples.
         """
 
-        return [(fq_name, schema)
-                for fq_name, schema in self._spec.items()
-                if Type.is_type_in(schema.get(self.ATTRIBUTE_TYPE, ''), schema_types)]
+        return {
+            fq_name: schema
+            for fq_name, schema in self._spec.items()
+            if Type.is_type_in(schema.get(self.ATTRIBUTE_TYPE, ''), list(schema_types))
+        }
 
     @staticmethod
     def get_transformer_name(fully_qualified_name: str) -> str:

@@ -153,9 +153,8 @@ class Runner(ABC):
     @staticmethod
     def _get_streaming_transformer_schema(
             schema_loader: SchemaLoader) -> StreamingTransformerSchema:
-        streaming_transformer_schema = schema_loader.get_schema_specs_of_type(
-            [Type.BLURR_TRANSFORM_STREAMING])
-        return schema_loader.get_schema_object(streaming_transformer_schema[0][0])
+        fq_name_and_schema = schema_loader.get_schema_specs_of_type(Type.BLURR_TRANSFORM_STREAMING)
+        return schema_loader.get_schema_object(next(iter(fq_name_and_schema)))
 
     @abstractmethod
     def execute(self, *args, **kwargs):
