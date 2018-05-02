@@ -112,7 +112,7 @@ def test_streaming_transformer_evaluate_time_error(schema_loader: SchemaLoader,
     transformer_schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
     transformer = StreamingTransformer(transformer_schema, 'user1')
     with pytest.raises(NameError, match='name \'datetime\' is not defined'):
-        assert transformer.evaluate(Record())
+        assert transformer.run_evaluate(Record())
 
 
 def test_streaming_transformer_evaluate_user_mismatch(schema_loader: SchemaLoader,
@@ -123,7 +123,7 @@ def test_streaming_transformer_evaluate_user_mismatch(schema_loader: SchemaLoade
     with pytest.raises(
             IdentityError,
             match='Identity in transformer \(user2\) and new record \(user1\) do not match'):
-        assert transformer.evaluate(Record())
+        assert transformer.run_evaluate(Record())
 
 
 def test_streaming_transformer_evaluate(schema_loader: SchemaLoader,
@@ -131,7 +131,7 @@ def test_streaming_transformer_evaluate(schema_loader: SchemaLoader,
     streaming_dtc = schema_loader.add_schema_spec(schema_spec)
     transformer_schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
     transformer = StreamingTransformer(transformer_schema, 'user1')
-    transformer.evaluate(Record())
+    transformer.run_evaluate(Record())
 
     assert transformer._snapshot == {'test_group': {'_identity': 'user1', 'events': 1}}
 
@@ -141,13 +141,13 @@ def test_streaming_transformer_finalize(schema_loader: SchemaLoader,
     streaming_dtc = schema_loader.add_schema_spec(schema_spec)
     transformer_schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
     transformer = StreamingTransformer(transformer_schema, 'user1')
-    store = schema_loader.get_schema_object('test.memstore')
+    store = schema_loader.get_store('test.memstore')
 
-    transformer.finalize()
+    transformer.run_finalize()
     assert store.get(Key('user1', 'test_group')) is None
 
-    transformer.evaluate(Record())
-    transformer.finalize()
+    transformer.run_evaluate(Record())
+    transformer.run_finalize()
     assert store.get(Key('user1', 'test_group')) == {'_identity': 'user1', 'events': 1}
 
 

@@ -3,8 +3,11 @@ from typing import Any, Dict, List, Tuple
 
 from dateutil import parser
 
-from blurr.core.schema_loader import SchemaLoader
-from blurr.core.store import Store, Key
+from blurr.core.store import Store, Key, StoreSchema
+
+
+class MemoryStoreSchema(StoreSchema):
+    pass
 
 
 class MemoryStore(Store):
@@ -12,8 +15,8 @@ class MemoryStore(Store):
     In-memory store implementation
     """
 
-    def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
-        super().__init__(fully_qualified_name, schema_loader)
+    def __init__(self, schema: MemoryStoreSchema) -> None:
+        self._schema = schema
         self._cache: Dict[Key, Any] = dict()
 
     def load(self):

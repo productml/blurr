@@ -49,15 +49,17 @@ def test_aggregate_schema_initialization_with_store(aggregate_schema_spec, store
 
     schema_loader.add_schema_spec(store_spec, 'user')
     aggregate_schema = MockAggregateSchema(name, schema_loader)
-    assert aggregate_schema.store is not None
-    assert aggregate_schema.store.name == 'memory'
+    store = schema_loader.get_store(aggregate_schema.store_schema.fully_qualified_name)
+    assert store is not None
+    assert store._schema.name == 'memory'
+    assert aggregate_schema.store_schema.name == 'memory'
 
 
 def test_aggregate_schema_initialization_without_store(aggregate_schema_spec):
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema_spec(aggregate_schema_spec)
     aggregate_schema = MockAggregateSchema(name, schema_loader)
-    assert aggregate_schema.store is None
+    assert aggregate_schema.store_schema is None
 
 
 def test_aggregate_schema_missing_attributes_adds_error(aggregate_schema_spec):

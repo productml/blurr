@@ -80,7 +80,7 @@ def activity_events() -> List[Record]:
 def evaluate_event(record: Record, aggregate: ActivityAggregate) -> None:
     aggregate._evaluation_context.global_add('source', record)
     aggregate._evaluation_context.global_add('time', parser.parse(record.event_time))
-    aggregate.evaluate()
+    aggregate.run_evaluate()
 
 
 def test_aggregate_final_state(activity_aggregate_schema: ActivityAggregateSchema,
@@ -95,9 +95,9 @@ def test_aggregate_final_state(activity_aggregate_schema: ActivityAggregateSchem
     for record in activity_events:
         evaluate_event(record, activity_aggregate)
 
-    activity_aggregate.finalize()
+    activity_aggregate.run_finalize()
 
-    store_state = activity_aggregate._schema.store.get_all(identity)
+    store_state = activity_aggregate._store.get_all(identity)
     assert len(store_state) == 3
     assert store_state.get(
         Key('user1', 'activity_aggr', datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc))) == {
@@ -136,19 +136,19 @@ def test_evaluate_no_separation(activity_aggregate_schema: ActivityAggregateSche
     activity_aggregate = ActivityAggregate(activity_aggregate_schema, identity, evaluation_context)
     evaluation_context.global_add(activity_aggregate._schema.name, activity_aggregate)
 
-    store_state = activity_aggregate._schema.store.get_all(identity)
+    store_state = activity_aggregate._store.get_all(identity)
     assert len(store_state) == 0
 
     evaluate_event(activity_events[0], activity_aggregate)
-    activity_aggregate.persist()
+    activity_aggregate._persist()
 
-    store_state = activity_aggregate._schema.store.get_all(identity)
+    store_state = activity_aggregate._store.get_all(identity)
     assert len(store_state) == 1
 
     evaluate_event(activity_events[1], activity_aggregate)
-    activity_aggregate.persist()
+    activity_aggregate._persist()
 
-    store_state = activity_aggregate._schema.store.get_all(identity)
+    store_state = activity_aggregate._store.get_all(identity)
     assert len(store_state) == 1
 
 
@@ -162,15 +162,15 @@ def test_evaluate_separate_on_inactivity(activity_aggregate_schema: ActivityAggr
     evaluation_context.global_add(activity_aggregate._schema.name, activity_aggregate)
 
     evaluate_event(activity_events[2], activity_aggregate)
-    activity_aggregate.persist()
+    activity_aggregate._persist()
 
-    store_state = activity_aggregate._schema.store.get_all(identity)
+    store_state = activity_aggregate._store.get_all(identity)
     assert len(store_state) == 1
 
     evaluate_event(activity_events[3], activity_aggregate)
-    activity_aggregate.persist()
+    activity_aggregate._persist()
 
-    store_state = activity_aggregate._schema.store.get_all(identity)
+    store_state = activity_aggregate._store.get_all(identity)
     assert len(store_state) == 2
 
 

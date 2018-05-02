@@ -68,7 +68,7 @@ class BlockAggregate(Aggregate):
     Manages the aggregates for block based roll-ups of streaming data
     """
 
-    def evaluate(self) -> None:
+    def run_evaluate(self) -> None:
         """
         Evaluates the current item
         """
@@ -80,11 +80,11 @@ class BlockAggregate(Aggregate):
         if split_should_be_evaluated and self._schema.split.evaluate(
                 self._evaluation_context) is True:
             # Save the current snapshot with the current timestamp
-            self.persist(self._start_time)
+            self._persist(self._start_time)
             # Reset the state of the contents
             self.__init__(self._schema, self._identity, self._evaluation_context)
 
-        super().evaluate()
+        super().run_evaluate()
 
-    def persist(self, timestamp=None) -> None:
-        super().persist(timestamp if timestamp else self._start_time)
+    def _persist(self, timestamp=None) -> None:
+        super()._persist(timestamp if timestamp else self._start_time)

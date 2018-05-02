@@ -48,18 +48,18 @@ class WindowTransformer(Transformer):
     def __init__(self, schema: WindowTransformerSchema, identity: str, context: Context) -> None:
         super().__init__(schema, identity)
         self._evaluation_context.merge(EvaluationContext(context))
-        self._anchor = Anchor(schema.anchor, self._evaluation_context)
+        self._anchor = Anchor(schema.anchor)
 
-    def evaluate(self, block: BlockAggregate) -> bool:
+    def run_evaluate(self, block: BlockAggregate) -> bool:
         """
         Evaluates the anchor condition against the specified block.
         :param block: Block to run the anchor condition against.
         :return: True, if the anchor condition is met, otherwise, False.
         """
-        if self._anchor.evaluate_anchor(block):
+        if self._anchor.evaluate_anchor(block, self._evaluation_context):
 
             try:
-                self.reset()
+                self.run_reset()
                 self._evaluation_context.global_add('anchor', block)
                 self._evaluate()
                 self._anchor.add_condition_met()
@@ -78,12 +78,12 @@ class WindowTransformer(Transformer):
 
         for item in self._nested_items.values():
             if isinstance(item, WindowAggregate):
-                item.prepare_window(self._anchor.anchor_block._start_time)
+                item._prepare_window(self._anchor.anchor_block._start_time)
 
-        super().evaluate()
+        super().run_evaluate()
 
     @property
-    def flattened_snapshot(self) -> Dict:
+    def run_flattened_snapshot(self) -> Dict:
         """
         Generates a flattened snapshot where the final key for a field is <aggregate_name>.<field_name>.
         :return: The flattened snapshot.

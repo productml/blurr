@@ -139,7 +139,7 @@ class BaseItem(ABC):
         return self._schema.name
 
     @abstractmethod
-    def evaluate(self, *args, **kwargs) -> None:
+    def run_evaluate(self, *args, **kwargs) -> None:
         """
         Evaluates the current item
         """
@@ -155,14 +155,14 @@ class BaseItem(ABC):
         raise NotImplementedError('snapshot() must be implemented')
 
     @abstractmethod
-    def restore(self, snapshot) -> BaseItemType:
+    def run_restore(self, snapshot) -> BaseItemType:
         """
         Restores the state of an item from a snapshot
         """
         raise NotImplementedError('restore() must be implemented')
 
     @abstractmethod
-    def reset(self) -> None:
+    def run_reset(self) -> None:
         """
         Resets the state of the item.
         """
@@ -183,7 +183,7 @@ class BaseItemCollection(BaseItem, ABC):
 
         super().__init__(schema, evaluation_context)
 
-    def evaluate(self, *args, **kwargs) -> None:
+    def run_evaluate(self, *args, **kwargs) -> None:
         """
         Evaluates the current item
         :returns An evaluation result object containing the result, or reasons why
@@ -191,7 +191,7 @@ class BaseItemCollection(BaseItem, ABC):
         """
         if self._needs_evaluation:
             for _, item in self._nested_items.items():
-                item.evaluate()
+                item.run_evaluate()
 
     @property
     def _snapshot(self) -> Dict[str, Any]:
@@ -203,7 +203,7 @@ class BaseItemCollection(BaseItem, ABC):
         except Exception as e:
             raise SnapshotError('Error while creating snapshot for {}'.format(self._name)) from e
 
-    def restore(self, snapshot: Dict[Union[str, Key], Any]) -> 'BaseItemCollection':
+    def run_restore(self, snapshot: Dict[Union[str, Key], Any]) -> 'BaseItemCollection':
         """
         Restores the state of a collection from a snapshot
         """
@@ -211,20 +211,20 @@ class BaseItemCollection(BaseItem, ABC):
 
             for name, snap in snapshot.items():
                 if isinstance(name, Key):
-                    self._nested_items[name.group].restore(snap)
+                    self._nested_items[name.group].run_restore(snap)
                 else:
-                    self._nested_items[name].restore(snap)
+                    self._nested_items[name].run_restore(snap)
             return self
 
         except Exception as e:
             raise SnapshotError('Error while restoring snapshot: {}'.format(self._snapshot)) from e
 
-    def reset(self) -> None:
+    def run_reset(self) -> None:
         for _, item in self._nested_items.items():
-            item.reset()
+            item.run_reset()
 
     @abstractmethod
-    def finalize(self) -> None:
+    def run_finalize(self) -> None:
         """
         Performs the final rites of an item before it decommissioned
         """

@@ -1,6 +1,7 @@
 import time
 from datetime import datetime, timezone
 from typing import Dict, Any
+from unittest import mock
 
 import boto3
 from pytest import fixture
@@ -8,6 +9,7 @@ from pytest import fixture
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
 from blurr.store.dynamo_store import DynamoStore
+from tests.store.dynamo.utils import DYNAMODB_KWARGS
 
 
 @fixture
@@ -19,24 +21,38 @@ def dynamo_store_spec() -> Dict[str, Any]:
     }
 
 
+def override_boto3_dynamodb_resource(db_kwargs=DYNAMODB_KWARGS) -> Any:
+    return boto3.resource('dynamodb', **db_kwargs)
+
+
+def get_boto3_dynamodb_client(db_kwargs=DYNAMODB_KWARGS) -> Any:
+    return boto3.client('dynamodb', **db_kwargs)
+
+
 @fixture
-def store(dynamo_store_spec) -> DynamoStore:
+def store(dynamo_store_spec: Dict[str, Any]) -> DynamoStore:
     schema_loader = SchemaLoader()
-    schema_loader.add_schema_spec(dynamo_store_spec)
-    dynamo_store = DynamoStore('dynamostore', schema_loader)
+    name = schema_loader.add_schema_spec(dynamo_store_spec)
+    with mock.patch(
+            'blurr.store.dynamo_store.DynamoStore.get_dynamodb_resource',
+            new=override_boto3_dynamodb_resource):
+        dynamo_store = schema_loader.get_store(name)
     yield dynamo_store
-    dynamo_store.table.delete()
+    dynamo_store._table.delete()
 
 
 @fixture(scope='session')
 def loaded_store() -> DynamoStore:
     schema_loader = SchemaLoader()
-    schema_loader.add_schema_spec({
+    name = schema_loader.add_schema_spec({
         'Name': 'dynamostore',
         'Type': 'Blurr:Store:Dynamo',
         'Table': '_unit_test_range' + '_' + str(int(time.time()))
     })
-    dynamo_store = DynamoStore('dynamostore', schema_loader)
+    with mock.patch(
+            'blurr.store.dynamo_store.DynamoStore.get_dynamodb_resource',
+            new=override_boto3_dynamodb_resource):
+        dynamo_store = schema_loader.get_store(name)
     dynamo_store.save(
         Key('test_user', 'test_group', datetime(2018, 1, 1, 1, 1, 1, 1, tzinfo=timezone.utc)), {
             'string_field': 'string',
@@ -89,26 +105,49 @@ def loaded_store() -> DynamoStore:
         })
 
     yield dynamo_store
-    dynamo_store.table.delete()
+    dynamo_store._table.delete()
 
 
-def test_table_creation_if_not_exist(dynamo_store_spec):
+def test_schema_init(dynamo_store_spec: Dict[str, Any]) -> None:
+    schema_loader = SchemaLoader()
+    name = schema_loader.add_schema(dynamo_store_spec)
+    store_schema = schema_loader.get_schema_object(name)
+    assert store_schema.name == dynamo_store_spec['Name']
+    assert store_schema.table_name == dynamo_store_spec['Table']
+    assert store_schema.rcu == 5
+    assert store_schema.wcu == 5
+
+
+def test_schema_init_with_read_write_units(dynamo_store_spec: Dict[str, Any]) -> None:
+    dynamo_store_spec['ReadCapacityUnits'] = 10
+    dynamo_store_spec['WriteCapacityUnits'] = 10
+    schema_loader = SchemaLoader()
+    name = schema_loader.add_schema(dynamo_store_spec)
+    store_schema = schema_loader.get_schema_object(name)
+    assert store_schema.rcu == 10
+    assert store_schema.wcu == 10
+
+
+@mock.patch(
+    'blurr.store.dynamo_store.DynamoStore.get_dynamodb_resource',
+    new=override_boto3_dynamodb_resource)
+def test_table_creation_if_not_exist(dynamo_store_spec: Dict[str, Any]) -> None:
     table_name = '_unit_test_table_creation' + '_' + str(int(time.time()))
     dynamo_store_spec['Table'] = table_name
     schema_loader = SchemaLoader()
-    schema_loader.add_schema_spec(dynamo_store_spec)
+    name = schema_loader.add_schema_spec(dynamo_store_spec)
 
-    dynamodb_client = boto3.client('dynamodb')
+    dynamodb_client = get_boto3_dynamodb_client()
     # Check table does not exist
     assert table_name not in dynamodb_client.list_tables()['TableNames']
 
     # Test that the store is created if it does not exist
-    dynamo_store = DynamoStore('dynamostore', schema_loader)
+    dynamo_store = schema_loader.get_store(name)
     assert table_name in dynamodb_client.list_tables()['TableNames']
-    assert dynamo_store.table.item_count == 0
+    assert dynamo_store._table.item_count == 0
 
-    dynamo_store.table.put_item(Item={'partition_key': 'part', 'range_key': 'range'})
-    item = dynamo_store.table.get_item(
+    dynamo_store._table.put_item(Item={'partition_key': 'part', 'range_key': 'range'})
+    item = dynamo_store._table.get_item(
         Key={
             'partition_key': 'part',
             'range_key': 'range'
@@ -117,9 +156,9 @@ def test_table_creation_if_not_exist(dynamo_store_spec):
     assert item
 
     # Ensure the same store is reused the next time
-    dynamo_store2 = DynamoStore('dynamostore', schema_loader)
+    dynamo_store2 = schema_loader.get_store(name)
 
-    item = dynamo_store2.table.get_item(
+    item = dynamo_store2._table.get_item(
         Key={
             'partition_key': 'part',
             'range_key': 'range'
@@ -127,7 +166,7 @@ def test_table_creation_if_not_exist(dynamo_store_spec):
 
     assert item
 
-    dynamo_store.table.delete()
+    dynamo_store._table.delete()
 
 
 def test_save_simple(store: DynamoStore) -> None:

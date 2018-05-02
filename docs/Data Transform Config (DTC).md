@@ -124,19 +124,20 @@ Aggregates:
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
 Type | Type of Aggregate | `Blurr:Aggregate:Identity`, `Blurr:Aggregate:Block`, `Blurr:Aggregate:Variable` | Required
-Name | Name of the Aggregate | Any `string`, unique within the DTC | Required
+Name | Name of the Aggregate | Any `string` that does not start with `_` or `run_`. , unique within the DTC | Required
 Store | Name of the Store in which to create the Aggregate  | Stores defined in the DTC | Required
 When | Boolean expression that defines which raw events to process | Any `boolean` expression | Optional
 
 An `Aggregate` contains `fields` for the information being stored. `Identity Aggregate` fields are especially useful for data that is relatively static over time - like a user's country.
 
- Each field in an Identity Aggregate has 3 properties.
+Each field in an `Aggregate` has 4 properties.
 
- Key |  Description | Allowed values | Required
- --- | ------------ | -------------- | --------
- Name | Name of the field | Any `string` | Required
- Type | Type of data being stored | `integer`, `boolean`, `string`, `datetime`, `float`, `map`, `list`, `set` | Required
- Value | Value of the field | Any python expression, and must match the Type | Required  
+Key |  Description | Allowed values | Required
+--- | ------------ | -------------- | --------
+Name | Name of the field | Any `string` that does not start with `_` or `run_`. | Required
+Type | Type of data being stored | `integer`, `boolean`, `string`, `datetime`, `float`, `map`, `list`, `set` | Required
+Value | Value of the field | Any python expression, and must match the Type | Required  
+When | Boolean expression that defines which raw events to process | Any `boolean` expression | Optional
 
 All fields in the Aggregate are encapsulated in a Aggregate object. The object is available in the DTL, which is the python environment processing the DTC. Field values can be accessed using `AggregateName.FieldName`
 
@@ -190,20 +191,9 @@ Aggregates:
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
 Type | Type of Aggregate | `Blurr:Aggregate:Identity`, `Blurr:Aggregate:Block`, `Blurr:Aggregate:Variable` | Required
-Name | Name of the Aggregate | Any, unique within the DTC | Required
+Name | Name of the Aggregate | Any `string` that does not start with `_` or `run_`. , unique within the DTC | Required
 When | Boolean expression that defines which raw events to process | Any `boolean` expression | Optional
 Split | Boolean expression that defines when a new block should be created | Any `boolean` expression | Required
-
-All fields in the Aggregate are encapsulated in a Aggregate object. The object is available in the DTL, which is a python environment processing the DTC. Field values can be accessed using `AggregateName.FieldName`
-
-Each field in an Block Aggregate has 4 properties.
-
-Key |  Description | Allowed values | Required
---- | ------------ | -------------- | --------
-Name | Name of the field | Any `string` | Required
-Type | Type of data being stored | `integer`, `boolean`, `string`, `datetime`, `float`, `map`, `list`, `set` | Required
-Value | Value of the field | Any python expression, and must match the Type | Required  
-When | Boolean expression that defines which raw events to process | Any `boolean` expression | Optional
 
 ### Activity Aggregate
 `Blurr:Aggregate:Activity`.Activity Aggregate is a specialization of the Block Aggregate where the inactivity based `Split` condition is 
@@ -382,25 +372,3 @@ Type |  Description | Expected format | Default
 `map` | Any type to type maps | ‘{“a”: 1, “b”: 2}’ | empty map
 `list` | lists can contain any type of data | ‘[1,2,3]’ | empty list
 `set` | contains only unique elements that are `integer`, `long`, `float` and `strings` | - | empty set
-
-# Reserved keywords
-
-## Reserved Field Names
-```
-identity
-time
-start_time
-end_time
-name
-schema
-type
-window
-split
-filter
-```
-## Reserved Function Names
-```
-add_to_map
-add_to_set
-counter
-```

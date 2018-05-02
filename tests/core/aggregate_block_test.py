@@ -68,7 +68,7 @@ def test_block_aggregate_schema_evaluate_without_split(block_aggregate_schema_sp
     identity = 'userA'
     time = datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc)
     block_aggregate = create_block_aggregate(block_aggregate_schema, time, identity)
-    block_aggregate.evaluate()
+    block_aggregate.run_evaluate()
 
     # Check eval results of various fields
     assert len(block_aggregate._nested_items) == 4
@@ -80,7 +80,7 @@ def test_block_aggregate_schema_evaluate_without_split(block_aggregate_schema_sp
     })
 
     # aggregate snapshot should not exist in store
-    assert block_aggregate_schema.store.get(
+    assert block_aggregate._store.get(
         Key(identity=block_aggregate._identity,
             group=block_aggregate._name,
             timestamp=block_aggregate._start_time)) is None
@@ -94,8 +94,8 @@ def test_block_aggregate_schema_evaluate_with_split(block_aggregate_schema_spec,
     identity = 'userA'
     time = datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc)
     block_aggregate = create_block_aggregate(block_aggregate_schema, time, identity)
-    block_aggregate.evaluate()
-    block_aggregate.evaluate()
+    block_aggregate.run_evaluate()
+    block_aggregate.run_evaluate()
 
     # Check eval results of various fields before split
     assert check_fields(block_aggregate._nested_items, {
@@ -106,7 +106,7 @@ def test_block_aggregate_schema_evaluate_with_split(block_aggregate_schema_spec,
     })
 
     current_snapshot = block_aggregate._snapshot
-    block_aggregate.evaluate()
+    block_aggregate.run_evaluate()
 
     # Check eval results of various fields
     assert check_fields(block_aggregate._nested_items, {
@@ -117,6 +117,6 @@ def test_block_aggregate_schema_evaluate_with_split(block_aggregate_schema_spec,
     })
 
     # Check aggregate snapshot present in store
-    assert block_aggregate_schema.store.get(
+    assert block_aggregate._store.get(
         Key(identity=block_aggregate._identity, group=block_aggregate._name,
             timestamp=time)) == current_snapshot

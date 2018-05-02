@@ -25,7 +25,7 @@ def schema_loader_with_mem_store(stream_dtc_name: str) -> SchemaLoader:
         'Name': 'memstore',
         'Type': Type.BLURR_STORE_MEMORY
     }, stream_dtc_name)
-    store = schema_loader.get_schema_object(stream_dtc_name + '.' + name)
+    store = schema_loader.get_store(stream_dtc_name + '.' + name)
     init_memory_store(store)
     return schema_loader
 

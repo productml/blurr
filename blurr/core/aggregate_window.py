@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import Any, List, Tuple
 
 from blurr.core.aggregate import Aggregate, AggregateSchema
-from blurr.core.aggregate_block import BlockAggregate
+from blurr.core.aggregate_block import BlockAggregate, BlockAggregateSchema
 from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
@@ -11,6 +11,7 @@ from blurr.core.type import Type
 
 
 class WindowAggregateSchema(AggregateSchema):
+
     ATTRIBUTE_WINDOW_VALUE = 'WindowValue'
     ATTRIBUTE_WINDOW_TYPE = 'WindowType'
     ATTRIBUTE_SOURCE = 'Source'
@@ -20,7 +21,7 @@ class WindowAggregateSchema(AggregateSchema):
 
         self.window_value = self._spec.get(self.ATTRIBUTE_WINDOW_VALUE, 0)
         self.window_type = self._spec.get(self.ATTRIBUTE_WINDOW_TYPE, None)
-        self.source = self.schema_loader.get_schema_object(
+        self.source: BlockAggregateSchema = self.schema_loader.get_schema_object(
             self._spec[self.ATTRIBUTE_SOURCE]) if self.ATTRIBUTE_SOURCE in self._spec else None
 
     def validate_schema_spec(self) -> None:
@@ -52,14 +53,15 @@ class WindowAggregate(Aggregate):
         super().__init__(schema, identity, evaluation_context)
         self._window_source = None
 
-    def prepare_window(self, start_time: datetime) -> None:
+    def _prepare_window(self, start_time: datetime) -> None:
         """
         Prepares window if any is specified.
         :param start_time: The anchor block start_time from where the window
         should be generated.
         """
         # evaluate window first which sets the correct window in the store
-        store = self._schema.source.store
+        store = self._schema.schema_loader.get_store(
+            self._schema.source.store_schema.fully_qualified_name)
         if Type.is_type_equal(self._schema.window_type, Type.DAY) or Type.is_type_equal(
                 self._schema.window_type, Type.HOUR):
             block_list = self._load_blocks(
@@ -110,10 +112,10 @@ class WindowAggregate(Aggregate):
         :return: List of BlockAggregate
         """
         return [
-            BlockAggregate(self._schema.source, self._identity, EvaluationContext()).restore(block)
-            for (_, block) in blocks
+            BlockAggregate(self._schema.source, self._identity,
+                           EvaluationContext()).run_restore(block) for (_, block) in blocks
         ]
 
-    def evaluate(self) -> None:
+    def run_evaluate(self) -> None:
         self._evaluation_context.local_context.add('source', self._window_source)
-        super().evaluate()
+        super().run_evaluate()

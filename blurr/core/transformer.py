@@ -65,12 +65,12 @@ class Transformer(BaseItemCollection, ABC):
         """
         return self._aggregates
 
-    def finalize(self) -> None:
+    def run_finalize(self) -> None:
         """
         Iteratively finalizes all data groups in its transformer
         """
         for item in self._nested_items.values():
-            item.finalize()
+            item.run_finalize()
 
     def __getattr__(self, item: str) -> Aggregate:
         """
