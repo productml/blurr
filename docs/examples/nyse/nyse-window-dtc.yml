@@ -18,7 +18,7 @@ Aggregates:
     Fields:
     - Name: value
       Type: float
-      Value: anchor.close
+      Value: anchor.close # the anchor object represents the record that matches the anchor condition
 
   - Type: Blurr:Aggregate:Window
     Name: last
