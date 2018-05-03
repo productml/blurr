@@ -45,9 +45,9 @@ class Runner(ABC):
         # This causes a problem when running the code on spark
         # as the validation yml file is inside the archived package
         # and yamale is not able to read that.
-        # validate(self._stream_dtc)
+        # validate_schema_spec(self._stream_dtc)
         # if self._window_dtc is not None:
-        #     validate(self._window_dtc)
+        #     validate_schema_spec(self._window_dtc)
 
     def execute_per_identity_records(self,
                                      identity_records: Tuple[str, List[Tuple[datetime, Record]]]
@@ -67,7 +67,7 @@ class Runner(ABC):
     def get_per_identity_records(self, events: Iterable, data_processor: DataProcessor
                                  ) -> Generator[Tuple[str, Tuple[datetime, Record]], None, None]:
         schema_loader = SchemaLoader()
-        stream_dtc_name = schema_loader.add_schema(self._stream_dtc)
+        stream_dtc_name = schema_loader.add_schema_spec(self._stream_dtc)
         stream_transformer_schema: StreamingTransformerSchema = schema_loader.get_schema_object(
             stream_dtc_name)
         for event in events:
@@ -84,7 +84,7 @@ class Runner(ABC):
         if self._stream_dtc is None:
             return {}
 
-        stream_dtc_name = schema_loader.add_schema(self._stream_dtc)
+        stream_dtc_name = schema_loader.add_schema_spec(self._stream_dtc)
         stream_transformer_schema = schema_loader.get_schema_object(stream_dtc_name)
 
         stream_transformer = StreamingTransformer(stream_transformer_schema, identity)
@@ -121,7 +121,7 @@ class Runner(ABC):
 
         window_data = []
 
-        window_dtc_name = schema_loader.add_schema(self._window_dtc)
+        window_dtc_name = schema_loader.add_schema_spec(self._window_dtc)
         window_transformer_schema = schema_loader.get_schema_object(window_dtc_name)
         window_transformer = WindowTransformer(window_transformer_schema, identity, exec_context)
 

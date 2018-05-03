@@ -4,12 +4,11 @@ from blurr.core.aggregate import Aggregate, AggregateSchema
 from blurr.core.evaluation import Expression
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.type import Type
+from blurr.core.validator import ATTRIBUTE_INTERNAL
 
 
 class BlockAggregateSchema(AggregateSchema):
-    """
-    Aggregates that handles the block rollup aggregation
-    """
+    """ Rolls up records into aggregate blocks.  Blocks are created when the split condition executes to true.  """
 
     ATTRIBUTE_SPLIT = 'Split'
 
@@ -20,18 +19,22 @@ class BlockAggregateSchema(AggregateSchema):
         self.split: Expression = Expression(
             self._spec[self.ATTRIBUTE_SPLIT]) if self.ATTRIBUTE_SPLIT in self._spec else None
 
-    def extend_schema(self, spec: Dict[str, Any]) -> Dict[str, Any]:
+    def validate_schema_spec(self) -> None:
+        super().validate_schema_spec()
+        self.validate_required_attributes(self.ATTRIBUTE_STORE, self.ATTRIBUTE_SPLIT)
+
+    def extend_schema_spec(self) -> None:
         """ Injects the block start and end times """
+        super().extend_schema_spec()
 
-        # Add new fields to the schema spec
-        predefined_field = self._build_time_fields_spec(spec[self.ATTRIBUTE_NAME])
-        spec[self.ATTRIBUTE_FIELDS][0:0] = predefined_field
+        if self.ATTRIBUTE_FIELDS in self._spec:
+            # Add new fields to the schema spec. Since `_identity` is added by the super, new elements are added after
+            predefined_field = self._build_time_fields_spec(self._spec[self.ATTRIBUTE_NAME])
+            self._spec[self.ATTRIBUTE_FIELDS][1:1] = predefined_field
 
-        # Add new field schema to the schema loader
-        for field_schema in predefined_field:
-            self.schema_loader.add_schema(field_schema, self.fully_qualified_name)
-
-        return super().extend_schema(spec)
+            # Add new field schema to the schema loader
+            for field_schema in predefined_field:
+                self.schema_loader.add_schema_spec(field_schema, self.fully_qualified_name)
 
     @staticmethod
     def _build_time_fields_spec(name_in_context: str) -> List[Dict[str, Any]]:
@@ -46,14 +49,16 @@ class BlockAggregateSchema(AggregateSchema):
                 'Type': Type.DATETIME,
                 'Value': ('time if {aggregate}._start_time is None else time '
                           'if time < {aggregate}._start_time else {aggregate}._start_time'
-                          ).format(aggregate=name_in_context)
+                          ).format(aggregate=name_in_context),
+                ATTRIBUTE_INTERNAL: True
             },
             {
                 'Name': '_end_time',
                 'Type': Type.DATETIME,
                 'Value': ('time if {aggregate}._end_time is None else time '
                           'if time > {aggregate}._end_time else {aggregate}._end_time'
-                          ).format(aggregate=name_in_context)
+                          ).format(aggregate=name_in_context),
+                ATTRIBUTE_INTERNAL: True
             },
         ]
 

@@ -39,8 +39,8 @@ class MockAggregate(Aggregate):
 @fixture
 def aggregate_schema_with_store():
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(get_aggregate_schema_spec())
-    schema_loader.add_schema(get_store_spec(), 'user')
+    name = schema_loader.add_schema_spec(get_aggregate_schema_spec())
+    schema_loader.add_schema_spec(get_store_spec(), 'user')
     return MockAggregateSchema(fully_qualified_name=name, schema_loader=schema_loader)
 
 
@@ -49,7 +49,7 @@ def aggregate_schema_without_store():
     schema_loader = SchemaLoader()
     aggregate_schema_spec = get_aggregate_schema_spec()
     del aggregate_schema_spec['Store']
-    name = schema_loader.add_schema(aggregate_schema_spec)
+    name = schema_loader.add_schema_spec(aggregate_schema_spec)
     return MockAggregateSchema(fully_qualified_name=name, schema_loader=schema_loader)
 
 

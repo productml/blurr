@@ -5,6 +5,7 @@ from pytest import fixture
 from blurr.core.aggregate_block import BlockAggregateSchema, \
     BlockAggregate
 from blurr.core.anchor import AnchorSchema, Anchor
+from blurr.core.errors import RequiredAttributeError
 from blurr.core.evaluation import EvaluationContext, Expression
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.type import Type
@@ -17,7 +18,7 @@ def schema_loader():
 
 @fixture
 def anchor_schema_max_one(schema_loader: SchemaLoader) -> AnchorSchema:
-    name = schema_loader.add_schema({
+    name = schema_loader.add_schema_spec({
         'Condition': True,
         'Max': 1,
         'Name': 'anchor',
@@ -28,7 +29,7 @@ def anchor_schema_max_one(schema_loader: SchemaLoader) -> AnchorSchema:
 
 @fixture
 def anchor_schema_max_two(schema_loader: SchemaLoader) -> AnchorSchema:
-    name = schema_loader.add_schema({
+    name = schema_loader.add_schema_spec({
         'Condition': True,
         'Max': 2,
         'Name': 'anchor',
@@ -39,7 +40,7 @@ def anchor_schema_max_two(schema_loader: SchemaLoader) -> AnchorSchema:
 
 @fixture
 def block_schema(schema_loader: SchemaLoader) -> BlockAggregateSchema:
-    name = schema_loader.add_schema({
+    name = schema_loader.add_schema_spec({
         'Type': Type.BLURR_AGGREGATE_BLOCK,
         'Name': 'session',
         'Fields': [
@@ -106,3 +107,13 @@ def test_anchor_condition(anchor_schema_max_one: AnchorSchema, block_item: Block
     assert anchor.evaluate_anchor(block_item, eval_context) is True
     anchor.add_condition_met()
     assert anchor.evaluate_anchor(block_item, eval_context) is False
+
+
+def test_anchor_schema_missing_condition_max_attribute_adds_error(schema_loader: SchemaLoader):
+    name = schema_loader.add_schema_spec({'Name': 'anchor', 'Type': Type.ANCHOR})
+    schema = AnchorSchema(name, schema_loader)
+
+    assert 2 == len(schema.errors)
+    assert isinstance(schema.errors[0], RequiredAttributeError)
+    assert AnchorSchema.ATTRIBUTE_CONDITION == schema.errors[0].attribute
+    assert AnchorSchema.ATTRIBUTE_MAX == schema.errors[1].attribute

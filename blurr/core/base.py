@@ -1,10 +1,12 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Type, TypeVar, Union
+from typing import Dict, Any, Type, TypeVar, Union, List, Optional
 
-from blurr.core.errors import SnapshotError
+from blurr.core.errors import SnapshotError, InvalidSchemaError
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
+from blurr.core.validator import validate_required_attributes, validate_python_identifier_attributes, \
+    validate_number_attribute, validate_empty_attributes
 
 
 class BaseSchema(ABC):
@@ -21,20 +23,58 @@ class BaseSchema(ABC):
         :param fully_qualified_name: Fully qualified path to the schema
         :param schema_loader: Schema repository that returns schema spec by fully qualified name
         """
-        self.schema_loader = schema_loader
-        self.fully_qualified_name = fully_qualified_name
-        self._spec: Dict[str, Any] = self.extend_schema(
-            self.schema_loader.get_schema_spec(self.fully_qualified_name))
+        self.schema_loader: SchemaLoader = schema_loader
+        self.fully_qualified_name: str = fully_qualified_name
+        self._spec: Dict[str, Any] = self.schema_loader.get_schema_spec(self.fully_qualified_name)
+
+        self.validate_schema_spec()
+
+        self.extend_schema_spec()
 
         self.name: str = self._spec[self.ATTRIBUTE_NAME]
         self.type: str = self._spec[self.ATTRIBUTE_TYPE]
+
         self.when: Expression = Expression(
             self._spec[self.ATTRIBUTE_WHEN]) if self.ATTRIBUTE_WHEN in self._spec else None
-        self.description = self._spec.get(self.ATTRIBUTE_DESCRIPTION, None)
+        self.description: str = self._spec.get(self.ATTRIBUTE_DESCRIPTION, None)
 
-    def extend_schema(self, spec: Dict[str, Any]) -> Dict[str, Any]:
-        """ Extends the defined schema specifications at runtime with defaults """
-        return spec
+    def extend_schema_spec(self) -> None:
+        """ Extends the defined schema specifications at runtime with defaults. When this method is being extended,
+        the first line should always be:  ```super().extend_schema_spec()``` """
+        pass
+
+    def add_errors(self, *errors: Union[InvalidSchemaError, List[InvalidSchemaError]]) -> None:
+        """ Adds errors to the error repository in schema loader """
+        self.schema_loader.add_errors(*errors)
+
+    @property
+    def errors(self) -> List[InvalidSchemaError]:
+        """ Returns a list of errors raised by this schema """
+        return self.schema_loader.get_errors(self.fully_qualified_name)
+
+    def validate_required_attributes(self, *attributes: str) -> None:
+        """ Validates that the schema contains a series of required attributes """
+        self.add_errors(
+            validate_required_attributes(self.fully_qualified_name, self._spec, *attributes))
+
+    def validate_number_attribute(self,
+                                  attribute: str,
+                                  value_type: Union[Type[int], Type[float]] = int,
+                                  minimum: Optional[Union[int, float]] = None,
+                                  maximum: Optional[Union[int, float]] = None):
+        """ Validates that the attribute contains a numeric value within boundaries if specified """
+        self.add_errors(
+            validate_number_attribute(self.fully_qualified_name, self._spec, attribute, value_type,
+                                      minimum, maximum))
+
+    def validate_schema_spec(self) -> None:
+        """ Contains the validation routines that are to be executed as part of initialization by subclasses.
+        When this method is being extended, the first line should always be: ```super().validate_schema_spec()``` """
+        self.add_errors(
+            validate_empty_attributes(self.fully_qualified_name, self._spec, *self._spec.keys()))
+        self.add_errors(
+            validate_python_identifier_attributes(self.fully_qualified_name, self._spec,
+                                                  self.ATTRIBUTE_NAME))
 
 
 class BaseSchemaCollection(BaseSchema, ABC):
@@ -50,15 +90,21 @@ class BaseSchemaCollection(BaseSchema, ABC):
         :param schema_loader: Schema repository that returns schema spec by fully qualified name
         :param nested_schema_attribute: Name of the attribute that contains the nested elements
         """
+        # Nested Items must be initialized before base init so that the validation routine finds it
+        self._nested_item_attribute = nested_schema_attribute
+
         super().__init__(fully_qualified_name, schema_loader)
 
-        self._nested_item_attribute = nested_schema_attribute
         # Load nested schema items
         self.nested_schema: Dict[str, Type[BaseSchema]] = {
             schema_spec[self.ATTRIBUTE_NAME]: self.schema_loader.get_nested_schema_object(
                 self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
             for schema_spec in self._spec.get(self._nested_item_attribute, [])
         }
+
+    def validate_schema_spec(self) -> None:
+        super().validate_schema_spec()
+        self.validate_required_attributes(self._nested_item_attribute)
 
 
 BaseItemType = TypeVar('T', bound='BaseItem')

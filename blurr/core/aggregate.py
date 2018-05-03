@@ -1,5 +1,3 @@
-from typing import Dict, Type, Any, Optional
-
 from abc import ABC
 from typing import Dict, Type, Any
 
@@ -11,6 +9,7 @@ from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store import StoreSchema
 from blurr.core.store_key import Key
 from blurr.core.type import Type as DTCType
+from blurr.core.validator import ATTRIBUTE_INTERNAL
 
 
 class AggregateSchema(BaseSchemaCollection, ABC):
@@ -35,20 +34,20 @@ class AggregateSchema(BaseSchemaCollection, ABC):
             self.store_schema = self.schema_loader.get_nested_schema_object(
                 self.schema_loader.get_transformer_name(self.fully_qualified_name), store_name)
 
-    def extend_schema(self, spec: Dict[str, Any]) -> Dict[str, Any]:
+    def extend_schema_spec(self) -> None:
         """ Injects the identity field """
+        super().extend_schema_spec()
 
-        identity_field = {'Name': '_identity', 'Type': DTCType.STRING, 'Value': 'identity'}
-        spec[self.ATTRIBUTE_FIELDS].insert(0, identity_field)
+        identity_field = {
+            'Name': '_identity',
+            'Type': DTCType.STRING,
+            'Value': 'identity',
+            ATTRIBUTE_INTERNAL: True
+        }
 
-        self.schema_loader.add_schema(identity_field, self.fully_qualified_name)
-
-        # If field type is missing, set it to string by default
-        for field in spec[self.ATTRIBUTE_FIELDS]:
-            if self.ATTRIBUTE_TYPE not in field:
-                field[self.ATTRIBUTE_TYPE] = DTCType.STRING
-
-        return super().extend_schema(spec)
+        if self.ATTRIBUTE_FIELDS in self._spec:
+            self._spec[self.ATTRIBUTE_FIELDS].insert(0, identity_field)
+            self.schema_loader.add_schema_spec(identity_field, self.fully_qualified_name)
 
 
 class Aggregate(BaseItemCollection, ABC):
