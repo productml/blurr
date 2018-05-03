@@ -66,15 +66,18 @@ In order to obtain this transformation, Blurr will process the events sequential
 ```yaml
 Type: Blurr:Transform:Streaming
 Version: '2018-03-01'
-Name : sessions
+Name: sessions
 
-Store:
+Stores:
    - Type: Blurr:Store:Memory
      Name: hello_world_store
 
 Identity: source.user_id
 
-Time: parser.parse(source.timestamp)
+Import:
+  - { Module: dateutil.parser, Identifiers: [ parse ]}
+
+Time: parse(source.timestamp)
 
 Aggregates:
 
@@ -85,7 +88,6 @@ Aggregates:
    Split: source.session_id != session_stats.session_id
 
    Fields:
-
      - Name: session_id
        Type: string
        Value: source.session_id
@@ -97,7 +99,7 @@ Aggregates:
 
      - Name: games_won
        Type: integer
-       When: source.event_id == 'game_end' and source.won == '1'
+       When: source.event_id == 'game_end' and source.won == 1
        Value: session_stats.games_won + 1
 ```
 
@@ -232,7 +234,7 @@ Processing this event results in the existing record having `games_won` increase
 ```yaml
 - Name: games_won
   Type: integer
-  When: source.event_id == 'game_end' and source.won == '1'
+  When: source.event_id == 'game_end' and source.won == 1
   Value: session_stats.games_won + 1
 ```
 
@@ -353,18 +355,16 @@ No record is created. The last record for that user is updated instead:
 We can preview the result of the transformation using `blurr transform` command:
 
 ```bash
-$ blurr transform --streaming-dtc sessions-dtc.yml events.log
+$ blurr transform --streaming-dtc tutorial1-streaming-dtc.yml tutorial1-data.log
 
-["09C1/session_stats/2018-03-04T09:10:22", {"session_id" : "915D", "games_played": "2", "games_won": "2"}]
-["B6FA/session_stats", {"session_id" : "D043", "games_played": "1", "games_won": "1"}]
-["09C1/session_stats", {"session_id" : "T8KA", "games_played": 1, "games_won": "1"}]
+["09C1/session_stats/2018-03-04T09:01:03+00:00", {"_identity": "09C1", "_start_time": "2018-03-04T09:01:03", "_end_time": "2018-03-04T09:10:22", "session_id": "915D", "games_played": 2, "games_won": 2}]
+["09C1/session_stats/2018-03-04T09:22:13+00:00", {"_identity": "09C1", "_start_time": "2018-03-04T09:22:13", "_end_time": "2018-03-04T09:25:24", "session_id": "T8KA", "games_played": 1, "games_won": 1}]
+["B6FA/session_stats/2018-03-04T09:11:03+00:00", {"_identity": "B6FA", "_start_time": "2018-03-04T09:11:03", "_end_time": "2018-03-04T09:21:55", "session_id": "D043", "games_played": 1, "games_won": 1}]
 ```
 
 `transform` prints the result of the transform in JSON format, which is slightly different from the table representation.
 
 Each entry consists of an array with 2 items:
 
-* A `session_id/Aggregate_name/timestamp` string. This represents the __Identity__ (`user_id`) in the tables.
+* A `identity/aggregate_name/timestamp` string. The __Identity__ is represented by `user_id` in the tables.
 * An object with the remaining values of the record.
-
-As we can see, not all the Identity representations have a timestamp. A "session end" timestamp is added after a new record is added for an Identity (after the `Split` condition is fulfilled), so only the last session of a user will not have a timestamp.

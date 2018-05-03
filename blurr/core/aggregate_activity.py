@@ -17,16 +17,16 @@ class ActivityAggregateSchema(BlockAggregateSchema):
 class ActivityAggregate(BlockAggregate):
     """ Aggregates activity in blocks separated by periods of inactivity"""
 
-    def evaluate(self) -> None:
+    def run_evaluate(self) -> None:
         time = self._evaluation_context.global_context['time']
 
         # If the event time is beyond separation threshold, create a new block
         if self._start_time and (time < self._start_time - self._schema.separation_interval
                                  or time > self._end_time + self._schema.separation_interval):
-            self.persist(self._start_time)
-            self.reset()
+            self._persist(self._start_time)
+            self.run_reset()
 
-        super().evaluate()
+        super().run_evaluate()
 
-    def finalize(self):
-        self.persist(self._start_time)
+    def run_finalize(self):
+        self._persist(self._start_time)

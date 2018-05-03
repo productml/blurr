@@ -89,8 +89,8 @@ class Runner(ABC):
 
         stream_transformer = StreamingTransformer(stream_transformer_schema, identity)
         for time, event in identity_events:
-            stream_transformer.evaluate(event)
-        stream_transformer.finalize()
+            stream_transformer.run_evaluate(event)
+        stream_transformer.run_finalize()
 
         return self._get_store(schema_loader).get_all(identity)
 
@@ -102,7 +102,7 @@ class Runner(ABC):
         stream_transformer = StreamingTransformer(
             self._get_streaming_transformer_schema(schema_loader), identity)
         all_data = self._get_store(schema_loader).get_all(identity)
-        stream_transformer.restore(all_data)
+        stream_transformer.run_restore(all_data)
 
         exec_context = Context()
         exec_context.add(stream_transformer._schema.name, stream_transformer)
@@ -134,9 +134,9 @@ class Runner(ABC):
                 continue
             try:
                 blocks += 1
-                if window_transformer.evaluate(block_obj.restore(data)):
+                if window_transformer.run_evaluate(block_obj.run_restore(data)):
                     anchors += 1
-                    window_data.append(window_transformer.flattened_snapshot)
+                    window_data.append(window_transformer.run_flattened_snapshot)
             except PrepareWindowMissingBlocksError as err:
                 logging.debug('{} with {}'.format(err, key))
 
@@ -146,17 +146,15 @@ class Runner(ABC):
 
         return window_data
 
-    def _get_store(self, schema_loader: SchemaLoader) -> Store:
-        store_schemas = schema_loader.get_schemas_of_type(Type.BLURR_STORE_MEMORY)
-        if not store_schemas:
-            store_schemas = schema_loader.get_schemas_of_type(Type.BLURR_STORE_DYNAMO)
-        return schema_loader.get_schema_object(store_schemas[0][0])
+    @staticmethod
+    def _get_store(schema_loader: SchemaLoader) -> Store:
+        return schema_loader.get_all_stores()[0]
 
+    @staticmethod
     def _get_streaming_transformer_schema(
-            self, schema_loader: SchemaLoader) -> StreamingTransformerSchema:
-        streaming_transformer_schema = schema_loader.get_schemas_of_type(
-            Type.BLURR_TRANSFORM_STREAMING)
-        return schema_loader.get_schema_object(streaming_transformer_schema[0][0])
+            schema_loader: SchemaLoader) -> StreamingTransformerSchema:
+        fq_name_and_schema = schema_loader.get_schema_specs_of_type(Type.BLURR_TRANSFORM_STREAMING)
+        return schema_loader.get_schema_object(next(iter(fq_name_and_schema)))
 
     @abstractmethod
     def execute(self, *args, **kwargs):

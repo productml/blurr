@@ -27,14 +27,6 @@ class TransformerSchema(BaseSchemaCollection, ABC):
 
         # Load the schema specific attributes
         self.version = self._spec[self.ATTRIBUTE_VERSION]
-
-        # Load list of stores from the schema
-        self.stores: Dict[str, Type[Store]] = {
-            schema_spec[self.ATTRIBUTE_NAME]: self.schema_loader.get_nested_schema_object(
-                self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
-            for schema_spec in self._spec.get(self.ATTRIBUTE_STORES, [])
-        }
-
         self.import_list = self._spec.get(self.ATTRIBUTE_IMPORT, [])
         self.schema_context = SchemaContext(self.import_list)
 
@@ -64,12 +56,12 @@ class Transformer(BaseItemCollection, ABC):
         """
         return self._aggregates
 
-    def finalize(self) -> None:
+    def run_finalize(self) -> None:
         """
         Iteratively finalizes all data groups in its transformer
         """
         for item in self._nested_items.values():
-            item.finalize()
+            item.run_finalize()
 
     def __getattr__(self, item: str) -> Aggregate:
         """
