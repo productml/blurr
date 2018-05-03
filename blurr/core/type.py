@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Union
+from typing import Union, List
 
 
 class Type(Enum):
@@ -32,6 +32,17 @@ class Type(Enum):
             return Type(actual_type) == expected_type
         except ValueError:
             return False
+
+    @staticmethod
+    def is_type_in(actual_type: Union[str, 'Type'], expected_type: List['Type']) -> bool:
+        try:
+            return Type(actual_type) in expected_type
+        except ValueError:
+            return False
+
+    @staticmethod
+    def is_store_type(store_type: Union[str, 'Type']) -> bool:
+        return Type.is_type_in(store_type, [Type.BLURR_STORE_MEMORY, Type.BLURR_STORE_DYNAMO])
 
 
 # Override __new__ to handle intialization by value of any case.

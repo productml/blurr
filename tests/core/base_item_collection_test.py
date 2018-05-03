@@ -47,7 +47,7 @@ class MockBaseItemCollection(BaseItemCollection):
             for name, item_schema in self._schema.nested_schema.items()
         }
 
-    def finalize(self) -> None:
+    def run_finalize(self) -> None:
         pass
 
     @property
@@ -94,19 +94,19 @@ def test_evaluate_needs_evaluation_false(collection_schema_spec: Dict[str, Any])
     schema_collection = MockBaseSchemaCollection(name, schema_loader,
                                                  AggregateSchema.ATTRIBUTE_FIELDS)
     item_collection = MockBaseItemCollection(schema_collection, EvaluationContext())
-    item_collection.evaluate()
+    item_collection.run_evaluate()
     assert item_collection.event_count == 0
 
 
 def test_evaluate_needs_evaluation_true(item_collection: MockBaseItemCollection) -> None:
-    item_collection.evaluate()
+    item_collection.run_evaluate()
     assert item_collection.event_count == 5
 
 
 def test_reset(item_collection: MockBaseItemCollection) -> None:
-    item_collection.evaluate()
+    item_collection.run_evaluate()
     assert item_collection.event_count == 5
-    item_collection.reset()
+    item_collection.run_reset()
     assert item_collection.event_count == 0
 
 
@@ -118,7 +118,7 @@ def test_evaluate_needs_evaluation_error_does_not_evaluate(
     schema_collection = MockBaseSchemaCollection(name, schema_loader,
                                                  AggregateSchema.ATTRIBUTE_FIELDS)
     item_collection = MockBaseItemCollection(schema_collection, EvaluationContext())
-    item_collection.evaluate()
+    item_collection.run_evaluate()
     assert item_collection.event_count == 0
 
 
@@ -127,13 +127,13 @@ def test_evaluate_invalid(item_collection: MockBaseItemCollection,
     # Test nested items not specified
     with mock_nested_items:
         with raises(Exception):
-            item_collection.evaluate()
+            item_collection.run_evaluate()
 
 
 def test_snapshot_valid(item_collection: MockBaseItemCollection) -> None:
     assert item_collection._snapshot == {'event_count': 0}
 
-    item_collection.evaluate()
+    item_collection.run_evaluate()
     assert item_collection._snapshot == {'event_count': 5}
 
 
@@ -152,14 +152,14 @@ def test_snapshot_invalid(collection_schema_spec: Dict[str, Any],
 
 
 def test_restore_valid(item_collection: MockBaseItemCollection) -> None:
-    item_collection.restore({'event_count': 5})
+    item_collection.run_restore({'event_count': 5})
     assert item_collection._snapshot == {'event_count': 5}
 
 
 def test_restore_invalid_snapshot_field(item_collection: MockBaseItemCollection) -> None:
     with raises(SnapshotError):
         invalid_snapshot = {'event': 5}
-        item_collection.restore(invalid_snapshot)
+        item_collection.run_restore(invalid_snapshot)
 
 
 def test_restore_invalid_snapshot_dict(collection_schema_spec: Dict[str, Any],
@@ -174,7 +174,7 @@ def test_restore_invalid_snapshot_dict(collection_schema_spec: Dict[str, Any],
         with raises(SnapshotError):
             item_collection = MockBaseItemCollection(schema_collection, EvaluationContext())
             snapshot = {'event_count: 5'}
-            item_collection.restore(snapshot)
+            item_collection.run_restore(snapshot)
 
 
 def test_get_attribute(collection_schema_spec: Dict[str, Any]) -> None:

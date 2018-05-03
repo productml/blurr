@@ -63,7 +63,6 @@ def test_transformer_schema_init(schema_loader: SchemaLoader, schema_spec: Dict[
     test_transformer_schema = MockTransformerSchema(name, schema_loader)
     assert test_transformer_schema.version == '2018-03-01'
     assert test_transformer_schema.type == Type.BLURR_TRANSFORM_STREAMING
-    assert test_transformer_schema.stores['memstore'].type == Type.BLURR_STORE_MEMORY
 
 
 def test_transformer_init(test_transformer) -> None:
@@ -77,13 +76,13 @@ def test_transformer_init(test_transformer) -> None:
 
 def test_transformer_finalize(test_transformer: MockTransformer,
                               schema_loader: SchemaLoader) -> None:
-    store = schema_loader.get_schema_object('test.memstore')
+    store = schema_loader.get_store('test.memstore')
 
-    test_transformer.finalize()
+    test_transformer.run_finalize()
     assert store.get(Key('user1', 'test_group')) is None
 
-    test_transformer.evaluate()
-    test_transformer.finalize()
+    test_transformer.run_evaluate()
+    test_transformer.run_finalize()
     assert store.get(Key('user1', 'test_group')) == {'_identity': 'user1', 'events': 1}
 
 
