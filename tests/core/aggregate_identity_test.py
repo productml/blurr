@@ -10,7 +10,6 @@ from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store import StoreSchema
 from blurr.core.store_key import Key
 from blurr.core.type import Type
-from blurr.store.memory_store import MemoryStore
 
 
 @fixture
@@ -107,8 +106,8 @@ def records() -> List[Record]:
 def identity_aggregate_schema(identity_aggregate_schema_spec: Dict[str, Any],
                               store_spec: Dict[str, Any]) -> IdentityAggregateSchema:
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(identity_aggregate_schema_spec)
-    schema_loader.add_schema(store_spec, name)
+    name = schema_loader.add_schema_spec(identity_aggregate_schema_spec)
+    schema_loader.add_schema_spec(store_spec, name)
     return IdentityAggregateSchema(name, schema_loader)
 
 

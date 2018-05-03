@@ -15,9 +15,13 @@ class DynamoStoreSchema(StoreSchema):
 
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
-        self.table_name = self._spec[self.ATTRIBUTE_TABLE]
+        self.table_name = self._spec.get(self.ATTRIBUTE_TABLE, None)
         self.rcu = self._spec.get(self.ATTRIBUTE_READ_CAPACITY_UNITS, 5)
         self.wcu = self._spec.get(self.ATTRIBUTE_WRITE_CAPACITY_UNITS, 5)
+
+    def validate_schema_spec(self) -> None:
+        super().validate_schema_spec()
+        self.validate_required_attributes(self.ATTRIBUTE_TABLE)
 
 
 class DynamoStore(Store):

@@ -16,7 +16,7 @@ def memory_store(schema_loader_with_mem_store, stream_dtc_name, mem_store_name) 
 @fixture
 def empty_memory_store() -> MemoryStore:
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema({'Name': 'memstore', 'Type': Type.BLURR_STORE_MEMORY})
+    name = schema_loader.add_schema_spec({'Name': 'memstore', 'Type': Type.BLURR_STORE_MEMORY})
     return schema_loader.get_store(name)
 
 

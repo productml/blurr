@@ -135,7 +135,7 @@ Each field in an `Aggregate` has 4 properties.
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
 Name | Name of the field | Any `string` that does not start with `_` or `run_`. | Required
-Type | Type of data being stored | `integer`, `boolean`, `string`, `datetime`, `float`, `map`, `list`, `set` | Optional. If Type is not set, the DTL uses `string` as the default type
+Type | Type of data being stored | `integer`, `boolean`, `string`, `datetime`, `float`, `map`, `list`, `set` | Required
 Value | Value of the field | Any python expression, and must match the Type | Required  
 When | Boolean expression that defines which raw events to process | Any `boolean` expression | Optional
 
@@ -335,7 +335,7 @@ Each field in a Window Aggregate has 3 properties.
 Key |  Description | Allowed values | Required
 --- | ------------ | -------------- | --------
 Name | Name of the field | Any `string` | Required
-Type | Type of data being stored | `integer`, `boolean`, `string`, `datetime`, `float`, `map`, `list`, `set` | Optional. If Type is not set, the DTL uses `string` as the default type
+Type | Type of data being stored | `integer`, `boolean`, `string`, `datetime`, `float`, `map`, `list`, `set` | Required
 Value | Value of the field | Any python expression, and must match the Type | Required
 
 ### Variable
@@ -360,7 +360,7 @@ Field values are not recorded when:
 
 ## Types
 
-If a type is not specified for a field, it is assumed that it is a `string`. The following types are supported.
+The following types are supported.
 
 Type |  Description | Expected format | Default
 --- | ------------ | -------------- | --------

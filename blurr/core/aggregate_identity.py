@@ -24,6 +24,10 @@ class IdentityAggregateSchema(AggregateSchema):
             for schema_spec in self._spec.get(self.ATTRIBUTE_DIMENSIONS, [])
         }
 
+    def validate_schema_spec(self) -> None:
+        super().validate_schema_spec()
+        self.validate_required_attributes(self.ATTRIBUTE_STORE)
+
 
 class IdentityAggregate(Aggregate):
     def __init__(self, schema: AggregateSchema, identity: str,

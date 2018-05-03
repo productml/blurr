@@ -116,7 +116,7 @@ class Expression:
         code_string = str(code_string)
 
         # For None / empty code strings
-        self.code_string = 'None' if code_string.isspace() else code_string
+        self.code_string = 'None' if not code_string or code_string.isspace() else code_string
         self.type = expression_type
 
         try:

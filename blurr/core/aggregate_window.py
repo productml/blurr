@@ -18,10 +18,17 @@ class WindowAggregateSchema(AggregateSchema):
 
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
-        self.window_value = self._spec[self.ATTRIBUTE_WINDOW_VALUE]
-        self.window_type = self._spec[self.ATTRIBUTE_WINDOW_TYPE]
+
+        self.window_value = self._spec.get(self.ATTRIBUTE_WINDOW_VALUE, 0)
+        self.window_type = self._spec.get(self.ATTRIBUTE_WINDOW_TYPE, None)
         self.source: BlockAggregateSchema = self.schema_loader.get_schema_object(
-            self._spec[self.ATTRIBUTE_SOURCE])
+            self._spec[self.ATTRIBUTE_SOURCE]) if self.ATTRIBUTE_SOURCE in self._spec else None
+
+    def validate_schema_spec(self) -> None:
+        super().validate_schema_spec()
+        self.validate_required_attributes(self.ATTRIBUTE_WINDOW_TYPE, self.ATTRIBUTE_WINDOW_VALUE,
+                                          self.ATTRIBUTE_SOURCE)
+        self.validate_number_attribute(self.ATTRIBUTE_WINDOW_VALUE, int)
 
 
 class _WindowSource:

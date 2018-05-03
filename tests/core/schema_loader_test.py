@@ -1,9 +1,8 @@
 from typing import Dict
 
-import pytest
-from pytest import fixture
+from pytest import fixture, raises
 
-from blurr.core.errors import InvalidSchemaError
+from blurr.core.errors import GenericSchemaError
 from blurr.core.field_simple import IntegerFieldSchema
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.transformer_streaming import StreamingTransformerSchema
@@ -60,36 +59,36 @@ def nested_schema_spec() -> Dict:
 @fixture
 def schema_loader(nested_schema_spec) -> SchemaLoader:
     schema_loader = SchemaLoader()
-    schema_loader.add_schema(nested_schema_spec)
+    schema_loader.add_schema_spec(nested_schema_spec)
     return schema_loader
 
 
 def test_add_invalid_schema() -> None:
     schema_loader = SchemaLoader()
 
-    assert schema_loader.add_schema('') is None
-    assert schema_loader.add_schema(['test']) is None
-    assert schema_loader.add_schema({'test': 1}) is None
+    assert schema_loader.add_schema_spec('') is None
+    assert schema_loader.add_schema_spec(['test']) is None
+    assert schema_loader.add_schema_spec({'test': 1}) is None
 
 
 def test_add_valid_simple_schema() -> None:
     schema_loader = SchemaLoader()
 
-    assert schema_loader.add_schema({'Name': 'test'}) == 'test'
-    assert schema_loader.get_schema_spec('test') == {'Name': 'test'}
+    assert schema_loader.add_schema_spec({'Name': 'test', 'Type': 'test_type'}) == 'test'
+    assert schema_loader.get_schema_spec('test') == {'Name': 'test', 'Type': 'test_type'}
 
 
 def test_add_valid_simple_schema_with_parent() -> None:
     schema_loader = SchemaLoader()
 
-    assert schema_loader.add_schema({'Name': 'test'}, 'parent') == 'test'
-    assert schema_loader.get_schema_spec('parent.test') == {'Name': 'test'}
+    assert schema_loader.add_schema_spec({'Name': 'test', 'Type': 'test_type'}, 'parent') == 'test'
+    assert schema_loader.get_schema_spec('parent.test') == {'Name': 'test', 'Type': 'test_type'}
 
 
 def test_add_valid_nested_schema(nested_schema_spec_bad_type: Dict) -> None:
     schema_loader = SchemaLoader()
 
-    assert schema_loader.add_schema(nested_schema_spec_bad_type) == 'test'
+    assert schema_loader.add_schema_spec(nested_schema_spec_bad_type) == 'test'
     assert schema_loader.get_schema_spec('test.test_group') == nested_schema_spec_bad_type[
         'Aggregates'][0]
     assert schema_loader.get_schema_spec('test.test_group.country') == nested_schema_spec_bad_type[
@@ -100,12 +99,12 @@ def test_add_valid_nested_schema(nested_schema_spec_bad_type: Dict) -> None:
 
 def test_get_schema_object_error(nested_schema_spec_bad_type: Dict) -> None:
     schema_loader = SchemaLoader()
-    schema_loader.add_schema(nested_schema_spec_bad_type)
+    schema_loader.add_schema_spec(nested_schema_spec_bad_type)
 
-    with pytest.raises(InvalidSchemaError, match='Unknown schema type Blurr:Unknown'):
+    with raises(GenericSchemaError, match='Type `Blurr:Unknown` not found.'):
         schema_loader.get_schema_object('test')
 
-    with pytest.raises(InvalidSchemaError, match='Type not defined in schema'):
+    with raises(GenericSchemaError, match='`Type` not defined in schema `test.test_group`'):
         schema_loader.get_schema_object('test.test_group')
 
 
@@ -141,41 +140,41 @@ def test_get_transformer_name() -> None:
 
 
 def test_get_store_error_not_declared(schema_loader: SchemaLoader):
-    with pytest.raises(InvalidSchemaError, match='test.memstore not declared in schema'):
+    with raises(GenericSchemaError, match='test.memstore not declared in schema'):
         schema_loader.get_store('test.memstore')
 
 
 def test_get_store_error_not_defined(schema_loader: SchemaLoader):
-    with pytest.raises(InvalidSchemaError, match='test.memstore not declared in schema'):
+    with raises(GenericSchemaError, match='test.memstore not declared in schema'):
         schema_loader.get_store('test.memstore')
 
 
 def test_get_store_error_missing_type(nested_schema_spec: Dict) -> None:
     nested_schema_spec['Store'] = {'Name': 'memstore'}
     schema_loader = SchemaLoader()
-    schema_loader.add_schema(nested_schema_spec)
-    with pytest.raises(InvalidSchemaError, match='Type not defined in schema for test.memstore'):
+    schema_loader.add_schema_spec(nested_schema_spec)
+    with raises(GenericSchemaError, match='`Type` not defined in schema `test.memstore`'):
         schema_loader.get_store('test.memstore')
 
 
 def test_get_store_error_wrong_type(nested_schema_spec: Dict) -> None:
     schema_loader = SchemaLoader()
-    schema_loader.add_schema(nested_schema_spec)
-    with pytest.raises(InvalidSchemaError, match='test.test_group does not have a store type'):
+    schema_loader.add_schema_spec(nested_schema_spec)
+    with raises(GenericSchemaError, match='test.test_group does not have a store type'):
         schema_loader.get_store('test.test_group')
 
 
 def test_get_store_success(nested_schema_spec: Dict) -> None:
     nested_schema_spec['Store'] = {'Name': 'memstore', 'Type': Type.BLURR_STORE_MEMORY}
     schema_loader = SchemaLoader()
-    schema_loader.add_schema(nested_schema_spec)
+    schema_loader.add_schema_spec(nested_schema_spec)
     assert isinstance(schema_loader.get_store('test.memstore'), MemoryStore)
 
 
 def test_get_all_stores(nested_schema_spec: Dict) -> None:
     nested_schema_spec['Store'] = {'Name': 'memstore', 'Type': Type.BLURR_STORE_MEMORY}
     schema_loader = SchemaLoader()
-    schema_loader.add_schema(nested_schema_spec)
+    schema_loader.add_schema_spec(nested_schema_spec)
 
     # No store instantiated yet.
     assert schema_loader.get_all_stores() == []
