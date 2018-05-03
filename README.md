@@ -4,7 +4,7 @@
 [![Documentation Status](https://readthedocs.org/projects/productml-blurr/badge/?version=latest)](http://productml-blurr.readthedocs.io/en/latest/?badge=latest)
 [![Coverage Status](https://coveralls.io/repos/github/productml/blurr/badge.svg?branch=master)](https://coveralls.io/github/productml/blurr?branch=master)
 [![PyPI version](https://badge.fury.io/py/blurr.svg)](https://badge.fury.io/py/blurr)
-[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/productml/blurr/master?filepath=examples%2Ftutorial)
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/productml/blurr/master?filepath=docs%2Fexamples%2Fnyse)
 
 # Table of contents
 
@@ -58,9 +58,11 @@ We see a future where MLOps means teams putting together various technologies to
 [Streaming DTC Tutorial](http://productml-blurr.readthedocs.io/en/latest/Streaming%20DTC%20Tutorial/) |
 [Window DTC Tutorial](http://productml-blurr.readthedocs.io/en/latest/Window%20DTC%20Tutorial/)
 
-Preparing data for specific use cases using Blurr
+Preparing data for specific use cases using Blurr:
 
-[Dynamic in-game offers (Offer AI)](docs/examples/offer-ai/offer-ai-walkthrough.md) | [Frequently Bought Together](docs/examples/frequently-bought-together/fbt-walkthrough.md)
+* [Dynamic in-game offers (Offer AI)](docs/examples/offer-ai/offer-ai-walkthrough.md) 
+* [Frequently Bought Together](docs/examples/frequently-bought-together/fbt-walkthrough.md)
+* [New York Stock Exchange Prediction](https://mybinder.org/v2/gh/productml/blurr/master?filepath=docs%2Fexamples%2Fnyse)
 
 # Try Blurr
 
