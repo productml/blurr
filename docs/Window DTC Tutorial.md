@@ -23,6 +23,17 @@ There are a couple of restrictions with boosts though:
 
 We expect our players will be encouraged to play more often during the next 3 days after activating the boost.
 
+The following change is made to the streaming DTC from the previous tutorial to take into account the boost information.
+
+```yaml
+- Name: boost
+       Type: boolean
+       Value: source.boost
+       When: source.boost == True
+```
+
+This will set the value of boost in the aggregate to True if __any__ of the events in the aggregate have the boost set to true.
+
 The goal of this tutorial is to __collect aggregated session data__ that __validates our assumption__.
 
 
@@ -56,15 +67,14 @@ Name: boost_data
 SourceDTC: sessions
 
 Anchor:
-  Condition: source.event_id == "game_start" and source.boost == True
+  Condition: sessions.session_stats.boost == True
 
 Aggregates:
   - Type: Blurr:Aggregate:Window
     Name: last_7_days
-    Window:
-      Type: day
-      Value: -7
-      Source: sessions.session_stats
+    WindowType: day
+    WindowValue: -7
+    Source: sessions.session_stats
 
     Fields:
      - Name: avg_games_per_session
@@ -73,10 +83,9 @@ Aggregates:
 
   - Type: Blurr:Aggregate:Window
     Name: next_3_days
-    Window:
-      Type: day
-      Value: +3
-      Source: sessions.session_stats
+    WindowType: day
+    WindowValue: +3
+    Source: sessions.session_stats
 
     Fields:
      - Name: avg_games_per_session
@@ -109,11 +118,10 @@ In time-based aggregations, data is aggregated around __Anchor Points__. This a 
 
 ```yaml
 Anchor:
-  Condition: source.event_id == "game_start" and source.boost == True
+  Condition: sessions.session_stats.boost == True
 ```
 
-As in Streaming DTCs, `source` keyword is used to access the properties of the object being processed.
-
+The `Name` given to source DTC above is used to access the DTC's properties. i.e in this case `sessions.sessions_stats.boost`
 
 ### 3.3. Identity
 
@@ -134,38 +142,27 @@ In a Window DTC the Identity also has a role: __grouping data__ that is aggregat
 Our Window DTC performs 2 different aggregations:
 
 * Over all sessions 7 days __before__ the Anchor Point.
-* Over all sessions 3 days __before__ the Anchor Point.
+* Over all sessions 3 days __after__ the Anchor Point.
 
 How each aggregate is calculated is defined in the `Window Aggregates`:
 
 
 ```yaml
 - Type: Blurr:Aggregate:Window
-    Name: last_7_days
-    Window:
-      Type: day
-      Value: -7
-      Source: sessions.session_stats
+  Name: last_7_days
+  WindowType: day
+  WindowValue: -7
+  Source: sessions.session_stats
 
-    Fields:
-     - Name: avg_games_per_session
-       Type: float
-       Value: sum(source.games_played) / len(source.session_id)
+  Fields:
+    - Name: avg_games_per_session
+      Type: float
+      Value: sum(source.games_played) / len(source.session_id)
 ```
 
 This `Window Aggregate` is responsible for aggregating data over the __previous 7 days__ before the boost activation.
 
-#### Window
-
-The `Window` element defines the time window for the aggregation.
-
-```yaml
-Type: day
-Value: -7
-  Source: sessions.session_stats
-```
-
-`Type` and `Value` are used to indicate the how many days/hours of data from/since the Anchor Point are being collected:
+`WindowType` and `WindowValue` are used to indicate the how many days/hours of data from/since the Anchor Point are being collected:
 
 `Source` is used to __lookup input data__ from the Streaming DTC.
 
@@ -242,15 +239,25 @@ We can preview the result of the transformation using `blurr transform` command.
 To preview a window transformation we need to pass both the Streaming and Window DTC as arguments:
 
 ```bash
-$ blurr transform --streaming-dtc sessions-dtc.yml --window-dtc boost-dtc.yml events.log
+$ blurr transform --streaming-dtc tutorial2-streaming-dtc.yml --window-dtc tutorial2-window-dtc.yml tutorial2-data.log
 
-["09C1", [{"last_7_days.avg_games_per_session": "4.82", "next_3_days.avg_games_per_session": "5.61"}]]
-["B6FA", [{"last_7_days.avg_games_per_session": "2.73", "next_3_days.avg_games_per_session": "3.09"}]]
-["NV9T", [{"last_7_days.avg_games_per_session": "8.11", "next_3_days.avg_games_per_session": "12.52"}]]
-["6CF3", [{"last_7_days.avg_games_per_session": "9.89", "next_3_days.avg_games_per_session": "1"}]]
+["7d49b5ef-0555-535c-8f53-1daff259e8fe", []]
+["e0093eec-44a2-b781-fca1-794edccae965", [{"last_7_days._identity": "e0093eec-44a2-b781-fca1-794edccae965", "last_7_days.avg_games_per_session": 32.0, "next_3_days._identity": "e0093eec-44a2-b781-fca1-794edccae965", "next_3_days.avg_games_per_session": 3.0}]]
+["df54d39f-a4a7-03f8-48e2-00bf755fe31c", [{"last_7_days._identity": "df54d39f-a4a7-03f8-48e2-00bf755fe31c", "last_7_days.avg_games_per_session": 21.0, "next_3_days._identity": "df54d39f-a4a7-03f8-48e2-00bf755fe31c", "next_3_days.avg_games_per_session": 28.0}]]
+["dfaa4419-5859-f2c8-4087-01b2b5738ae4", [{"last_7_days._identity": "dfaa4419-5859-f2c8-4087-01b2b5738ae4", "last_7_days.avg_games_per_session": 13.0, "next_3_days._identity": "dfaa4419-5859-f2c8-4087-01b2b5738ae4", "next_3_days.avg_games_per_session": 8.0}]]
+["8a2a81bc-c7ed-c09c-5a43-4a8694412db8", []]
+["b5cf93ba-7642-a7c7-f553-8e8a254fe92c", [{"last_7_days._identity": "b5cf93ba-7642-a7c7-f553-8e8a254fe92c", "last_7_days.avg_games_per_session": 19.0, "next_3_days._identity": "b5cf93ba-7642-a7c7-f553-8e8a254fe92c", "next_3_days.avg_games_per_session": 9.5}]]
+["14c2c283-32a6-43e1-a000-b5d7be6d9cba", [{"last_7_days._identity": "14c2c283-32a6-43e1-a000-b5d7be6d9cba", "last_7_days.avg_games_per_session": 1.0, "next_3_days._identity": "14c2c283-32a6-43e1-a000-b5d7be6d9cba", "next_3_days.avg_games_per_session": 9.5}]]
+["fba1f6bc-73f6-db6a-9b9e-2a848b8f6ee3", []]
+["4ac60a7c-fcd4-351b-f6cf-1bb868f813fa", []]
+["8c400eb3-3612-9b3f-cb15-f4947f0af565", []]
+["e728a2ed-8fd7-e81b-3ce1-851a5580c5bd", []]
+["32cec9c5-42ba-3329-3831-af5b8d432937", []]
 ```
 
 Each entry consists of an array with 2 items:
 
-* `user_id`, the __Identity__ from the Streaming DTC.
+* `user_id`, the __Identity__ from the Streaming DTC. 
 * An object with the remaining values of the record.
+
+Note:- It will print once for each user in the raw events file wether the window aggregates exist or not.

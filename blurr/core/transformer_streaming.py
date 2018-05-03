@@ -41,6 +41,7 @@ class StreamingTransformerSchema(TransformerSchema):
         context = self.schema_context.context
         context.add_record(record)
         time = self.time.evaluate(context)
+
         if not time or not isinstance(time, datetime):
             raise TimeError('Could not determine time using {}.  Record is {}'.format(
                 self.time.code_string, record))
