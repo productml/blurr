@@ -1,0 +1,81 @@
+Type: Blurr:Transform:Window
+Version: '2018-03-01'
+Name: moving_averages
+
+SourceDTC: nyse
+
+Anchor:
+  Condition: nyse.stats.volatility < 0.04
+
+Aggregates:
+
+
+  - Type: Blurr:Aggregate:Window
+    Name: close
+    WindowType: count
+    WindowValue: 1
+    Source: nyse.stats
+    Fields:
+    - Name: value
+      Type: float
+      Value: anchor.close # the anchor object represents the record that matches the anchor condition
+
+  - Type: Blurr:Aggregate:Window
+    Name: last
+    WindowType: count
+    WindowValue: -1
+    Source: nyse.stats
+    Fields:
+    - Name: close
+      Type: float
+      Value: source.close[0]
+    - Name: volume
+      Type: float
+      Value: source.volume[0]
+    - Name: volatility
+      Type: float
+      Value: source.volatility[0]
+
+  - Type: Blurr:Aggregate:Window
+    Name: last_3
+    WindowType: count
+    WindowValue: -3
+    Source: nyse.stats
+    Fields:
+    - Name: close_avg
+      Type: float
+      Value: sum(source.close) / len(source.close)
+    - Name: volume_avg
+      Type: float
+      Value: sum(source.volume) / len(source.volume)
+    - Name: volatility_avg
+      Type: float
+      Value: sum(source.volatility) / len(source.volatility)
+    - Name: max_volatility
+      Type: float
+      Value: max(source.volatility)
+    - Name: min_volatility
+      Type: float
+      Value: min(source.volatility)
+
+  - Type: Blurr:Aggregate:Window
+    Name: last_7
+    WindowType: count
+    WindowValue: -7
+    Source: nyse.stats
+    Fields:
+    - Name: close_avg
+      Type: float
+      Value: sum(source.close) / len(source.close)
+    - Name: volume_avg
+      Type: float
+      Value: sum(source.volume) / len(source.volume)
+    - Name: volatility_avg
+      Type: float
+      Value: sum(source.volatility) / len(source.volatility)
+    - Name: max_volatility
+      Type: float
+      Value: max(source.volatility)
+    - Name: min_volatility
+      Type: float
+      Value: min(source.volatility)
