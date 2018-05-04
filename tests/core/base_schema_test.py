@@ -4,7 +4,8 @@ import yaml
 from pytest import fixture
 
 from blurr.core.base import BaseSchema, BaseSchemaCollection
-from blurr.core.errors import RequiredAttributeError, EmptyAttributeError, InvalidIdentifierError
+from blurr.core.errors import RequiredAttributeError, EmptyAttributeError, InvalidIdentifierError, \
+    InvalidExpressionError
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 
@@ -59,9 +60,20 @@ def test_base_schema_validate_schema_spec_missing_type_and_empty_when(
 
     assert len(schema.errors) == 2
     assert isinstance(schema.errors[0], EmptyAttributeError)
-    assert schema.errors[0].attribute == 'When'
+    assert schema.errors[0].attribute == BaseSchema.ATTRIBUTE_WHEN
     assert isinstance(schema.errors[1], InvalidIdentifierError)
-    assert schema.errors[1].attribute == 'Name'
+    assert schema.errors[1].attribute == BaseSchema.ATTRIBUTE_NAME
+
+
+def test_base_schema_bluid_expression_adds_error_on_invalid_expression(schema_spec: Dict[str, Any]):
+
+    schema_spec[BaseSchema.ATTRIBUTE_WHEN] = '`'
+    schema = get_test_schema(schema_spec)
+
+    assert len(schema.errors) == 1
+    assert isinstance(schema.errors[0], InvalidExpressionError)
+    assert schema.errors[0].attribute == BaseSchema.ATTRIBUTE_WHEN
+    assert schema.errors[0].error is not None
 
 
 @fixture
