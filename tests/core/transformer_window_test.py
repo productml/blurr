@@ -6,7 +6,7 @@ from pytest import fixture
 
 from blurr.core.aggregate_block import BlockAggregate
 from blurr.core.anchor import AnchorSchema
-from blurr.core.errors import PrepareWindowMissingBlocksError
+from blurr.core.errors import PrepareWindowMissingBlocksError, RequiredAttributeError
 from blurr.core.evaluation import Context
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
@@ -33,7 +33,7 @@ def schema_loader():
 
 @fixture
 def stream_transformer(schema_loader, stream_schema_spec):
-    stream_dtc_name = schema_loader.add_schema(stream_schema_spec)
+    stream_dtc_name = schema_loader.add_schema_spec(stream_schema_spec)
     stream_transformer = StreamingTransformer(
         schema_loader.get_schema_object(stream_dtc_name), 'user1')
     stream_transformer.run_restore({Key('user1', 'state'): {'country': 'US'}})
@@ -42,7 +42,7 @@ def stream_transformer(schema_loader, stream_schema_spec):
 
 @fixture
 def window_transformer(schema_loader, stream_transformer, window_schema_spec):
-    window_dtc_name = schema_loader.add_schema(window_schema_spec)
+    window_dtc_name = schema_loader.add_schema_spec(window_schema_spec)
     return WindowTransformer(
         schema_loader.get_schema_object(window_dtc_name), 'user1',
         Context({
@@ -61,8 +61,8 @@ def block_aggregate(stream_transformer):
 
 
 def test_window_transformer_schema_init(schema_loader, stream_schema_spec, window_schema_spec):
-    schema_loader.add_schema(stream_schema_spec)
-    window_dtc_name = schema_loader.add_schema(window_schema_spec)
+    schema_loader.add_schema_spec(stream_schema_spec)
+    window_dtc_name = schema_loader.add_schema_spec(window_schema_spec)
     window_transformer_schema = WindowTransformerSchema(window_dtc_name, schema_loader)
     anchor_spec = schema_loader.get_schema_spec('ProductMLExample.anchor')
     assert anchor_spec == window_schema_spec['Anchor']
@@ -151,3 +151,15 @@ def test_window_transformer_internal_reset(schema_loader, window_transformer, bl
     snapshot = window_transformer._snapshot
     assert snapshot['last_session'] == {'_identity': 'user1', 'events': 2}
     assert snapshot['last_day'] == {'_identity': 'user1', 'total_events': 3}
+
+
+def test_window_transformer_schema_missing_attributes_adds_error(schema_loader, stream_schema_spec,
+                                                                 window_schema_spec):
+    del window_schema_spec[WindowTransformerSchema.ATTRIBUTE_ANCHOR]
+    schema_loader.add_schema_spec(stream_schema_spec)
+    window_dtc_name = schema_loader.add_schema_spec(window_schema_spec)
+    schema = WindowTransformerSchema(window_dtc_name, schema_loader)
+
+    assert 1 == len(schema.errors)
+    assert isinstance(schema.errors[0], RequiredAttributeError)
+    assert WindowTransformerSchema.ATTRIBUTE_ANCHOR == schema.errors[0].attribute

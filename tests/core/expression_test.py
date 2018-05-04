@@ -35,7 +35,7 @@ def schema_spec() -> Dict:
 @fixture
 def schema_loader(schema_spec: Dict) -> SchemaLoader:
     schema_loader = SchemaLoader()
-    schema_loader.add_schema(schema_spec)
+    schema_loader.add_schema_spec(schema_spec)
     return schema_loader
 
 

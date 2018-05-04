@@ -34,7 +34,7 @@ def store_spec() -> Dict[str, Any]:
 @fixture
 def schema_loader(store_spec) -> SchemaLoader:
     schema_loader = SchemaLoader()
-    schema_loader.add_schema(store_spec, 'user')
+    schema_loader.add_schema_spec(store_spec, 'user')
     return schema_loader
 
 
@@ -62,7 +62,7 @@ def create_block_aggregate(schema, time, identity) -> BlockAggregate:
 
 
 def test_block_aggregate_schema_evaluate_without_split(block_aggregate_schema_spec, schema_loader):
-    name = schema_loader.add_schema(block_aggregate_schema_spec)
+    name = schema_loader.add_schema_spec(block_aggregate_schema_spec)
     block_aggregate_schema = BlockAggregateSchema(name, schema_loader)
 
     identity = 'userA'
@@ -88,7 +88,7 @@ def test_block_aggregate_schema_evaluate_without_split(block_aggregate_schema_sp
 
 def test_block_aggregate_schema_evaluate_with_split(block_aggregate_schema_spec, schema_loader):
     block_aggregate_schema_spec['Split'] = 'user.event_count == 2'
-    name = schema_loader.add_schema(block_aggregate_schema_spec)
+    name = schema_loader.add_schema_spec(block_aggregate_schema_spec)
     block_aggregate_schema = BlockAggregateSchema(name, schema_loader)
 
     identity = 'userA'

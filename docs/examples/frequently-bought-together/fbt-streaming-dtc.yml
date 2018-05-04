@@ -33,21 +33,21 @@ Aggregates:
 
    Fields:
      - Name: appInstanceId
+       Type: string
        Value: source.appInstanceId
 
-   Fields:
      - Name: age
+       Type: string
        Value: source.age
 
-   Fields:
      - Name: gender
+       Type: string
        Value: source.gender
 
-   Fields:
      - Name: country
+       Type: string
        Value: source.country
 
-   Fields:
      - Name: install_date
        Type: datetime
        Value: time
@@ -57,8 +57,8 @@ Aggregates:
        # is later than the time of the event being processed, so user.time will
        # always be the first event that was seen for the user
 
-   Fields:
      - Name: days_since_install
+       Type: string
        Value: (time - user.time).days
 
 ##

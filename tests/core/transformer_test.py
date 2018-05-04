@@ -3,9 +3,8 @@ from typing import Dict, Any
 import pytest
 from pytest import fixture
 
-from blurr.core.errors import MissingAttributeError
+from blurr.core.errors import MissingAttributeError, RequiredAttributeError
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.store_key import Key
 from blurr.core.transformer import TransformerSchema, Transformer
 from blurr.core.type import Type
 
@@ -16,14 +15,9 @@ def schema_spec() -> Dict[str, Any]:
         'Name': 'test',
         'Type': Type.BLURR_TRANSFORM_STREAMING,
         'Version': '2018-03-01',
-        'Stores': [{
-            'Name': 'memstore',
-            'Type': Type.BLURR_STORE_MEMORY
-        }],
         'Aggregates': [{
             'Name': 'test_group',
-            'Type': Type.BLURR_AGGREGATE_IDENTITY,
-            'Store': 'memstore',
+            'Type': Type.BLURR_AGGREGATE_VARIABLE,
             'Fields': [{
                 "Type": "integer",
                 "Name": "events",
@@ -54,12 +48,12 @@ def schema_loader() -> SchemaLoader:
 
 @fixture
 def test_transformer(schema_loader: SchemaLoader, schema_spec: Dict[str, Any]) -> MockTransformer:
-    name = schema_loader.add_schema(schema_spec)
+    name = schema_loader.add_schema_spec(schema_spec)
     return MockTransformer(MockTransformerSchema(name, schema_loader), 'user1')
 
 
 def test_transformer_schema_init(schema_loader: SchemaLoader, schema_spec: Dict[str, Any]) -> None:
-    name = schema_loader.add_schema(schema_spec)
+    name = schema_loader.add_schema_spec(schema_spec)
     test_transformer_schema = MockTransformerSchema(name, schema_loader)
     assert test_transformer_schema.version == '2018-03-01'
     assert test_transformer_schema.type == Type.BLURR_TRANSFORM_STREAMING
@@ -72,18 +66,6 @@ def test_transformer_init(test_transformer) -> None:
         'test_group': test_transformer._aggregates['test_group']
     }
     assert test_transformer._evaluation_context.local_context == {}
-
-
-def test_transformer_finalize(test_transformer: MockTransformer,
-                              schema_loader: SchemaLoader) -> None:
-    store = schema_loader.get_store('test.memstore')
-
-    test_transformer.run_finalize()
-    assert store.get(Key('user1', 'test_group')) is None
-
-    test_transformer.run_evaluate()
-    test_transformer.run_finalize()
-    assert store.get(Key('user1', 'test_group')) == {'_identity': 'user1', 'events': 1}
 
 
 def test_transformer_get_attr(test_transformer: MockTransformer) -> None:
@@ -102,3 +84,18 @@ def test_transformer_get_item(test_transformer: MockTransformer) -> None:
 def test_transformer_get_item_missing(test_transformer: MockTransformer) -> None:
     with pytest.raises(MissingAttributeError, match='missing_group not defined in test'):
         assert test_transformer['missing_group']
+
+
+def test_transformer_schema_missing_version_attribute_adds_error(schema_loader: SchemaLoader,
+                                                                 schema_spec: Dict[str, Any]):
+    del schema_spec[TransformerSchema.ATTRIBUTE_VERSION]
+    del schema_spec[TransformerSchema.ATTRIBUTE_AGGREGATES]
+
+    name = schema_loader.add_schema_spec(schema_spec)
+    schema = MockTransformerSchema(name, schema_loader)
+
+    assert len(schema.errors) == 2
+    assert isinstance(schema.errors[0], RequiredAttributeError)
+    assert schema.errors[0].attribute == TransformerSchema.ATTRIBUTE_AGGREGATES
+    assert isinstance(schema.errors[1], RequiredAttributeError)
+    assert schema.errors[1].attribute == TransformerSchema.ATTRIBUTE_VERSION

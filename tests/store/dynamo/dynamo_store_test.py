@@ -32,7 +32,7 @@ def get_boto3_dynamodb_client(db_kwargs=DYNAMODB_KWARGS) -> Any:
 @fixture
 def store(dynamo_store_spec: Dict[str, Any]) -> DynamoStore:
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(dynamo_store_spec)
+    name = schema_loader.add_schema_spec(dynamo_store_spec)
     with mock.patch(
             'blurr.store.dynamo_store.DynamoStore.get_dynamodb_resource',
             new=override_boto3_dynamodb_resource):
@@ -44,7 +44,7 @@ def store(dynamo_store_spec: Dict[str, Any]) -> DynamoStore:
 @fixture(scope='session')
 def loaded_store() -> DynamoStore:
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema({
+    name = schema_loader.add_schema_spec({
         'Name': 'dynamostore',
         'Type': 'Blurr:Store:Dynamo',
         'Table': '_unit_test_range' + '_' + str(int(time.time()))
@@ -110,7 +110,7 @@ def loaded_store() -> DynamoStore:
 
 def test_schema_init(dynamo_store_spec: Dict[str, Any]) -> None:
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(dynamo_store_spec)
+    name = schema_loader.add_schema_spec(dynamo_store_spec)
     store_schema = schema_loader.get_schema_object(name)
     assert store_schema.name == dynamo_store_spec['Name']
     assert store_schema.table_name == dynamo_store_spec['Table']
@@ -122,7 +122,7 @@ def test_schema_init_with_read_write_units(dynamo_store_spec: Dict[str, Any]) ->
     dynamo_store_spec['ReadCapacityUnits'] = 10
     dynamo_store_spec['WriteCapacityUnits'] = 10
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(dynamo_store_spec)
+    name = schema_loader.add_schema_spec(dynamo_store_spec)
     store_schema = schema_loader.get_schema_object(name)
     assert store_schema.rcu == 10
     assert store_schema.wcu == 10
@@ -135,7 +135,7 @@ def test_table_creation_if_not_exist(dynamo_store_spec: Dict[str, Any]) -> None:
     table_name = '_unit_test_table_creation' + '_' + str(int(time.time()))
     dynamo_store_spec['Table'] = table_name
     schema_loader = SchemaLoader()
-    name = schema_loader.add_schema(dynamo_store_spec)
+    name = schema_loader.add_schema_spec(dynamo_store_spec)
 
     dynamodb_client = get_boto3_dynamodb_client()
     # Check table does not exist

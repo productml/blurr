@@ -18,17 +18,20 @@ class TransformerSchema(BaseSchemaCollection, ABC):
     """
 
     ATTRIBUTE_VERSION = 'Version'
-    ATTRIBUTE_STORES = 'Stores'
     ATTRIBUTE_AGGREGATES = 'Aggregates'
     ATTRIBUTE_IMPORT = 'Import'
+    ATTRIBUTE_STORES = 'Stores'
 
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader, self.ATTRIBUTE_AGGREGATES)
 
-        # Load the schema specific attributes
-        self.version = self._spec[self.ATTRIBUTE_VERSION]
+        self.version = self._spec.get(self.ATTRIBUTE_VERSION, None)
         self.import_list = self._spec.get(self.ATTRIBUTE_IMPORT, [])
         self.schema_context = SchemaContext(self.import_list)
+
+    def validate_schema_spec(self) -> None:
+        super().validate_schema_spec()
+        self.validate_required_attributes(self.ATTRIBUTE_VERSION)
 
 
 class Transformer(BaseItemCollection, ABC):
