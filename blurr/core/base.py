@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Type, TypeVar, Union, List, Optional
 
-from blurr.core.errors import SnapshotError, InvalidSchemaError
+from blurr.core.errors import SnapshotError, InvalidSchemaError, InvalidExpressionError
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
@@ -34,14 +34,20 @@ class BaseSchema(ABC):
         self.name: str = self._spec[self.ATTRIBUTE_NAME]
         self.type: str = self._spec[self.ATTRIBUTE_TYPE]
 
-        self.when: Expression = Expression(
-            self._spec[self.ATTRIBUTE_WHEN]) if self.ATTRIBUTE_WHEN in self._spec else None
+        self.when: Expression = self.build_expression(self.ATTRIBUTE_WHEN)
         self.description: str = self._spec.get(self.ATTRIBUTE_DESCRIPTION, None)
 
-    def extend_schema_spec(self) -> None:
-        """ Extends the defined schema specifications at runtime with defaults. When this method is being extended,
-        the first line should always be:  ```super().extend_schema_spec()``` """
-        pass
+    def build_expression(self, attribute: str) -> Optional[Expression]:
+        """ Builds an expression object.  Adds an error if expression creation has errors. """
+
+        expression_string = self._spec.get(attribute, None)
+        if expression_string and not str(expression_string).isspace():
+            try:
+                return Expression(str(expression_string))
+            except Exception as err:
+                self.add_errors(InvalidExpressionError(self.fully_qualified_name, self._spec, attribute, err))
+
+        return None
 
     def add_errors(self, *errors: Union[InvalidSchemaError, List[InvalidSchemaError]]) -> None:
         """ Adds errors to the error repository in schema loader """
@@ -75,6 +81,11 @@ class BaseSchema(ABC):
         self.add_errors(
             validate_python_identifier_attributes(self.fully_qualified_name, self._spec,
                                                   self.ATTRIBUTE_NAME))
+
+    def extend_schema_spec(self) -> None:
+        """ Extends the defined schema specifications at runtime with defaults. When this method is being extended,
+        the first line should always be:  ```super().extend_schema_spec()``` """
+        pass
 
 
 class BaseSchemaCollection(BaseSchema, ABC):

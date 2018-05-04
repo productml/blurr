@@ -119,11 +119,14 @@ class InvalidIdentifierError(InvalidSchemaError):
             reason=self.reason.value)
 
 
-class InvalidExpressionError(Exception):
+class InvalidExpressionError(InvalidSchemaError):
     """
     Indicates that a python expression specified is either non-compilable, or not allowed
     """
-    pass
+    def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
+                 error: Exception, *args, **kwargs):
+        super().__init__(fully_qualified_name, spec, attribute, *args, **kwargs)
+        self.error = error
 
 
 class ExpressionEvaluationError(Exception):

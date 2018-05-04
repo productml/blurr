@@ -119,10 +119,7 @@ class Expression:
         self.code_string = 'None' if not code_string or code_string.isspace() else code_string
         self.type = expression_type
 
-        try:
-            self.code_object = compile(self.code_string, '<string>', self.type.value)
-        except Exception as e:
-            raise InvalidExpressionError(e)
+        self.code_object = compile(self.code_string, '<string>', self.type.value)
 
     def evaluate(self, evaluation_context: EvaluationContext) -> Any:
         """
