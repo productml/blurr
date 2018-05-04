@@ -20,12 +20,12 @@ def _create_zip(dir: str, target_file: str) -> None:
     zip_file.close()
 
 
-def _resolve_pip_dependencies(tmp_dir : str) -> int:
+def _resolve_pip_dependencies(tmp_dir: str) -> int:
     pip_verbosity = [] if logging.is_debug_enabled() else ["--quiet"]
     pip_cmd = [
-                  "install", "--requirement",
-                  os.path.join(tmp_dir, "requirements.txt"), "--target", tmp_dir
-              ] + pip_verbosity
+        "install", "--requirement",
+        os.path.join(tmp_dir, "requirements.txt"), "--target", tmp_dir
+    ] + pip_verbosity
     return pip.main(pip_cmd)
 
 
