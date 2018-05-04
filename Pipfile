@@ -23,7 +23,7 @@ twine = "*"
 pytest-cov = "*"
 python-coveralls = "*"
 "boto3" = "*"
-pip = "*"
+pip = "==9.0.3"
 
 
 [requires]
