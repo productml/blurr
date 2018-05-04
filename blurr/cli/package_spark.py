@@ -2,7 +2,9 @@ import zipfile
 from distutils.dir_util import copy_tree
 
 import os
-import pip
+from pip._internal import main as pip_main
+
+
 import tempfile
 
 from blurr.cli.util import eprint
@@ -26,7 +28,7 @@ def _resolve_pip_dependencies(tmp_dir: str) -> int:
         "install", "--requirement",
         os.path.join(tmp_dir, "requirements.txt"), "--target", tmp_dir
     ] + pip_verbosity
-    return pip.main(pip_cmd)
+    return pip_main(pip_cmd)
 
 
 def package_spark(source_dir: str, target_file: str) -> int:
