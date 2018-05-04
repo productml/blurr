@@ -1,7 +1,7 @@
 from typing import Dict, Any
 
 import yaml
-from pytest import fixture
+from pytest import fixture, raises
 
 from blurr.core.base import BaseSchema, BaseSchemaCollection
 from blurr.core.errors import RequiredAttributeError, EmptyAttributeError, InvalidIdentifierError, \
@@ -65,15 +65,17 @@ def test_base_schema_validate_schema_spec_missing_type_and_empty_when(
     assert schema.errors[1].attribute == BaseSchema.ATTRIBUTE_NAME
 
 
-def test_base_schema_bluid_expression_adds_error_on_invalid_expression(schema_spec: Dict[str, Any]):
+def test_base_schema_build_expression_adds_error_on_invalid_expression(schema_spec: Dict[str, Any]):
 
-    schema_spec[BaseSchema.ATTRIBUTE_WHEN] = '`'
+    schema_spec[BaseSchema.ATTRIBUTE_WHEN] = 'a;b'
     schema = get_test_schema(schema_spec)
 
     assert len(schema.errors) == 1
     assert isinstance(schema.errors[0], InvalidExpressionError)
     assert schema.errors[0].attribute == BaseSchema.ATTRIBUTE_WHEN
-    assert schema.errors[0].error is not None
+
+    with raises(InvalidExpressionError, match='`When: a;b` in section `TestField` is invalid Python expression.'):
+        raise schema.errors[0]
 
 
 @fixture
@@ -112,7 +114,7 @@ def test_schema_collection_missing_nested_attribute_adds_error(
 
 
 def test_schema_collection_empty_nested_attribute_adds_error(
-        schema_collection_spec: Dict[str, Any]):
+    schema_collection_spec: Dict[str, Any]):
     del schema_collection_spec['Fields'][0]
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema_spec(schema_collection_spec)
