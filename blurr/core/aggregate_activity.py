@@ -1,7 +1,8 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from blurr.core.aggregate_block import BlockAggregate, BlockAggregateSchema
 from blurr.core.schema_loader import SchemaLoader
+from blurr.core.store_key import Key
 
 
 class ActivityAggregateSchema(BlockAggregateSchema):
@@ -28,6 +29,9 @@ class ActivityAggregate(BlockAggregate):
     def run_evaluate(self) -> None:
         time = self._evaluation_context.global_context['time']
 
+        if not self._start_time:
+            self._load_old_state()
+
         # If the event time is beyond separation threshold, create a new block
         if self._start_time and (time < self._start_time - self._schema.separation_interval
                                  or time > self._end_time + self._schema.separation_interval):
@@ -35,6 +39,12 @@ class ActivityAggregate(BlockAggregate):
             self.run_reset()
 
         super().run_evaluate()
+
+    def _load_old_state(self):
+        key = Key(self._identity, self._name, datetime.utcnow())
+        most_recent_block = self._store.get_range(key, None, -1)
+        if most_recent_block:
+            self.run_restore(most_recent_block[0][1])
 
     def run_finalize(self):
         self._persist(self._start_time)

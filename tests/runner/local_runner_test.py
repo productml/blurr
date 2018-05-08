@@ -15,10 +15,10 @@ def execute_runner(stream_dtc_file: str, window_dtc_file: Optional[str],
 
 def test_only_stream_dtc_provided():
     runner, data = execute_runner('tests/data/stream.yml', None, ['tests/data/raw.json'])
-    assert len(data) == 8
+    assert len(data) == 3
 
     # Stream DTC output
-    assert data[Key('userA', 'session', datetime(2018, 3, 7, 23, 35, 31))] == {
+    assert data['userA'][0][Key('userA', 'session', datetime(2018, 3, 7, 23, 35, 31))] == {
         '_identity': 'userA',
         '_start_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()).isoformat(),
         '_end_time': datetime(2018, 3, 7, 23, 35, 32, tzinfo=tzutc()).isoformat(),
@@ -27,7 +27,7 @@ def test_only_stream_dtc_provided():
         'continent': 'World'
     }
 
-    assert data[Key('userA', 'session', datetime(2018, 3, 7, 22, 35, 31))] == {
+    assert data['userA'][0][Key('userA', 'session', datetime(2018, 3, 7, 22, 35, 31))] == {
         '_identity': 'userA',
         '_start_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=tzutc()).isoformat(),
         '_end_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=tzutc()).isoformat(),
@@ -36,13 +36,13 @@ def test_only_stream_dtc_provided():
         'continent': 'North America'
     }
 
-    assert data[Key('userA', 'state')] == {
+    assert data['userA'][0][Key('userA', 'state')] == {
         '_identity': 'userA',
         'country': 'IN',
         'continent': 'World'
     }
 
-    assert data[Key('userB', 'session', datetime(2018, 3, 7, 23, 35, 31))] == {
+    assert data['userB'][0][Key('userB', 'session', datetime(2018, 3, 7, 23, 35, 31))] == {
         '_identity': 'userB',
         '_start_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()).isoformat(),
         '_end_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()).isoformat(),
@@ -51,7 +51,8 @@ def test_only_stream_dtc_provided():
         'continent': ''
     }
 
-    assert not runner._window_data
+    for (_, window_data) in runner._per_user_data.values():
+        assert window_data == []
 
 
 def test_no_variable_aggreate_data_stored():
@@ -65,16 +66,14 @@ def test_stream_and_window_dtc_provided():
     runner, data = execute_runner('tests/data/stream.yml', 'tests/data/window.yml',
                                   ['tests/data/raw.json'])
 
-    assert not runner._block_data
-
     # Window DTC output
-    assert data['userA'] == [{
+    assert data['userA'][1] == [{
         'last_session.events': 1,
         'last_session._identity': 'userA',
         'last_day.total_events': 1,
         'last_day._identity': 'userA'
     }]
-    assert data['userB'] == []
+    assert data['userB'][1] == []
 
 
 def test_write_output_file_only_source_dtc_provided(tmpdir):

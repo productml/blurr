@@ -24,12 +24,16 @@ def get_spark_output(out_dir: PosixPath) -> List:
 
 def test_only_stream_dtc_provided():
     runner, data = execute_runner('tests/data/stream.yml', None, ['tests/data/raw.json'])
-    block_data = {k: v for (k, v) in data.collect()}
+    block_data = {}
+    window_data = {}
+    for id, (per_id_block_data, per_id_window_data) in data.collect():
+        block_data[id] = per_id_block_data
+        window_data[id] = per_id_window_data
 
-    assert len(block_data) == 8
+    assert len(block_data) == 3
 
     # Stream DTC output
-    assert block_data[Key('userA', 'session', datetime(
+    assert block_data['userA'][Key('userA', 'session', datetime(
         2018, 3, 7, 23, 35, 31, tzinfo=tzutc()))] == {
             '_identity': 'userA',
             '_start_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()).isoformat(),
@@ -39,7 +43,7 @@ def test_only_stream_dtc_provided():
             'continent': 'World'
         }
 
-    assert block_data[Key('userA', 'session', datetime(2018, 3, 7, 22, 35, 31))] == {
+    assert block_data['userA'][Key('userA', 'session', datetime(2018, 3, 7, 22, 35, 31))] == {
         '_identity': 'userA',
         '_start_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=tzutc()).isoformat(),
         '_end_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=tzutc()).isoformat(),
@@ -48,13 +52,13 @@ def test_only_stream_dtc_provided():
         'continent': 'North America'
     }
 
-    assert block_data[Key('userA', 'state')] == {
+    assert block_data['userA'][Key('userA', 'state')] == {
         '_identity': 'userA',
         'country': 'IN',
         'continent': 'World'
     }
 
-    assert block_data[Key('userB', 'session', datetime(
+    assert block_data['userB'][Key('userB', 'session', datetime(
         2018, 3, 7, 23, 35, 31, tzinfo=tzutc()))] == {
             '_identity': 'userB',
             '_start_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()).isoformat(),
@@ -64,19 +68,25 @@ def test_only_stream_dtc_provided():
             'continent': ''
         }
 
+    assert window_data == {'userA': [], 'userB': [], 'userC': []}
+
 
 def test_no_variable_aggreate_data_stored():
     runner, data = execute_runner('tests/data/stream.yml', None, ['tests/data/raw.json'])
-    block_data = {k: v for (k, v) in data.collect()}
+    block_data = {}
+    for id, (per_id_block_data, _) in data.collect():
+        block_data[id] = per_id_block_data
 
     # Variables should not be stored
-    assert Key('userA', 'vars') not in block_data
+    assert Key('userA', 'vars') not in block_data['userA']
 
 
 def test_stream_and_window_dtc_provided():
     runner, data = execute_runner('tests/data/stream.yml', 'tests/data/window.yml',
                                   ['tests/data/raw.json'])
-    window_data = dict(data.collect())
+    window_data = {}
+    for id, (_, per_id_window_data) in data.collect():
+        window_data[id] = per_id_window_data
 
     assert window_data['userA'] == [{
         'last_session.events': 1,

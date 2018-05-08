@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from decimal import Decimal
 from json import JSONEncoder
-from typing import List, Optional, Tuple, Any, Union, Dict, Iterable, Generator
+from typing import List, Optional, Tuple, Any, Dict, Iterable, Generator
 
 import yaml
 
@@ -20,22 +20,23 @@ from blurr.core.type import Type
 from blurr.runner.data_processor import DataProcessor
 
 
-class BlurrJSONEncoder(JSONEncoder):
-    def default(self, o):
-        if isinstance(o, Decimal):
-            ratio = o.as_integer_ratio()
-            if ratio[1] == 1:
-                return int(o)
-            else:
-                return float(o)
-
-        if isinstance(o, Key):
-            return str(o)
-
-        return super().default(o)
-
-
 class Runner(ABC):
+    """
+    An abstract class that provides functionality to:
+    - Convert raw events in Records
+    - Process a list of Records for a user.
+
+    A class that inherits from Runner should do the following:
+    1. Call `get_per_identity_records()` using an iterator of the events available. This returns
+        a generator which creates a Tuple[Identity, Tuple[datetime, Record]]] output.
+    2. The Tuple[Identity, Tuple[datetime, Record]]] output should be grouped together by the
+         Identity to create a List of Tuple[datetime, Record]] per identity.
+    3. Using the per identity list of Tuple[datetime, Record]] `execute_per_identity_records()`
+        should be called.
+        - This returns Tuple[Identity, Tuple[Streaming DTC State, List of Window DTC output]].
+        - `execute_per_identity_records()` can take in a existing old_state (old Streaming DTC
+            State) so as to allow batch execution to make use of previous output.
+    """
     def __init__(self, stream_dtc_file: str, window_dtc_file: Optional[str]):
         self._stream_dtc = yaml.safe_load(open(stream_dtc_file))
         self._window_dtc = None if window_dtc_file is None else yaml.safe_load(
@@ -50,44 +51,71 @@ class Runner(ABC):
         #     validate_schema_spec(self._window_dtc)
 
     def execute_per_identity_records(self,
-                                     identity_records: Tuple[str, List[Tuple[datetime, Record]]]
-                                     ) -> List[Union[Tuple[Key, Any], Tuple[str, Any]]]:
-        identity, events = identity_records
-        schema_loader = SchemaLoader()
-        events.sort(key=lambda x: x[0])
+                                     identity: str, records: List[Tuple[datetime, Record]],
+                                     old_state: Optional[Dict[Key, Any]] = None) -> Tuple[str, Tuple[Dict, List]]:
+        """
+        Executes the streaming and window DTC on the given records. An option old state can provided
+        which initializes the state for execution. This is useful for batch execution where the
+        previous state is written out to storage and can be loaded for the next batch run.
 
-        block_data = self._execute_stream_dtc(events, identity, schema_loader)
+        :param identity: Identity of the records.
+        :param records: List of Tuple[datetime, Record] to be processed.
+        :param old_state: Streaming DTC state dictionary from a previous execution.
+        :return: Tuple[Identity, Tuple[Identity, Tuple[Streaming DTC state dictionary,
+            List of window DTC output]].
+        """
+        schema_loader = SchemaLoader()
+        if records:
+            records.sort(key=lambda x: x[0])
+        else:
+            records = []
+
+        block_data = self._execute_stream_dtc(records, identity, schema_loader, old_state)
         window_data = self._execute_window_dtc(identity, schema_loader)
 
-        if self._window_dtc is None:
-            return [(k, v) for k, v in block_data.items()]
-        else:
-            return [(identity, window_data)]
+        return identity, (block_data, window_data)
 
     def get_per_identity_records(self, events: Iterable, data_processor: DataProcessor
                                  ) -> Generator[Tuple[str, Tuple[datetime, Record]], None, None]:
+        """
+        Uses the given iteratable events and the data processor convert the event into a list of
+        Records along with its identity and time.
+        :param events: iteratable events.
+        :param data_processor: DataProcessor to process each event in events.
+        :return: yields Tuple[Identity, Tuple[datetime, Record]] for all Records in events,
+        """
         schema_loader = SchemaLoader()
         stream_dtc_name = schema_loader.add_schema_spec(self._stream_dtc)
         stream_transformer_schema: StreamingTransformerSchema = schema_loader.get_schema_object(
             stream_dtc_name)
         for event in events:
-            for record in data_processor.process_data(event):
-                try:
-                    id = stream_transformer_schema.get_identity(record)
-                    time = stream_transformer_schema.get_time(record)
-                    yield (id, (time, record))
-                except Exception as err:
-                    logging.debug('{} in parsing Record.'.format(err))
+            try:
+                for record in data_processor.process_data(event):
+                    try:
+                        id = stream_transformer_schema.get_identity(record)
+                        time = stream_transformer_schema.get_time(record)
+                        yield (id, (time, record))
+                    except Exception as err:
+                        logging.error('{} in parsing Record {}.'.format(err, record))
+            except Exception as err:
+                logging.error('{} in parsing Event {}.'.format(err, event))
 
     def _execute_stream_dtc(self, identity_events: List[Tuple[datetime, Record]], identity: str,
-                            schema_loader: SchemaLoader) -> Dict[Key, Any]:
+                            schema_loader: SchemaLoader,
+                            old_state: Optional[Dict] = None) -> Dict[Key, Any]:
         if self._stream_dtc is None:
             return {}
 
         stream_dtc_name = schema_loader.add_schema_spec(self._stream_dtc)
         stream_transformer_schema = schema_loader.get_schema_object(stream_dtc_name)
+        store = self._get_store(schema_loader)
+
+        if old_state:
+            for k,v in old_state:
+                store.save(k,v)
 
         stream_transformer = StreamingTransformer(stream_transformer_schema, identity)
+
         for time, event in identity_events:
             stream_transformer.run_evaluate(event)
         stream_transformer.run_finalize()
@@ -148,7 +176,12 @@ class Runner(ABC):
 
     @staticmethod
     def _get_store(schema_loader: SchemaLoader) -> Store:
-        return schema_loader.get_all_stores()[0]
+        stores = schema_loader.get_all_stores()
+        if not stores:
+            fq_name_and_schema = schema_loader.get_schema_specs_of_type(Type.BLURR_STORE_DYNAMO, Type.BLURR_STORE_MEMORY)
+            return schema_loader.get_store(next(iter(fq_name_and_schema)))
+
+        return stores[0]
 
     @staticmethod
     def _get_streaming_transformer_schema(

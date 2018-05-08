@@ -9,9 +9,10 @@ def test_extended_runner():
     local_runner.execute(
         local_runner.get_identity_records_from_json_files(['tests/extended/raw.json']))
 
-    assert len(local_runner._block_data) == 5
+    assert len(local_runner._per_user_data) == 1
+    assert len(local_runner._per_user_data['user-1'][0]) == 5
 
-    result_state = local_runner._block_data[Key('user-1', 'state')]
+    result_state = local_runner._per_user_data['user-1'][0][Key('user-1', 'state')]
     expected_state = {
         '_identity': 'user-1',
         'country': 'US',
@@ -35,8 +36,8 @@ def test_extended_runner():
 
     assert result_state == expected_state
 
-    result_session = local_runner._block_data[Key('user-1', 'session',
-                                                  datetime(2016, 2, 13, 0, 0, 58))]
+    result_session = local_runner._per_user_data['user-1'][0][Key('user-1', 'session',
+                                                                  datetime(2016, 2, 13, 0, 0, 58))]
     expected_session = {
         '_identity': 'user-1',
         '_start_time': datetime(2016, 2, 13, 0, 0, 58).isoformat(),
@@ -53,7 +54,7 @@ def test_extended_runner():
     }
     assert result_session == expected_session
 
-    result_session_10 = local_runner._block_data[Key('user-1', 'session', datetime(
+    result_session_10 = local_runner._per_user_data['user-1'][0][Key('user-1', 'session', datetime(
         2016, 2, 10, 0, 0))]
     expected_session_10 = {
         '_identity': 'user-1',
@@ -72,7 +73,7 @@ def test_extended_runner():
 
     assert result_session_10 == expected_session_10
 
-    result_session_11 = local_runner._block_data[Key('user-1', 'session', datetime(
+    result_session_11 = local_runner._per_user_data['user-1'][0][Key('user-1', 'session', datetime(
         2016, 2, 11, 0, 0))]
     expected_session_11 = {
         '_identity': 'user-1',
@@ -91,7 +92,7 @@ def test_extended_runner():
 
     assert result_session_11 == expected_session_11
 
-    result_session_12 = local_runner._block_data[Key('user-1', 'session', datetime(
+    result_session_12 = local_runner._per_user_data['user-1'][0][Key('user-1', 'session', datetime(
         2016, 2, 12, 0, 0))]
     expected_session_12 = {
         '_identity': 'user-1',
