@@ -54,8 +54,8 @@ def test_extended_runner():
     }
     assert result_session == expected_session
 
-    result_session_10 = local_runner._per_user_data['user-1'][0][Key('user-1', 'session', datetime(
-        2016, 2, 10, 0, 0))]
+    result_session_10 = local_runner._per_user_data['user-1'][0][Key('user-1', 'session',
+                                                                     datetime(2016, 2, 10, 0, 0))]
     expected_session_10 = {
         '_identity': 'user-1',
         '_start_time': datetime(2016, 2, 10, 0, 0).isoformat(),
@@ -73,8 +73,8 @@ def test_extended_runner():
 
     assert result_session_10 == expected_session_10
 
-    result_session_11 = local_runner._per_user_data['user-1'][0][Key('user-1', 'session', datetime(
-        2016, 2, 11, 0, 0))]
+    result_session_11 = local_runner._per_user_data['user-1'][0][Key('user-1', 'session',
+                                                                     datetime(2016, 2, 11, 0, 0))]
     expected_session_11 = {
         '_identity': 'user-1',
         '_start_time': datetime(2016, 2, 11, 0, 0).isoformat(),
@@ -92,8 +92,8 @@ def test_extended_runner():
 
     assert result_session_11 == expected_session_11
 
-    result_session_12 = local_runner._per_user_data['user-1'][0][Key('user-1', 'session', datetime(
-        2016, 2, 12, 0, 0))]
+    result_session_12 = local_runner._per_user_data['user-1'][0][Key('user-1', 'session',
+                                                                     datetime(2016, 2, 12, 0, 0))]
     expected_session_12 = {
         '_identity': 'user-1',
         '_start_time': datetime(2016, 2, 12, 0, 0).isoformat(),

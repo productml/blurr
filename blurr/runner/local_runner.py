@@ -27,11 +27,19 @@ class LocalRunner(Runner):
         if self._window_dtc is not None:
             validate(self._window_dtc)
 
-    def _execute_for_all_identities(
-            self, identity_records: Dict[str, List[Tuple[datetime, Record]]]) -> None:
+    def _execute_for_all_identities(self,
+                                    identity_records: Dict[str, List[Tuple[datetime, Record]]],
+                                    old_state: Optional[Dict[str, Dict]] = None) -> None:
+        if not old_state:
+            old_state = {}
         for identity, records in identity_records.items():
-            _, data = self.execute_per_identity_records(identity, records)
+            _, data = self.execute_per_identity_records(identity, records,
+                                                        old_state.get(identity, None))
             self._per_user_data[identity] = data
+
+        for identity, state in old_state.items():
+            if identity not in self._per_user_data:
+                self._per_user_data[identity] = (old_state[identity], [])
 
     def get_identity_records_from_json_files(
             self,
@@ -46,8 +54,10 @@ class LocalRunner(Runner):
                     identity_records[identity].append(record_with_datetime)
         return identity_records
 
-    def execute(self, identity_records: Dict[str, List[Tuple[datetime, Record]]]) -> Dict[str, Tuple[Dict, List]]:
-        self._execute_for_all_identities(identity_records)
+    def execute(self,
+                identity_records: Dict[str, List[Tuple[datetime, Record]]],
+                old_state: Optional[Dict[str, Dict]] = None) -> Dict[str, Tuple[Dict, List]]:
+        self._execute_for_all_identities(identity_records, old_state)
         return self._per_user_data
 
     def print_output(self, per_user_data) -> None:

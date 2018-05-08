@@ -20,7 +20,7 @@ except ImportError as err:
 _module_spark_session: 'SparkSession' = None
 
 
-def get_spark_session(spark_session: Optional['SparkSession']) -> 'SparkSession':
+def get_spark_session(spark_session: Optional['SparkSession'] = None) -> 'SparkSession':
     if spark_session:
         return spark_session
 
@@ -55,6 +55,7 @@ class SparkRunner(Runner):
     # for the next execution run and as the training data for the model respectively.
     ```
     """
+
     def __init__(self, stream_dtc_file: str, window_dtc_file: Optional[str] = None):
         """
         Initialize SparkRunner.
@@ -67,7 +68,8 @@ class SparkRunner(Runner):
             raise _spark_import_err
         super().__init__(stream_dtc_file, window_dtc_file)
 
-    def _execute_per_identity_records(self, identity_records_with_state: Tuple[str, Union[List, Tuple[List, Dict]]]):
+    def _execute_per_identity_records(
+            self, identity_records_with_state: Tuple[str, Union[List, Tuple[List, Dict]]]):
         identity, records_with_state = identity_records_with_state
         if isinstance(records_with_state, tuple):
             record, state = records_with_state
@@ -112,10 +114,11 @@ class SparkRunner(Runner):
         return raw_records.mapPartitions(
             lambda x: self.get_per_identity_records(x, data_processor)).groupByKey().mapValues(list)
 
-    def get_record_rdd_from_rdd(self,
-                                rdd: 'RDD',
-                                data_processor: DataProcessor = SimpleDictionaryDataProcessor(),
-                                ) -> 'RDD':
+    def get_record_rdd_from_rdd(
+            self,
+            rdd: 'RDD',
+            data_processor: DataProcessor = SimpleDictionaryDataProcessor(),
+    ) -> 'RDD':
         """
         Converts a RDD of raw events into the `Record`s format for processing. `data_processor` is
         used to process the per row data to convert them into `Record`.
@@ -146,8 +149,9 @@ class SparkRunner(Runner):
         """
         _spark_session_ = get_spark_session(spark_session)
         if not self._window_dtc:
-            per_identity_data.flatMap(lambda x: [json.dumps(data, cls=BlurrJSONEncoder) for data in x[1][0].items()]).saveAsTextFile(
-                path)
+            per_identity_data.flatMap(
+                lambda x: [json.dumps(data, cls=BlurrJSONEncoder) for data in x[1][0].items()]
+            ).saveAsTextFile(path)
         else:
             # Convert to a DataFrame first so that the data can be saved as a CSV
             _spark_session_.createDataFrame(per_identity_data.flatMap(lambda x: x[1][1])).write.csv(
@@ -163,9 +167,11 @@ class SparkRunner(Runner):
         :param per_identity_data: Output of the `execute()` call.
         """
         if not self._window_dtc:
-            data = per_identity_data.flatMap(lambda x: [json.dumps(data, cls=BlurrJSONEncoder) for data in x[1][0].items()])
+            data = per_identity_data.flatMap(
+                lambda x: [json.dumps(data, cls=BlurrJSONEncoder) for data in x[1][0].items()])
         else:
             # Convert to a DataFrame first so that the data can be saved as a CSV
-            data = per_identity_data.map(lambda x: json.dumps((x[0], x[1][1]), cls=BlurrJSONEncoder))
+            data = per_identity_data.map(
+                lambda x: json.dumps((x[0], x[1][1]), cls=BlurrJSONEncoder))
         for row in data.collect():
             print(row)

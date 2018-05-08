@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Tuple, Any, Optional
+from typing import List, Tuple, Any, Optional, Dict
 
 from dateutil.tz import tzutc
 
@@ -7,10 +7,13 @@ from blurr.core.store_key import Key
 from blurr.runner.local_runner import LocalRunner
 
 
-def execute_runner(stream_dtc_file: str, window_dtc_file: Optional[str],
-                   local_json_files: List[str]) -> Tuple[LocalRunner, Any]:
+def execute_runner(stream_dtc_file: str,
+                   window_dtc_file: Optional[str],
+                   local_json_files: List[str],
+                   old_state: Optional[Dict[str, Dict]] = None) -> Tuple[LocalRunner, Any]:
     runner = LocalRunner(stream_dtc_file, window_dtc_file)
-    return runner, runner.execute(runner.get_identity_records_from_json_files(local_json_files))
+    return runner, runner.execute(
+        runner.get_identity_records_from_json_files(local_json_files), old_state)
 
 
 def test_only_stream_dtc_provided():
@@ -74,6 +77,37 @@ def test_stream_and_window_dtc_provided():
         'last_day._identity': 'userA'
     }]
     assert data['userB'][1] == []
+
+
+def test_stream_dtc_with_state():
+    _, data_combined = execute_runner('tests/data/stream.yml', None,
+                                      ['tests/data/raw.json', 'tests/data/raw2.json'], None)
+
+    _, data_separate = execute_runner('tests/data/stream.yml', None, ['tests/data/raw.json'], None)
+    old_state = {
+        identity: block_data
+        for identity, (block_data, window_data) in data_separate.items()
+    }
+    _, data_separate = execute_runner('tests/data/stream.yml', None, ['tests/data/raw2.json'],
+                                      old_state)
+
+    assert data_separate == data_combined
+
+
+def test_stream_and_window_dtc_with_state():
+    _, data_combined = execute_runner('tests/data/stream.yml', 'tests/data/window.yml',
+                                      ['tests/data/raw.json', 'tests/data/raw2.json'], None)
+
+    _, data_separate = execute_runner('tests/data/stream.yml', 'tests/data/window.yml',
+                                      ['tests/data/raw.json'], None)
+    old_state = {
+        identity: block_data
+        for identity, (block_data, window_data) in data_separate.items()
+    }
+    _, data_separate = execute_runner('tests/data/stream.yml', 'tests/data/window.yml',
+                                      ['tests/data/raw2.json'], old_state)
+
+    assert data_separate == data_combined
 
 
 def test_write_output_file_only_source_dtc_provided(tmpdir):

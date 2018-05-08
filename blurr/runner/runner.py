@@ -37,6 +37,7 @@ class Runner(ABC):
         - `execute_per_identity_records()` can take in a existing old_state (old Streaming DTC
             State) so as to allow batch execution to make use of previous output.
     """
+
     def __init__(self, stream_dtc_file: str, window_dtc_file: Optional[str]):
         self._stream_dtc = yaml.safe_load(open(stream_dtc_file))
         self._window_dtc = None if window_dtc_file is None else yaml.safe_load(
@@ -50,9 +51,11 @@ class Runner(ABC):
         # if self._window_dtc is not None:
         #     validate_schema_spec(self._window_dtc)
 
-    def execute_per_identity_records(self,
-                                     identity: str, records: List[Tuple[datetime, Record]],
-                                     old_state: Optional[Dict[Key, Any]] = None) -> Tuple[str, Tuple[Dict, List]]:
+    def execute_per_identity_records(
+            self,
+            identity: str,
+            records: List[Tuple[datetime, Record]],
+            old_state: Optional[Dict[Key, Any]] = None) -> Tuple[str, Tuple[Dict, List]]:
         """
         Executes the streaming and window DTC on the given records. An option old state can provided
         which initializes the state for execution. This is useful for batch execution where the
@@ -100,7 +103,9 @@ class Runner(ABC):
             except Exception as err:
                 logging.error('{} in parsing Event {}.'.format(err, event))
 
-    def _execute_stream_dtc(self, identity_events: List[Tuple[datetime, Record]], identity: str,
+    def _execute_stream_dtc(self,
+                            identity_events: List[Tuple[datetime, Record]],
+                            identity: str,
                             schema_loader: SchemaLoader,
                             old_state: Optional[Dict] = None) -> Dict[Key, Any]:
         if self._stream_dtc is None:
@@ -111,14 +116,15 @@ class Runner(ABC):
         store = self._get_store(schema_loader)
 
         if old_state:
-            for k,v in old_state:
-                store.save(k,v)
+            for k, v in old_state.items():
+                store.save(k, v)
 
-        stream_transformer = StreamingTransformer(stream_transformer_schema, identity)
+        if identity_events:
+            stream_transformer = StreamingTransformer(stream_transformer_schema, identity)
 
-        for time, event in identity_events:
-            stream_transformer.run_evaluate(event)
-        stream_transformer.run_finalize()
+            for time, event in identity_events:
+                stream_transformer.run_evaluate(event)
+            stream_transformer.run_finalize()
 
         return self._get_store(schema_loader).get_all(identity)
 
@@ -178,7 +184,8 @@ class Runner(ABC):
     def _get_store(schema_loader: SchemaLoader) -> Store:
         stores = schema_loader.get_all_stores()
         if not stores:
-            fq_name_and_schema = schema_loader.get_schema_specs_of_type(Type.BLURR_STORE_DYNAMO, Type.BLURR_STORE_MEMORY)
+            fq_name_and_schema = schema_loader.get_schema_specs_of_type(
+                Type.BLURR_STORE_DYNAMO, Type.BLURR_STORE_MEMORY)
             return schema_loader.get_store(next(iter(fq_name_and_schema)))
 
         return stores[0]
