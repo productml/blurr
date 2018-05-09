@@ -10,7 +10,6 @@ from blurr.core import logging
 
 
 def _create_zip(dir: str, target_file: str) -> None:
-
     dir_abs_path = os.path.abspath(dir)
     zip_file = zipfile.ZipFile(target_file, 'w', zipfile.ZIP_DEFLATED)
     for root, dirs, files in os.walk(dir):
