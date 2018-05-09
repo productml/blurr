@@ -41,7 +41,7 @@ class BaseSchema(ABC):
         """ Builds an expression object.  Adds an error if expression creation has errors. """
 
         expression_string = self._spec.get(attribute, None)
-        if expression_string and not str(expression_string).isspace():
+        if expression_string:
             try:
                 return Expression(str(expression_string))
             except Exception as err:

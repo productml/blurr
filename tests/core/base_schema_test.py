@@ -38,7 +38,7 @@ def get_test_schema(schema_spec: Dict[str, Any]) -> MockSchema:
     return MockSchema(name, schema_loader)
 
 
-def test_base_schema_with_all_attributes(schema_spec: Dict[str, Any]):
+def test_with_all_attributes(schema_spec: Dict[str, Any]):
     test_schema = get_test_schema(schema_spec)
     assert test_schema.name == schema_spec[BaseSchema.ATTRIBUTE_NAME]
     assert test_schema.type == schema_spec[BaseSchema.ATTRIBUTE_TYPE]
@@ -46,7 +46,7 @@ def test_base_schema_with_all_attributes(schema_spec: Dict[str, Any]):
     assert test_schema.when.evaluate(EvaluationContext())
 
 
-def test_base_schema_with_no_attribute_when(schema_spec: Dict[str, Any]):
+def test_with_no_attribute_when(schema_spec: Dict[str, Any]):
     del schema_spec[BaseSchema.ATTRIBUTE_WHEN]
     test_schema = get_test_schema(schema_spec)
     assert test_schema.name == schema_spec[BaseSchema.ATTRIBUTE_NAME]
@@ -54,7 +54,7 @@ def test_base_schema_with_no_attribute_when(schema_spec: Dict[str, Any]):
     assert test_schema.when is None
 
 
-def test_base_schema_validate_schema_spec_missing_type_and_empty_when(
+def test_validate_schema_spec_missing_type_and_empty_when(
         invalid_schema_spec: Dict[str, Any]):
     schema = get_test_schema(invalid_schema_spec)
 
@@ -65,7 +65,7 @@ def test_base_schema_validate_schema_spec_missing_type_and_empty_when(
     assert schema.errors[1].attribute == BaseSchema.ATTRIBUTE_NAME
 
 
-def test_base_schema_build_expression_adds_error_on_invalid_expression(schema_spec: Dict[str, Any]):
+def test_build_expression_adds_error_on_invalid_expression(schema_spec: Dict[str, Any]):
 
     schema_spec[BaseSchema.ATTRIBUTE_WHEN] = 'a;b'
     schema = get_test_schema(schema_spec)
