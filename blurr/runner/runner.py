@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
-from decimal import Decimal
-from json import JSONEncoder
 from typing import List, Optional, Tuple, Any, Dict, Iterable, Generator
 
 import yaml
@@ -20,6 +18,9 @@ from blurr.core.type import Type
 from blurr.runner.data_processor import DataProcessor
 
 
+TimeAndRecord = Tuple[datetime, Record]
+
+
 class Runner(ABC):
     """
     An abstract class that provides functionality to:
@@ -28,10 +29,10 @@ class Runner(ABC):
 
     A class that inherits from Runner should do the following:
     1. Call `get_per_identity_records()` using an iterator of the events available. This returns
-        a generator which creates a Tuple[Identity, Tuple[datetime, Record]]] output.
-    2. The Tuple[Identity, Tuple[datetime, Record]]] output should be grouped together by the
-         Identity to create a List of Tuple[datetime, Record]] per identity.
-    3. Using the per identity list of Tuple[datetime, Record]] `execute_per_identity_records()`
+        a generator which creates a Tuple[Identity, TimeAndRecord]] output.
+    2. The Tuple[Identity, TimeAndRecord]] output should be grouped together by the
+         Identity to create a List of TimeAndRecord] per identity.
+    3. Using the per identity list of TimeAndRecord] `execute_per_identity_records()`
         should be called.
         - This returns Tuple[Identity, Tuple[Streaming DTC State, List of Window DTC output]].
         - `execute_per_identity_records()` can take in a existing old_state (old Streaming DTC
@@ -54,7 +55,7 @@ class Runner(ABC):
     def execute_per_identity_records(
             self,
             identity: str,
-            records: List[Tuple[datetime, Record]],
+            records: List[TimeAndRecord],
             old_state: Optional[Dict[Key, Any]] = None) -> Tuple[str, Tuple[Dict, List]]:
         """
         Executes the streaming and window DTC on the given records. An option old state can provided
@@ -62,7 +63,7 @@ class Runner(ABC):
         previous state is written out to storage and can be loaded for the next batch run.
 
         :param identity: Identity of the records.
-        :param records: List of Tuple[datetime, Record] to be processed.
+        :param records: List of TimeAndRecord to be processed.
         :param old_state: Streaming DTC state dictionary from a previous execution.
         :return: Tuple[Identity, Tuple[Identity, Tuple[Streaming DTC state dictionary,
             List of window DTC output]].
@@ -79,13 +80,13 @@ class Runner(ABC):
         return identity, (block_data, window_data)
 
     def get_per_identity_records(self, events: Iterable, data_processor: DataProcessor
-                                 ) -> Generator[Tuple[str, Tuple[datetime, Record]], None, None]:
+                                 ) -> Generator[Tuple[str, TimeAndRecord], None, None]:
         """
         Uses the given iteratable events and the data processor convert the event into a list of
         Records along with its identity and time.
         :param events: iteratable events.
         :param data_processor: DataProcessor to process each event in events.
-        :return: yields Tuple[Identity, Tuple[datetime, Record]] for all Records in events,
+        :return: yields Tuple[Identity, TimeAndRecord] for all Records in events,
         """
         schema_loader = SchemaLoader()
         stream_dtc_name = schema_loader.add_schema_spec(self._stream_dtc)
@@ -104,7 +105,7 @@ class Runner(ABC):
                 logging.error('{} in parsing Event {}.'.format(err, event))
 
     def _execute_stream_dtc(self,
-                            identity_events: List[Tuple[datetime, Record]],
+                            identity_events: List[TimeAndRecord],
                             identity: str,
                             schema_loader: SchemaLoader,
                             old_state: Optional[Dict] = None) -> Dict[Key, Any]:

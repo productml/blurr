@@ -6,14 +6,12 @@ Usage:
 import csv
 import json
 from collections import defaultdict
-from datetime import datetime
 from typing import List, Optional, Dict, Tuple
 
-from blurr.core.record import Record
 from blurr.core.syntax.schema_validator import validate
 from blurr.runner.data_processor import DataProcessor, SimpleJsonDataProcessor
 from blurr.runner.json_encoder import BlurrJSONEncoder
-from blurr.runner.runner import Runner
+from blurr.runner.runner import Runner, TimeAndRecord
 
 
 class LocalRunner(Runner):
@@ -28,7 +26,7 @@ class LocalRunner(Runner):
             validate(self._window_dtc)
 
     def _execute_for_all_identities(self,
-                                    identity_records: Dict[str, List[Tuple[datetime, Record]]],
+                                    identity_records: Dict[str, List[TimeAndRecord]],
                                     old_state: Optional[Dict[str, Dict]] = None) -> None:
         if not old_state:
             old_state = {}
@@ -45,7 +43,7 @@ class LocalRunner(Runner):
             self,
             local_json_files: List[str],
             data_processor: DataProcessor = SimpleJsonDataProcessor()
-    ) -> Dict[str, List[Tuple[datetime, Record]]]:
+    ) -> Dict[str, List[TimeAndRecord]]:
         identity_records = defaultdict(list)
         for file in local_json_files:
             with open(file) as file_stream:
@@ -55,7 +53,7 @@ class LocalRunner(Runner):
         return identity_records
 
     def execute(self,
-                identity_records: Dict[str, List[Tuple[datetime, Record]]],
+                identity_records: Dict[str, List[TimeAndRecord]],
                 old_state: Optional[Dict[str, Dict]] = None) -> Dict[str, Tuple[Dict, List]]:
         self._execute_for_all_identities(identity_records, old_state)
         return self._per_user_data

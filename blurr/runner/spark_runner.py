@@ -82,7 +82,7 @@ class SparkRunner(Runner):
         Executes Blurr DTC with the given records. old_state_rdd can be provided to load an older
         state from a previous run.
 
-        :param identity_records: RDD of the form Tuple[Identity, List[datetime, Record]]
+        :param identity_records: RDD of the form Tuple[Identity, List[TimeAndRecord]]
         :param old_state_rdd: A previous streaming DTC state RDD as Tuple[Identity, Streaming DTC
             State]
         :return: RDD[Identity, Tuple[Streaming DTC State, List of Window DTC output]]
@@ -105,7 +105,7 @@ class SparkRunner(Runner):
         :param data_processor: `DataProcessor` to process each event in the json files.
         :param spark_session: `SparkSession` to use for execution. If None is provided then a basic
             `SparkSession` is created.
-        :return: RDD containing Tuple[Identity, List[datetime, Record]] which can be used in
+        :return: RDD containing Tuple[Identity, List[TimeAndRecord]] which can be used in
             `execute()`
         """
         spark_context = get_spark_session(spark_session).sparkContext
@@ -125,7 +125,7 @@ class SparkRunner(Runner):
 
         :param rdd: RDD containing the raw events.
         :param data_processor: `DataProcessor` to process each row in the given `rdd`.
-        :return: RDD containing Tuple[Identity, List[datetime, Record]] which can be used in
+        :return: RDD containing Tuple[Identity, List[TimeAndRecord]] which can be used in
             `execute()`
         """
         return rdd.mapPartitions(
