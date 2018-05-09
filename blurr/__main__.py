@@ -18,7 +18,10 @@ Commands:
                     3. Both streaming and window DTC are provided - Transform
                     outputs the final result of applying the streaming and window
                     DTC on the raw data file.
-    package-spark   Generates a submittable Spark app with .zip extension.
+    package-spark   Generates a submittable Spark app with .zip extension. Requires a
+                    requirements.txt inside --source-dir. The generated package
+                    will contain all the python code inside the provided --source-dir,
+                    along with all the dependencies resolved from requirements.txt.
 
 
 Options:
