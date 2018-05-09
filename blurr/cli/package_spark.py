@@ -2,10 +2,8 @@ import zipfile
 from distutils.dir_util import copy_tree
 
 import os
-from pip._internal import main as pip_main
-
-
 import tempfile
+from pip._internal import main as pip_main
 
 from blurr.cli.util import eprint
 from blurr.core import logging
