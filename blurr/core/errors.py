@@ -109,9 +109,6 @@ class SchemaErrorCollection:
             for i in item:
                 self.add(i)
 
-        elif isinstance(item, type(self)):
-            self.merge(item)
-
     def merge(self, item: 'SchemaErrorCollection'):
         if not item:
             return
@@ -141,7 +138,8 @@ class SchemaErrorCollection:
         return len(self.log) > 0
 
     def raise_errors(self):
-        raise SchemaError(self)
+        if self.has_errors:
+            raise SchemaError(self)
 
 
 class SchemaErrorCollectionFormatter:
@@ -167,7 +165,6 @@ class SchemaError(Exception):
     def __init__(self, errors: SchemaErrorCollection, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.errors = errors
-        self.formatter = SchemaErrorCollectionFormatter()
 
     def __str__(self):
         return self.formatter.format(self.errors)
