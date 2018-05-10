@@ -19,8 +19,7 @@ class AnchorSchema(BaseSchema):
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
 
-        self.condition = Expression(self._spec[
-            self.ATTRIBUTE_CONDITION]) if self.ATTRIBUTE_CONDITION in self._spec else None
+        self.condition = self.build_expression(self.ATTRIBUTE_CONDITION)
         self.max = self._spec[self.ATTRIBUTE_MAX] if self.ATTRIBUTE_MAX in self._spec else None
 
     def validate_schema_spec(self) -> None:
