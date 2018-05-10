@@ -1,6 +1,6 @@
 from typing import Dict, Any, List, Optional, Union
 
-from blurr.core.errors import GenericSchemaError, InvalidSchemaError
+from blurr.core.errors import GenericSchemaError, BaseSchemaError
 from blurr.core.errors import SchemaErrorCollection
 from blurr.core.loader import TypeLoader
 from blurr.core.type import Type
@@ -53,12 +53,12 @@ class SchemaLoader:
 
         return spec[ATTRIBUTE_NAME]
 
-    def add_errors(self, *errors: Union[InvalidSchemaError, SchemaErrorCollection]) -> None:
+    def add_errors(self, *errors: Union[BaseSchemaError, SchemaErrorCollection]) -> None:
         """ Adds errors to the error store for the schema """
         for error in errors:
             self._error_cache.add(error)
 
-    def get_errors(self, fully_qualified_name: str) -> List[InvalidSchemaError]:
+    def get_errors(self, fully_qualified_name: str) -> List[BaseSchemaError]:
         return self._error_cache[fully_qualified_name]
 
     # Using forward reference to avoid cyclic dependency.

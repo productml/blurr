@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Type, TypeVar, Union, List, Optional
 
-from blurr.core.errors import SnapshotError, InvalidSchemaError, InvalidExpressionError
+from blurr.core.errors import SnapshotError, BaseSchemaError, InvalidExpressionError
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
@@ -49,12 +49,12 @@ class BaseSchema(ABC):
 
         return None
 
-    def add_errors(self, *errors: Union[InvalidSchemaError, List[InvalidSchemaError]]) -> None:
+    def add_errors(self, *errors: Union[BaseSchemaError, List[BaseSchemaError]]) -> None:
         """ Adds errors to the error repository in schema loader """
         self.schema_loader.add_errors(*errors)
 
     @property
-    def errors(self) -> List[InvalidSchemaError]:
+    def errors(self) -> List[BaseSchemaError]:
         """ Returns a list of errors raised by this schema """
         return self.schema_loader.get_errors(self.fully_qualified_name)
 

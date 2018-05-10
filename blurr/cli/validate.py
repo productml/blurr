@@ -5,7 +5,7 @@ import yaml
 
 from blurr.cli.util import get_yml_files, eprint
 from blurr.core import logging
-from blurr.core.errors import InvalidSchemaError
+from blurr.core.errors import BaseSchemaError
 from blurr.core.syntax.schema_validator import validate
 
 
@@ -31,7 +31,7 @@ def validate_file(dtc_file: str) -> int:
         eprint('Invalid yaml')
         eprint(str(err))
         return 1
-    except InvalidSchemaError as err:
+    except BaseSchemaError as err:
         eprint(str(err))
         return 1
     except:

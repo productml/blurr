@@ -1,6 +1,7 @@
 from abc import ABC
 from collections import defaultdict
 from enum import Enum
+from io import StringIO
 from itertools import chain
 from os import linesep
 from typing import List, Dict, Any, Union, Type
@@ -10,7 +11,7 @@ class GenericSchemaError(Exception):
     pass
 
 
-class InvalidSchemaError(Exception, ABC):
+class BaseSchemaError(Exception, ABC):
     """
     Indicates an error in the schema specification
     """
@@ -27,15 +28,81 @@ class InvalidSchemaError(Exception, ABC):
             cls=self.__class__.__name__, fqn=self.fully_qualified_name, attribute=self.attribute)
 
 
+class RequiredAttributeError(BaseSchemaError):
+    def __str__(self):
+        return 'Attribute `{}` must be present under `{}`.'.format(self.attribute,
+                                                                   self.fully_qualified_name)
+
+
+class EmptyAttributeError(BaseSchemaError):
+    def __str__(self):
+        return 'Attribute `{}` under `{}` cannot be left empty.'.format(
+            self.attribute, self.fully_qualified_name)
+
+
+class InvalidNumberError(BaseSchemaError):
+    def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
+                 value_type: Type, minimum: Any, maximum: Any, *args, **kwargs):
+        super().__init__(fully_qualified_name, spec, attribute, *args, **kwargs)
+        self.type = value_type
+        self.min = minimum
+        self.max = maximum
+
+    def __str__(self):
+        return 'Attribute `{attr}` under `{fqn}` must be of type `{type}`. {less_than} {greater_than}'.format(
+            attr=self.attribute,
+            fqn=self.fully_qualified_name,
+            type=self.type.__name__,
+            greater_than=('Must be greater than ' + str(self.min)) if self.min else '',
+            less_than=('Must be lesser than ' + (self.max)) if self.max else '')
+
+
+class InvalidIdentifierError(BaseSchemaError):
+    class Reason(Enum):
+        STARTS_WITH_UNDERSCORE = 'Identifiers starting with underscore `_` are reserved'
+        STARTS_WITH_RUN = 'Identifiers starting with `run_` are reserved'
+        INVALID_PYTHON_IDENTIFIER = 'Identifiers must be valid Python identifiers'
+
+    def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
+                 reason: 'Reason', *args, **kwargs):
+        super().__init__(fully_qualified_name, spec, attribute, *args, **kwargs)
+        self.reason = reason
+
+    def __str__(self):
+        return '`{attribute}: {value}` in section `{name}` is invalid. {reason}.'.format(
+            attribute=self.attribute,
+            value=self.spec.get(self.attribute, '*missing*'),
+            name=self.fully_qualified_name,
+            reason=self.reason.value)
+
+
+class InvalidExpressionError(BaseSchemaError):
+    """
+    Indicates that a python expression specified is either non-compilable, or not allowed
+    """
+
+    def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
+                 error: Exception, *args, **kwargs):
+        super().__init__(fully_qualified_name, spec, attribute, *args, **kwargs)
+        self.error = error
+
+    def __str__(self):
+        return '`{attribute}: {value}` in section `{name}` is invalid Python expression. Compilation error: \n{error}'.format(
+            attribute=self.attribute,
+            value=self.spec.get(self.attribute, '*missing*'),
+            name=self.fully_qualified_name,
+            error=str(self.error))
+
+
 class SchemaErrorCollection:
     def __init__(self, *args):
-        self.log: Dict[str, List(InvalidSchemaError)] = defaultdict(list)
+        self.log: Dict[str, List(BaseSchemaError)] = defaultdict(list)
         for arg in args:
             self.add(arg)
 
     def add(self,
-            item: Union[InvalidSchemaError, List[InvalidSchemaError]]):
-        if isinstance(item, InvalidSchemaError):
+            item: Union[BaseSchemaError, List[BaseSchemaError]]):
+        if isinstance(item, BaseSchemaError):
             self.log[item.fully_qualified_name].append(item)
 
         elif isinstance(item, list):
@@ -62,79 +129,48 @@ class SchemaErrorCollection:
     def __contains__(self, item):
         return self.log.__contains__(item)
 
+    def __iter__(self):
+        return iter(self.log.items())
+
     @property
-    def errors(self) -> List[InvalidSchemaError]:
+    def errors(self) -> List[BaseSchemaError]:
         return list(chain.from_iterable(self.log.values()))
 
     @property
     def has_errors(self) -> bool:
         return len(self.log) > 0
 
-
-class RequiredAttributeError(InvalidSchemaError):
-    def __str__(self):
-        return 'Attribute `{}` must be present under `{}`.'.format(self.attribute,
-                                                                   self.fully_qualified_name)
+    def raise_errors(self):
+        raise SchemaError(self)
 
 
-class EmptyAttributeError(InvalidSchemaError):
-    def __str__(self):
-        return 'Attribute `{}` under `{}` cannot be left empty.'.format(
-            self.attribute, self.fully_qualified_name)
+class SchemaErrorCollectionFormatter:
+
+    def __init__(self, **kwargs):
+        self.header_separator = kwargs.get('header_separator', '=')
+        self.error_separator = kwargs.get('item_separator', '-')
+        self.line_separator = kwargs.get('line_separator', linesep)
+
+    def format(self, errors: SchemaErrorCollection) -> Any:
+        with StringIO() as result:
+            for fqn, errs in errors:
+                result.writelines([self.line_separator,
+                                   fqn, self.line_separator,
+                                   self.header_separator * len(fqn), self.line_separator])
+                for err in errs:
+                    result.writelines(['--> ', str(err), self.line_separator])
+
+            return result.getvalue()
 
 
-class InvalidNumberError(InvalidSchemaError):
-    def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
-                 value_type: Type, minimum: Any, maximum: Any, *args, **kwargs):
-        super().__init__(fully_qualified_name, spec, attribute, *args, **kwargs)
-        self.type = value_type
-        self.min = minimum
-        self.max = maximum
-
-    def __str__(self):
-        return 'Attribute `{attr}` under `{fqn}` must be of type `{type}`. {less_than} {greater_than}'.format(
-            attr=self.attribute,
-            fqn=self.fully_qualified_name,
-            type=self.type.__name__,
-            greater_than=('Must be greater than ' + str(self.min)) if self.min else '',
-            less_than=('Must be lesser than ' + (self.max)) if self.max else '')
-
-
-class InvalidIdentifierError(InvalidSchemaError):
-    class Reason(Enum):
-        STARTS_WITH_UNDERSCORE = 'Identifiers starting with underscore `_` are reserved'
-        STARTS_WITH_RUN = 'Identifiers starting with `run_` are reserved'
-        INVALID_PYTHON_IDENTIFIER = 'Identifiers must be valid Python identifiers'
-
-    def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
-                 reason: 'Reason', *args, **kwargs):
-        super().__init__(fully_qualified_name, spec, attribute, *args, **kwargs)
-        self.reason = reason
+class SchemaError(Exception):
+    def __init__(self, errors: SchemaErrorCollection, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.errors = errors
+        self.formatter = SchemaErrorCollectionFormatter()
 
     def __str__(self):
-        return '`{attribute}: {value}` in section `{name}` is invalid. {reason}.'.format(
-            attribute=self.attribute,
-            value=self.spec.get(self.attribute, '*missing*'),
-            name=self.fully_qualified_name,
-            reason=self.reason.value)
-
-
-class InvalidExpressionError(InvalidSchemaError):
-    """
-    Indicates that a python expression specified is either non-compilable, or not allowed
-    """
-
-    def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
-                 error: Exception, *args, **kwargs):
-        super().__init__(fully_qualified_name, spec, attribute, *args, **kwargs)
-        self.error = error
-
-    def __str__(self):
-        return '`{attribute}: {value}` in section `{name}` is invalid Python expression. Compilation error: \n{error}'.format(
-            attribute=self.attribute,
-            value=self.spec.get(self.attribute, '*missing*'),
-            name=self.fully_qualified_name,
-            error=str(self.error))
+        return self.formatter.format(self.errors)
 
 
 class ExpressionEvaluationError(Exception):
