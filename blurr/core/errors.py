@@ -165,9 +165,13 @@ class SchemaError(Exception):
     def __init__(self, errors: SchemaErrorCollection, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.errors = errors
+        self.formatter = SchemaErrorCollectionFormatter()
 
     def __str__(self):
         return self.formatter.format(self.errors)
+
+    def __repr__(self):
+        return self.__class__.__name__ + linesep + str(self)
 
 
 class ExpressionEvaluationError(Exception):
