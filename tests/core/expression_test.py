@@ -96,7 +96,7 @@ def test_expression_user_function() -> None:
 
 def test_invalid_expression() -> None:
     code_string = '{9292#?&@&^'
-    with raises(InvalidExpressionError):
+    with raises(Exception):
         Expression(code_string)
 
 
