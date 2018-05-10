@@ -1,6 +1,6 @@
 from abc import ABC
 from copy import copy
-from typing import Dict, Type
+from typing import Dict
 
 from blurr.core.aggregate import Aggregate
 from blurr.core.base import BaseItemCollection, BaseSchemaCollection
@@ -8,7 +8,6 @@ from blurr.core.errors import MissingAttributeError
 from blurr.core.loader import TypeLoader
 from blurr.core.schema_context import SchemaContext
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.store import Store
 
 
 class TransformerSchema(BaseSchemaCollection, ABC):

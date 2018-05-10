@@ -1,9 +1,7 @@
 import pytest
-import json
-from typing import Any
 
-from blurr.cli.validate import validate_file
 from blurr.cli.cli import cli
+from blurr.cli.validate import validate_file
 
 
 @pytest.mark.parametrize('input_dtc', [

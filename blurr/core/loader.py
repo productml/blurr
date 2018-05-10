@@ -1,7 +1,7 @@
 import importlib
 from typing import Any, Union
 
-from blurr.core.errors import BaseSchemaError, GenericSchemaError
+from blurr.core.errors import GenericSchemaError
 from blurr.core.type import Type
 
 ITEM_MAP = {

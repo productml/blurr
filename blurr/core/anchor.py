@@ -4,7 +4,7 @@ from typing import Dict
 
 from blurr.core.aggregate_block import BlockAggregate
 from blurr.core.base import BaseSchema
-from blurr.core.evaluation import Expression, EvaluationContext
+from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 
 
