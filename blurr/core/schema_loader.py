@@ -64,7 +64,6 @@ class SchemaLoader:
     def raise_errors(self) -> None:
         self._error_cache.raise_errors()
 
-
     def get_errors(self, fully_qualified_name: str) -> List[BaseSchemaError]:
         return self._error_cache[fully_qualified_name]
 

@@ -1,12 +1,12 @@
 import sys
-from typing import List
+from typing import List, Any, Dict
 
 import yaml
 
 from blurr.cli.util import get_yml_files, eprint
 from blurr.core import logging
-from blurr.core.errors import BaseSchemaError
-from blurr.core.syntax.schema_validator import validate
+from blurr.core.errors import BaseSchemaError, SchemaError
+from blurr.core.schema_loader import SchemaLoader
 
 
 def validate_command(dtc_files: List[str]) -> int:
@@ -34,11 +34,22 @@ def validate_file(dtc_file: str) -> int:
     except BaseSchemaError as err:
         eprint(str(err))
         return 1
+    except SchemaError as err:
+        eprint(str(err))
+        return 1
     except:
         exception_value = sys.exc_info()[1]
         logging.error(exception_value)
         eprint('There was an error parsing the document')
         return 1
+
+
+def validate(spec: Dict[str, Any]) -> None:
+    schema_loader = SchemaLoader()
+    stream_dtc_name = schema_loader.add_schema_spec(spec)
+    schema_loader.raise_errors()
+    schema_loader.get_schema_object(stream_dtc_name)
+    schema_loader.raise_errors()
 
 
 def get_valid_yml_files(yml_files: List[str]) -> List[str]:
