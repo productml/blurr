@@ -4,7 +4,7 @@ from enum import Enum
 from io import StringIO
 from itertools import chain
 from os import linesep
-from typing import List, Dict, Any, Union, Type
+from typing import List, Dict, Any, Union, Type, Set
 
 
 class GenericSchemaError(Exception):
@@ -38,6 +38,19 @@ class EmptyAttributeError(BaseSchemaError):
     def __str__(self):
         return 'Attribute `{}` under `{}` cannot be left empty.'.format(
             self.attribute, self.fully_qualified_name)
+
+
+class InvalidValueError(BaseSchemaError):
+    def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
+                 candidates: Set[Any], *args, **kwargs):
+        super().__init__(fully_qualified_name, spec, attribute, *args, **kwargs)
+        self.candidates = candidates
+
+    def __str__(self):
+        return 'Attribute `{attr}` under `{fqn}` must have one of the following values: {candidates}'.format(
+            attr=self.attribute,
+            fqn=self.fully_qualified_name,
+            candidates=' | '.join([str(x) for x in self.candidates]))
 
 
 class InvalidNumberError(BaseSchemaError):

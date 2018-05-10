@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Type, TypeVar, Union, List, Optional
+from typing import Dict, Any, Type, TypeVar, Union, List, Optional, Set
 
 from blurr.core.errors import SnapshotError, BaseSchemaError, InvalidExpressionError
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
 from blurr.core.validator import validate_required_attributes, validate_python_identifier_attributes, \
-    validate_number_attribute, validate_empty_attributes
+    validate_number_attribute, validate_empty_attributes, validate_enum_attribute
 
 
 class BaseSchema(ABC):
@@ -67,11 +67,15 @@ class BaseSchema(ABC):
                                   attribute: str,
                                   value_type: Union[Type[int], Type[float]] = int,
                                   minimum: Optional[Union[int, float]] = None,
-                                  maximum: Optional[Union[int, float]] = None):
+                                  maximum: Optional[Union[int, float]] = None) -> None:
         """ Validates that the attribute contains a numeric value within boundaries if specified """
         self.add_errors(
-            validate_number_attribute(self.fully_qualified_name, self._spec, attribute, value_type,
-                                      minimum, maximum))
+            validate_number_attribute(self.fully_qualified_name, self._spec, attribute, value_type, minimum, maximum))
+
+    def validate_enum_attribute(self, attribute: str, candidates: Set[Union[str, int, float]]) -> None:
+        """ Validates that the attribute value is among the candidates """
+        self.add_errors(
+            validate_enum_attribute(self.fully_qualified_name, self._spec, attribute, candidates))
 
     def validate_schema_spec(self) -> None:
         """ Contains the validation routines that are to be executed as part of initialization by subclasses.
@@ -79,8 +83,7 @@ class BaseSchema(ABC):
         self.add_errors(
             validate_empty_attributes(self.fully_qualified_name, self._spec, *self._spec.keys()))
         self.add_errors(
-            validate_python_identifier_attributes(self.fully_qualified_name, self._spec,
-                                                  self.ATTRIBUTE_NAME))
+            validate_python_identifier_attributes(self.fully_qualified_name, self._spec, self.ATTRIBUTE_NAME))
 
     def extend_schema_spec(self) -> None:
         """ Extends the defined schema specifications at runtime with defaults. When this method is being extended,

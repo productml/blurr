@@ -45,6 +45,5 @@ def test_invalid_dtc(capsys):
     code = run_command(['invalid_wrong_version.yml'])
     out, err = capsys.readouterr()
     assert code == 1
-    assert 'There was an error parsing the document' in err
-    #assert 'Version: \'2088-03-01\' not in (\'2018-03-01\',)' in err
+    assert 'Attribute `Version` under `example_name` must have one of the following values: 2018-03-01' in err
     assert get_running_validation_str('invalid_wrong_version.yml') in out
