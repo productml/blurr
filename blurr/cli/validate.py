@@ -7,6 +7,7 @@ from blurr.cli.util import get_yml_files, eprint
 from blurr.core import logging
 from blurr.core.errors import BaseSchemaError, SchemaError
 from blurr.core.schema_loader import SchemaLoader
+from blurr.core.syntax.schema_validator import is_streaming_dtc, validate as validate_window
 
 
 def validate_command(dtc_files: List[str]) -> int:
@@ -24,7 +25,12 @@ def validate_file(dtc_file: str) -> int:
     print('Running syntax validation on {}'.format(dtc_file))
     try:
         dtc_dict = yaml.safe_load(open(dtc_file, 'r', encoding='utf-8'))
-        validate(dtc_dict)
+        if is_streaming_dtc(dtc_dict):
+            validate(dtc_dict)
+        else:
+            # TODO: Window DTC validation using the new validation technique requires
+            # streaming DTC to be loaded in the schema loader.  Refactoring required.
+            validate_window(dtc_dict)
         print('Document is valid')
         return 0
     except yaml.YAMLError as err:
@@ -37,10 +43,10 @@ def validate_file(dtc_file: str) -> int:
     except SchemaError as err:
         eprint(str(err))
         return 1
-    except:
+    except Exception as err:
         exception_value = sys.exc_info()[1]
         logging.error(exception_value)
-        eprint('There was an error parsing the document')
+        eprint('There was an error parsing the document. Error:\n' + str(err))
         return 1
 
 

@@ -138,6 +138,7 @@ class SchemaLoader:
         :param fully_qualified_name: The fully qualified name of the schema needed.
         :return: Schema dictionary.
         """
+
         try:
             return self._spec_cache[fully_qualified_name]
         except:
