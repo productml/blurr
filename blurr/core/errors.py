@@ -113,8 +113,7 @@ class SchemaErrorCollection:
         for arg in args:
             self.add(arg)
 
-    def add(self,
-            item: Union[BaseSchemaError, List[BaseSchemaError]]):
+    def add(self, item: Union[BaseSchemaError, List[BaseSchemaError]]):
         if isinstance(item, BaseSchemaError):
             self.log[item.fully_qualified_name].append(item)
 
@@ -156,7 +155,6 @@ class SchemaErrorCollection:
 
 
 class SchemaErrorCollectionFormatter:
-
     def __init__(self, **kwargs):
         self.header_separator = kwargs.get('header_separator', '=')
         self.error_separator = kwargs.get('item_separator', '-')
@@ -165,9 +163,10 @@ class SchemaErrorCollectionFormatter:
     def format(self, errors: SchemaErrorCollection) -> Any:
         with StringIO() as result:
             for fqn, errs in errors:
-                result.writelines([self.line_separator,
-                                   fqn, self.line_separator,
-                                   self.header_separator * len(fqn), self.line_separator])
+                result.writelines([
+                    self.line_separator, fqn, self.line_separator, self.header_separator * len(fqn),
+                    self.line_separator
+                ])
                 for err in errs:
                     result.writelines(['--> ', str(err), self.line_separator])
 

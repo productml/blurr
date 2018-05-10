@@ -15,8 +15,7 @@ def transform(*, log_files, stream_dtc, window_dtc=None, output_file):
     transform_local(stream_dtc, window_dtc, log_files, output_file)
 
 
-def transform_local(stream_dtc_file, window_dtc_file,
-                    raw_json_files, output_file) -> int:
+def transform_local(stream_dtc_file, window_dtc_file, raw_json_files, output_file) -> int:
     runner = LocalRunner(stream_dtc_file, window_dtc_file)
     result = runner.execute(
         runner.get_identity_records_from_json_files(raw_json_files, SimpleJsonDataProcessor()))
@@ -33,13 +32,12 @@ def print_head(file):
             table += "<th>" + key + "<th>"
         table += "</tr>"
 
-
     with open(file) as f:
         i = 0
         while i < 4:
             log = json.loads(f.readline())
             if not log[1]['_identity']:
-                continue;
+                continue
             i = i + 1
             table += "<tr>"
             for key, value in log[1].items():

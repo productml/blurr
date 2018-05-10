@@ -45,7 +45,8 @@ class BaseSchema(ABC):
             try:
                 return Expression(str(expression_string))
             except Exception as err:
-                self.add_errors(InvalidExpressionError(self.fully_qualified_name, self._spec, attribute, err))
+                self.add_errors(
+                    InvalidExpressionError(self.fully_qualified_name, self._spec, attribute, err))
 
         return None
 
@@ -70,9 +71,11 @@ class BaseSchema(ABC):
                                   maximum: Optional[Union[int, float]] = None) -> None:
         """ Validates that the attribute contains a numeric value within boundaries if specified """
         self.add_errors(
-            validate_number_attribute(self.fully_qualified_name, self._spec, attribute, value_type, minimum, maximum))
+            validate_number_attribute(self.fully_qualified_name, self._spec, attribute, value_type,
+                                      minimum, maximum))
 
-    def validate_enum_attribute(self, attribute: str, candidates: Set[Union[str, int, float]]) -> None:
+    def validate_enum_attribute(self, attribute: str,
+                                candidates: Set[Union[str, int, float]]) -> None:
         """ Validates that the attribute value is among the candidates """
         self.add_errors(
             validate_enum_attribute(self.fully_qualified_name, self._spec, attribute, candidates))
@@ -83,7 +86,8 @@ class BaseSchema(ABC):
         self.add_errors(
             validate_empty_attributes(self.fully_qualified_name, self._spec, *self._spec.keys()))
         self.add_errors(
-            validate_python_identifier_attributes(self.fully_qualified_name, self._spec, self.ATTRIBUTE_NAME))
+            validate_python_identifier_attributes(self.fully_qualified_name, self._spec,
+                                                  self.ATTRIBUTE_NAME))
 
     def extend_schema_spec(self) -> None:
         """ Extends the defined schema specifications at runtime with defaults. When this method is being extended,
