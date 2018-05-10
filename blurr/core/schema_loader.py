@@ -62,10 +62,8 @@ class SchemaLoader:
         return self._error_cache[fully_qualified_name]
 
     def raise_errors(self) -> None:
+        """ Raises errors that have been collected in the error cache """
         self._error_cache.raise_errors()
-
-    def get_errors(self, fully_qualified_name: str) -> List[BaseSchemaError]:
-        return self._error_cache[fully_qualified_name]
 
     # Using forward reference to avoid cyclic dependency.
     def get_schema_object(self, fully_qualified_name: str) -> 'BaseSchema':
