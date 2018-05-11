@@ -5,6 +5,7 @@ set -e
 echo "checking requirements..."
 pipenv  --version > /dev/null
 java -version > /dev/null
+wget --version > /dev/null
 
 echo "installing dependencies..."
 pipenv install --dev --ignore-pipfile
