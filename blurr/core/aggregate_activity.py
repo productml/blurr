@@ -41,8 +41,8 @@ class ActivityAggregate(BlockAggregate):
         super().run_evaluate()
 
     def _load_old_state(self):
-        key = Key(self._identity, self._name, datetime.utcnow())
-        most_recent_block = self._store.get_range(key, None, -1)
+        most_recent_block = self._store.get_range(
+            Key(self._identity, self._name, datetime.utcnow()), None, -1)
         if most_recent_block:
             self.run_restore(most_recent_block[0][1])
 
