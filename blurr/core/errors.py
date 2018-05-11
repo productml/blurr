@@ -16,11 +16,24 @@ class BaseSchemaError(Exception, ABC):
     Indicates an error in the schema specification
     """
 
-    def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str, *args,
-                 **kwargs):
+    def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fully_qualified_name = fully_qualified_name
         self.spec = spec
+
+    def __repr__(self):
+        return '{cls}: FQN: {fqn}'.format(
+            cls=self.__class__.__name__, fqn=self.fully_qualified_name)
+
+
+class BaseSchemaAttributeError(BaseSchemaError, ABC):
+    """
+    Indicates an error in the schema specification
+    """
+
+    def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str, *args,
+                 **kwargs):
+        super().__init__(fully_qualified_name, spec, *args, **kwargs)
         self.attribute = attribute
 
     def __repr__(self):
@@ -28,19 +41,21 @@ class BaseSchemaError(Exception, ABC):
             cls=self.__class__.__name__, fqn=self.fully_qualified_name, attribute=self.attribute)
 
 
-class RequiredAttributeError(BaseSchemaError):
+
+
+class RequiredAttributeError(BaseSchemaAttributeError):
     def __str__(self):
         return 'Attribute `{}` must be present under `{}`.'.format(self.attribute,
                                                                    self.fully_qualified_name)
 
 
-class EmptyAttributeError(BaseSchemaError):
+class EmptyAttributeError(BaseSchemaAttributeError):
     def __str__(self):
         return 'Attribute `{}` under `{}` cannot be left empty.'.format(
             self.attribute, self.fully_qualified_name)
 
 
-class InvalidValueError(BaseSchemaError):
+class InvalidValueError(BaseSchemaAttributeError):
     def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
                  candidates: Set[Any], *args, **kwargs):
         super().__init__(fully_qualified_name, spec, attribute, *args, **kwargs)
@@ -53,7 +68,7 @@ class InvalidValueError(BaseSchemaError):
             candidates=' | '.join([str(x) for x in self.candidates]))
 
 
-class InvalidNumberError(BaseSchemaError):
+class InvalidNumberError(BaseSchemaAttributeError):
     def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
                  value_type: Type, minimum: Any, maximum: Any, *args, **kwargs):
         super().__init__(fully_qualified_name, spec, attribute, *args, **kwargs)
@@ -70,7 +85,7 @@ class InvalidNumberError(BaseSchemaError):
             less_than=('Must be lesser than ' + (self.max)) if self.max else '')
 
 
-class InvalidIdentifierError(BaseSchemaError):
+class InvalidIdentifierError(BaseSchemaAttributeError):
     class Reason(Enum):
         STARTS_WITH_UNDERSCORE = 'Identifiers starting with underscore `_` are reserved'
         STARTS_WITH_RUN = 'Identifiers starting with `run_` are reserved'
@@ -89,7 +104,7 @@ class InvalidIdentifierError(BaseSchemaError):
             reason=self.reason.value)
 
 
-class InvalidExpressionError(BaseSchemaError):
+class InvalidExpressionError(BaseSchemaAttributeError):
     """
     Indicates that a python expression specified is either non-compilable, or not allowed
     """
