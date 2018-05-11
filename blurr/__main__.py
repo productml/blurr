@@ -2,6 +2,7 @@
 Usage:
     blurr validate [--debug] [<DTC> ...]
     blurr transform [--debug] [--runner=<runner>] [--streaming-dtc=<dtc-file>] [--window-dtc=<dtc-file>] [--data-processor=<data-processor>] (--source=<raw-json-files> | <raw-json-files>)
+    blurr package-spark [--debug] [--source-dir=<dir>] [--target=<zip-file>]
     blurr -h | --help
 
 Commands:
@@ -17,6 +18,11 @@ Commands:
                     3. Both streaming and window DTC are provided - Transform
                     outputs the final result of applying the streaming and window
                     DTC on the raw data file.
+    package-spark   Generates a submittable Spark app with .zip extension. Requires a
+                    requirements.txt inside --source-dir. The generated package
+                    will contain all the python code inside the provided --source-dir,
+                    along with all the dependencies resolved from requirements.txt.
+
 
 Options:
     -h --help                   Show this screen.
@@ -33,6 +39,8 @@ Options:
                                         Possible values:
                                         simple - One event dictionary per line in the source file(s). <default>
                                         ipfix - Processor for IpFix format.
+    --source-dir=<dir>          A directory containing a Spark app to be packaged. [default: ./]
+    --target=<zip-file>         Filename of the generated Spark app zipfile. [default: spark-app.zip]
 """
 import logging
 import os
