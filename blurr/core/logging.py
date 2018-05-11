@@ -79,3 +79,7 @@ def info(msg, *args, **kwargs):
 
 def warning(msg, *args, **kwargs):
     _get_logger().warning(msg, *args, **kwargs)
+
+
+def is_debug_enabled():
+    _get_logger().isEnabledFor(logging.DEBUG)

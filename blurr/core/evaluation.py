@@ -112,17 +112,10 @@ class Expression:
         :param code_string: Python code statement
         """
 
-        # For non string single value expressions. Ex: 5, False.
-        code_string = str(code_string)
-
-        # For None / empty code strings
-        self.code_string = 'None' if not code_string or code_string.isspace() else code_string
+        self.code_string = str(code_string)
         self.type = expression_type
 
-        try:
-            self.code_object = compile(self.code_string, '<string>', self.type.value)
-        except Exception as e:
-            raise InvalidExpressionError(e)
+        self.code_object = compile(self.code_string, '<string>', self.type.value)
 
     def evaluate(self, evaluation_context: EvaluationContext) -> Any:
         """

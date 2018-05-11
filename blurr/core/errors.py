@@ -118,11 +118,22 @@ class InvalidIdentifierError(InvalidSchemaError):
             reason=self.reason.value)
 
 
-class InvalidExpressionError(Exception):
+class InvalidExpressionError(InvalidSchemaError):
     """
     Indicates that a python expression specified is either non-compilable, or not allowed
     """
-    pass
+
+    def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
+                 error: Exception, *args, **kwargs):
+        super().__init__(fully_qualified_name, spec, attribute, *args, **kwargs)
+        self.error = error
+
+    def __str__(self):
+        return '`{attribute}: {value}` in section `{name}` is invalid Python expression. Compilation error: \n{error}'.format(
+            attribute=self.attribute,
+            value=self.spec.get(self.attribute, '*missing*'),
+            name=self.fully_qualified_name,
+            error=str(self.error))
 
 
 class ExpressionEvaluationError(Exception):

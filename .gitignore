@@ -127,3 +127,6 @@ docs/examples/tutorial/session_data*.log
 
 # scripts temporal Pipfiles
 scripts/Pipfile*
+
+# temp files
+.tmp/
