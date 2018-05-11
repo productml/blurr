@@ -15,6 +15,7 @@ def run_command(stream_dtc_file: Optional[str],
     return cli({
         'transform': True,
         'validate': False,
+        'package-spark': False,
         '--runner': runner,
         '--streaming-dtc': stream_dtc_file,
         '--window-dtc': window_dtc_file,

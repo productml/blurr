@@ -22,7 +22,9 @@ pipenv = "*"
 twine = "*"
 pytest-cov = "*"
 python-coveralls = "*"
-boto3 = "*"
+"boto3" = "*"
+pip = "*"
+
 
 [requires]
 

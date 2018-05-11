@@ -5,7 +5,9 @@ from blurr.cli.cli import cli
 
 def run_command(dtc_files: List[str]) -> int:
     arguments = {
+        'transform': False,
         'validate': True,
+        'package-spark': False,
         '<DTC>': ['tests/core/syntax/dtcs/' + dtc_file for dtc_file in dtc_files]
     }
     return cli(arguments)
