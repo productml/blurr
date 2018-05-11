@@ -16,8 +16,7 @@ class BlockAggregateSchema(AggregateSchema):
         super().__init__(fully_qualified_name, schema_loader)
 
         # Load type specific attributes
-        self.split: Expression = Expression(
-            self._spec[self.ATTRIBUTE_SPLIT]) if self.ATTRIBUTE_SPLIT in self._spec else None
+        self.split: Expression = self.build_expression(self.ATTRIBUTE_SPLIT)
 
     def validate_schema_spec(self) -> None:
         super().validate_schema_spec()
