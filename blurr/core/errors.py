@@ -33,8 +33,7 @@ class SchemaErrorCollection:
         for arg in args:
             self.add(arg)
 
-    def add(self,
-            item: Union[InvalidSchemaError, List[InvalidSchemaError]]):
+    def add(self, item: Union[InvalidSchemaError, List[InvalidSchemaError]]):
         if isinstance(item, InvalidSchemaError):
             self.log[item.fully_qualified_name].append(item)
 

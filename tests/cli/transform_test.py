@@ -26,7 +26,10 @@ def run_command(stream_dtc_file: Optional[str],
 
 
 def assert_record_in_ouput(record: Any, out_text: str) -> None:
-    assert json.dumps(record) in out_text
+    out_list = []
+    for text in out_text.splitlines():
+        out_list.append(json.loads(text))
+    assert record in out_list
 
 
 def test_transform_invalid(capsys) -> None:
@@ -60,27 +63,32 @@ def test_transform_only_stream(capsys, runner) -> None:
         raw_json_files=None,
         runner=runner) == 0
     out, err = capsys.readouterr()
-    assert_record_in_ouput(('userA/session/2018-03-07T22:35:31+00:00', {
-        '_identity': 'userA',
-        '_start_time': '2018-03-07T22:35:31+00:00',
-        '_end_time': '2018-03-07T22:35:31+00:00',
-        'events': 1,
-        'country': 'US',
-        'continent': 'North America'
-    }), out)
-    assert_record_in_ouput(('userA/state', {
-        '_identity': 'userA',
-        'country': 'IN',
-        'continent': 'World'
-    }), out)
-    assert_record_in_ouput(('userA/session/2018-03-07T23:35:31+00:00', {
-        '_identity': 'userA',
-        '_start_time': '2018-03-07T23:35:31+00:00',
-        '_end_time': '2018-03-07T23:35:32+00:00',
-        'events': 2,
-        'country': 'IN',
-        'continent': 'World'
-    }), out)
+    assert_record_in_ouput([
+        'userA/session/2018-03-07T22:35:31+00:00', {
+            '_identity': 'userA',
+            '_start_time': '2018-03-07T22:35:31+00:00',
+            '_end_time': '2018-03-07T22:35:31+00:00',
+            'events': 1,
+            'country': 'US',
+            'continent': 'North America'
+        }
+    ], out)
+    assert_record_in_ouput(
+        ['userA/state', {
+            '_identity': 'userA',
+            'country': 'IN',
+            'continent': 'World'
+        }], out)
+    assert_record_in_ouput([
+        'userA/session/2018-03-07T23:35:31+00:00', {
+            '_identity': 'userA',
+            '_start_time': '2018-03-07T23:35:31+00:00',
+            '_end_time': '2018-03-07T23:35:32+00:00',
+            'events': 2,
+            'country': 'IN',
+            'continent': 'World'
+        }
+    ], out)
     assert err == ''
 
 
@@ -93,12 +101,14 @@ def test_transform_valid_raw_with_source(capsys, runner) -> None:
         raw_json_files=None,
         runner=runner) == 0
     out, err = capsys.readouterr()
-    assert_record_in_ouput(('userA', [{
-        'last_session._identity': 'userA',
-        'last_session.events': 2,
-        'last_day._identity': 'userA',
-        'last_day.total_events': 2
-    }]), out)
+    assert_record_in_ouput([
+        'userA', [{
+            'last_session._identity': 'userA',
+            'last_session.events': 2,
+            'last_day._identity': 'userA',
+            'last_day.total_events': 2
+        }]
+    ], out)
     assert err == ''
 
 
@@ -106,12 +116,14 @@ def test_transform_valid_raw_without_source(capsys) -> None:
     assert run_command('tests/data/stream.yml', 'tests/data/window.yml', None,
                        'tests/data/raw.json,tests/data/raw.json') == 0
     out, err = capsys.readouterr()
-    assert_record_in_ouput(('userA', [{
-        'last_session._identity': 'userA',
-        'last_session.events': 2,
-        'last_day._identity': 'userA',
-        'last_day.total_events': 2
-    }]), out)
+    assert_record_in_ouput([
+        'userA', [{
+            'last_session._identity': 'userA',
+            'last_session.events': 2,
+            'last_day._identity': 'userA',
+            'last_day.total_events': 2
+        }]
+    ], out)
     assert err == ''
 
 

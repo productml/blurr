@@ -12,20 +12,12 @@ from blurr.core.schema_loader import SchemaLoader
 
 @fixture
 def schema_spec():
-    return {
-        'Name': 'TestField',
-        'Type': 'integer',
-        'When': 'True == True'
-    }
+    return {'Name': 'TestField', 'Type': 'integer', 'When': 'True == True'}
 
 
 @fixture
 def invalid_schema_spec():
-    return {
-        'Name': '_TestField',
-        'Type': 'integer',
-        'When': ''
-    }
+    return {'Name': '_TestField', 'Type': 'integer', 'When': ''}
 
 
 class MockSchema(BaseSchema):
