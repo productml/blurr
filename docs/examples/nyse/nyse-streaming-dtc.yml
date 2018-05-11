@@ -1,4 +1,4 @@
-Type: 'Blurr:Transform:Streaming'
+Type: Blurr:Transform:Streaming
 Version: '2018-03-01'
 Description: New York Store Exchange Transformations
 Name: nyse
@@ -11,11 +11,11 @@ Identity: source.symbol
 Time: parse(source.datetime)
 
 Stores:
-  - Type: 'Blurr:Store:Memory'
+  - Type: Blurr:Store:Memory
     Name: memory
 
 Aggregates:
-  - Type: 'Blurr:Aggregate:Block'
+  - Type: Blurr:Aggregate:Block
     Name: stats
     Store: memory
     Split: time.date() != stats.latest_tradetime.date()
