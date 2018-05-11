@@ -31,8 +31,8 @@ class Runner(ABC):
     1. Call `get_per_identity_records()` using an iterator of the events available. This returns
         a generator which creates a Tuple[Identity, TimeAndRecord]] output.
     2. The Tuple[Identity, TimeAndRecord]] output should be grouped together by the
-         Identity to create a List of TimeAndRecord] per identity.
-    3. Using the per identity list of TimeAndRecord] `execute_per_identity_records()`
+         Identity to create a List of TimeAndRecord per identity.
+    3. Using the per identity list of TimeAndRecord `execute_per_identity_records()`
         should be called.
         - This returns Tuple[Identity, Tuple[Streaming DTC State, List of Window DTC output]].
         - `execute_per_identity_records()` can take in a existing old_state (old Streaming DTC
