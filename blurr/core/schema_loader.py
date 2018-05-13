@@ -1,6 +1,6 @@
 from typing import Dict, Any, List, Optional, Union
 
-from blurr.core.errors import GenericSchemaError, BaseSchemaError
+from blurr.core.errors import GenericSchemaError, BaseSchemaError, InvalidTypeError, TypeLoaderError, SpecNotFoundError
 from blurr.core.errors import SchemaErrorCollection
 from blurr.core.loader import TypeLoader
 from blurr.core.type import Type
@@ -43,6 +43,9 @@ class SchemaLoader:
             self._error_cache.add(
                 validate_required_attributes(fully_qualified_name, spec, ATTRIBUTE_NAME,
                                              ATTRIBUTE_TYPE))
+            if ATTRIBUTE_TYPE in spec and not Type.contains(spec[ATTRIBUTE_TYPE]):
+                self._error_cache.add(InvalidTypeError(fully_qualified_name, spec, ATTRIBUTE_TYPE,
+                                                       InvalidTypeError.Reason.TYPE_NOT_DEFINED))
 
         self._spec_cache[fully_qualified_name] = spec
         for key, val in spec.items():
@@ -58,8 +61,9 @@ class SchemaLoader:
         for error in errors:
             self._error_cache.add(error)
 
-    def get_errors(self, fully_qualified_name: str) -> List[BaseSchemaError]:
-        return self._error_cache[fully_qualified_name]
+    def get_errors(self, fully_qualified_name: str, include_nested: bool = True) -> List[BaseSchemaError]:
+        return self._error_cache[fully_qualified_name] + [error for error in self._error_cache.errors if error.fully_qualified_name.startswith(
+            fully_qualified_name + self.ITEM_SEPARATOR)] if include_nested else []
 
     def raise_errors(self) -> None:
         """ Raises errors that have been collected in the error cache """
@@ -75,13 +79,16 @@ class SchemaLoader:
 
         if fully_qualified_name not in self._schema_cache:
             spec = self.get_schema_spec(fully_qualified_name)
-            if ATTRIBUTE_TYPE not in spec:
-                raise GenericSchemaError(
-                    '`Type` not defined in schema `{fqn}`'.format(fqn=fully_qualified_name))
-            self._schema_cache[fully_qualified_name] = TypeLoader.load_schema(spec[ATTRIBUTE_TYPE])(
-                fully_qualified_name, self)
 
-        return self._schema_cache[fully_qualified_name]
+            if spec:
+                try:
+                    self._schema_cache[fully_qualified_name] = TypeLoader.load_schema(spec[ATTRIBUTE_TYPE])(
+                        fully_qualified_name, self)
+                except TypeLoaderError as err:
+                    self.add_errors(InvalidTypeError(fully_qualified_name, spec, ATTRIBUTE_TYPE,
+                                                     InvalidTypeError.Reason.TYPE_NOT_LOADED, err.type_class_name))
+
+        return self._schema_cache.get(fully_qualified_name, None)
 
     def get_store(self, fully_qualified_name: str) -> 'Store':
         """
@@ -137,10 +144,10 @@ class SchemaLoader:
         :return: Schema dictionary.
         """
 
-        try:
-            return self._spec_cache[fully_qualified_name]
-        except:
-            raise GenericSchemaError("{} not declared in schema".format(fully_qualified_name))
+        if fully_qualified_name not in self._spec_cache:
+            self.add_errors(SpecNotFoundError(fully_qualified_name, {}))
+
+        return self._spec_cache.get(fully_qualified_name, None)
 
     def get_schema_specs_of_type(self, *schema_types: Type) -> Dict[str, Dict[str, Any]]:
         """

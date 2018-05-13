@@ -1,7 +1,7 @@
 import importlib
 from typing import Any, Union
 
-from blurr.core.errors import GenericSchemaError
+from blurr.core.errors import TypeLoaderError
 from blurr.core.type import Type
 
 ITEM_MAP = {
@@ -51,6 +51,7 @@ SCHEMA_MAP = {
     Type.SET: 'blurr.core.field_complex.SetFieldSchema'
 }
 
+
 # TODO Build dynamic type loader from a central configuration rather than reading a static dictionary
 
 
@@ -65,11 +66,13 @@ class TypeLoader:
 
     @staticmethod
     def load_type(type_name: Union[str, Type], type_map: dict) -> Any:
+        type_class = None
         try:
             type_name_enum = Type(type_name)
+            type_class = type_map[type_name_enum]
             return TypeLoader.import_class_by_full_name(type_map[type_name_enum])
         except (KeyError, ValueError):
-            raise GenericSchemaError('Type `{}` not found.'.format(type_name))
+            raise TypeLoaderError(str(type_name), type_class)
 
     @staticmethod
     def import_class_by_full_name(name):

@@ -75,7 +75,7 @@ def test_build_expression_adds_error_on_invalid_expression(schema_spec: Dict[str
 def schema_collection_spec():
     return yaml.load('''
         Name: TestAggregate
-        Type: Aggregate
+        Type: Blurr:Aggregate:Identity
         When: True == True
         Fields:
             - Name: TestField

@@ -4,7 +4,7 @@ import pytest
 from pytest import fixture
 
 from blurr.core.aggregate import AggregateSchema
-from blurr.core.errors import RequiredAttributeError, GenericSchemaError
+from blurr.core.errors import RequiredAttributeError, GenericSchemaError, SpecNotFoundError
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.type import Type
 
@@ -44,8 +44,9 @@ def test_aggregate_schema_initialization_with_store(aggregate_schema_spec, store
     aggregate_schema_spec['Store'] = 'memory'
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema_spec(aggregate_schema_spec)
-    with pytest.raises(GenericSchemaError, match="user.memory not declared in schema"):
-        MockAggregateSchema(name, schema_loader)
+
+    MockAggregateSchema(name, schema_loader)
+    assert isinstance(schema_loader.get_errors(name, True)[0], SpecNotFoundError)
 
     schema_loader.add_schema_spec(store_spec, 'user')
     aggregate_schema = MockAggregateSchema(name, schema_loader)
