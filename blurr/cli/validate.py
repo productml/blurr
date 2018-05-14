@@ -22,7 +22,7 @@ def validate_command(dtc_files: List[str]) -> int:
 
 
 def validate_file(dtc_file: str) -> int:
-    print('Running syntax validation on {}'.format(dtc_file))
+    print('Running validation on {}'.format(dtc_file))
     try:
         dtc_dict = yaml.safe_load(open(dtc_file, 'r', encoding='utf-8'))
         if is_streaming_dtc(dtc_dict):
@@ -37,6 +37,7 @@ def validate_file(dtc_file: str) -> int:
         eprint('Invalid yaml')
         eprint(str(err))
         return 1
+    # TODO Keeping for legacy - to be removed in the future
     except BaseSchemaError as err:
         eprint(str(err))
         return 1
