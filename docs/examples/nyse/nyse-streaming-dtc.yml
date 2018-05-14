@@ -4,11 +4,11 @@ Description: New York Store Exchange Transformations
 Name: nyse
 
 Import:
-  - { Module: datetime, Identifiers: [ datetime ] }
+  - { Module: dateutil.parser, Identifiers: [ parse ]}
 
 Identity: source.symbol
 
-Time: datetime.strptime(source.date, '%Y-%m-%d')
+Time: parse(source.datetime)
 
 Stores:
   - Type: Blurr:Store:Memory
@@ -18,17 +18,32 @@ Aggregates:
   - Type: Blurr:Aggregate:Block
     Name: stats
     Store: memory
-    Split: True # a new block is created for each single dataset record
+    Split: str(time.date()) != stats.date
     When: source.symbol in ['AAPL', 'MSFT', 'GOOG', 'FB']
     Fields:
       - Name: close
         Type: float
-        Value: source.close
+        Value: source.price
+
+      - Name: high
+        Type: float
+        Value: source.price
+        When: source.price >= stats.high
+    
+      - Name: low
+        Type: float
+        Value: source.price
+        When: (stats.low == 0 or source.price < stats.low)
 
       - Name: volatility
         Type: float
-        Value: (float(source.high) / float(source.low)) - 1
+        Value: (float(stats.high) / float(stats.low)) - 1
+        When: stats.low > 0
 
       - Name: volume
         Type: float
-        Value: source.volume
+        Value: stats.volume + source.volume
+
+      - Name: date
+        Type: string
+        Value: str(time.date())
