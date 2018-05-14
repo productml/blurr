@@ -14,7 +14,7 @@ def run_command(dtc_files: List[str]) -> int:
 
 
 def get_running_validation_str(file_name: str) -> str:
-    return 'Running syntax validation on tests/core/syntax/dtcs/' + file_name
+    return 'Running validation on tests/core/syntax/dtcs/' + file_name
 
 
 def test_valid_dtc(capsys):
