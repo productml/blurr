@@ -55,12 +55,12 @@ def test_initialization_with_valid_source(schema_loader_with_mem_store: SchemaLo
 
 
 def test_initialization_with_invalid_source(schema_loader_with_mem_store: SchemaLoader,
-                                            window_schema_spec: Dict[str, Any],
-                                            stream_dtc_name: str):
+                                            window_schema_spec: Dict[str, Any]):
     name = schema_loader_with_mem_store.add_schema_spec(window_schema_spec)
 
-    with raises(GenericSchemaError, match=stream_dtc_name + '.session not declared in schema'):
-        WindowAggregateSchema(name, schema_loader_with_mem_store)
+    schema = WindowAggregateSchema(name, schema_loader_with_mem_store)
+    assert len(schema.errors) == 0
+    assert len(schema_loader_with_mem_store.get_errors()) == 1
 
 
 def test_window_aggregate_schema_missing_attributes_adds_error(

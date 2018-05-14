@@ -61,7 +61,10 @@ class SchemaLoader:
         for error in errors:
             self._error_cache.add(error)
 
-    def get_errors(self, fully_qualified_name: str, include_nested: bool = True) -> List[BaseSchemaError]:
+    def get_errors(self, fully_qualified_name: str = None, include_nested: bool = True) -> List[BaseSchemaError]:
+        if not fully_qualified_name:
+            return self._error_cache.errors
+
         return self._error_cache[fully_qualified_name] + [error for error in self._error_cache.errors if error.fully_qualified_name.startswith(
             fully_qualified_name + self.ITEM_SEPARATOR)] if include_nested else []
 
