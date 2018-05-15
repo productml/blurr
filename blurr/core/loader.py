@@ -1,5 +1,5 @@
 import importlib
-from typing import Any, Union
+from typing import Any, Union, Dict, Optional
 
 from blurr.core.errors import GenericSchemaError
 from blurr.core.type import Type
@@ -53,6 +53,7 @@ SCHEMA_MAP = {
 
 # TODO Build dynamic type loader from a central configuration rather than reading a static dictionary
 
+_class_cache: Dict[str, Type] = {}
 
 class TypeLoader:
     @staticmethod
@@ -72,10 +73,9 @@ class TypeLoader:
             raise GenericSchemaError('Type `{}` not found.'.format(type_name))
 
     @staticmethod
-    def import_class_by_full_name(name):
-        components = name.rsplit('.', 1)
-        mod = importlib.import_module(components[0])
-        if len(components) == 1:
-            return mod
-        loaded_class = getattr(mod, components[1])
-        return loaded_class
+    def import_class_by_full_name(name) -> Optional[Type]:
+        if name not in _class_cache:
+            components = name.rsplit('.', 1)
+            mod = importlib.import_module(components[0])
+            _class_cache[name] = mod if len(components) == 1 else getattr(mod, components[1])
+        return _class_cache.get(name, None)
