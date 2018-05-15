@@ -66,7 +66,7 @@ def validate_number_attribute(
 
     try:
         value = value_type(spec[attribute])
-        if (minimum and value < minimum) or (maximum and value > maximum):
+        if (minimum is not None and value < minimum) or (maximum is not None and value > maximum):
             raise None
     except:
         return InvalidNumberError(fully_qualified_name, spec, attribute, value_type, minimum,
