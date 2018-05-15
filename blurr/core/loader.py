@@ -51,7 +51,6 @@ SCHEMA_MAP = {
     Type.SET: 'blurr.core.field_complex.SetFieldSchema'
 }
 
-
 # TODO Build dynamic type loader from a central configuration rather than reading a static dictionary
 
 
