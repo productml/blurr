@@ -29,7 +29,7 @@ class BaseSchemaError(Exception, ABC):
     @abstractmethod
     def key(self) -> Tuple:
         """ Returns a tuple that uniquely identifies the object by its values """
-        return tuple(self.fully_qualified_name)
+        return (self.fully_qualified_name,)
 
     def __hash__(self):
         return hash(self.key)
