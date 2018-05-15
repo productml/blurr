@@ -4,7 +4,7 @@ import yaml
 from pytest import raises, fixture
 
 from blurr.core.errors import RequiredAttributeError, InvalidIdentifierError, EmptyAttributeError, InvalidValueError
-from blurr.core.validator import validate_required_attributes, \
+from blurr.core.validator import validate_required_attributes, validate_number_attribute, \
     validate_python_identifier_attributes, ATTRIBUTE_INTERNAL, validate_empty_attributes, validate_enum_attribute
 
 
@@ -73,7 +73,7 @@ def test_validate_python_identifier_attributes_with_error_conditions(invalid_spe
     with raises(
             InvalidIdentifierError,
             match='`Identity1: _illegal_identity` in section `test` is invalid. '
-            'Identifiers starting with underscore `_` are reserved.',
+                  'Identifiers starting with underscore `_` are reserved.',
             message='Message does not correctly reflect the reason'):
         raise error
 
@@ -83,7 +83,7 @@ def test_validate_python_identifier_attributes_with_error_conditions(invalid_spe
     with raises(
             InvalidIdentifierError,
             match='`Identity2: some space` in section `test` is invalid. '
-            'Identifiers must be valid Python identifiers.',
+                  'Identifiers must be valid Python identifiers.',
             message='Message does not correctly reflect the reason'):
         raise error
 
@@ -93,7 +93,7 @@ def test_validate_python_identifier_attributes_with_error_conditions(invalid_spe
     with raises(
             InvalidIdentifierError,
             match='`Identity3: run_reserved` in section `test` is invalid. '
-            'Identifiers starting with `run_` are reserved.',
+                  'Identifiers starting with `run_` are reserved.',
             message='Message does not correctly reflect the reason'):
         raise error
 
@@ -125,3 +125,11 @@ def test_validate_enum_attribute(invalid_spec):
             'Attribute `Identity3` under `test` must have one of the following values: candidate1 | candidate2 | candidate3',
             message='Error message did not match expected pattern'):
         raise error
+
+
+def test_validate_number_attribute():
+    assert validate_number_attribute('test', {'number': -3}, 'number', int, 0, 3)
+    assert validate_number_attribute('test', {'number': -3}, 'number', int, -3, -3) is None
+    assert validate_number_attribute('test', {'number': 3}, 'number', int, 0) is None
+    assert validate_number_attribute('test', {'number': 3}, 'number', int, None, 0)
+    assert validate_number_attribute('test', {'number': 3}, 'number', int, None, 5) is None
