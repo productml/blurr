@@ -1,14 +1,14 @@
 from typing import Dict
 
-from pytest import fixture, raises
+from pytest import fixture
 
-from blurr.core.errors import GenericSchemaError, InvalidTypeError, RequiredAttributeError, SpecNotFoundError
+from blurr.core.errors import InvalidTypeError, RequiredAttributeError, SpecNotFoundError
 from blurr.core.field_simple import IntegerFieldSchema
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.transformer_streaming import StreamingTransformerSchema
 from blurr.core.type import Type
-from blurr.store.memory_store import MemoryStore
 from blurr.core.validator import ATTRIBUTE_TYPE
+from blurr.store.memory_store import MemoryStore
 
 
 @fixture

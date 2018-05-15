@@ -1,6 +1,6 @@
 from typing import Dict, Any, List, Optional, Union
 
-from blurr.core.errors import GenericSchemaError, BaseSchemaError, InvalidTypeError, TypeLoaderError, SpecNotFoundError
+from blurr.core.errors import BaseSchemaError, InvalidTypeError, TypeLoaderError, SpecNotFoundError
 from blurr.core.errors import SchemaErrorCollection
 from blurr.core.loader import TypeLoader
 from blurr.core.type import Type
