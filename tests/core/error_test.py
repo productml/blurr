@@ -72,10 +72,9 @@ def test_schema_error_collection_formatter(errors):
     formatter = SchemaErrorCollectionFormatter(line_separator='\n')
 
     err = formatter.format(collection)
-    assert err == '''
+    assert err.startswith('''
 fqn
-===
---> Attribute `missing` must be present under `fqn`.
---> Attribute `empty` under `fqn` cannot be left empty.
---> `identity: _some thing` in section `fqn` is invalid. Identifiers starting with underscore `_` are reserved.
-'''
+===''')
+    assert '--> Attribute `missing` must be present under `fqn`.\n' in err
+    assert '--> Attribute `empty` under `fqn` cannot be left empty.\n' in err
+    assert '--> `identity: _some thing` in section `fqn` is invalid. Identifiers starting with underscore `_` are reserved.' in err
