@@ -46,8 +46,7 @@ def test_with_no_attribute_when(schema_spec: Dict[str, Any]):
     assert test_schema.when is None
 
 
-def test_validate_schema_spec_missing_type_and_empty_when(
-        invalid_schema_spec: Dict[str, Any]):
+def test_validate_schema_spec_missing_type_and_empty_when(invalid_schema_spec: Dict[str, Any]):
     schema = get_test_schema(invalid_schema_spec)
 
     assert len(schema.errors) == 2
@@ -66,7 +65,9 @@ def test_build_expression_adds_error_on_invalid_expression(schema_spec: Dict[str
     assert isinstance(schema.errors[0], InvalidExpressionError)
     assert schema.errors[0].attribute == BaseSchema.ATTRIBUTE_WHEN
 
-    with raises(InvalidExpressionError, match='`When: a;b` in section `TestField` is invalid Python expression.'):
+    with raises(
+            InvalidExpressionError,
+            match='`When: a;b` in section `TestField` is invalid Python expression.'):
         raise schema.errors[0]
 
 
@@ -106,7 +107,7 @@ def test_schema_collection_missing_nested_attribute_adds_error(
 
 
 def test_schema_collection_empty_nested_attribute_adds_error(
-    schema_collection_spec: Dict[str, Any]):
+        schema_collection_spec: Dict[str, Any]):
     del schema_collection_spec['Fields'][0]
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema_spec(schema_collection_spec)

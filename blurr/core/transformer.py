@@ -1,6 +1,6 @@
 from abc import ABC
 from copy import copy
-from typing import Dict, Type
+from typing import Dict
 
 from blurr.core.aggregate import Aggregate
 from blurr.core.base import BaseItemCollection, BaseSchemaCollection
@@ -8,7 +8,6 @@ from blurr.core.errors import MissingAttributeError
 from blurr.core.loader import TypeLoader
 from blurr.core.schema_context import SchemaContext
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.store import Store
 
 
 class TransformerSchema(BaseSchemaCollection, ABC):
@@ -32,6 +31,7 @@ class TransformerSchema(BaseSchemaCollection, ABC):
     def validate_schema_spec(self) -> None:
         super().validate_schema_spec()
         self.validate_required_attributes(self.ATTRIBUTE_VERSION)
+        self.validate_enum_attribute(self.ATTRIBUTE_VERSION, {'2018-03-01'})
 
 
 class Transformer(BaseItemCollection, ABC):

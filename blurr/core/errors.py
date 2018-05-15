@@ -1,16 +1,17 @@
 from abc import ABC
 from collections import defaultdict
 from enum import Enum
+from io import StringIO
 from itertools import chain
 from os import linesep
-from typing import List, Dict, Any, Union, Type
+from typing import List, Dict, Any, Union, Type, Set
 
 
 class GenericSchemaError(Exception):
     pass
 
 
-class InvalidSchemaError(Exception, ABC):
+class BaseSchemaError(Exception, ABC):
     """
     Indicates an error in the schema specification
     """
@@ -27,62 +28,32 @@ class InvalidSchemaError(Exception, ABC):
             cls=self.__class__.__name__, fqn=self.fully_qualified_name, attribute=self.attribute)
 
 
-class SchemaErrorCollection:
-    def __init__(self, *args):
-        self.log: Dict[str, List(InvalidSchemaError)] = defaultdict(list)
-        for arg in args:
-            self.add(arg)
-
-    def add(self, item: Union[InvalidSchemaError, List[InvalidSchemaError]]):
-        if isinstance(item, InvalidSchemaError):
-            self.log[item.fully_qualified_name].append(item)
-
-        elif isinstance(item, list):
-            for i in item:
-                self.add(i)
-
-        elif isinstance(item, type(self)):
-            self.merge(item)
-
-    def merge(self, item: 'SchemaErrorCollection'):
-        if not item:
-            return
-
-        for k, v in item.log.items():
-            self.log[k].extend(v)
-
-    def __str__(self):
-        return linesep.join(
-            [str(error) for error in self.log.values()]) if len(self.log) > 0 else ''
-
-    def __getitem__(self, item):
-        return self.log.get(item, None)
-
-    def __contains__(self, item):
-        return self.log.__contains__(item)
-
-    @property
-    def errors(self) -> List[InvalidSchemaError]:
-        return list(chain.from_iterable(self.log.values()))
-
-    @property
-    def has_errors(self) -> bool:
-        return len(self.log) > 0
-
-
-class RequiredAttributeError(InvalidSchemaError):
+class RequiredAttributeError(BaseSchemaError):
     def __str__(self):
         return 'Attribute `{}` must be present under `{}`.'.format(self.attribute,
                                                                    self.fully_qualified_name)
 
 
-class EmptyAttributeError(InvalidSchemaError):
+class EmptyAttributeError(BaseSchemaError):
     def __str__(self):
         return 'Attribute `{}` under `{}` cannot be left empty.'.format(
             self.attribute, self.fully_qualified_name)
 
 
-class InvalidNumberError(InvalidSchemaError):
+class InvalidValueError(BaseSchemaError):
+    def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
+                 candidates: Set[Any], *args, **kwargs):
+        super().__init__(fully_qualified_name, spec, attribute, *args, **kwargs)
+        self.candidates = candidates
+
+    def __str__(self):
+        return 'Attribute `{attr}` under `{fqn}` must have one of the following values: {candidates}'.format(
+            attr=self.attribute,
+            fqn=self.fully_qualified_name,
+            candidates=' | '.join([str(x) for x in self.candidates]))
+
+
+class InvalidNumberError(BaseSchemaError):
     def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
                  value_type: Type, minimum: Any, maximum: Any, *args, **kwargs):
         super().__init__(fully_qualified_name, spec, attribute, *args, **kwargs)
@@ -99,7 +70,7 @@ class InvalidNumberError(InvalidSchemaError):
             less_than=('Must be lesser than ' + (self.max)) if self.max else '')
 
 
-class InvalidIdentifierError(InvalidSchemaError):
+class InvalidIdentifierError(BaseSchemaError):
     class Reason(Enum):
         STARTS_WITH_UNDERSCORE = 'Identifiers starting with underscore `_` are reserved'
         STARTS_WITH_RUN = 'Identifiers starting with `run_` are reserved'
@@ -118,7 +89,7 @@ class InvalidIdentifierError(InvalidSchemaError):
             reason=self.reason.value)
 
 
-class InvalidExpressionError(InvalidSchemaError):
+class InvalidExpressionError(BaseSchemaError):
     """
     Indicates that a python expression specified is either non-compilable, or not allowed
     """
@@ -134,6 +105,85 @@ class InvalidExpressionError(InvalidSchemaError):
             value=self.spec.get(self.attribute, '*missing*'),
             name=self.fully_qualified_name,
             error=str(self.error))
+
+
+class SchemaErrorCollection:
+    def __init__(self, *args):
+        self.log: Dict[str, List(BaseSchemaError)] = defaultdict(list)
+        for arg in args:
+            self.add(arg)
+
+    def add(self, item: Union[BaseSchemaError, List[BaseSchemaError]]):
+        if isinstance(item, BaseSchemaError):
+            self.log[item.fully_qualified_name].append(item)
+
+        elif isinstance(item, list):
+            for i in item:
+                self.add(i)
+
+    def merge(self, item: 'SchemaErrorCollection'):
+        if not item:
+            return
+
+        for k, v in item.log.items():
+            self.log[k].extend(v)
+
+    def __str__(self):
+        return linesep.join(
+            [str(error) for error in self.log.values()]) if len(self.log) > 0 else ''
+
+    def __getitem__(self, item):
+        return self.log.get(item, None)
+
+    def __contains__(self, item):
+        return self.log.__contains__(item)
+
+    def __iter__(self):
+        return iter(self.log.items())
+
+    @property
+    def errors(self) -> List[BaseSchemaError]:
+        return list(chain.from_iterable(self.log.values()))
+
+    @property
+    def has_errors(self) -> bool:
+        return len(self.log) > 0
+
+    def raise_errors(self):
+        if self.has_errors:
+            raise SchemaError(self)
+
+
+class SchemaErrorCollectionFormatter:
+    def __init__(self, **kwargs):
+        self.header_separator = kwargs.get('header_separator', '=')
+        self.error_separator = kwargs.get('item_separator', '-')
+        self.line_separator = kwargs.get('line_separator', linesep)
+
+    def format(self, errors: SchemaErrorCollection) -> Any:
+        with StringIO() as result:
+            for fqn, errs in errors:
+                result.writelines([
+                    self.line_separator, fqn, self.line_separator, self.header_separator * len(fqn),
+                    self.line_separator
+                ])
+                for err in errs:
+                    result.writelines(['--> ', str(err), self.line_separator])
+
+            return result.getvalue()
+
+
+class SchemaError(Exception):
+    def __init__(self, errors: SchemaErrorCollection, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.errors = errors
+        self.formatter = SchemaErrorCollectionFormatter()
+
+    def __str__(self):
+        return self.formatter.format(self.errors)
+
+    def __repr__(self):
+        return self.__class__.__name__ + linesep + str(self)
 
 
 class ExpressionEvaluationError(Exception):
