@@ -1,6 +1,7 @@
-from pytest import fixture
+from pytest import fixture, raises
 
-from blurr.core.errors import SchemaErrorCollection, RequiredAttributeError, EmptyAttributeError, InvalidIdentifierError
+from blurr.core.errors import SchemaErrorCollection, RequiredAttributeError, EmptyAttributeError, \
+    InvalidIdentifierError, SchemaError, SchemaErrorCollectionFormatter
 
 fully_qualified_name = 'fqn'
 
@@ -10,8 +11,8 @@ def spec():
     return {'empty': '', 'identity': '_some thing'}
 
 
-@fixture(scope='session')
-def errors():
+@fixture
+def errors(spec):
     return [
         RequiredAttributeError(fully_qualified_name, spec, 'missing'),
         EmptyAttributeError(fully_qualified_name, spec, 'empty'),
@@ -48,10 +49,33 @@ def test_schema_error_collection_merge(spec, errors):
 
     assert len(collection.errors) == 1
 
-    collection.add(collection2)
+    collection.add(collection2.errors)
 
     assert len(collection[fully_qualified_name]) == 4
     assert error in collection[fully_qualified_name]
     assert errors[0] in collection[fully_qualified_name]
     assert errors[1] in collection[fully_qualified_name]
     assert errors[2] in collection[fully_qualified_name]
+
+
+def test_schema_error_collection_raise(errors):
+    collection = SchemaErrorCollection(errors)
+
+    with raises(SchemaError) as err:
+        collection.raise_errors()
+
+    assert err.value.errors == collection
+
+
+def test_schema_error_collection_formatter(errors):
+    collection = SchemaErrorCollection(errors)
+    formatter = SchemaErrorCollectionFormatter(line_separator='\n')
+
+    err = formatter.format(collection)
+    assert err == '''
+fqn
+===
+--> Attribute `missing` must be present under `fqn`.
+--> Attribute `empty` under `fqn` cannot be left empty.
+--> `identity: _some thing` in section `fqn` is invalid. Identifiers starting with underscore `_` are reserved.
+'''

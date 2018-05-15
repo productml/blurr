@@ -1,7 +1,7 @@
-from typing import Dict, Any, Type, Optional, Union, List, Tuple, Callable
+from typing import Dict, Any, Type, Optional, Union, List, Tuple, Callable, Set
 
 from blurr.core.errors import InvalidIdentifierError, RequiredAttributeError, EmptyAttributeError, \
-    InvalidNumberError
+    InvalidNumberError, InvalidValueError
 
 ATTRIBUTE_NAME = 'Name'
 ATTRIBUTE_TYPE = 'Type'
@@ -59,13 +59,26 @@ def validate_number_attribute(
         value_type: Union[Type[int], Type[float]] = int,
         minimum: Optional[Union[int, float]] = None,
         maximum: Optional[Union[int, float]] = None) -> Optional[InvalidNumberError]:
+    """ Validates to ensure that the value is a number of the specified type, and lies with the specified range """
+
     if attribute not in spec:
         return
 
     try:
         value = value_type(spec[attribute])
-        if (minimum and value < minimum) or (maximum and value > maximum):
+        if (minimum is not None and value < minimum) or (maximum is not None and value > maximum):
             raise None
     except:
         return InvalidNumberError(fully_qualified_name, spec, attribute, value_type, minimum,
                                   maximum)
+
+
+def validate_enum_attribute(fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
+                            candidates: Set[Union[str, int, float]]) -> Optional[InvalidValueError]:
+    """ Validates to ensure that the value of an attribute lies within an allowed set of candidates """
+
+    if attribute not in spec:
+        return
+
+    if spec[attribute] not in candidates:
+        return InvalidValueError(fully_qualified_name, spec, attribute, candidates)

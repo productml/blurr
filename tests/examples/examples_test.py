@@ -1,10 +1,11 @@
 import pytest
-import json
-from typing import Any
 
-from blurr.cli.validate import validate_file
 from blurr.cli.cli import cli
+from blurr.cli.validate import validate_file
 
+
+# TODO Window DTC validation requires the streaming DTC to be in context
+# Rethink validation in parameterized form
 
 @pytest.mark.parametrize('input_dtc', [
     'docs/examples/frequently-bought-together/fbt-streaming-dtc.yml',
@@ -17,6 +18,7 @@ from blurr.cli.cli import cli
 ])
 def test_example_dtc_valid(input_dtc):
     assert validate_file(input_dtc) == 0
+
 
 
 def get_file_text(file_path) -> str:
