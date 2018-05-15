@@ -106,24 +106,36 @@ class InvalidTypeError(BaseSchemaAttributeError):
     class Reason(Enum):
         TYPE_NOT_DEFINED = 'Type `{type_name}` is not declared in the system configuration.'
         TYPE_NOT_LOADED = 'Class `{type_class_name}` could not be loaded.'
-        INCORRECT_BASE = 'Object does not inherit from the expected base class {expected_base_class}.'
+        INCORRECT_BASE = 'Object does not inherit from the expected base class {expected_base_type}.'
 
-    def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
-                 reason: 'InvalidTypeError.Reason', type_class_name: str = None,
-                 expected_base_class: Type = None, *args, **kwargs):
+    class BaseTypes:
+        SCHEMA = 'BaseSchema'
+        ITEM = 'BaseItem'
+        STORE = 'Store'
+
+    def __init__(self,
+                 fully_qualified_name: str,
+                 spec: Dict[str, Any],
+                 attribute: str,
+                 reason: 'InvalidTypeError.Reason',
+                 type_class_name: str = None,
+                 expected_base_type: BaseTypes = None,
+                 *args,
+                 **kwargs):
         super().__init__(fully_qualified_name, spec, attribute, *args, **kwargs)
         self.reason = reason
         self.type_class_name = type_class_name
-        self.expected_base_class = expected_base_class
+        self.expected_base_type = expected_base_type
 
     def __str__(self):
         return '`{attribute}: {value}` in section `{name}` is invalid. {reason}.'.format(
             attribute=self.attribute,
             value=self.spec.get(self.attribute, '*missing*'),
             name=self.fully_qualified_name,
-            reason=self.reason.value.format(type_name=self.spec.get(self.attribute, '*missing*'),
-                                            expected_base_class=self.expected_base_class.__name__,
-                                            type_class_name=self.type_class_name))
+            reason=self.reason.value.format(
+                type_name=self.spec.get(self.attribute, '*missing*'),
+                expected_base_type=self.expected_base_type.value,
+                type_class_name=self.type_class_name))
 
 
 class InvalidExpressionError(BaseSchemaAttributeError):
@@ -226,6 +238,7 @@ class SchemaError(Exception):
 class SpecNotFoundError(BaseSchemaError):
     pass
 
+
 class ExpressionEvaluationError(Exception):
     """
     Error raised during expression evaluation by the interpreter
@@ -245,9 +258,7 @@ class TypeLoaderError(Exception):
 
     def __str__(self):
         return 'Failed to load class `{type_class_name}` of type `{type_name}`.'.format(
-            type_class_name=self.type_class_name,
-            type_name=self.type_name
-        )
+            type_class_name=self.type_class_name, type_name=self.type_name)
 
 
 class SnapshotError(Exception):
