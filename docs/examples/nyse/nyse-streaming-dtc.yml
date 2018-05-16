@@ -4,11 +4,11 @@ Description: New York Store Exchange Transformations
 Name: nyse
 
 Import:
-  - { Module: dateutil.parser, Identifiers: [ parse ]}
+  - { Module: datetime, Identifiers: [ datetime ]}
 
 Identity: source.symbol
 
-Time: parse(source.datetime)
+Time: datetime.strptime(source.datetime, '%Y-%m-%d %H:%M:%S')
 
 Stores:
   - Type: Blurr:Store:Memory
