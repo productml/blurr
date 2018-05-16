@@ -3,7 +3,7 @@ from enum import Enum
 from typing import Any, Dict
 
 from blurr.core import logging
-from blurr.core.errors import InvalidExpressionError, MissingAttributeError
+from blurr.core.errors import MissingAttributeError
 from blurr.core.record import Record
 
 

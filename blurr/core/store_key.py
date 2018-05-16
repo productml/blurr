@@ -40,6 +40,9 @@ class Key:
 
         return Key.PARTITION.join([self.identity, self.group])
 
+    def __repr__(self):
+        return self.__str__()
+
     def __eq__(self, other: 'Key') -> bool:
         return other and (self.identity, self.group,
                           self.timestamp) == (other.identity, other.group, other.timestamp)

@@ -46,7 +46,7 @@ class IdentityAggregate(Aggregate):
             name: TypeLoader.load_item(item_schema.type)(item_schema, self._evaluation_context)
             for name, item_schema in self._schema.dimension_fields.items()
         })
-        self._key = None
+        self._existing_key = None
 
     def run_evaluate(self) -> None:
         if not self._needs_evaluation:
@@ -55,16 +55,19 @@ class IdentityAggregate(Aggregate):
         if not self._evaluate_dimension_fields():
             return
 
-        if self._key and not self._compare_dimensions_to_fields():
+        # First time being run. Load state from store.
+        if not self._existing_key:
+            self._init_state_from_new_key()
+
+        if self._existing_key and not self._compare_dimensions_to_fields():
             self._persist()
-            self._init_state_from_key()
+            self._init_state_from_new_key()
 
         super().run_evaluate()
-        self._key = self._prepare_key()
+        self._existing_key = self._prepare_key()
 
-    def _init_state_from_key(self):
-        self._key = self._prepare_key()
-        snapshot = self._store.get(self._key)
+    def _init_state_from_new_key(self):
+        snapshot = self._store.get(self._prepare_key())
         if snapshot:
             self.run_restore(snapshot)
         else:
@@ -98,4 +101,4 @@ class IdentityAggregate(Aggregate):
 
     def _persist(self, timestamp=None) -> None:
         # TODO Refactor keys when refactoring store
-        self._store.save(self._key, self._snapshot)
+        self._store.save(self._existing_key, self._snapshot)

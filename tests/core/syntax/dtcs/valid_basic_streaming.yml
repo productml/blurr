@@ -15,14 +15,16 @@ Stores:
 Aggregates:
  - Type: Blurr:Aggregate:Identity
    Name: user
-   Store: offer_ai_dynamo
+   Store: memory_store
    Dimensions:
      - Name: level
+       Type: string
        Value: source.level
    Fields:
      - Name: user_id
+       Type: string
        Value: source.customer_identifier
-       Atomic: true
      - Name: country
+       Type: string
        Value: source.country
        When: last_session == None

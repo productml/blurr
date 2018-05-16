@@ -6,7 +6,7 @@ from blurr.core.errors import MissingAttributeError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.loader import TypeLoader
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.store import StoreSchema
+from blurr.core.store import StoreSchema, Store
 from blurr.core.store_key import Key
 from blurr.core.type import Type as DTCType
 from blurr.core.validator import ATTRIBUTE_INTERNAL
@@ -71,7 +71,7 @@ class Aggregate(BaseItemCollection, ABC):
             name: TypeLoader.load_item(item_schema.type)(item_schema, self._evaluation_context)
             for name, item_schema in self._schema.nested_schema.items()
         }
-        self._store = None
+        self._store: Store = None
         if self._schema.store_schema:
             self._store = self._schema.schema_loader.get_store(
                 self._schema.store_schema.fully_qualified_name)
