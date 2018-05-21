@@ -4,7 +4,7 @@
 [![Documentation Status](https://readthedocs.org/projects/productml-blurr/badge/?version=latest)](http://productml-blurr.readthedocs.io/en/latest/?badge=latest)
 [![Coverage Status](https://coveralls.io/repos/github/productml/blurr/badge.svg?branch=master)](https://coveralls.io/github/productml/blurr?branch=master)
 [![PyPI version](https://badge.fury.io/py/blurr.svg)](https://badge.fury.io/py/blurr)
-[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/productml/blurr/master?filepath=docs%2Fexamples%2Fnyse)
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/productml/blurr-examples/master)
 
 # Table of contents
 
@@ -62,7 +62,7 @@ Preparing data for specific use cases using Blurr:
 
 * [Dynamic in-game offers (Offer AI)](docs/examples/offer-ai/offer-ai-walkthrough.md) 
 * [Frequently Bought Together](docs/examples/frequently-bought-together/fbt-walkthrough.md)
-* [New York Stock Exchange Prediction](https://mybinder.org/v2/gh/productml/blurr/master?filepath=docs%2Fexamples%2Fnyse)
+* [New York Stock Exchange Prediction](https://mybinder.org/v2/gh/productml/blurr-examples/master?filepath=nyse%2Fnyse.ipynb)
 
 # Try Blurr
 
