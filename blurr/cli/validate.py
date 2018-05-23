@@ -5,7 +5,7 @@ import yaml
 
 from blurr.cli.util import get_yml_files, eprint
 from blurr.core import logging
-from blurr.core.errors import SchemaError
+from blurr.core.errors import SchemaError, InvalidSpecError
 from blurr.core.schema_loader import SchemaLoader
 
 
@@ -44,6 +44,8 @@ def validate_file(dtc_file: str) -> int:
 def validate(spec: Dict[str, Any]) -> None:
     schema_loader = SchemaLoader()
     dtc_name = schema_loader.add_schema_spec(spec)
+    if not dtc_name:
+        raise InvalidSpecError(spec)
     schema_loader.raise_errors()
     schema_loader.get_schema_object(dtc_name)
     print(schema_loader.get_errors())

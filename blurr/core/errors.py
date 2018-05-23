@@ -232,7 +232,7 @@ class SchemaErrorCollection:
 
     @property
     def has_errors(self) -> bool:
-        return len(self.log) > 0
+        return len(self.errors) > 0
 
     def raise_errors(self):
         if self.has_errors:
@@ -276,6 +276,22 @@ class SpecNotFoundError(BaseSchemaError):
     @property
     def key(self):
         return super().key
+
+
+class InvalidSpecError(BaseSchemaError):
+
+    def __init__(self, spec: Dict[str, Any], *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fully_qualified_name = '**InvalidSpec**'
+        self.spec = spec
+
+    @property
+    def key(self):
+        return super().key
+
+    def __str__(self):
+        return 'The following spec is invalid: \n{spec}'.format(
+            spec=self.spec)
 
 
 class ExpressionEvaluationError(Exception):
