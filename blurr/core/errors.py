@@ -88,7 +88,7 @@ class InvalidValueError(BaseSchemaAttributeError):
 
 class InvalidNumberError(BaseSchemaAttributeError):
     def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
-                 value_type: Type, minimum: Any, maximum: Any, *args, **kwargs):
+                 value_type: Type, minimum: Any = None, maximum: Any = None, *args, **kwargs):
         super().__init__(fully_qualified_name, spec, attribute, *args, **kwargs)
         self.type = value_type
         self.min = minimum
@@ -186,10 +186,6 @@ class InvalidExpressionError(BaseSchemaAttributeError):
             value=self.spec.get(self.attribute, '*missing*'),
             name=self.fully_qualified_name,
             error=str(self.error))
-
-    @property
-    def key(self):
-        return super().key + (str(self.error),)
 
 
 class SchemaErrorCollection:

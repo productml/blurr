@@ -24,6 +24,7 @@ class AnchorSchema(BaseSchema):
 
     def validate_schema_spec(self) -> None:
         self.validate_required_attributes(self.ATTRIBUTE_CONDITION, self.ATTRIBUTE_MAX)
+        self.validate_number_attribute(self.ATTRIBUTE_MAX, int, 1)
 
 
 class Anchor:
