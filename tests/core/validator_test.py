@@ -113,7 +113,7 @@ def test_validate_empty_attributes():
             message='Error message did not match expected pattern'):
         raise errors[0]
 
-
+ 
 def test_validate_enum_attribute(invalid_spec):
     error = validate_enum_attribute('test', invalid_spec, 'Identity3',
                                     {'candidate1', 'candidate2', 'candidate3'})

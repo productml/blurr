@@ -44,8 +44,16 @@ class Type(Enum):
     def is_store_type(store_type: Union[str, 'Type']) -> bool:
         return Type.is_type_in(store_type, [Type.BLURR_STORE_MEMORY, Type.BLURR_STORE_DYNAMO])
 
+    @staticmethod
+    def contains(value: Union[str, 'Type']) -> bool:
+        """ Checks if a type is defined """
+        if isinstance(value, str):
+            return any(value.lower() == i.value for i in Type)
+
+        return any(value == i for i in Type)
+
 
 # Override __new__ to handle intialization by value of any case.
 Type.__new__ = lambda cls, value: (super(Type, cls).__new__(cls, value.lower())
-                                    if isinstance(value, str) else
-                                    super(Type, cls).__new__(cls, value))
+                                   if isinstance(value, str) else
+                                   super(Type, cls).__new__(cls, value))
