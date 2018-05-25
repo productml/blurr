@@ -35,15 +35,14 @@ def assert_record_in_ouput(record: Any, out_text: str) -> None:
 def test_transform_invalid(capsys) -> None:
     assert run_command(None, None, None, None) == 1
     out, err = capsys.readouterr()
-    assert ('Streaming BTS file not provided and could not be found in '
-            'the current directory.') in err
+    assert ('Streaming BTS not provided and could not be found in the current directory.') in err
 
 
 def test_transform_only_window(capsys) -> None:
     assert run_command(None, 'tests/data/window.yml', None, None) == 1
     out, err = capsys.readouterr()
     assert out == ''
-    assert ('Streaming BTS file not provided and could not be found in the current directory.') in err
+    assert ('Streaming BTS not provided and could not be found in the current directory.') in err
 
 
 def test_transform_no_raw_data(capsys) -> None:
