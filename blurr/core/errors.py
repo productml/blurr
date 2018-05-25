@@ -1,10 +1,10 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from collections import defaultdict
 from enum import Enum
 from io import StringIO
 from itertools import chain
 from os import linesep
-from typing import List, Dict, Any, Union, Type, Set
+from typing import List, Dict, Any, Union, Type, Set, Tuple
 
 
 class GenericSchemaError(Exception):
@@ -25,6 +25,18 @@ class BaseSchemaError(Exception, ABC):
         return '{cls}: FQN: {fqn}'.format(
             cls=self.__class__.__name__, fqn=self.fully_qualified_name)
 
+    @property
+    @abstractmethod
+    def key(self) -> Tuple:
+        """ Returns a tuple that uniquely identifies the object by its values """
+        return (self.fully_qualified_name,)
+
+    def __hash__(self):
+        return hash(self.key)
+
+    def __eq__(self, other):
+        return type(self) == type(other) and self.key == other.key
+
 
 class BaseSchemaAttributeError(BaseSchemaError, ABC):
     """
@@ -39,6 +51,10 @@ class BaseSchemaAttributeError(BaseSchemaError, ABC):
     def __repr__(self):
         return '{cls}: FQN: {fqn}, Attribute: {attribute}'.format(
             cls=self.__class__.__name__, fqn=self.fully_qualified_name, attribute=self.attribute)
+
+    @property
+    def key(self):
+        return super().key + (self.attribute,)
 
 
 class RequiredAttributeError(BaseSchemaAttributeError):
@@ -65,6 +81,10 @@ class InvalidValueError(BaseSchemaAttributeError):
             fqn=self.fully_qualified_name,
             candidates=' | '.join([str(x) for x in self.candidates]))
 
+    @property
+    def key(self):
+        return super().key + (str(self.candidates),)
+
 
 class InvalidNumberError(BaseSchemaAttributeError):
     def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
@@ -80,7 +100,11 @@ class InvalidNumberError(BaseSchemaAttributeError):
             fqn=self.fully_qualified_name,
             type=self.type.__name__,
             greater_than=('Must be greater than ' + str(self.min)) if self.min else '',
-            less_than=('Must be lesser than ' + (self.max)) if self.max else '')
+            less_than=('Must be lesser than ' + str(self.max)) if self.max else '')
+
+    @property
+    def key(self):
+        return super().key + (self.type.__name__, self.min, self.max)
 
 
 class InvalidIdentifierError(BaseSchemaAttributeError):
@@ -100,6 +124,10 @@ class InvalidIdentifierError(BaseSchemaAttributeError):
             value=self.spec.get(self.attribute, '*missing*'),
             name=self.fully_qualified_name,
             reason=self.reason.value)
+
+    @property
+    def key(self):
+        return super().key + (str(self.reason),)
 
 
 class InvalidTypeError(BaseSchemaAttributeError):
@@ -137,6 +165,10 @@ class InvalidTypeError(BaseSchemaAttributeError):
                 expected_base_type=self.expected_base_type.value,
                 type_class_name=self.type_class_name))
 
+    @property
+    def key(self):
+        return super().key + (str(self.reason), str(self.expected_base_type), self.type_class_name)
+
 
 class InvalidExpressionError(BaseSchemaAttributeError):
     """
@@ -155,16 +187,20 @@ class InvalidExpressionError(BaseSchemaAttributeError):
             name=self.fully_qualified_name,
             error=str(self.error))
 
+    @property
+    def key(self):
+        return super().key + (str(self.error),)
+
 
 class SchemaErrorCollection:
     def __init__(self, *args):
-        self.log: Dict[str, List(BaseSchemaError)] = defaultdict(list)
+        self.log: Dict[str, Set[BaseSchemaError]] = defaultdict(set)
         for arg in args:
             self.add(arg)
 
     def add(self, item: Union[BaseSchemaError, List[BaseSchemaError]]):
         if isinstance(item, BaseSchemaError):
-            self.log[item.fully_qualified_name].append(item)
+            self.log[item.fully_qualified_name].add(item)
 
         elif isinstance(item, list):
             for i in item:
@@ -175,14 +211,14 @@ class SchemaErrorCollection:
             return
 
         for k, v in item.log.items():
-            self.log[k].extend(v)
+            self.log[k].update(v)
 
     def __str__(self):
         return linesep.join(
             [str(error) for error in self.log.values()]) if len(self.log) > 0 else ''
 
     def __getitem__(self, item):
-        return self.log[item]
+        return list(self.log[item])
 
     def __contains__(self, item):
         return self.log.__contains__(item)
@@ -236,7 +272,10 @@ class SchemaError(Exception):
 
 
 class SpecNotFoundError(BaseSchemaError):
-    pass
+
+    @property
+    def key(self):
+        return super().key
 
 
 class ExpressionEvaluationError(Exception):
