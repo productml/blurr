@@ -19,9 +19,9 @@
 
 # What is Blurr?
 
-Blurr transforms structured, streaming `raw data` into `features` for model training and prediction using a `high-level expressive YAML-based language` called the Data Transform Configuration (DTC).
+Blurr transforms structured, streaming `raw data` into `features` for model training and prediction using a `high-level expressive YAML-based language` called the Blurr Transform Spec (BTS).
 
-The DTC is a __data transform definition__ for structured data. The DTC encapsulates the *business logic* of data transforms and Blurr orchestrates the *execution* of data transforms. Blurr is runner-agnostic, so DTCs can be run by event processors such as Spark, Spark Streaming or Flink.
+The BTS is a __data transform definition__ for structured data. The BTS encapsulates the *business logic* of data transforms and Blurr orchestrates the *execution* of data transforms. Blurr unner-agnostic, so BTSs can be run by event processors such as Spark, Spark Streaming or Flink.
 
 ![Blurr Training](docs/images/blurr-in-training.png)
 
@@ -45,7 +45,7 @@ Blurr is a collection of components built for MLOps, the Blurr Core library is o
 
 >We believe in a world where everyone is a data engineer. Or a data scientist. Or an ML engineer. The lines are blurred (*cough*). Just like development and operations became DevOps over time
 
-We see a future where MLOps means teams putting together various technologies to suit their needs. For production ML applications, the __speed of experimentation__ and __iterations__ is the difference between success and failure. The __DTC helps teams iterate on features faster__. The vision for Blurr is to build MLOps components to help ML teams experiment at high speed.
+We see a future where MLOps means teams putting together various technologies to suit their needs. For production ML applications, the __speed of experimentation__ and __iterations__ is the difference between success and failure. The __BTS helps teams iterate on features faster__. The vision for Blurr is to build MLOps components to help ML teams experiment at high speed.
 
 [How to build AI culture: go through the curve of enlightenment](https://hackernoon.com/how-to-build-ai-culture-go-through-the-curve-of-enlightenment-21c239c1d5a7)
 
@@ -55,8 +55,8 @@ We see a future where MLOps means teams putting together various technologies to
 
 [Read the docs](http://productml-blurr.readthedocs.io/en/latest/)
 
-[Streaming DTC Tutorial](http://productml-blurr.readthedocs.io/en/latest/Streaming%20DTC%20Tutorial/) |
-[Window DTC Tutorial](http://productml-blurr.readthedocs.io/en/latest/Window%20DTC%20Tutorial/)
+[Streaming BTS Tutorial](http://productml-blurr.readthedocs.io/en/latest/Streaming%20BTS%20Tutorial/) |
+[Window BTS Tutorial](http://productml-blurr.readthedocs.io/en/latest/Window%20BTS%20Tutorial/)
 
 Preparing data for specific use cases using Blurr:
 
@@ -67,7 +67,7 @@ Preparing data for specific use cases using Blurr:
 # Try Blurr
 
 One way to interact with Blurr is by using a Command Line Interface (CLI). The CLI is used to run blurr
-locally and is a great way of validating and testing the DTCs before deploying them in 
+locally and is a great way of validating and testing the BTSs before deploying them in 
 production. 
 
 `$ pip install blurr`
@@ -106,7 +106,7 @@ Inspired by the (old school) [Joel Test](https://www.joelonsoftware.com/2000/08/
 Blurr is currently in Developer Preview. __Stay in touch!__: Star this project or email hello@blurr.ai
 
 - ~~Local transformations only~~
-- ~~Support for custom functions and other python libraries in the DTC~~
+- ~~Support for custom functions and other python libraries in the BTS~~
 - ~~Spark runner~~
 - S3 support for data sink
 - DynamoDB as an Intermediate Store

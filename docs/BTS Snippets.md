@@ -19,7 +19,7 @@ Split: (time - end_time).minutes > 30
 # Calculates the distance in minutes between event time and the end time (time last event was received) of the current block.  Split happens when the difference is greater than 30 minutes.
 ```
 
-# Advanced DTC functions
+# Advanced BTS functions
 
 ## Parsing UNIX timestamp
 ```YAML

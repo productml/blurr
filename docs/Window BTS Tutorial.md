@@ -1,6 +1,6 @@
 # Tutorial 2: Window Aggregation
 
-In this tutorial we'll introduce a new type of DTC: the __Window DTC__, and will learn how a Window DTC consumes session data produced in the first tutorial in order to generate __time aggregated data__.
+In this tutorial we'll introduce a new type of BTS: the __Window BTS__, and will learn how a Window BTS consumes session data produced in the first tutorial in order to generate __time aggregated data__.
 
 Try the code from this example [launching a Jupyter Notebook](https://mybinder.org/v2/gh/productml/blurr/master?filepath=examples%2Ftutorial).
 
@@ -23,7 +23,7 @@ There are a couple of restrictions with boosts though:
 
 We expect our players will be encouraged to play more often during the next 3 days after activating the boost.
 
-The following change is made to the streaming DTC from the previous tutorial to take into account the boost information.
+The following change is made to the streaming BTS from the previous tutorial to take into account the boost information.
 
 ```yaml
 - Name: boost
@@ -55,16 +55,16 @@ We will obtain this data by aggregating the __original session data__ obtained i
 
 This result shows our players have increased the games played per session after activating the boost.
 
-## 3. Window DTC
+## 3. Window BTS
 
-In order to obtain the output described before, Blurr will perform __time-based aggregation__ over the historic session data obtained with the Streaming DTC in the first tutorial. This transformation is defined in a __Window DTC__:
+In order to obtain the output described before, Blurr will perform __time-based aggregation__ over the historic session data obtained with the Streaming BTS in the first tutorial. This transformation is defined in a __Window BTS__:
 
 ```yaml
 Type: Blurr:Transform:Window
 Version: '2018-03-01'
 Name: boost_data
 
-SourceDTC: sessions
+SourceBTS: sessions
 
 Anchor:
   Condition: sessions.session_stats.boost == True
@@ -93,20 +93,20 @@ Aggregates:
        Value: sum(source.games_played) / len(source.session_id)
 ```
 
-As we can see, the structure of a Window DTC is pretty similar to the Streaming DTC. There are 2 new elements though: `SourceDTC` and `Anchor`
+As we can see, the structure of a Window BTS is pretty similar to the Streaming BTS. There are 2 new elements though: `SourceBTS` and `Anchor`
 
-### 3.1. SourceDTC
+### 3.1. SourceBTS
 
-As we mentioned before, a Window DTC will use session data produced by a Streaming DTC as __data input__. This is indicated in `SourceDTC`:
+As we mentioned before, a Window BTS will use session data produced by a Streaming BTS as __data input__. This is indicated in `SourceBTS`:
 
 ```yaml
-SourceDTC: sessions
+SourceBTS: sessions
 ```
 
-`sessions` is the `Name` given to the Streaming DTC in its header:
+`sessions` is the `Name` given to the Streaming BTS in its header:
 
 ```yaml
-# excerpt from Streaming DTC
+# excerpt from Streaming BTS
 Type: Blurr:Transform:Streaming
 Version: '2018-03-07'
 Name : sessions
@@ -121,25 +121,25 @@ Anchor:
   Condition: sessions.session_stats.boost == True
 ```
 
-The `Name` given to source DTC above is used to access the DTC's properties. i.e in this case `sessions.sessions_stats.boost`
+The `Name` given to source BTS above is used to access the BTS's properties. i.e in this case `sessions.sessions_stats.boost`
 
 ### 3.3. Identity
 
 It's time to bring back the concept of Identity introduced in the previous tutorial:
 
 ```yaml
-# excerpt from Streaming DTC
+# excerpt from Streaming BTS
 Identity: source.user_id
 ```
 
 So far, we've thought of the Identity as a mandatory field that is part of both the original events and session data.
 
-In a Window DTC the Identity also has a role: __grouping data__ that is aggregated around Anchor Points. The Identity ensures that our output has __one record per user__.
+In a Window BTS the Identity also has a role: __grouping data__ that is aggregated around Anchor Points. The Identity ensures that our output has __one record per user__.
 
 
 ### 3.4. Window Aggregates
 
-Our Window DTC performs 2 different aggregations:
+Our Window BTS performs 2 different aggregations:
 
 * Over all sessions 7 days __before__ the Anchor Point.
 * Over all sessions 3 days __after__ the Anchor Point.
@@ -164,12 +164,12 @@ This `Window Aggregate` is responsible for aggregating data over the __previous 
 
 `WindowType` and `WindowValue` are used to indicate the how many days/hours of data from/since the Anchor Point are being collected:
 
-`Source` is used to __lookup input data__ from the Streaming DTC.
+`Source` is used to __lookup input data__ from the Streaming BTS.
 
-In this case the input is session data produced in `session_stats` Aggregate in `sessions` Streaming DTC:
+In this case the input is session data produced in `session_stats` Aggregate in `sessions` Streaming BTS:
 
 ```yaml
-# excerpt from Streaming DTC
+# excerpt from Streaming BTS
 Aggregates:
  - Type: Blurr:Aggregate:Block
    Name: session_stats
@@ -236,10 +236,10 @@ sum([i for i in source.games_played if i >= 2])
 
 We can preview the result of the transformation using `blurr transform` command.
 
-To preview a window transformation we need to pass both the Streaming and Window DTC as arguments:
+To preview a window transformation we need to pass both the Streaming and Window BTS as arguments:
 
 ```bash
-$ blurr transform --streaming-dtc tutorial2-streaming-dtc.yml --window-dtc tutorial2-window-dtc.yml tutorial2-data.log
+$ blurr transform --streaming-bts tutorial2-streaming-bts.yml --window-bts tutorial2-window-bts.yml tutorial2-data.log
 
 ["7d49b5ef-0555-535c-8f53-1daff259e8fe", []]
 ["e0093eec-44a2-b781-fca1-794edccae965", [{"last_7_days._identity": "e0093eec-44a2-b781-fca1-794edccae965", "last_7_days.avg_games_per_session": 32.0, "next_3_days._identity": "e0093eec-44a2-b781-fca1-794edccae965", "next_3_days.avg_games_per_session": 3.0}]]
@@ -257,7 +257,7 @@ $ blurr transform --streaming-dtc tutorial2-streaming-dtc.yml --window-dtc tutor
 
 Each entry consists of an array with 2 items:
 
-* `user_id`, the __Identity__ from the Streaming DTC. 
+* `user_id`, the __Identity__ from the Streaming BTS. 
 * An object with the remaining values of the record.
 
 Note:- It will print once for each user in the raw events file wether the window aggregates exist or not.
