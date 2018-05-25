@@ -15,7 +15,6 @@ def is_streaming_dtc(dtc_dict: Dict) -> bool:
     return Type.is_type_equal(dtc_dict.get('Type', ''), Type.BLURR_TRANSFORM_STREAMING)
 
 
-
 def get_yml_files(path: str = '.') -> List[str]:
     return [
         os.path.join(path, file)

@@ -70,24 +70,28 @@ def test_invalid_dtc(capsys):
      {RequiredAttributeError('example_name', {}, StreamingTransformerSchema.ATTRIBUTE_TIME)}),
     ('invalid_string_instead_integer.yml',
      {InvalidNumberError('example_name.anchor', {}, AnchorSchema.ATTRIBUTE_MAX, int, 1)}),
-    ('invalid_non_existing_data_type.yml',
-     {InvalidTypeError('example_name.user.user_id', {}, BaseSchema.ATTRIBUTE_TYPE,
-                       InvalidTypeError.Reason.TYPE_NOT_DEFINED)}),
+    ('invalid_non_existing_data_type.yml', {
+        InvalidTypeError('example_name.user.user_id', {}, BaseSchema.ATTRIBUTE_TYPE,
+                         InvalidTypeError.Reason.TYPE_NOT_DEFINED)
+    }),
     ('invalid_incorrect_expression.yml',
      {InvalidExpressionError('example_name', {}, BaseSchema.ATTRIBUTE_WHEN, None)}),
     ('invalid_set_expression.yml',
      {InvalidExpressionError('example_name', {}, BaseSchema.ATTRIBUTE_WHEN, None)}),
     ('invalid_aggregate_has_no_fields.yml',
      {RequiredAttributeError('example_name.user', {}, AggregateSchema.ATTRIBUTE_FIELDS)}),
-    ('invalid_field_name.yml',
-     {InvalidIdentifierError('example_name.user._name', {}, BaseSchema.ATTRIBUTE_NAME,
-                             InvalidIdentifierError.Reason.STARTS_WITH_UNDERSCORE)}),
-    ('invalid_dtc_type.yml',
-     {InvalidTypeError('ProductMLExample', {}, BaseSchema.ATTRIBUTE_TYPE,
-                       InvalidTypeError.Reason.TYPE_NOT_DEFINED)}),
-    ('invalid_dimension_type.yml',
-     {InvalidValueError('example_name.user.value', {}, BaseSchema.ATTRIBUTE_TYPE,
-                        {Type.INTEGER.value, Type.STRING.value})}),
+    ('invalid_field_name.yml', {
+        InvalidIdentifierError('example_name.user._name', {}, BaseSchema.ATTRIBUTE_NAME,
+                               InvalidIdentifierError.Reason.STARTS_WITH_UNDERSCORE)
+    }),
+    ('invalid_dtc_type.yml', {
+        InvalidTypeError('ProductMLExample', {}, BaseSchema.ATTRIBUTE_TYPE,
+                         InvalidTypeError.Reason.TYPE_NOT_DEFINED)
+    }),
+    ('invalid_dimension_type.yml', {
+        InvalidValueError('example_name.user.value', {}, BaseSchema.ATTRIBUTE_TYPE,
+                          {Type.INTEGER.value, Type.STRING.value})
+    }),
 ])
 def test_invalid_schema(file: str, errors: Set[BaseSchemaError]) -> None:
     with raises(SchemaError) as err:

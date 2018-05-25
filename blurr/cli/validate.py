@@ -7,7 +7,6 @@ from blurr.cli.util import get_yml_files, eprint
 from blurr.core import logging
 from blurr.core.errors import SchemaError, InvalidSpecError
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.type import Type
 
 
 def validate_command(dtc_files: List[str]) -> int:
@@ -55,4 +54,3 @@ def validate(spec: Dict[str, Any]) -> None:
 
 def get_valid_yml_files(yml_files: List[str]) -> List[str]:
     return [yml_file for yml_file in yml_files if validate_file(yml_file) == 0]
-

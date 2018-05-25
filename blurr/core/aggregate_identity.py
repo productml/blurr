@@ -4,7 +4,6 @@ from typing import Dict
 from blurr.core.aggregate import AggregateSchema, Aggregate
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.field import FieldSchema, Field
-from blurr.core.field_simple import IntegerFieldSchema, StringFieldSchema
 from blurr.core.loader import TypeLoader
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
@@ -32,10 +31,13 @@ class IdentityAggregateSchema(AggregateSchema):
         self.validate_required_attributes(self.ATTRIBUTE_STORE)
         for schema_spec in self._spec.get(self.ATTRIBUTE_DIMENSIONS, []):
             self.add_errors(
-                validate_enum_attribute(self.schema_loader.get_fully_qualified_name(self.fully_qualified_name,
-                                                                                    schema_spec[self.ATTRIBUTE_NAME]),
-                                        # TODO Find a way to remove hardcoding of the type strings
-                                        schema_spec, self.ATTRIBUTE_TYPE, {Type.INTEGER.value, Type.STRING.value}))
+                validate_enum_attribute(
+                    self.schema_loader.get_fully_qualified_name(self.fully_qualified_name,
+                                                                schema_spec[self.ATTRIBUTE_NAME]),
+                    # TODO Find a way to remove hardcoding of the type strings
+                    schema_spec,
+                    self.ATTRIBUTE_TYPE,
+                    {Type.INTEGER.value, Type.STRING.value}))
 
 
 class IdentityAggregate(Aggregate):
