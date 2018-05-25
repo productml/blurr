@@ -80,15 +80,16 @@ class Field(BaseItem):
         self.value = self._schema.default
         self.eval_error = False
 
-    def run_evaluate(self) -> None:
+    def run_evaluate(self, evaluation_context: EvaluationContext = None) -> None:
         """
         Overrides the base evaluation to set the value to the evaluation result of the value
         expression in the schema
         """
+        evaluation_context = evaluation_context if evaluation_context else self._evaluation_context
         result = None
         self.eval_error = False
         if self._needs_evaluation:
-            result = self._schema.value.evaluate(self._evaluation_context)
+            result = self._schema.value.evaluate(evaluation_context)
 
         self.eval_error = result is None
         if self.eval_error:

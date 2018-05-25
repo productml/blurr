@@ -17,7 +17,6 @@ from blurr.core.transformer_window import WindowTransformer
 from blurr.core.type import Type
 from blurr.runner.data_processor import DataProcessor
 
-
 TimeAndRecord = Tuple[datetime, Record]
 
 

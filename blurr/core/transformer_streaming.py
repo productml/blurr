@@ -4,6 +4,7 @@ from blurr.core.errors import IdentityError, TimeError
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.transformer import Transformer, TransformerSchema
+from blurr.core.evaluation import ScopedEvaluationContext, EvaluationContext, Context
 
 
 class StreamingTransformerSchema(TransformerSchema):
@@ -25,31 +26,43 @@ class StreamingTransformerSchema(TransformerSchema):
         self.validate_required_attributes(self.ATTRIBUTE_IDENTITY, self.ATTRIBUTE_TIME,
                                           self.ATTRIBUTE_STORES)
 
-    def get_identity(self, record: Record) -> str:
+    def get_identity(self, record: Record, evaluation_context: EvaluationContext = None) -> str:
         """
         Evaluates and returns the identity as specified in the schema.
-        :param record: Record which is used to determine the identity.
+        :param record: Record which is used to determine the identity. Setting none assumes record is in context.
         :return: The evaluated identity
         :raises: IdentityError if identity cannot be determined.
         """
-        context = self.schema_context.context
-        context.add_record(record)
-        identity = self.identity.evaluate(context)
+        identity = None
+        context = evaluation_context if evaluation_context else self.schema_context.context
+
+        if record is not None:
+            context.add_record(record)
+            identity = self.identity.evaluate(context)
+            context.remove_record()
+        else:
+            identity = self.identity.evaluate(context)
+
         if not identity:
             raise IdentityError('Could not determine identity using {}. Record is {}'.format(
                 self.identity.code_string, record))
-        context.remove_record()
+
         return identity
 
-    def get_time(self, record: Record) -> datetime:
-        context = self.schema_context.context
-        context.add_record(record)
-        time = self.time.evaluate(context)
+    def get_time(self, record: Record, evaluation_context: EvaluationContext = None) -> datetime:
+        context = evaluation_context if evaluation_context else self.schema_context.context
+        time = None
+        if record is not None:
+            context.add_record(record)
+            time = self.time.evaluate(context)
+            context.remove_record()
+        else:
+            time = self.time.evaluate(context)
 
         if not time or not isinstance(time, datetime):
             raise TimeError('Could not determine time using {}.  Record is {}'.format(
                 self.time.code_string, record))
-        context.remove_record()
+
         return time
 
 
@@ -65,18 +78,19 @@ class StreamingTransformer(Transformer):
         :raises: IdentityError if identity is different from the one used during
         initialization.
         """
-        record_identity = self._schema.get_identity(record)
-        if self._identity != record_identity:
-            raise IdentityError(
-                'Identity in transformer ({}) and new record ({}) do not match'.format(
-                    self._identity, record_identity))
+        with ScopedEvaluationContext(self._evaluation_context, Context({
+                'source': record
+        })) as evaluation_context:
+            record_identity = self._schema.get_identity(None, evaluation_context)
+            if self._identity != record_identity:
+                raise IdentityError(
+                    'Identity in transformer ({}) and new record ({}) do not match'.format(
+                        self._identity, record_identity))
 
-        # Add source record and time to the global context
-        self._evaluation_context.add_record(record)
-        self._evaluation_context.global_add('time',
-                                            self._schema.time.evaluate(self._evaluation_context))
-        super().run_evaluate()
+            # Add source record and time to the global context
 
-        # Cleanup source and time form the context
-        self._evaluation_context.remove_record()
-        self._evaluation_context.global_remove('time')
+            evaluation_context.global_add('time', self._schema.time.evaluate(evaluation_context))
+            super().run_evaluate(evaluation_context=evaluation_context)
+
+            # Cleanup source and time form the context
+            evaluation_context.global_remove('time')

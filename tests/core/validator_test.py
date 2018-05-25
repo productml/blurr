@@ -73,7 +73,7 @@ def test_validate_python_identifier_attributes_with_error_conditions(invalid_spe
     with raises(
             InvalidIdentifierError,
             match='`Identity1: _illegal_identity` in section `test` is invalid. '
-                  'Identifiers starting with underscore `_` are reserved.',
+            'Identifiers starting with underscore `_` are reserved.',
             message='Message does not correctly reflect the reason'):
         raise error
 
@@ -83,7 +83,7 @@ def test_validate_python_identifier_attributes_with_error_conditions(invalid_spe
     with raises(
             InvalidIdentifierError,
             match='`Identity2: some space` in section `test` is invalid. '
-                  'Identifiers must be valid Python identifiers.',
+            'Identifiers must be valid Python identifiers.',
             message='Message does not correctly reflect the reason'):
         raise error
 
@@ -93,7 +93,7 @@ def test_validate_python_identifier_attributes_with_error_conditions(invalid_spe
     with raises(
             InvalidIdentifierError,
             match='`Identity3: run_reserved` in section `test` is invalid. '
-                  'Identifiers starting with `run_` are reserved.',
+            'Identifiers starting with `run_` are reserved.',
             message='Message does not correctly reflect the reason'):
         raise error
 

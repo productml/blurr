@@ -3,6 +3,7 @@ from datetime import timedelta, datetime
 from blurr.core.aggregate_block import BlockAggregate, BlockAggregateSchema
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
+from blurr.core.evaluation import EvaluationContext
 
 
 class ActivityAggregateSchema(BlockAggregateSchema):
@@ -26,8 +27,9 @@ class ActivityAggregateSchema(BlockAggregateSchema):
 class ActivityAggregate(BlockAggregate):
     """ Aggregates activity in blocks separated by periods of inactivity"""
 
-    def run_evaluate(self) -> None:
-        time = self._evaluation_context.global_context['time']
+    def run_evaluate(self, evaluation_context: EvaluationContext = None) -> None:
+        evaluation_context = evaluation_context if evaluation_context else self._evaluation_context
+        time = evaluation_context.global_context['time']
 
         if not self._start_time:
             self._load_old_state()
@@ -38,7 +40,7 @@ class ActivityAggregate(BlockAggregate):
             self._persist(self._start_time)
             self.run_reset()
 
-        super().run_evaluate()
+        super().run_evaluate(evaluation_context=evaluation_context)
 
     def _load_old_state(self):
         most_recent_block = self._store.get_range(

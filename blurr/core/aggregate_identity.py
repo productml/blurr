@@ -48,11 +48,14 @@ class IdentityAggregate(Aggregate):
         })
         self._existing_key = None
 
-    def run_evaluate(self) -> None:
+    def run_evaluate(self, evaluation_context: EvaluationContext = None) -> None:
+
+        evaluation_context = evaluation_context if evaluation_context else self._evaluation_context
+
         if not self._needs_evaluation:
             return
 
-        if not self._evaluate_dimension_fields():
+        if not self._evaluate_dimension_fields(evaluation_context):
             return
 
         # First time being run. Load state from store.
@@ -63,7 +66,7 @@ class IdentityAggregate(Aggregate):
             self._persist()
             self._init_state_from_new_key()
 
-        super().run_evaluate()
+        super().run_evaluate(evaluation_context=evaluation_context)
         self._existing_key = self._prepare_key()
 
     def _init_state_from_new_key(self):
@@ -73,12 +76,13 @@ class IdentityAggregate(Aggregate):
         else:
             self.run_reset()
 
-    def _evaluate_dimension_fields(self) -> bool:
+    def _evaluate_dimension_fields(
+            self, evaluation_context: EvaluationContext = EvaluationContext()) -> bool:
         """
         Evaluates the dimension fields. Returns False if any of the fields could not be evaluated.
         """
         for _, item in self._dimension_fields.items():
-            item.run_evaluate()
+            item.run_evaluate(evaluation_context=evaluation_context)
             if item.eval_error:
                 return False
         return True
