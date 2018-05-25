@@ -20,13 +20,13 @@ def run_command(dtc_files: List[str]) -> int:
         'transform': False,
         'validate': True,
         'package-spark': False,
-        '<DTC>': ['tests/core/syntax/dtcs/' + dtc_file for dtc_file in dtc_files]
+        '<DTC>': ['tests/cli/dtcs/' + dtc_file for dtc_file in dtc_files]
     }
     return cli(arguments)
 
 
 def get_running_validation_str(file_name: str) -> str:
-    return 'Running validation on tests/core/syntax/dtcs/' + file_name
+    return 'Running validation on tests/cli/dtcs/' + file_name
 
 
 def test_valid_dtc(capsys):

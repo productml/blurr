@@ -1,10 +1,19 @@
 import os
 import sys
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 import yaml
 
-from blurr.core.syntax.schema_validator import is_streaming_dtc, is_window_dtc
+from blurr.core.type import Type
+
+
+def is_window_dtc(dtc_dict: Dict) -> bool:
+    return Type.is_type_equal(dtc_dict.get('Type', ''), Type.BLURR_TRANSFORM_WINDOW)
+
+
+def is_streaming_dtc(dtc_dict: Dict) -> bool:
+    return Type.is_type_equal(dtc_dict.get('Type', ''), Type.BLURR_TRANSFORM_STREAMING)
+
 
 
 def get_yml_files(path: str = '.') -> List[str]:

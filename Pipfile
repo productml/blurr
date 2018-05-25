@@ -10,7 +10,6 @@ name = "pypi"
 pyyaml = "*"
 python-dateutil = "*"
 docopt = "*"
-yamale = "*"
 
 
 [dev-packages]
