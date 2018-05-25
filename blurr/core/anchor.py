@@ -10,7 +10,7 @@ from blurr.core.schema_loader import SchemaLoader
 
 class AnchorSchema(BaseSchema):
     """
-    Represents the schema for the Anchor specified in a window DTC.
+    Represents the schema for the Anchor specified in a window BTS.
     """
 
     ATTRIBUTE_CONDITION = 'Condition'

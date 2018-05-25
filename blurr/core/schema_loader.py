@@ -189,9 +189,9 @@ class SchemaLoader:
     @staticmethod
     def get_transformer_name(fully_qualified_name: str) -> str:
         """
-        Returns the DTC transformer name based on the given fully_qualified_name
+        Returns the BTS transformer name based on the given fully_qualified_name
         of one of the nested child items.
         :param fully_qualified_name: Fully qualified name of the nested child item.
-        :return: DTC transformer name.
+        :return: BTS transformer name.
         """
         return fully_qualified_name.split(SchemaLoader.ITEM_SEPARATOR, 1)[0]
