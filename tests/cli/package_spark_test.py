@@ -1,7 +1,7 @@
-import uuid
-
 import os
 import tempfile
+import uuid
+
 from _pytest.capture import CaptureFixture
 
 from blurr.cli.cli import cli

@@ -1,12 +1,13 @@
 from typing import Dict
 
-from pytest import fixture, raises
+from pytest import fixture
 
-from blurr.core.errors import GenericSchemaError
+from blurr.core.errors import InvalidTypeError, RequiredAttributeError, SpecNotFoundError
 from blurr.core.field_simple import IntegerFieldSchema
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.transformer_streaming import StreamingTransformerSchema
 from blurr.core.type import Type
+from blurr.core.validator import ATTRIBUTE_TYPE
 from blurr.store.memory_store import MemoryStore
 
 
@@ -19,12 +20,12 @@ def nested_schema_spec_bad_type() -> Dict:
         'Aggregates': [{
             'Name': 'test_group',
             'Fields': [{
-                "Type": "string",
                 "Name": "country",
+                "Type": "string",
                 "Value": "source.country"
             }, {
-                "Type": "integer",
                 "Name": "events",
+                "Type": "integer",
                 "Value": "test_group.events+1"
             }]
         }]
@@ -99,13 +100,22 @@ def test_add_valid_nested_schema(nested_schema_spec_bad_type: Dict) -> None:
 
 def test_get_schema_object_error(nested_schema_spec_bad_type: Dict) -> None:
     schema_loader = SchemaLoader()
-    schema_loader.add_schema_spec(nested_schema_spec_bad_type)
+    fqn = schema_loader.add_schema_spec(nested_schema_spec_bad_type)
 
-    with raises(GenericSchemaError, match='Type `Blurr:Unknown` not found.'):
-        schema_loader.get_schema_object('test')
+    errors = schema_loader.get_errors()
+    assert len(schema_loader.get_errors('test', True)) == 2
 
-    with raises(GenericSchemaError, match='`Type` not defined in schema `test.test_group`'):
-        schema_loader.get_schema_object('test.test_group')
+    assert InvalidTypeError('test', nested_schema_spec_bad_type, ATTRIBUTE_TYPE,
+                            InvalidTypeError.Reason.TYPE_NOT_DEFINED) in errors
+    assert RequiredAttributeError('test.test_group', nested_schema_spec_bad_type['Aggregates'],
+                                  ATTRIBUTE_TYPE) in errors
+
+    schema = schema_loader.get_schema_object('test')
+    errors = schema_loader.get_errors()
+    assert len(schema_loader.get_errors('test', True)) == 3
+    assert schema is None
+    assert InvalidTypeError(fqn, nested_schema_spec_bad_type, ATTRIBUTE_TYPE,
+                            InvalidTypeError.Reason.TYPE_NOT_LOADED) in errors
 
 
 def test_get_schema_object(schema_loader: SchemaLoader) -> None:
@@ -140,28 +150,18 @@ def test_get_transformer_name() -> None:
 
 
 def test_get_store_error_not_declared(schema_loader: SchemaLoader):
-    with raises(GenericSchemaError, match='test.memstore not declared in schema'):
-        schema_loader.get_store('test.memstore')
+    schema_loader.get_store('test.memstore')
+    error = schema_loader.get_errors('test.memstore', False)[0]
+    assert isinstance(error, SpecNotFoundError)
 
 
-def test_get_store_error_not_defined(schema_loader: SchemaLoader):
-    with raises(GenericSchemaError, match='test.memstore not declared in schema'):
-        schema_loader.get_store('test.memstore')
-
-
-def test_get_store_error_missing_type(nested_schema_spec: Dict) -> None:
-    nested_schema_spec['Store'] = {'Name': 'memstore'}
-    schema_loader = SchemaLoader()
-    schema_loader.add_schema_spec(nested_schema_spec)
-    with raises(GenericSchemaError, match='`Type` not defined in schema `test.memstore`'):
-        schema_loader.get_store('test.memstore')
-
-
-def test_get_store_error_wrong_type(nested_schema_spec: Dict) -> None:
-    schema_loader = SchemaLoader()
-    schema_loader.add_schema_spec(nested_schema_spec)
-    with raises(GenericSchemaError, match='test.test_group does not have a store type'):
-        schema_loader.get_store('test.test_group')
+def test_get_store_error_wrong_type(schema_loader: SchemaLoader) -> None:
+    schema_loader.get_store('test')
+    error = next(
+        x for x in schema_loader.get_errors('test', False) if isinstance(x, InvalidTypeError))
+    assert isinstance(error, InvalidTypeError)
+    assert error.reason == InvalidTypeError.Reason.INCORRECT_BASE
+    assert error.expected_base_type == InvalidTypeError.BaseTypes.STORE
 
 
 def test_get_store_success(nested_schema_spec: Dict) -> None:

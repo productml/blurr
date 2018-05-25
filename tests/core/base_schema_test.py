@@ -50,14 +50,15 @@ def test_validate_schema_spec_missing_type_and_empty_when(invalid_schema_spec: D
     schema = get_test_schema(invalid_schema_spec)
 
     assert len(schema.errors) == 2
-    assert isinstance(schema.errors[0], EmptyAttributeError)
-    assert schema.errors[0].attribute == BaseSchema.ATTRIBUTE_WHEN
-    assert isinstance(schema.errors[1], InvalidIdentifierError)
-    assert schema.errors[1].attribute == BaseSchema.ATTRIBUTE_NAME
+
+    assert EmptyAttributeError(invalid_schema_spec[BaseSchema.ATTRIBUTE_NAME], invalid_schema_spec,
+                               BaseSchema.ATTRIBUTE_WHEN) in schema.errors
+    assert InvalidIdentifierError(invalid_schema_spec[BaseSchema.ATTRIBUTE_NAME], invalid_schema_spec,
+                                  BaseSchema.ATTRIBUTE_NAME,
+                                  InvalidIdentifierError.Reason.STARTS_WITH_UNDERSCORE) in schema.errors
 
 
 def test_build_expression_adds_error_on_invalid_expression(schema_spec: Dict[str, Any]):
-
     schema_spec[BaseSchema.ATTRIBUTE_WHEN] = 'a;b'
     schema = get_test_schema(schema_spec)
 
@@ -75,7 +76,7 @@ def test_build_expression_adds_error_on_invalid_expression(schema_spec: Dict[str
 def schema_collection_spec():
     return yaml.load('''
         Name: TestAggregate
-        Type: Aggregate
+        Type: Blurr:Aggregate:Identity
         When: True == True
         Fields:
             - Name: TestField

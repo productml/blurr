@@ -1,10 +1,10 @@
 from typing import Dict, Any
 
-from pytest import raises, fixture
+from pytest import fixture
 
 from blurr.core.aggregate_block import BlockAggregateSchema
 from blurr.core.aggregate_window import WindowAggregateSchema
-from blurr.core.errors import GenericSchemaError, RequiredAttributeError
+from blurr.core.errors import RequiredAttributeError
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.type import Type
 
@@ -55,12 +55,12 @@ def test_initialization_with_valid_source(schema_loader_with_mem_store: SchemaLo
 
 
 def test_initialization_with_invalid_source(schema_loader_with_mem_store: SchemaLoader,
-                                            window_schema_spec: Dict[str, Any],
-                                            stream_dtc_name: str):
+                                            window_schema_spec: Dict[str, Any]):
     name = schema_loader_with_mem_store.add_schema_spec(window_schema_spec)
 
-    with raises(GenericSchemaError, match=stream_dtc_name + '.session not declared in schema'):
-        WindowAggregateSchema(name, schema_loader_with_mem_store)
+    schema = WindowAggregateSchema(name, schema_loader_with_mem_store)
+    assert len(schema.errors) == 0
+    assert len(schema_loader_with_mem_store.get_errors()) == 1
 
 
 def test_window_aggregate_schema_missing_attributes_adds_error(
@@ -76,5 +76,6 @@ def test_window_aggregate_schema_missing_attributes_adds_error(
     schema = WindowAggregateSchema(name, schema_loader_with_mem_store)
 
     assert 3 == len(schema.errors)
-    assert isinstance(schema.errors[0], RequiredAttributeError)
-    assert WindowAggregateSchema.ATTRIBUTE_WINDOW_TYPE == schema.errors[0].attribute
+    assert RequiredAttributeError(name, {}, WindowAggregateSchema.ATTRIBUTE_WINDOW_TYPE) in schema.errors
+    assert RequiredAttributeError(name, {}, WindowAggregateSchema.ATTRIBUTE_WINDOW_VALUE) in schema.errors
+    assert RequiredAttributeError(name, {}, WindowAggregateSchema.ATTRIBUTE_SOURCE) in schema.errors
