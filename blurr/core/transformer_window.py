@@ -4,7 +4,7 @@ from blurr.core.aggregate_block import BlockAggregate
 from blurr.core.aggregate_window import WindowAggregate
 from blurr.core.anchor import Anchor
 from blurr.core.errors import AnchorBlockNotDefinedError
-from blurr.core.evaluation import Context, EvaluationContext
+from blurr.core.evaluation import Context, EvaluationContext, ScopedEvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.transformer import Transformer, TransformerSchema
 from blurr.core.type import Type
@@ -54,21 +54,19 @@ class WindowTransformer(Transformer):
         :param block: Block to run the anchor condition against.
         :return: True, if the anchor condition is met, otherwise, False.
         """
-        if self._anchor.evaluate_anchor(block, self._evaluation_context):
 
-            try:
+        with ScopedEvaluationContext(self._evaluation_context, Context({
+                'anchor': block
+        })) as evaluation_context:
+            if self._anchor.evaluate_anchor(block, evaluation_context):
                 self.run_reset()
-                self._evaluation_context.global_add('anchor', block)
-                self._evaluate()
+                self._evaluate(evaluation_context)
                 self._anchor.add_condition_met()
                 return True
-            finally:
-                self._evaluation_context.global_remove('anchor')
-
         return False
 
-    def _evaluate(self):
-        if 'anchor' not in self._evaluation_context.global_context or self._anchor.anchor_block is None:
+    def _evaluate(self, evaluation_context: EvaluationContext):
+        if 'anchor' not in evaluation_context.global_context or self._anchor.anchor_block is None:
             raise AnchorBlockNotDefinedError()
 
         if not self._needs_evaluation:
@@ -78,7 +76,7 @@ class WindowTransformer(Transformer):
             if isinstance(item, WindowAggregate):
                 item._prepare_window(self._anchor.anchor_block._start_time)
 
-        super().run_evaluate()
+        super().run_evaluate(evaluation_context=evaluation_context)
 
     @property
     def run_flattened_snapshot(self) -> Dict:

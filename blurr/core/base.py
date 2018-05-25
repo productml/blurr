@@ -160,7 +160,7 @@ class BaseItem(ABC):
         return self._schema.name
 
     @abstractmethod
-    def run_evaluate(self, *args, **kwargs) -> None:
+    def run_evaluate(self, *args, evaluation_context: EvaluationContext = None, **kwargs) -> None:
         """
         Evaluates the current item
         """
@@ -204,7 +204,7 @@ class BaseItemCollection(BaseItem, ABC):
 
         super().__init__(schema, evaluation_context)
 
-    def run_evaluate(self, *args, **kwargs) -> None:
+    def run_evaluate(self, *args, evaluation_context: EvaluationContext = None, **kwargs) -> None:
         """
         Evaluates the current item
         :returns An evaluation result object containing the result, or reasons why
@@ -212,7 +212,7 @@ class BaseItemCollection(BaseItem, ABC):
         """
         if self._needs_evaluation:
             for _, item in self._nested_items.items():
-                item.run_evaluate()
+                item.run_evaluate(evaluation_context)
 
     @property
     def _snapshot(self) -> Dict[str, Any]:

@@ -97,6 +97,21 @@ class EvaluationContext:
         self.local_context.merge(evaluation_context.local_context)
 
 
+class ScopedEvaluationContext():
+    def __init__(self, evaluation_context: EvaluationContext, context: Context):
+        self.evaluation_context = copy(evaluation_context)
+        self.evaluation_context.global_context.merge(context)
+        self.context_keys = context.keys()
+
+    def __enter__(self):
+        return self.evaluation_context
+
+    def __exit__(self, *args):
+        for key in self.context_keys:
+            if key in self.evaluation_context.global_context:
+                del self.evaluation_context.global_context[key]
+
+
 class ExpressionType(Enum):
     EVAL = 'eval'
     EXEC = 'exec'

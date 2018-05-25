@@ -116,6 +116,7 @@ class WindowAggregate(Aggregate):
                            EvaluationContext()).run_restore(block) for (_, block) in blocks
         ]
 
-    def run_evaluate(self) -> None:
-        self._evaluation_context.local_context.add('source', self._window_source)
-        super().run_evaluate()
+    def run_evaluate(self, evaluation_context: EvaluationContext = None) -> None:
+        evaluation_context = evaluation_context if evaluation_context else self._evaluation_context
+        evaluation_context.local_context.add('source', self._window_source)
+        super().run_evaluate(evaluation_context=evaluation_context)
