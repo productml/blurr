@@ -15,21 +15,21 @@ from blurr.core.transformer_streaming import StreamingTransformerSchema
 from blurr.core.type import Type
 
 
-def run_command(dtc_files: List[str]) -> int:
+def run_command(bts_files: List[str]) -> int:
     arguments = {
         'transform': False,
         'validate': True,
         'package-spark': False,
-        '<DTC>': ['tests/cli/dtcs/' + dtc_file for dtc_file in dtc_files]
+        '<BTS>': ['tests/cli/bts/' + bts_file for bts_file in bts_files]
     }
     return cli(arguments)
 
 
 def get_running_validation_str(file_name: str) -> str:
-    return 'Running validation on tests/cli/dtcs/' + file_name
+    return 'Running validation on tests/cli/bts/' + file_name
 
 
-def test_valid_dtc(capsys):
+def test_valid_bts(capsys):
     code = run_command(['valid_basic_streaming.yml'])
     out, err = capsys.readouterr()
     assert code == 0
@@ -45,7 +45,7 @@ def test_invalid_yaml(capsys):
     assert 'Invalid yaml' in err
 
 
-def test_multiple_dtc_files(capsys):
+def test_multiple_bts_files(capsys):
     code = run_command(['valid_basic_streaming.yml', 'invalid_yaml.yml'])
     out, err = capsys.readouterr()
     assert code == 1
@@ -55,7 +55,7 @@ def test_multiple_dtc_files(capsys):
     assert 'Invalid yaml' in err
 
 
-def test_invalid_dtc(capsys):
+def test_invalid_bts(capsys):
     code = run_command(['invalid_wrong_version.yml'])
     out, err = capsys.readouterr()
     assert code == 1
@@ -84,7 +84,7 @@ def test_invalid_dtc(capsys):
         InvalidIdentifierError('example_name.user._name', {}, BaseSchema.ATTRIBUTE_NAME,
                                InvalidIdentifierError.Reason.STARTS_WITH_UNDERSCORE)
     }),
-    ('invalid_dtc_type.yml', {
+    ('invalid_bts_type.yml', {
         InvalidTypeError('ProductMLExample', {}, BaseSchema.ATTRIBUTE_TYPE,
                          InvalidTypeError.Reason.TYPE_NOT_DEFINED)
     }),
@@ -95,7 +95,7 @@ def test_invalid_dtc(capsys):
 ])
 def test_invalid_schema(file: str, errors: Set[BaseSchemaError]) -> None:
     with raises(SchemaError) as err:
-        dtc_dict = yaml.safe_load(open('tests/cli/dtcs/' + file, 'r', encoding='utf-8'))
-        validate(dtc_dict)
+        bts_dict = yaml.safe_load(open('tests/cli/bts/' + file, 'r', encoding='utf-8'))
+        validate(bts_dict)
 
     assert errors.issubset(set(err.value.errors.errors))
