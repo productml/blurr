@@ -7,20 +7,20 @@ from blurr.core.store_key import Key
 from blurr.runner.local_runner import LocalRunner
 
 
-def execute_runner(stream_dtc_file: str,
-                   window_dtc_file: Optional[str],
+def execute_runner(stream_bts_file: str,
+                   window_bts_file: Optional[str],
                    local_json_files: List[str],
                    old_state: Optional[Dict[str, Dict]] = None) -> Tuple[LocalRunner, Any]:
-    runner = LocalRunner(stream_dtc_file, window_dtc_file)
+    runner = LocalRunner(stream_bts_file, window_bts_file)
     return runner, runner.execute(
         runner.get_identity_records_from_json_files(local_json_files), old_state)
 
 
-def test_only_stream_dtc_provided():
+def test_only_stream_bts_provided():
     runner, data = execute_runner('tests/data/stream.yml', None, ['tests/data/raw.json'])
     assert len(data) == 3
 
-    # Stream DTC output
+    # Stream BTS output
     assert data['userA'][0][Key('userA', 'session', datetime(2018, 3, 7, 23, 35, 31))] == {
         '_identity': 'userA',
         '_start_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()).isoformat(),
@@ -65,11 +65,11 @@ def test_no_variable_aggreate_data_stored():
     assert Key('userA', 'vars') not in data
 
 
-def test_stream_and_window_dtc_provided():
+def test_stream_and_window_bts_provided():
     runner, data = execute_runner('tests/data/stream.yml', 'tests/data/window.yml',
                                   ['tests/data/raw.json'])
 
-    # Window DTC output
+    # Window BTS output
     assert data['userA'][1] == [{
         'last_session.events': 1,
         'last_session._identity': 'userA',
@@ -79,7 +79,7 @@ def test_stream_and_window_dtc_provided():
     assert data['userB'][1] == []
 
 
-def test_stream_dtc_with_state():
+def test_stream_bts_with_state():
     _, data_combined = execute_runner('tests/data/stream.yml', None,
                                       ['tests/data/raw.json', 'tests/data/raw2.json'], None)
 
@@ -94,7 +94,7 @@ def test_stream_dtc_with_state():
     assert data_separate == data_combined
 
 
-def test_stream_and_window_dtc_with_state():
+def test_stream_and_window_bts_with_state():
     _, data_combined = execute_runner('tests/data/stream.yml', 'tests/data/window.yml',
                                       ['tests/data/raw.json', 'tests/data/raw2.json'], None)
 
@@ -110,7 +110,7 @@ def test_stream_and_window_dtc_with_state():
     assert data_separate == data_combined
 
 
-def test_write_output_file_only_source_dtc_provided(tmpdir):
+def test_write_output_file_only_source_bts_provided(tmpdir):
     runner, data = execute_runner('tests/data/stream.yml', None, ['tests/data/raw.json'])
     output_file = tmpdir.join('out.txt')
     runner.write_output_file(str(output_file), data)
@@ -125,7 +125,7 @@ def test_write_output_file_only_source_dtc_provided(tmpdir):
             '}]') in output_text
 
 
-def test_write_output_file_with_stream_and_window_dtc_provided(tmpdir):
+def test_write_output_file_with_stream_and_window_bts_provided(tmpdir):
     runner, data = execute_runner('tests/data/stream.yml', 'tests/data/window.yml',
                                   ['tests/data/raw.json'])
     output_file = tmpdir.join('out.txt')
