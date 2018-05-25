@@ -140,9 +140,9 @@ class Expression:
                 type(err).__name__, self.code_string, err))
             # These should result in an exception being raised:
             # NameError - Exceptions thrown because of using names in the expression which are not
-            #   present in EvaluationContext. A common cause for this is typos in the DTC.
-            # MissingAttributeError - Exception thrown when a DTC nested item is used which does not
-            #   exist. Should only happen for erroneous DTCs.
+            #   present in EvaluationContext. A common cause for this is typos in the BTS.
+            # MissingAttributeError - Exception thrown when a BTS nested item is used which does not
+            #   exist. Should only happen for erroneous BTSs.
             # ImportError - Thrown when there is a failure in importing other modules.
             if isinstance(err, (NameError, MissingAttributeError, ImportError)):
                 raise err
