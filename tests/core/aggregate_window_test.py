@@ -12,7 +12,7 @@ from blurr.core.type import Type
 
 @fixture
 def window_aggregate_schema(schema_loader_with_mem_store: SchemaLoader, mem_store_name: str,
-                            stream_dtc_name: str) -> WindowAggregateSchema:
+                            stream_bts_name: str) -> WindowAggregateSchema:
     schema_loader_with_mem_store.add_schema_spec({
         'Type': Type.BLURR_AGGREGATE_BLOCK,
         'Name': 'session',
@@ -24,13 +24,13 @@ def window_aggregate_schema(schema_loader_with_mem_store: SchemaLoader, mem_stor
                 'Value': 'session.events + 1',
             },
         ],
-    }, stream_dtc_name)
+    }, stream_bts_name)
     name = schema_loader_with_mem_store.add_schema_spec({
         'Type': Type.BLURR_AGGREGATE_WINDOW,
         'Name': 'test_window_name',
         'WindowType': Type.DAY,
         'WindowValue': 1,
-        'Source': stream_dtc_name + '.session',
+        'Source': stream_bts_name + '.session',
         'Fields': [{
             'Name': 'total_events',
             'Type': Type.INTEGER,
