@@ -53,9 +53,10 @@ def test_validate_schema_spec_missing_type_and_empty_when(invalid_schema_spec: D
 
     assert EmptyAttributeError(invalid_schema_spec[BaseSchema.ATTRIBUTE_NAME], invalid_schema_spec,
                                BaseSchema.ATTRIBUTE_WHEN) in schema.errors
-    assert InvalidIdentifierError(invalid_schema_spec[BaseSchema.ATTRIBUTE_NAME], invalid_schema_spec,
-                                  BaseSchema.ATTRIBUTE_NAME,
-                                  InvalidIdentifierError.Reason.STARTS_WITH_UNDERSCORE) in schema.errors
+    assert InvalidIdentifierError(
+        invalid_schema_spec[BaseSchema.ATTRIBUTE_NAME], invalid_schema_spec,
+        BaseSchema.ATTRIBUTE_NAME,
+        InvalidIdentifierError.Reason.STARTS_WITH_UNDERSCORE) in schema.errors
 
 
 def test_build_expression_adds_error_on_invalid_expression(schema_spec: Dict[str, Any]):

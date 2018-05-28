@@ -55,6 +55,7 @@ SCHEMA_MAP = {
 
 _class_cache: Dict[str, Type] = {}
 
+
 class TypeLoader:
     @staticmethod
     def load_schema(type_name: Union[str, Type]):
