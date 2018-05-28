@@ -100,23 +100,22 @@ def test_add_valid_nested_schema(nested_schema_spec_bad_type: Dict) -> None:
 
 def test_get_schema_object_error(nested_schema_spec_bad_type: Dict) -> None:
     schema_loader = SchemaLoader()
-    schema_loader.add_schema_spec(nested_schema_spec_bad_type)
+    fqn = schema_loader.add_schema_spec(nested_schema_spec_bad_type)
 
+    errors = schema_loader.get_errors()
     assert len(schema_loader.get_errors('test', True)) == 2
 
-    type_missing_error = schema_loader.get_errors('test')[0]
-    assert isinstance(type_missing_error, InvalidTypeError)
-    assert type_missing_error.reason == InvalidTypeError.Reason.TYPE_NOT_DEFINED
-    assert isinstance(schema_loader.get_errors('test')[1], RequiredAttributeError)
-    assert schema_loader.get_errors('test')[1].attribute == ATTRIBUTE_TYPE
+    assert InvalidTypeError('test', nested_schema_spec_bad_type, ATTRIBUTE_TYPE,
+                            InvalidTypeError.Reason.TYPE_NOT_DEFINED) in errors
+    assert RequiredAttributeError('test.test_group', nested_schema_spec_bad_type['Aggregates'],
+                                  ATTRIBUTE_TYPE) in errors
 
     schema = schema_loader.get_schema_object('test')
-
+    errors = schema_loader.get_errors()
+    assert len(schema_loader.get_errors('test', True)) == 3
     assert schema is None
-    assert len(schema_loader.get_errors('test')) == 3
-    type_missing_error = schema_loader.get_errors('test', False)[1]
-    assert isinstance(type_missing_error, InvalidTypeError)
-    assert type_missing_error.reason == InvalidTypeError.Reason.TYPE_NOT_LOADED
+    assert InvalidTypeError(fqn, nested_schema_spec_bad_type, ATTRIBUTE_TYPE,
+                            InvalidTypeError.Reason.TYPE_NOT_LOADED) in errors
 
 
 def test_get_schema_object(schema_loader: SchemaLoader) -> None:

@@ -1,4 +1,4 @@
-from typing import Dict, Any, List, Optional, Union
+from typing import Dict, Any, List, Optional, Union, Set
 
 from blurr.core.errors import BaseSchemaError, InvalidTypeError, TypeLoaderError, SpecNotFoundError
 from blurr.core.errors import SchemaErrorCollection
