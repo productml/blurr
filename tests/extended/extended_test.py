@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from blurr.core.store_key import Key
+from blurr.core.store_key import Key, KeyType
 from blurr.runner.local_runner import LocalRunner
 
 
@@ -12,7 +12,8 @@ def test_extended_runner():
     assert len(local_runner._per_user_data) == 1
     assert len(local_runner._per_user_data['user-1'][0]) == 5
 
-    result_state = local_runner._per_user_data['user-1'][0][Key('user-1', 'state')]
+    result_state = local_runner._per_user_data['user-1'][0][Key(KeyType.DIMENSION, 'user-1',
+                                                                'state')]
     expected_state = {
         '_identity': 'user-1',
         'country': 'US',
@@ -36,7 +37,8 @@ def test_extended_runner():
 
     assert result_state == expected_state
 
-    result_session = local_runner._per_user_data['user-1'][0][Key('user-1', 'session',
+    result_session = local_runner._per_user_data['user-1'][0][Key(KeyType.TIMESTAMP, 'user-1',
+                                                                  'session', [],
                                                                   datetime(2016, 2, 13, 0, 0, 58))]
     expected_session = {
         '_identity': 'user-1',
@@ -54,7 +56,8 @@ def test_extended_runner():
     }
     assert result_session == expected_session
 
-    result_session_10 = local_runner._per_user_data['user-1'][0][Key('user-1', 'session',
+    result_session_10 = local_runner._per_user_data['user-1'][0][Key(KeyType.TIMESTAMP, 'user-1',
+                                                                     'session', [],
                                                                      datetime(2016, 2, 10, 0, 0))]
     expected_session_10 = {
         '_identity': 'user-1',
@@ -73,7 +76,8 @@ def test_extended_runner():
 
     assert result_session_10 == expected_session_10
 
-    result_session_11 = local_runner._per_user_data['user-1'][0][Key('user-1', 'session',
+    result_session_11 = local_runner._per_user_data['user-1'][0][Key(KeyType.TIMESTAMP, 'user-1',
+                                                                     'session', [],
                                                                      datetime(2016, 2, 11, 0, 0))]
     expected_session_11 = {
         '_identity': 'user-1',
@@ -92,7 +96,8 @@ def test_extended_runner():
 
     assert result_session_11 == expected_session_11
 
-    result_session_12 = local_runner._per_user_data['user-1'][0][Key('user-1', 'session',
+    result_session_12 = local_runner._per_user_data['user-1'][0][Key(KeyType.TIMESTAMP, 'user-1',
+                                                                     'session', [],
                                                                      datetime(2016, 2, 12, 0, 0))]
     expected_session_12 = {
         '_identity': 'user-1',

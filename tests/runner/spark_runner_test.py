@@ -4,7 +4,7 @@ from typing import List, Tuple, Any, Optional, Dict
 
 from dateutil.tz import tzutc
 
-from blurr.core.store_key import Key
+from blurr.core.store_key import Key, KeyType
 from blurr.runner.spark_runner import SparkRunner, get_spark_session
 
 
@@ -38,7 +38,7 @@ def test_only_stream_dtc_provided():
     assert len(block_data) == 3
 
     # Stream DTC output
-    assert block_data['userA'][Key('userA', 'session',
+    assert block_data['userA'][Key(KeyType.TIMESTAMP, 'userA', 'session', [],
                                    datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()))] == {
                                        '_identity': 'userA',
                                        '_start_time': datetime(
@@ -50,22 +50,25 @@ def test_only_stream_dtc_provided():
                                        'continent': 'World'
                                    }
 
-    assert block_data['userA'][Key('userA', 'session', datetime(2018, 3, 7, 22, 35, 31))] == {
-        '_identity': 'userA',
-        '_start_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=tzutc()).isoformat(),
-        '_end_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=tzutc()).isoformat(),
-        'events': 1,
-        'country': 'US',
-        'continent': 'North America'
-    }
+    assert block_data['userA'][Key(KeyType.TIMESTAMP, 'userA', 'session', [],
+                                   datetime(2018, 3, 7, 22, 35, 31))] == {
+                                       '_identity': 'userA',
+                                       '_start_time': datetime(
+                                           2018, 3, 7, 22, 35, 31, tzinfo=tzutc()).isoformat(),
+                                       '_end_time': datetime(
+                                           2018, 3, 7, 22, 35, 31, tzinfo=tzutc()).isoformat(),
+                                       'events': 1,
+                                       'country': 'US',
+                                       'continent': 'North America'
+                                   }
 
-    assert block_data['userA'][Key('userA', 'state')] == {
+    assert block_data['userA'][Key(KeyType.DIMENSION, 'userA', 'state')] == {
         '_identity': 'userA',
         'country': 'IN',
         'continent': 'World'
     }
 
-    assert block_data['userB'][Key('userB', 'session',
+    assert block_data['userB'][Key(KeyType.TIMESTAMP, 'userB', 'session', [],
                                    datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()))] == {
                                        '_identity': 'userB',
                                        '_start_time': datetime(
@@ -87,7 +90,7 @@ def test_no_variable_aggreate_data_stored():
         block_data[id] = per_id_block_data
 
     # Variables should not be stored
-    assert Key('userA', 'vars') not in block_data['userA']
+    assert Key(KeyType.DIMENSION, 'userA', 'vars') not in block_data['userA']
 
 
 def test_stream_and_window_dtc_provided():
@@ -142,7 +145,7 @@ def test_write_output_file_only_source_dtc_provided(tmpdir):
     out_dir = tmpdir.join('out')
     runner.write_output_file(str(out_dir), data)
     output_text = get_spark_output(out_dir)
-    assert ('["userA/session/2018-03-07T22:35:31+00:00", {'
+    assert ('["userA/session//2018-03-07T22:35:31+00:00", {'
             '"_identity": "userA", '
             '"_start_time": "2018-03-07T22:35:31+00:00", '
             '"_end_time": "2018-03-07T22:35:31+00:00", '

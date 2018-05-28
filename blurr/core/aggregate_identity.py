@@ -6,7 +6,7 @@ from blurr.core.evaluation import EvaluationContext
 from blurr.core.field import FieldSchema, Field
 from blurr.core.loader import TypeLoader
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.store_key import Key
+from blurr.core.store_key import Key, KeyType
 
 
 class IdentityAggregateSchema(AggregateSchema):
@@ -64,10 +64,10 @@ class IdentityAggregate(Aggregate):
             self._init_state_from_new_key()
 
         super().run_evaluate()
-        self._existing_key = self._prepare_key()
+        self._existing_key = self._key
 
     def _init_state_from_new_key(self):
-        snapshot = self._store.get(self._prepare_key())
+        snapshot = self._store.get(self._key)
         if snapshot:
             self.run_restore(snapshot)
         else:
@@ -90,15 +90,12 @@ class IdentityAggregate(Aggregate):
                 return False
         return True
 
-    def _prepare_key(self, timestamp: datetime = None):
+    @property
+    def _key(self, timestamp: datetime = None):
         """ Generates the Key object based on dimension fields. """
-        if self._dimension_fields:
-            return Key(self._identity, self._name + '.' +
-                       (':').join([str(item.value) for item in self._dimension_fields.values()]),
-                       timestamp)
+        return Key(KeyType.DIMENSION, self._identity, self._name,
+                   [str(item.value) for item in self._dimension_fields.values()])
 
-        return Key(self._identity, self._name, timestamp)
-
-    def _persist(self, timestamp=None) -> None:
+    def _persist(self) -> None:
         # TODO Refactor keys when refactoring store
         self._store.save(self._existing_key, self._snapshot)

@@ -9,7 +9,7 @@ from blurr.core.anchor import AnchorSchema
 from blurr.core.errors import PrepareWindowMissingBlocksError, RequiredAttributeError
 from blurr.core.evaluation import Context
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.store_key import Key
+from blurr.core.store_key import Key, KeyType
 from blurr.core.transformer_streaming import StreamingTransformer
 from blurr.core.transformer_window import WindowTransformer, WindowTransformerSchema
 from blurr.core.type import Type
@@ -36,7 +36,7 @@ def stream_transformer(schema_loader, stream_schema_spec):
     stream_dtc_name = schema_loader.add_schema_spec(stream_schema_spec)
     stream_transformer = StreamingTransformer(
         schema_loader.get_schema_object(stream_dtc_name), 'user1')
-    stream_transformer.run_restore({Key('user1', 'state'): {'country': 'US'}})
+    stream_transformer.run_restore({Key(KeyType.DIMENSION, 'user1', 'state'): {'country': 'US'}})
     return stream_transformer
 
 
