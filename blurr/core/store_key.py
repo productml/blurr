@@ -76,9 +76,7 @@ class Key:
 
     def __str__(self):
         """ Returns the string representation of the key"""
-        return Key.PARTITION.join([
-            self.identity, self.sort_key
-        ])
+        return Key.PARTITION.join([self.identity, self.sort_key])
 
     @property
     def sort_key(self):
@@ -126,10 +124,16 @@ class Key:
         return hash((self.identity, self.group, self.timestamp, self.dimensions))
 
     def starts_with(self, other: 'Key') -> bool:
-        if (self.key_type, self.identity, self.group) != (other.key_type, other.identity, other.group):
+        """
+        Checks if this key starts with the other key provided. Returns False if key_type, identity
+        or group are different.
+        For `KeyType.TIMESTAMP` returns True.
+        For `KeyType.DIMENSION` does a prefix match between the two dimensions property.
+        """
+        if (self.key_type, self.identity, self.group) != (other.key_type, other.identity,
+                                                          other.group):
             return False
         if self.key_type == KeyType.TIMESTAMP:
             return True
         if self.key_type == KeyType.DIMENSION:
             return self.dimensions.startswith(other.dimensions)
-

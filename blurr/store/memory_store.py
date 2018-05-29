@@ -31,7 +31,8 @@ class MemoryStore(Store):
                 for k, v in self._cache.items()
                 if k.identity == identity} if identity else self._cache.copy()
 
-    def _get_range_timestamp_key(self, start: Key, end: Key = None, count: int = 0) -> List[Tuple[Key, Any]]:
+    def _get_range_timestamp_key(self, start: Key, end: Key = None,
+                                 count: int = 0) -> List[Tuple[Key, Any]]:
         if not count:
             items_in_range = []
             for key, item in self._cache.items():
@@ -51,7 +52,11 @@ class MemoryStore(Store):
             else:
                 return items[:count]
 
-    def _get_range_dimension_key(self, base_key: Key, start_time: datetime, end_time: datetime = None, count: int = 0) -> List[Tuple[Key, Any]]:
+    def _get_range_dimension_key(self,
+                                 base_key: Key,
+                                 start_time: datetime,
+                                 end_time: datetime = None,
+                                 count: int = 0) -> List[Tuple[Key, Any]]:
         pass
 
     @staticmethod

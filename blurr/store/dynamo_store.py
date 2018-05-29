@@ -97,7 +97,8 @@ class DynamoStore(Store):
 
         return self.clean_for_get(item)
 
-    def _get_range_timestamp_key(self, start: Key, end: Key = None, count: int = 0) -> List[Tuple[Key, Any]]:
+    def _get_range_timestamp_key(self, start: Key, end: Key = None,
+                                 count: int = 0) -> List[Tuple[Key, Any]]:
         sort_key_condition = DynamoKey('range_key')
 
         if end:
@@ -128,9 +129,11 @@ class DynamoStore(Store):
 
         return records
 
-    def _get_range_dimension_key(self, base_key: Key, start_time: datetime,
-                                 end_time: datetime = None, count: int = 0) -> List[
-        Tuple[Key, Any]]:
+    def _get_range_dimension_key(self,
+                                 base_key: Key,
+                                 start_time: datetime,
+                                 end_time: datetime = None,
+                                 count: int = 0) -> List[Tuple[Key, Any]]:
         pass
 
     def get_all(self, identity: str) -> Dict[Key, Any]:

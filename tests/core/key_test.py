@@ -103,3 +103,35 @@ def test_less_than_timestamp_key():
         KeyType.TIMESTAMP, 'a', 'b', [], datetime(2018, 3, 7, 22, 35, 31))) is True
     assert (Key(KeyType.TIMESTAMP, 'a', 'b', [], datetime(2018, 3, 7, 22, 35, 31)) < Key(
         KeyType.TIMESTAMP, 'a', 'c', [], datetime(2018, 3, 7, 22, 35, 31))) is False
+
+
+def test_timestamp_key_starts_with():
+    assert not Key(KeyType.TIMESTAMP, 'user1', 'group1').starts_with(
+        Key(KeyType.DIMENSION, 'user1', 'group1'))
+    assert not Key(KeyType.TIMESTAMP, 'user1', 'group1').starts_with(
+        Key(KeyType.TIMESTAMP, 'user2', 'group1'))
+    assert not Key(KeyType.TIMESTAMP, 'user1', 'group1').starts_with(
+        Key(KeyType.TIMESTAMP, 'user1', 'group2'))
+    assert Key(KeyType.TIMESTAMP, 'user1', 'group1', [],
+               datetime(2018, 3, 7, 22, 35, 31)).starts_with(
+                   Key(KeyType.TIMESTAMP, 'user1', 'group1', [], datetime(2018, 4, 7, 22, 35, 31)))
+
+
+def test_dimension_key_starts_with():
+    assert not Key(KeyType.DIMENSION, 'user1', 'group1').starts_with(
+        Key(KeyType.TIMESTAMP, 'user1', 'group1'))
+    assert not Key(KeyType.DIMENSION, 'user1', 'group1').starts_with(
+        Key(KeyType.DIMENSION, 'user2', 'group1'))
+    assert not Key(KeyType.DIMENSION, 'user1', 'group1').starts_with(
+        Key(KeyType.DIMENSION, 'user1', 'group2'))
+    assert not Key(KeyType.DIMENSION, 'user1', 'group1', ['a', 'b'], None).starts_with(
+        Key(KeyType.DIMENSION, 'user1', 'group1', ['a', 'b', 'c'], None))
+    assert not Key(KeyType.DIMENSION, 'user1', 'group1', ['a', 'b'], None).starts_with(
+        Key(KeyType.DIMENSION, 'user1', 'group1', ['c'], None))
+
+    assert Key(KeyType.DIMENSION, 'user1', 'group1', ['a', 'b', 'c'], None).starts_with(
+        Key(KeyType.DIMENSION, 'user1', 'group1', [''], None))
+    assert Key(KeyType.DIMENSION, 'user1', 'group1', ['a', 'b', 'c'], None).starts_with(
+        Key(KeyType.DIMENSION, 'user1', 'group1', ['a', 'b'], None))
+    assert Key(KeyType.DIMENSION, 'user1', 'group1', ['a', 'b', 'c'], None).starts_with(
+        Key(KeyType.DIMENSION, 'user1', 'group1', ['a', 'b', 'c'], None))

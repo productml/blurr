@@ -66,11 +66,13 @@ class WindowAggregate(Aggregate):
                 self._schema.window_type, Type.HOUR):
             block_list = self._load_blocks(
                 store.get_range(
-                    Key(KeyType.TIMESTAMP, self._identity, self._schema.source.name), start_time, self._get_end_time(start_time)))
+                    Key(KeyType.TIMESTAMP, self._identity, self._schema.source.name), start_time,
+                    self._get_end_time(start_time)))
         else:
             block_list = self._load_blocks(
                 store.get_range(
-                    Key(KeyType.TIMESTAMP, self._identity, self._schema.source.name),start_time, None, self._schema.window_value))
+                    Key(KeyType.TIMESTAMP, self._identity, self._schema.source.name), start_time,
+                    None, self._schema.window_value))
 
         self._window_source = _WindowSource(block_list)
         self._validate_view()

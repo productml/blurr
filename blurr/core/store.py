@@ -27,7 +27,11 @@ class Store(ABC):
         """
         raise NotImplementedError()
 
-    def get_range(self, base_key: Key, start_time: datetime, end_time: datetime = None, count: int = 0) -> List[Tuple[Key, Any]]:
+    def get_range(self,
+                  base_key: Key,
+                  start_time: datetime,
+                  end_time: datetime = None,
+                  count: int = 0) -> List[Tuple[Key, Any]]:
         """
         Returns the list of items from the store based on the given time range or count.
         :param base_key: Items which don't start with the base_key are filtered out.
@@ -51,7 +55,8 @@ class Store(ABC):
             return self._get_range_dimension_key(base_key, start_time, end_time, count)
 
     @abstractmethod
-    def _get_range_timestamp_key(self, start: Key, end: Key = None, count: int = 0) -> List[Tuple[Key, Any]]:
+    def _get_range_timestamp_key(self, start: Key, end: Key = None,
+                                 count: int = 0) -> List[Tuple[Key, Any]]:
         """
         Returns the list of items from the store based on the given time range or count.
 
@@ -60,7 +65,11 @@ class Store(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def _get_range_dimension_key(self, base_key: Key, start_time: datetime, end_time: datetime = None, count: int = 0) -> List[Tuple[Key, Any]]:
+    def _get_range_dimension_key(self,
+                                 base_key: Key,
+                                 start_time: datetime,
+                                 end_time: datetime = None,
+                                 count: int = 0) -> List[Tuple[Key, Any]]:
         """
         Returns the list of items from the store based on the given time range or count.
 
