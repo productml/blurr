@@ -42,8 +42,8 @@ class Key:
         if key_type == KeyType.DIMENSION and timestamp:
             raise ValueError('`timestamp` should not be set for KeyType.DIMENSION.')
 
-        if key_type == KeyType.TIMESTAMP and not timestamp:
-            raise ValueError('`timestamp` should be set for KeyType.TIMESTAMP.')
+        if key_type == KeyType.TIMESTAMP and dimensions:
+            raise ValueError('`dimensions` should not be set for KeyType.TIMESTAMP.')
 
         self.key_type = key_type
         self.identity = identity
@@ -77,8 +77,7 @@ class Key:
     def __str__(self):
         """ Returns the string representation of the key"""
         return Key.PARTITION.join([
-            self.identity, self.group, self.dimensions,
-            self.timestamp.isoformat() if self.timestamp else ''
+            self.identity, self.sort_key
         ])
 
     @property
@@ -125,3 +124,12 @@ class Key:
 
     def __hash__(self):
         return hash((self.identity, self.group, self.timestamp, self.dimensions))
+
+    def starts_with(self, other: 'Key') -> bool:
+        if (self.key_type, self.identity, self.group) != (other.key_type, other.identity, other.group):
+            return False
+        if self.key_type == KeyType.TIMESTAMP:
+            return True
+        if self.key_type == KeyType.DIMENSION:
+            return self.dimensions.startswith(other.dimensions)
+

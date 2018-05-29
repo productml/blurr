@@ -31,7 +31,7 @@ def test_key_type_and_args_error():
     with pytest.raises(ValueError, match='`timestamp` should not be set for KeyType.DIMENSION.'):
         Key(KeyType.DIMENSION, 'id', 'group', [], datetime(2018, 3, 7, 22, 35, 31))
 
-    with pytest.raises(ValueError, match='`timestamp` should be set for KeyType.TIMESTAMP.'):
+    with pytest.raises(ValueError, match='`dimensions` should not be set for KeyType.TIMESTAMP.'):
         Key(KeyType.TIMESTAMP, 'id', 'group', ['dim1'], None)
 
 

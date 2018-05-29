@@ -56,11 +56,8 @@ def test_get_range_start_end(memory_store: MemoryStore) -> None:
     """
     Tests that the range get does not include the blocks that lie on the boundary
     """
-    start = Key(KeyType.TIMESTAMP, 'user1', 'session', [],
-                datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc))
-    end = Key(KeyType.TIMESTAMP, 'user1', 'session', [],
-              datetime(2018, 3, 7, 22, 38, 31, 0, timezone.utc))
-    blocks = memory_store.get_range(start, end)
+    key = Key(KeyType.TIMESTAMP, 'user1', 'session')
+    blocks = memory_store.get_range(key, datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc), datetime(2018, 3, 7, 22, 38, 31, 0, timezone.utc))
     assert len(blocks) == 2
     assert blocks[0][1]['_start_time'] == datetime(2018, 3, 7, 20, 35, 35, 0,
                                                    timezone.utc).isoformat()
@@ -70,9 +67,8 @@ def test_get_range_start_count(memory_store: MemoryStore) -> None:
     """
     Tests that the range get does not include the blocks that lie on the boundary
     """
-    start = Key(KeyType.TIMESTAMP, 'user1', 'session', [],
-                datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc))
-    blocks = memory_store.get_range(start, None, 2)
+    key = Key(KeyType.TIMESTAMP, 'user1', 'session')
+    blocks = memory_store.get_range(key, datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc), None, 2)
     assert len(blocks) == 2
     assert blocks[0][1]['_start_time'] == datetime(2018, 3, 7, 20, 35, 35, 0,
                                                    timezone.utc).isoformat()
@@ -82,9 +78,8 @@ def test_get_range_end_count(memory_store: MemoryStore) -> None:
     """
     Tests that the range get does not include the blocks that lie on the boundary
     """
-    end = Key(KeyType.TIMESTAMP, 'user1', 'session', [],
-              datetime(2018, 3, 7, 22, 38, 31, 0, timezone.utc))
-    blocks = memory_store.get_range(end, None, -2)
+    key = Key(KeyType.TIMESTAMP, 'user1', 'session')
+    blocks = memory_store.get_range(key, datetime(2018, 3, 7, 22, 38, 31, 0, timezone.utc), None, -2)
     assert len(blocks) == 2
     assert blocks[0][1]['_start_time'] == datetime(2018, 3, 7, 20, 35, 35, 0,
                                                    timezone.utc).isoformat()

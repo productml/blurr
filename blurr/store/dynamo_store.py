@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any, Dict, List, Tuple
 
 import boto3
@@ -6,6 +7,7 @@ from dateutil import parser
 
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store import Store, Key, StoreSchema
+from blurr.core.store_key import KeyType
 
 
 class DynamoStoreSchema(StoreSchema):
@@ -95,14 +97,7 @@ class DynamoStore(Store):
 
         return self.clean_for_get(item)
 
-    def get_range(self, start: Key, end: Key = None, count: int = 0) -> List[Tuple[Key, Any]]:
-
-        if end and count:
-            raise ValueError('Only one of `end` or `count` can be set')
-
-        if end is not None and end < start:
-            start, end = end, start
-
+    def _get_range_timestamp_key(self, start: Key, end: Key = None, count: int = 0) -> List[Tuple[Key, Any]]:
         sort_key_condition = DynamoKey('range_key')
 
         if end:
@@ -132,6 +127,11 @@ class DynamoStore(Store):
             del records[-1]
 
         return records
+
+    def _get_range_dimension_key(self, base_key: Key, start_time: datetime,
+                                 end_time: datetime = None, count: int = 0) -> List[
+        Tuple[Key, Any]]:
+        pass
 
     def get_all(self, identity: str) -> Dict[Key, Any]:
         response = self._table.query(KeyConditionExpression=DynamoKey('partition_key').eq(identity))

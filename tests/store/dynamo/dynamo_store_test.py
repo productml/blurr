@@ -206,10 +206,7 @@ def test_save_time(store: DynamoStore) -> None:
 
 def test_get_range_items_on_boundary_are_removed(loaded_store: DynamoStore) -> None:
     items = loaded_store.get_range(
-        Key(KeyType.TIMESTAMP, 'test_user', 'test_group', [],
-            datetime(2018, 1, 1, 2, 1, 1, 1, tzinfo=timezone.utc)),
-        Key(KeyType.TIMESTAMP, 'test_user', 'test_group', [],
-            datetime(2018, 1, 1, 6, 1, 1, 1, tzinfo=timezone.utc)))
+        Key(KeyType.TIMESTAMP, 'test_user', 'test_group'),datetime(2018, 1, 1, 2, 1, 1, 1, tzinfo=timezone.utc),datetime(2018, 1, 1, 6, 1, 1, 1, tzinfo=timezone.utc))
 
     assert len(items) == 3
     assert items[0][1]['int_field'] == 3
@@ -218,10 +215,7 @@ def test_get_range_items_on_boundary_are_removed(loaded_store: DynamoStore) -> N
 
 def test_get_range_no_items_on_boundary(loaded_store: DynamoStore) -> None:
     items = loaded_store.get_range(
-        Key(KeyType.TIMESTAMP, 'test_user', 'test_group', [],
-            datetime(2018, 1, 1, 2, 1, 1, 0, tzinfo=timezone.utc)),
-        Key(KeyType.TIMESTAMP, 'test_user', 'test_group', [],
-            datetime(2018, 1, 1, 6, 1, 1, 2, tzinfo=timezone.utc)))
+        Key(KeyType.TIMESTAMP, 'test_user', 'test_group'), datetime(2018, 1, 1, 2, 1, 1, 0, tzinfo=timezone.utc), datetime(2018, 1, 1, 6, 1, 1, 2, tzinfo=timezone.utc))
 
     assert len(items) == 5
     assert items[0][1]['int_field'] == 2
@@ -230,8 +224,7 @@ def test_get_range_no_items_on_boundary(loaded_store: DynamoStore) -> None:
 
 def test_get_range_count_forward(loaded_store: DynamoStore) -> None:
     items = loaded_store.get_range(
-        Key(KeyType.TIMESTAMP, 'test_user', 'test_group', [],
-            datetime(2018, 1, 1, 2, 1, 1, 1, tzinfo=timezone.utc)), None, 3)
+        Key(KeyType.TIMESTAMP, 'test_user', 'test_group'), datetime(2018, 1, 1, 2, 1, 1, 1, tzinfo=timezone.utc), None, 3)
 
     assert len(items) == 3
     assert items[0][1]['int_field'] == 3
@@ -240,8 +233,7 @@ def test_get_range_count_forward(loaded_store: DynamoStore) -> None:
 
 def test_get_range_count_backward(loaded_store: DynamoStore) -> None:
     items = loaded_store.get_range(
-        Key(KeyType.TIMESTAMP, 'test_user', 'test_group', [],
-            datetime(2018, 1, 1, 6, 1, 1, 1, tzinfo=timezone.utc)), None, -3)
+        Key(KeyType.TIMESTAMP, 'test_user', 'test_group'), datetime(2018, 1, 1, 6, 1, 1, 1, tzinfo=timezone.utc), None, -3)
 
     assert len(items) == 3
     assert items[0][1]['int_field'] == 5
