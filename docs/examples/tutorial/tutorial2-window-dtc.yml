@@ -6,7 +6,6 @@ SourceDTC: sessions
 
 Anchor:
   Condition: sessions.session_stats.boost == True
-  Max: 1
 
 Aggregates:
   - Type: Blurr:Aggregate:Window

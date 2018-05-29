@@ -114,6 +114,5 @@ def test_anchor_schema_missing_condition_max_attribute_adds_error(schema_loader:
     name = schema_loader.add_schema_spec(spec)
     schema = AnchorSchema(name, schema_loader)
 
-    assert len(schema.errors) == 2
+    assert len(schema.errors) == 1
     assert RequiredAttributeError('anchor', spec, AnchorSchema.ATTRIBUTE_CONDITION) in schema.errors
-    assert RequiredAttributeError('anchor', spec, AnchorSchema.ATTRIBUTE_MAX) in schema.errors
