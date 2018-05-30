@@ -14,12 +14,14 @@ class DynamoStoreSchema(StoreSchema):
     ATTRIBUTE_TABLE = 'Table'
     ATTRIBUTE_READ_CAPACITY_UNITS = 'ReadCapacityUnits'
     ATTRIBUTE_WRITE_CAPACITY_UNITS = 'WriteCapacityUnits'
+    QUERY_LIMIT = 1000
 
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
         self.table_name = self._spec.get(self.ATTRIBUTE_TABLE, None)
         self.rcu = self._spec.get(self.ATTRIBUTE_READ_CAPACITY_UNITS, 5)
         self.wcu = self._spec.get(self.ATTRIBUTE_WRITE_CAPACITY_UNITS, 5)
+        self.query_limit = self.QUERY_LIMIT
 
     def validate_schema_spec(self) -> None:
         super().validate_schema_spec()
@@ -103,7 +105,7 @@ class DynamoStore(Store):
         # Limit is set to count+1 because for items where the start key matches exactly
         # KeyConditionExpression passes and FilterExpression fails.
         response = self._table.query(
-            Limit=abs(count) + 1 if count else 1000,
+            Limit=abs(count) + 1 if count else self._schema.query_limit,
             KeyConditionExpression=DynamoKey('partition_key').eq(
                 start.identity) & sort_key_condition,
             FilterExpression=Attr('_start_time').gt(start.timestamp.isoformat()) &
@@ -124,7 +126,7 @@ class DynamoStore(Store):
         # returned to find the count number of elements in a sorted manner.
         # TODO: Improve count query performance by using a secondary index.
         response = self._table.query(
-            Limit=1000,
+            Limit=self._schema.query_limit,
             KeyConditionExpression=DynamoKey('partition_key').eq(
                 base_key.identity) & DynamoKey('range_key').begins_with(base_key.sort_prefix_key),
             FilterExpression=Attr('_start_time').gt(start_time.isoformat()) &

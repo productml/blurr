@@ -94,7 +94,7 @@ class Key:
     def sort_prefix_key(self):
         if self.key_type == KeyType.DIMENSION:
             return Key.PARTITION.join([self.group, self.dimensions_str]
-                                      if self.dimensions_str else [self.group])
+                                      if self.dimensions_str else [self.group, ''])
 
         if self.key_type == KeyType.TIMESTAMP:
             return self.sort_key

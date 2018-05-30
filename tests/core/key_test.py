@@ -135,3 +135,11 @@ def test_dimension_key_starts_with():
         Key(KeyType.DIMENSION, 'user1', 'group1', ['a', 'b'], None))
     assert Key(KeyType.DIMENSION, 'user1', 'group1', ['a', 'b', 'c'], None).starts_with(
         Key(KeyType.DIMENSION, 'user1', 'group1', ['a', 'b', 'c'], None))
+
+
+def test_sort_prefix_key():
+    assert Key(KeyType.DIMENSION, 'user1', 'group1').sort_prefix_key == 'group1/'
+    assert Key(KeyType.DIMENSION, 'user1', 'group1', ['a', 'b']).sort_prefix_key == 'group1/a:b'
+    assert Key(KeyType.TIMESTAMP, 'user1', 'group1').sort_prefix_key == 'group1//'
+    assert Key(KeyType.TIMESTAMP, 'user1', 'group1', [], datetime(
+        2018, 3, 7, 22, 35, 31)).sort_prefix_key == 'group1//2018-03-07T22:35:31+00:00'
