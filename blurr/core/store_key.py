@@ -18,6 +18,7 @@ class Key:
     PARTITION = '/'
     DIMENSION_PARTITION = ':'
 
+    # TODO: Consider adding a * to force parameterization of attributes.
     def __init__(self,
                  key_type: KeyType,
                  identity: str,

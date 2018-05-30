@@ -97,5 +97,4 @@ class IdentityAggregate(Aggregate):
                    [str(item.value) for item in self._dimension_fields.values()])
 
     def _persist(self) -> None:
-        # TODO Refactor keys when refactoring store
         self._store.save(self._existing_key, self._snapshot)
