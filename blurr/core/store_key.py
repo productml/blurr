@@ -22,7 +22,7 @@ class Key:
                  key_type: KeyType,
                  identity: str,
                  group: str,
-                 dimensions: List[Any] = list(),
+                 dimensions: List[str] = list(),
                  timestamp: datetime = None) -> None:
         """
         Initializes a new key for storing data
@@ -50,7 +50,12 @@ class Key:
         self.group = group
         self.timestamp = timestamp if not timestamp or timestamp.tzinfo else timestamp.replace(
             tzinfo=timezone.utc)
-        self.dimensions = ':'.join(dimensions) if dimensions else ''
+        self.dimensions = dimensions
+
+    # TODO: Handle '/' and ':' values in dimensions
+    @property
+    def dimensions_str(self):
+        return ':'.join(self.dimensions) if self.dimensions else ''
 
     @staticmethod
     def parse(key_string: str) -> 'Key':
@@ -81,8 +86,17 @@ class Key:
     @property
     def sort_key(self):
         return Key.PARTITION.join(
-            [self.group, self.dimensions,
+            [self.group, self.dimensions_str,
              self.timestamp.isoformat() if self.timestamp else ''])
+
+    @property
+    def sort_prefix_key(self):
+        if self.key_type == KeyType.DIMENSION:
+            return Key.PARTITION.join([self.group, self.dimensions_str]
+                                      if self.dimensions_str else [self.group])
+
+        if self.key_type == KeyType.TIMESTAMP:
+            return self.sort_key
 
     def __repr__(self):
         return self.__str__()
@@ -121,14 +135,14 @@ class Key:
         return self.dimensions > other.dimensions
 
     def __hash__(self):
-        return hash((self.identity, self.group, self.timestamp, self.dimensions))
+        return hash((self.identity, self.group, self.timestamp, self.dimensions_str))
 
     def starts_with(self, other: 'Key') -> bool:
         """
         Checks if this key starts with the other key provided. Returns False if key_type, identity
         or group are different.
         For `KeyType.TIMESTAMP` returns True.
-        For `KeyType.DIMENSION` does a prefix match between the two dimensions property.
+        For `KeyType.DIMENSION` does prefix match between the two dimensions property.
         """
         if (self.key_type, self.identity, self.group) != (other.key_type, other.identity,
                                                           other.group):
@@ -136,4 +150,6 @@ class Key:
         if self.key_type == KeyType.TIMESTAMP:
             return True
         if self.key_type == KeyType.DIMENSION:
-            return self.dimensions.startswith(other.dimensions)
+            if len(self.dimensions) < len(other.dimensions):
+                return False
+            return self.dimensions[0:len(other.dimensions)] == other.dimensions

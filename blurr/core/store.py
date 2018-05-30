@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABC
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, List, Tuple, Dict
 
 from blurr.core.base import BaseSchema
@@ -42,20 +42,22 @@ class Store(ABC):
         if end_time and count:
             raise ValueError('Only one of `end` or `count` can be set')
 
-        if end_time is not None and end_time < start_time:
+        if count:
+            end_time = datetime.min.replace(
+                tzinfo=timezone.utc) if count < 0 else datetime.max.replace(tzinfo=timezone.utc)
+
+        if end_time < start_time:
             start_time, end_time = end_time, start_time
 
         if base_key.key_type == KeyType.TIMESTAMP:
             start_key = Key(KeyType.TIMESTAMP, base_key.identity, base_key.group, [], start_time)
-            end_key = None
-            if end_time:
-                end_key = Key(KeyType.TIMESTAMP, base_key.identity, base_key.group, [], end_time)
+            end_key = Key(KeyType.TIMESTAMP, base_key.identity, base_key.group, [], end_time)
             return self._get_range_timestamp_key(start_key, end_key, count)
         else:
             return self._get_range_dimension_key(base_key, start_time, end_time, count)
 
     @abstractmethod
-    def _get_range_timestamp_key(self, start: Key, end: Key = None,
+    def _get_range_timestamp_key(self, start: Key, end: Key,
                                  count: int = 0) -> List[Tuple[Key, Any]]:
         """
         Returns the list of items from the store based on the given time range or count.
@@ -68,7 +70,7 @@ class Store(ABC):
     def _get_range_dimension_key(self,
                                  base_key: Key,
                                  start_time: datetime,
-                                 end_time: datetime = None,
+                                 end_time: datetime,
                                  count: int = 0) -> List[Tuple[Key, Any]]:
         """
         Returns the list of items from the store based on the given time range or count.
@@ -76,6 +78,16 @@ class Store(ABC):
         This is used when the key being used is a DIMENSION key.
         """
         raise NotImplementedError()
+
+    @staticmethod
+    def _restrict_items_to_count(items: List[Tuple[Key, Any]], count: int) -> List[Tuple[Key, Any]]:
+        if abs(count) > len(items):
+            count = Store._sign(count) * len(items)
+
+        if count < 0:
+            return items[count:]
+        else:
+            return items[:count]
 
     @abstractmethod
     def save(self, key: Key, item: Any) -> None:
@@ -97,3 +109,7 @@ class Store(ABC):
         Finalizes the store by flushing all remaining data to persistence
         """
         raise NotImplementedError()
+
+    @staticmethod
+    def _sign(x: int) -> int:
+        return (1, -1)[x < 0]

@@ -130,7 +130,7 @@ def test_dimension_key_starts_with():
         Key(KeyType.DIMENSION, 'user1', 'group1', ['c'], None))
 
     assert Key(KeyType.DIMENSION, 'user1', 'group1', ['a', 'b', 'c'], None).starts_with(
-        Key(KeyType.DIMENSION, 'user1', 'group1', [''], None))
+        Key(KeyType.DIMENSION, 'user1', 'group1', [], None))
     assert Key(KeyType.DIMENSION, 'user1', 'group1', ['a', 'b', 'c'], None).starts_with(
         Key(KeyType.DIMENSION, 'user1', 'group1', ['a', 'b'], None))
     assert Key(KeyType.DIMENSION, 'user1', 'group1', ['a', 'b', 'c'], None).starts_with(

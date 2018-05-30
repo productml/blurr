@@ -44,10 +44,20 @@ def init_memory_store(store: MemoryStore) -> None:
             'events': 1,
             '_start_time': date.isoformat()
         })
+    store.save(
+        Key(KeyType.DIMENSION, 'user1', 'session_dim', ['dimA', 'session1']), {
+            'events': 1,
+            '_start_time': date.isoformat()
+        })
 
     date = datetime(2018, 3, 7, 20, 35, 35, 0, timezone.utc)
     store.save(
         Key(KeyType.TIMESTAMP, 'user1', 'session', [], date), {
+            'events': 2,
+            '_start_time': date.isoformat()
+        })
+    store.save(
+        Key(KeyType.DIMENSION, 'user1', 'session_dim', ['dimB', 'session2']), {
             'events': 2,
             '_start_time': date.isoformat()
         })
@@ -58,10 +68,20 @@ def init_memory_store(store: MemoryStore) -> None:
             'events': 3,
             '_start_time': date.isoformat()
         })
+    store.save(
+        Key(KeyType.DIMENSION, 'user1', 'session_dim', ['dimA', 'session3']), {
+            'events': 3,
+            '_start_time': date.isoformat()
+        })
 
     date = datetime(2018, 3, 7, 22, 38, 31, 0, timezone.utc)
     store.save(
         Key(KeyType.TIMESTAMP, 'user1', 'session', [], date), {
+            'events': 4,
+            '_start_time': date.isoformat()
+        })
+    store.save(
+        Key(KeyType.DIMENSION, 'user1', 'session_dim', ['dimB', 'session4']), {
             'events': 4,
             '_start_time': date.isoformat()
         })
@@ -72,10 +92,20 @@ def init_memory_store(store: MemoryStore) -> None:
             'events': 5,
             '_start_time': date.isoformat()
         })
+    store.save(
+        Key(KeyType.DIMENSION, 'user1', 'session_dim', ['dimA', 'session5']), {
+            'events': 5,
+            '_start_time': date.isoformat()
+        })
 
     date = datetime(2018, 3, 8, 23, 40, 31, 0, timezone.utc)
     store.save(
         Key(KeyType.TIMESTAMP, 'user1', 'session', [], date), {
+            'events': 6,
+            '_start_time': date.isoformat()
+        })
+    store.save(
+        Key(KeyType.DIMENSION, 'user1', 'session_dim', ['dimB', 'session6']), {
             'events': 6,
             '_start_time': date.isoformat()
         })

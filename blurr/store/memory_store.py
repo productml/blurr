@@ -33,35 +33,32 @@ class MemoryStore(Store):
 
     def _get_range_timestamp_key(self, start: Key, end: Key = None,
                                  count: int = 0) -> List[Tuple[Key, Any]]:
-        if not count:
-            items_in_range = []
-            for key, item in self._cache.items():
-                if start < key < end:
-                    items_in_range.append((key, item))
-            return items_in_range
-        else:
-            filter_condition = (lambda i: i[0] > start) if count > 0 else (lambda i: i[0] < start)
-
-            items = sorted(filter(filter_condition, list(self._cache.items())))
-
-            if abs(count) > len(items):
-                count = MemoryStore._sign(count) * len(items)
-
-            if count < 0:
-                return items[count:]
-            else:
-                return items[:count]
+        items = []
+        for key, item in self._cache.items():
+            if start < key < end:
+                items.append((key, item))
+        items = sorted(items)
+        if count:
+            items = self._restrict_items_to_count(items, count)
+        return items
 
     def _get_range_dimension_key(self,
                                  base_key: Key,
                                  start_time: datetime,
-                                 end_time: datetime = None,
+                                 end_time: datetime,
                                  count: int = 0) -> List[Tuple[Key, Any]]:
-        pass
-
-    @staticmethod
-    def _sign(x: int) -> int:
-        return (1, -1)[x < 0]
+        start_time_str = start_time.isoformat()
+        end_time_str = end_time.isoformat()
+        items = []
+        for key, item in self._cache.items():
+            if key.starts_with(base_key):
+                item_time = item.get('_start_time', datetime.min.isoformat())
+                if start_time_str < item_time < end_time_str:
+                    items.append((key, item))
+        items = sorted(items, key=lambda i: i[1].get('_start_time', datetime.min.isoformat()))
+        if count:
+            items = self._restrict_items_to_count(items, count)
+        return items
 
     def save(self, key: Key, item: Any) -> None:
         self._cache[key] = item
