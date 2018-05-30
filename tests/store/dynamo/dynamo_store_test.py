@@ -7,7 +7,7 @@ import boto3
 from pytest import fixture
 
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.store_key import Key
+from blurr.core.store_key import Key, KeyType
 from blurr.store.dynamo_store import DynamoStore
 from tests.store.dynamo.utils import DYNAMODB_KWARGS
 
@@ -54,55 +54,65 @@ def loaded_store() -> DynamoStore:
             new=override_boto3_dynamodb_resource):
         dynamo_store = schema_loader.get_store(name)
     dynamo_store.save(
-        Key('test_user', 'test_group', datetime(2018, 1, 1, 1, 1, 1, 1, tzinfo=timezone.utc)), {
-            'string_field': 'string',
-            'int_field': 1
-        })
+        Key(KeyType.TIMESTAMP, 'test_user', 'test_group', [],
+            datetime(2018, 1, 1, 1, 1, 1, 1, tzinfo=timezone.utc)), {
+                'string_field': 'string',
+                'int_field': 1
+            })
     dynamo_store.save(
-        Key('test_user2', 'test_group', datetime(2018, 1, 1, 1, 1, 1, 1, tzinfo=timezone.utc)), {
-            'string_field': 'string',
-            'int_field': 1
-        })
+        Key(KeyType.TIMESTAMP, 'test_user2', 'test_group', [],
+            datetime(2018, 1, 1, 1, 1, 1, 1, tzinfo=timezone.utc)), {
+                'string_field': 'string',
+                'int_field': 1
+            })
     dynamo_store.save(
-        Key('test_user', 'test_group', datetime(2018, 1, 1, 2, 1, 1, 1, tzinfo=timezone.utc)), {
-            'string_field': 'string2',
-            'int_field': 2
-        })
+        Key(KeyType.TIMESTAMP, 'test_user', 'test_group', [],
+            datetime(2018, 1, 1, 2, 1, 1, 1, tzinfo=timezone.utc)), {
+                'string_field': 'string2',
+                'int_field': 2
+            })
     dynamo_store.save(
-        Key('test_user', 'test_group', datetime(2018, 1, 1, 3, 1, 1, 1, tzinfo=timezone.utc)), {
-            'string_field': 'string3',
-            'int_field': 3
-        })
+        Key(KeyType.TIMESTAMP, 'test_user', 'test_group', [],
+            datetime(2018, 1, 1, 3, 1, 1, 1, tzinfo=timezone.utc)), {
+                'string_field': 'string3',
+                'int_field': 3
+            })
     dynamo_store.save(
-        Key('test_user', 'test_group', datetime(2018, 1, 1, 4, 1, 1, 1, tzinfo=timezone.utc)), {
-            'string_field': 'string4',
-            'int_field': 4
-        })
+        Key(KeyType.TIMESTAMP, 'test_user', 'test_group', [],
+            datetime(2018, 1, 1, 4, 1, 1, 1, tzinfo=timezone.utc)), {
+                'string_field': 'string4',
+                'int_field': 4
+            })
     dynamo_store.save(
-        Key('test_user', 'test_group', datetime(2018, 1, 1, 5, 1, 1, 1, tzinfo=timezone.utc)), {
-            'string_field': 'string5',
-            'int_field': 5
-        })
+        Key(KeyType.TIMESTAMP, 'test_user', 'test_group', [],
+            datetime(2018, 1, 1, 5, 1, 1, 1, tzinfo=timezone.utc)), {
+                'string_field': 'string5',
+                'int_field': 5
+            })
     dynamo_store.save(
-        Key('test_user', 'test_group', datetime(2018, 1, 1, 6, 1, 1, 1, tzinfo=timezone.utc)), {
-            'string_field': 'string6',
-            'int_field': 6
-        })
+        Key(KeyType.TIMESTAMP, 'test_user', 'test_group', [],
+            datetime(2018, 1, 1, 6, 1, 1, 1, tzinfo=timezone.utc)), {
+                'string_field': 'string6',
+                'int_field': 6
+            })
     dynamo_store.save(
-        Key('test_user2', 'test_group', datetime(2018, 1, 1, 6, 1, 1, 1, tzinfo=timezone.utc)), {
-            'string_field': 'string6',
-            'int_field': 6
-        })
+        Key(KeyType.TIMESTAMP, 'test_user2', 'test_group', [],
+            datetime(2018, 1, 1, 6, 1, 1, 1, tzinfo=timezone.utc)), {
+                'string_field': 'string6',
+                'int_field': 6
+            })
     dynamo_store.save(
-        Key('test_user', 'test_group', datetime(2018, 1, 1, 7, 1, 1, 1, tzinfo=timezone.utc)), {
-            'string_field': 'string7',
-            'int_field': 7
-        })
+        Key(KeyType.TIMESTAMP, 'test_user', 'test_group', [],
+            datetime(2018, 1, 1, 7, 1, 1, 1, tzinfo=timezone.utc)), {
+                'string_field': 'string7',
+                'int_field': 7
+            })
     dynamo_store.save(
-        Key('test_user', 'test_group', datetime(2018, 1, 1, 8, 1, 1, 1, tzinfo=timezone.utc)), {
-            'string_field': 'string8',
-            'int_field': 8
-        })
+        Key(KeyType.TIMESTAMP, 'test_user', 'test_group', [],
+            datetime(2018, 1, 1, 8, 1, 1, 1, tzinfo=timezone.utc)), {
+                'string_field': 'string8',
+                'int_field': 8
+            })
 
     yield dynamo_store
     dynamo_store._table.delete()
@@ -170,18 +180,25 @@ def test_table_creation_if_not_exist(dynamo_store_spec: Dict[str, Any]) -> None:
 
 
 def test_save_simple(store: DynamoStore) -> None:
-    store.save(Key('test_user', 'test_group'), {'string_field': 'string', 'int_field': 1})
-    assert store.get(Key('test_user', 'test_group')) == {'string_field': 'string', 'int_field': 1}
+    store.save(
+        Key(KeyType.DIMENSION, 'test_user', 'test_group'), {
+            'string_field': 'string',
+            'int_field': 1
+        })
+    assert store.get(Key(KeyType.DIMENSION, 'test_user', 'test_group')) == {
+        'string_field': 'string',
+        'int_field': 1
+    }
 
 
 def test_save_time(store: DynamoStore) -> None:
     start_time = datetime(2018, 1, 1, 1, 1, 1, 1, tzinfo=timezone.utc)
     store.save(
-        Key('test_user', 'test_group', start_time), {
+        Key(KeyType.TIMESTAMP, 'test_user', 'test_group', [], start_time), {
             'string_field': 'string2',
             'int_field': 2
         })
-    assert store.get(Key('test_user', 'test_group', start_time)) == {
+    assert store.get(Key(KeyType.TIMESTAMP, 'test_user', 'test_group', [], start_time)) == {
         'string_field': 'string2',
         'int_field': 2
     }
@@ -189,8 +206,10 @@ def test_save_time(store: DynamoStore) -> None:
 
 def test_get_range_items_on_boundary_are_removed(loaded_store: DynamoStore) -> None:
     items = loaded_store.get_range(
-        Key('test_user', 'test_group', datetime(2018, 1, 1, 2, 1, 1, 1, tzinfo=timezone.utc)),
-        Key('test_user', 'test_group', datetime(2018, 1, 1, 6, 1, 1, 1, tzinfo=timezone.utc)))
+        Key(KeyType.TIMESTAMP, 'test_user', 'test_group', [],
+            datetime(2018, 1, 1, 2, 1, 1, 1, tzinfo=timezone.utc)),
+        Key(KeyType.TIMESTAMP, 'test_user', 'test_group', [],
+            datetime(2018, 1, 1, 6, 1, 1, 1, tzinfo=timezone.utc)))
 
     assert len(items) == 3
     assert items[0][1]['int_field'] == 3
@@ -199,8 +218,10 @@ def test_get_range_items_on_boundary_are_removed(loaded_store: DynamoStore) -> N
 
 def test_get_range_no_items_on_boundary(loaded_store: DynamoStore) -> None:
     items = loaded_store.get_range(
-        Key('test_user', 'test_group', datetime(2018, 1, 1, 2, 1, 1, 0, tzinfo=timezone.utc)),
-        Key('test_user', 'test_group', datetime(2018, 1, 1, 6, 1, 1, 2, tzinfo=timezone.utc)))
+        Key(KeyType.TIMESTAMP, 'test_user', 'test_group', [],
+            datetime(2018, 1, 1, 2, 1, 1, 0, tzinfo=timezone.utc)),
+        Key(KeyType.TIMESTAMP, 'test_user', 'test_group', [],
+            datetime(2018, 1, 1, 6, 1, 1, 2, tzinfo=timezone.utc)))
 
     assert len(items) == 5
     assert items[0][1]['int_field'] == 2
@@ -209,8 +230,8 @@ def test_get_range_no_items_on_boundary(loaded_store: DynamoStore) -> None:
 
 def test_get_range_count_forward(loaded_store: DynamoStore) -> None:
     items = loaded_store.get_range(
-        Key('test_user', 'test_group', datetime(2018, 1, 1, 2, 1, 1, 1, tzinfo=timezone.utc)), None,
-        3)
+        Key(KeyType.TIMESTAMP, 'test_user', 'test_group', [],
+            datetime(2018, 1, 1, 2, 1, 1, 1, tzinfo=timezone.utc)), None, 3)
 
     assert len(items) == 3
     assert items[0][1]['int_field'] == 3
@@ -219,8 +240,8 @@ def test_get_range_count_forward(loaded_store: DynamoStore) -> None:
 
 def test_get_range_count_backward(loaded_store: DynamoStore) -> None:
     items = loaded_store.get_range(
-        Key('test_user', 'test_group', datetime(2018, 1, 1, 6, 1, 1, 1, tzinfo=timezone.utc)), None,
-        -3)
+        Key(KeyType.TIMESTAMP, 'test_user', 'test_group', [],
+            datetime(2018, 1, 1, 6, 1, 1, 1, tzinfo=timezone.utc)), None, -3)
 
     assert len(items) == 3
     assert items[0][1]['int_field'] == 5

@@ -71,10 +71,6 @@ class DynamoStore(Store):
         return boto3.resource('dynamodb')
 
     @staticmethod
-    def dimensions(key: Key):
-        return key.group + (key.PARTITION + key.timestamp.isoformat() if key.timestamp else '')
-
-    @staticmethod
     def clean_for_get(item: Dict[str, Any]) -> Dict[str, Any]:
         item.pop('partition_key', None)
         item.pop('range_key', None)
@@ -85,15 +81,13 @@ class DynamoStore(Store):
         return {k: v for k, v in item.items() if v}
 
     def prepare_record(self, record: Dict[str, Any]) -> Tuple[Key, Any]:
-        dimensions = record['range_key'].split(Key.PARTITION)
-        key = Key(record['partition_key'], dimensions[0], None
-                  if len(dimensions) == 1 else parser.parse(dimensions[1]))
+        key = Key.parse_sort_key(record['partition_key'], record['range_key'])
         return key, self.clean_for_get(record)
 
     def get(self, key: Key) -> Any:
         item = self._table.get_item(Key={
             'partition_key': key.identity,
-            'range_key': self.dimensions(key)
+            'range_key': key.sort_key
         }).get('Item', None)
 
         if not item:
@@ -109,20 +103,18 @@ class DynamoStore(Store):
         if end is not None and end < start:
             start, end = end, start
 
-        dimension_key_condition = DynamoKey('range_key')
+        sort_key_condition = DynamoKey('range_key')
 
         if end:
-            dimension_key_condition = dimension_key_condition.between(
-                self.dimensions(start), self.dimensions(end))
+            sort_key_condition = sort_key_condition.between(start.sort_key, end.sort_key)
         else:
-            dimension_key_condition = dimension_key_condition.gt(
-                self.dimensions(start)) if count > 0 else dimension_key_condition.lt(
-                    self.dimensions(start))
+            sort_key_condition = sort_key_condition.gt(
+                start.sort_key) if count > 0 else sort_key_condition.lt(start.sort_key)
 
         response = self._table.query(
             Limit=abs(count) if count else 1000,
             KeyConditionExpression=DynamoKey('partition_key').eq(start.identity) &
-            dimension_key_condition,
+            sort_key_condition,
             ScanIndexForward=count >= 0,
         )
 
@@ -148,7 +140,7 @@ class DynamoStore(Store):
 
     def save(self, key: Key, item: Any) -> None:
         item['partition_key'] = key.identity
-        item['range_key'] = self.dimensions(key)
+        item['range_key'] = key.sort_key
         self._table.put_item(Item=self.clean_item_for_save(item))
 
     def delete(self, key: Key) -> None:

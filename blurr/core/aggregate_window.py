@@ -6,7 +6,7 @@ from blurr.core.aggregate_block import BlockAggregate, BlockAggregateSchema
 from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.store_key import Key
+from blurr.core.store_key import Key, KeyType
 from blurr.core.type import Type
 
 
@@ -66,13 +66,15 @@ class WindowAggregate(Aggregate):
                 self._schema.window_type, Type.HOUR):
             block_list = self._load_blocks(
                 store.get_range(
-                    Key(self._identity, self._schema.source.name, start_time),
-                    Key(self._identity, self._schema.source.name, self._get_end_time(start_time))))
+                    Key(KeyType.TIMESTAMP, self._identity, self._schema.source.name, [],
+                        start_time),
+                    Key(KeyType.TIMESTAMP, self._identity, self._schema.source.name, [],
+                        self._get_end_time(start_time))))
         else:
             block_list = self._load_blocks(
                 store.get_range(
-                    Key(self._identity, self._schema.source.name, start_time), None,
-                    self._schema.window_value))
+                    Key(KeyType.TIMESTAMP, self._identity, self._schema.source.name, [],
+                        start_time), None, self._schema.window_value))
 
         self._window_source = _WindowSource(block_list)
         self._validate_view()
