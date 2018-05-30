@@ -5,7 +5,8 @@ from blurr.core.errors import SnapshotError, BaseSchemaError, InvalidExpressionE
 from blurr.core.evaluation import Expression, EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key
-from blurr.core.validator import validate_required_attributes, validate_python_identifier_attributes, \
+from blurr.core.validator import validate_required_attributes, \
+    validate_python_identifier_attributes, \
     validate_number_attribute, validate_empty_attributes, validate_enum_attribute
 
 
