@@ -3,21 +3,21 @@ import pytest
 from blurr.cli.cli import cli
 from blurr.cli.validate import validate_file
 
-# TODO Window DTC validation requires the streaming DTC to be in context
+# TODO Window BTS validation requires the streaming BTS to be in context
 # Rethink validation in parameterized form
 
 
-@pytest.mark.parametrize('input_dtc', [
-    'docs/examples/frequently-bought-together/fbt-streaming-dtc.yml',
-    'docs/examples/frequently-bought-together/fbt-window-dtc.yml',
-    'docs/examples/offer-ai/offer-ai-streaming-dtc.yml',
-    'docs/examples/offer-ai/offer-ai-window-dtc.yml',
-    'docs/examples/tutorial/tutorial1-streaming-dtc.yml',
-    'docs/examples/tutorial/tutorial2-streaming-dtc.yml',
-    'docs/examples/tutorial/tutorial2-window-dtc.yml'
+@pytest.mark.parametrize('input_bts', [
+    'docs/examples/frequently-bought-together/fbt-streaming-bts.yml',
+    'docs/examples/frequently-bought-together/fbt-window-bts.yml',
+    'docs/examples/offer-ai/offer-ai-streaming-bts.yml',
+    'docs/examples/offer-ai/offer-ai-window-bts.yml',
+    'docs/examples/tutorial/tutorial1-streaming-bts.yml',
+    'docs/examples/tutorial/tutorial2-streaming-bts.yml',
+    'docs/examples/tutorial/tutorial2-window-bts.yml'
 ])
-def test_example_dtc_valid(input_dtc):
-    assert validate_file(input_dtc) == 0
+def test_example_bts_valid(input_bts):
+    assert validate_file(input_bts) == 0
 
 
 def get_file_text(file_path) -> str:
@@ -27,19 +27,19 @@ def get_file_text(file_path) -> str:
 
 @pytest.mark.parametrize(
     'input_files, output_file',
-    [(('docs/examples/tutorial/tutorial1-streaming-dtc.yml', None,
+    [(('docs/examples/tutorial/tutorial1-streaming-bts.yml', None,
        'docs/examples/tutorial/tutorial1-data.log'), "docs/examples/tutorial/tutorial1-output.log"),
-     (('docs/examples/tutorial/tutorial2-streaming-dtc.yml',
-       'docs/examples/tutorial/tutorial2-window-dtc.yml',
+     (('docs/examples/tutorial/tutorial2-streaming-bts.yml',
+       'docs/examples/tutorial/tutorial2-window-bts.yml',
        'docs/examples/tutorial/tutorial2-data.log'), "docs/examples/tutorial/tutorial2-output.log")]
 )
-def test_example_dtc_output(input_files, output_file, capsys):
-    stream_dtc_file, window_dtc_file, raw_json_file = input_files
+def test_example_bts_output(input_files, output_file, capsys):
+    stream_bts_file, window_bts_file, raw_json_file = input_files
     assert cli({
         'transform': True,
         'validate': False,
-        '--streaming-dtc': stream_dtc_file,
-        '--window-dtc': window_dtc_file,
+        '--streaming-bts': stream_bts_file,
+        '--window-bts': window_bts_file,
         '--source': raw_json_file,
         '--runner': 'local',
         '--data-processor': None,

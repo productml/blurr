@@ -1,6 +1,6 @@
 """
 Usage:
-    local_runner.py --raw-data=<files> --streaming-dtc=<file> [--window-dtc=<file>] [--output-file=<file>]
+    local_runner.py --raw-data=<files> --streaming-bts=<file> [--window-bts=<file>] [--output-file=<file>]
     local_runner.py (-h | --help)
 """
 import csv
@@ -15,15 +15,15 @@ from blurr.runner.runner import Runner, TimeAndRecord
 
 
 class LocalRunner(Runner):
-    def __init__(self, stream_dtc_file: str, window_dtc_file: Optional[str] = None):
-        super().__init__(stream_dtc_file, window_dtc_file)
+    def __init__(self, stream_bts_file: str, window_bts_file: Optional[str] = None):
+        super().__init__(stream_bts_file, window_bts_file)
 
         self._per_user_data = {}
 
-    def _validate_dtc_syntax(self) -> None:
-        validate(self._stream_dtc)
-        if self._window_dtc is not None:
-            validate(self._window_dtc)
+    def _validate_bts_syntax(self) -> None:
+        validate(self._stream_bts)
+        if self._window_bts is not None:
+            validate(self._window_bts)
 
     def _execute_for_all_identities(self,
                                     identity_records: Dict[str, List[TimeAndRecord]],
@@ -60,14 +60,14 @@ class LocalRunner(Runner):
 
     def print_output(self, per_user_data) -> None:
         for id, (block_data, window_data) in per_user_data.items():
-            if not self._window_dtc:
+            if not self._window_bts:
                 for data in block_data.items():
                     print(json.dumps(data, cls=BlurrJSONEncoder))
             else:
                 print(json.dumps((id, window_data), cls=BlurrJSONEncoder))
 
     def write_output_file(self, output_file: str, per_user_data):
-        if not self._window_dtc:
+        if not self._window_bts:
             with open(output_file, 'w') as file:
                 for block_data, _ in per_user_data.values():
                     for row in block_data.items():

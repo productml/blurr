@@ -1,7 +1,7 @@
 Type: Blurr:Transform:Window
 Version: '2018-03-01'
 Description: Example
-SourceDTC: test
+SourceBTS: test
 Name: example_name
 When: source.package_version == '1.0'
 

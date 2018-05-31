@@ -13,20 +13,20 @@ TUTORIAL_PATH=docs/examples/tutorial
 
 echo "generating session_data_tutorial_1.log..."
 pipenv run python -m blurr transform \
-    --streaming-dtc=${TUTORIAL_PATH}/tutorial1-streaming-dtc.yml \
+    --streaming-bts=${TUTORIAL_PATH}/tutorial1-streaming-bts.yml \
     ${TUTORIAL_PATH}/tutorial1-data.log > ${TUTORIAL_PATH}/session_data_tutorial_1.log
 
 
 echo "generating session_data_tutorial_2_streaming.log..."
 pipenv run python -m blurr transform \
-    --streaming-dtc=${TUTORIAL_PATH}/tutorial2-streaming-dtc.yml \
+    --streaming-bts=${TUTORIAL_PATH}/tutorial2-streaming-bts.yml \
     ${TUTORIAL_PATH}/tutorial2-data.log > ${TUTORIAL_PATH}/session_data_tutorial_2_streaming.log
 
 
 echo "generating session_data_tutorial_2_window.log..."
 pipenv run python -m blurr transform \
-    --streaming-dtc=${TUTORIAL_PATH}/tutorial2-streaming-dtc.yml \
-    --window-dtc=${TUTORIAL_PATH}/tutorial2-window-dtc.yml \
+    --streaming-bts=${TUTORIAL_PATH}/tutorial2-streaming-bts.yml \
+    --window-bts=${TUTORIAL_PATH}/tutorial2-window-bts.yml \
     ${TUTORIAL_PATH}/tutorial2-data.log > ${TUTORIAL_PATH}/session_data_tutorial_2_window.log
 
 echo "data generated in ${TUTORIAL_PATH}"

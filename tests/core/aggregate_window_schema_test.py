@@ -26,13 +26,13 @@ def aggregate_block_schema_spec(mem_store_name: str) -> Dict[str, Any]:
 
 
 @fixture
-def window_schema_spec(stream_dtc_name: str) -> Dict[str, Any]:
+def window_schema_spec(stream_bts_name: str) -> Dict[str, Any]:
     return {
         'Type': Type.BLURR_AGGREGATE_WINDOW,
         'Name': 'test_window_name',
         'WindowType': Type.DAY,
         'WindowValue': 1,
-        'Source': stream_dtc_name + '.session',
+        'Source': stream_bts_name + '.session',
         'Fields': [{
             'Name': 'total_events',
             'Type': Type.INTEGER,
@@ -43,8 +43,8 @@ def window_schema_spec(stream_dtc_name: str) -> Dict[str, Any]:
 
 def test_initialization_with_valid_source(schema_loader_with_mem_store: SchemaLoader,
                                           aggregate_block_schema_spec: Dict[str, Any],
-                                          window_schema_spec: Dict[str, Any], stream_dtc_name: str):
-    schema_loader_with_mem_store.add_schema_spec(aggregate_block_schema_spec, stream_dtc_name)
+                                          window_schema_spec: Dict[str, Any], stream_bts_name: str):
+    schema_loader_with_mem_store.add_schema_spec(aggregate_block_schema_spec, stream_bts_name)
     name = schema_loader_with_mem_store.add_schema_spec(window_schema_spec)
 
     window_aggregate_schema = WindowAggregateSchema(name, schema_loader_with_mem_store)
@@ -65,12 +65,12 @@ def test_initialization_with_invalid_source(schema_loader_with_mem_store: Schema
 
 def test_window_aggregate_schema_missing_attributes_adds_error(
         schema_loader_with_mem_store: SchemaLoader, aggregate_block_schema_spec: Dict[str, Any],
-        window_schema_spec: Dict[str, Any], stream_dtc_name: str):
+        window_schema_spec: Dict[str, Any], stream_bts_name: str):
     del window_schema_spec[WindowAggregateSchema.ATTRIBUTE_WINDOW_TYPE]
     del window_schema_spec[WindowAggregateSchema.ATTRIBUTE_WINDOW_VALUE]
     del window_schema_spec[WindowAggregateSchema.ATTRIBUTE_SOURCE]
 
-    schema_loader_with_mem_store.add_schema_spec(aggregate_block_schema_spec, stream_dtc_name)
+    schema_loader_with_mem_store.add_schema_spec(aggregate_block_schema_spec, stream_bts_name)
     name = schema_loader_with_mem_store.add_schema_spec(window_schema_spec)
 
     schema = WindowAggregateSchema(name, schema_loader_with_mem_store)

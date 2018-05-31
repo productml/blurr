@@ -23,11 +23,6 @@ def run_command(example: str, target: str) -> int:
 def generate_target_filename():
     return os.path.join(TMP, str(uuid.uuid4()) + '.zip')
 
-
-def get_running_validation_str(file_name: str) -> str:
-    return 'Running syntax validation on tests/core/syntax/dtcs/' + file_name
-
-
 def test_app_with_requirements_txt_generates_spark_app(capsys: CaptureFixture) -> None:
     target_file = generate_target_filename()
     assert run_command('app_with_requirements_txt', target_file) == 0

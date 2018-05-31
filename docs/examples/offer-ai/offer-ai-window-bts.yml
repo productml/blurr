@@ -1,27 +1,27 @@
 ####
-# Header block that defines the properties of this DTC
+# Header block that defines the properties of this BTS
 ####
 
-# Type of DTC. Streaming or Window
-# The Window DTC periodically applies windows operations on top of sessionized data
+# Type of BTS. Streaming or Window
+# The Window BTS periodically applies windows operations on top of sessionized data
 Type: Blurr:Transform:Window
 Version: '2018-03-01'
 Description: Window ops for feature generation
 
 Name: offer_ai_window
 
-# The Streaming DTC used
-SourceDTC: offer_ai_v1
+# The Streaming BTS used
+SourceBTS: offer_ai_v1
 
 # Anchor defines the condition used to trigger the decision
 # If an offer is shown to the user in this session, the session
 # in which the offer is shown is the anchor
 Anchor:
   Condition:  source.game_stats.offer_type != ''
-  # Max defines the maximum number of output rows to be generated every time the Window DTC is run
-  # We expect the Window DTC is run periodically (perhaps daily) to generate training data
+  # Max defines the maximum number of output rows to be generated every time the Window BTS is run
+  # We expect the Window BTS is run periodically (perhaps daily) to generate training data
   # By setting max = 1, we're making sure that we are only selecting one session for each user
-  # in each period the Window DTC is run. This is to avoid over-sampling more active users
+  # in each period the Window BTS is run. This is to avoid over-sampling more active users
   Max: 1
 
 

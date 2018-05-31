@@ -108,6 +108,6 @@ Since user may not buy everything in one transaction, `fbt_1`, `fbt_2`, `fbt_3` 
 
 ![Anchor](images/fbt-anchor.png)
 
-[Streaming DTC](fbt-streaming-dtc.yml)
+[Streaming BTS](fbt-streaming-bts.yml)
 
-[Window DTC](fbt-window-dtc.yml)
+[Window BTS](fbt-window-bts.yml)

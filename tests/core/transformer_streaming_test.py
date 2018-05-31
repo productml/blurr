@@ -50,48 +50,48 @@ def schema_loader() -> SchemaLoader:
 
 def test_streaming_transformer_schema_schema_init(schema_loader: SchemaLoader,
                                                   schema_spec: Dict[str, Any]) -> None:
-    streaming_dtc = schema_loader.add_schema_spec(schema_spec)
-    transformer_schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
+    streaming_bts = schema_loader.add_schema_spec(schema_spec)
+    transformer_schema = StreamingTransformerSchema(streaming_bts, schema_loader)
     assert transformer_schema.identity.code_string == '\'user1\''
     assert transformer_schema.time.code_string == 'datetime(2016,10,10)'
 
 
 def test_streaming_transformer_schema_get_identity_constant(schema_loader: SchemaLoader,
                                                             schema_spec: Dict[str, Any]) -> None:
-    streaming_dtc = schema_loader.add_schema_spec(schema_spec)
-    transformer_schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
+    streaming_bts = schema_loader.add_schema_spec(schema_spec)
+    transformer_schema = StreamingTransformerSchema(streaming_bts, schema_loader)
     assert transformer_schema.get_identity(Context()) == 'user1'
 
 
 def test_streaming_transformer_schema_get_identity_from_record(schema_loader: SchemaLoader,
                                                                schema_spec: Dict[str, Any]) -> None:
     schema_spec['Identity'] = 'source.user'
-    streaming_dtc = schema_loader.add_schema_spec(schema_spec)
-    transformer_schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
+    streaming_bts = schema_loader.add_schema_spec(schema_spec)
+    transformer_schema = StreamingTransformerSchema(streaming_bts, schema_loader)
     assert transformer_schema.get_identity(Record({'user': 'user1'})) == 'user1'
 
 
 def test_streaming_transformer_schema_get_identity_error(schema_loader: SchemaLoader,
                                                          schema_spec: Dict[str, Any]) -> None:
     schema_spec['Identity'] = 'source.user'
-    streaming_dtc = schema_loader.add_schema_spec(schema_spec)
-    transformer_schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
+    streaming_bts = schema_loader.add_schema_spec(schema_spec)
+    transformer_schema = StreamingTransformerSchema(streaming_bts, schema_loader)
     with pytest.raises(IdentityError, match='Could not determine identity using source.user'):
         assert transformer_schema.get_identity(Record())
 
 
 def test_streaming_transformer_schema_get_time_constant(schema_loader: SchemaLoader,
                                                         schema_spec: Dict[str, Any]) -> None:
-    streaming_dtc = schema_loader.add_schema_spec(schema_spec)
-    transformer_schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
+    streaming_bts = schema_loader.add_schema_spec(schema_spec)
+    transformer_schema = StreamingTransformerSchema(streaming_bts, schema_loader)
     assert transformer_schema.get_time(Record()) == datetime(2016, 10, 10)
 
 
 def test_streaming_transformer_schema_get_time_datetime_not_defined(
         schema_loader: SchemaLoader, schema_spec: Dict[str, Any]) -> None:
     del schema_spec['Import']
-    streaming_dtc = schema_loader.add_schema_spec(schema_spec)
-    transformer_schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
+    streaming_bts = schema_loader.add_schema_spec(schema_spec)
+    transformer_schema = StreamingTransformerSchema(streaming_bts, schema_loader)
     with pytest.raises(NameError, match='name \'datetime\' is not defined'):
         assert transformer_schema.get_time(Context())
 
@@ -99,8 +99,8 @@ def test_streaming_transformer_schema_get_time_datetime_not_defined(
 def test_streaming_transformer_schema_get_time_type_error(schema_loader: SchemaLoader,
                                                           schema_spec: Dict[str, Any]) -> None:
     schema_spec['Time'] = '1'
-    streaming_dtc = schema_loader.add_schema_spec(schema_spec)
-    transformer_schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
+    streaming_bts = schema_loader.add_schema_spec(schema_spec)
+    transformer_schema = StreamingTransformerSchema(streaming_bts, schema_loader)
     with pytest.raises(TimeError, match='Could not determine time using 1'):
         assert transformer_schema.get_time(Context())
 
@@ -108,8 +108,8 @@ def test_streaming_transformer_schema_get_time_type_error(schema_loader: SchemaL
 def test_streaming_transformer_evaluate_time_error(schema_loader: SchemaLoader,
                                                    schema_spec: Dict[str, Any]) -> None:
     del schema_spec['Import']
-    streaming_dtc = schema_loader.add_schema_spec(schema_spec)
-    transformer_schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
+    streaming_bts = schema_loader.add_schema_spec(schema_spec)
+    transformer_schema = StreamingTransformerSchema(streaming_bts, schema_loader)
     transformer = StreamingTransformer(transformer_schema, 'user1')
     with pytest.raises(NameError, match='name \'datetime\' is not defined'):
         assert transformer.run_evaluate(Record())
@@ -117,8 +117,8 @@ def test_streaming_transformer_evaluate_time_error(schema_loader: SchemaLoader,
 
 def test_streaming_transformer_evaluate_user_mismatch(schema_loader: SchemaLoader,
                                                       schema_spec: Dict[str, Any]) -> None:
-    streaming_dtc = schema_loader.add_schema_spec(schema_spec)
-    transformer_schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
+    streaming_bts = schema_loader.add_schema_spec(schema_spec)
+    transformer_schema = StreamingTransformerSchema(streaming_bts, schema_loader)
     transformer = StreamingTransformer(transformer_schema, 'user2')
     with pytest.raises(
             IdentityError,
@@ -128,8 +128,8 @@ def test_streaming_transformer_evaluate_user_mismatch(schema_loader: SchemaLoade
 
 def test_streaming_transformer_evaluate(schema_loader: SchemaLoader,
                                         schema_spec: Dict[str, Any]) -> None:
-    streaming_dtc = schema_loader.add_schema_spec(schema_spec)
-    transformer_schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
+    streaming_bts = schema_loader.add_schema_spec(schema_spec)
+    transformer_schema = StreamingTransformerSchema(streaming_bts, schema_loader)
     transformer = StreamingTransformer(transformer_schema, 'user1')
     transformer.run_evaluate(Record())
 
@@ -138,8 +138,8 @@ def test_streaming_transformer_evaluate(schema_loader: SchemaLoader,
 
 def test_streaming_transformer_finalize(schema_loader: SchemaLoader,
                                         schema_spec: Dict[str, Any]) -> None:
-    streaming_dtc = schema_loader.add_schema_spec(schema_spec)
-    transformer_schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
+    streaming_bts = schema_loader.add_schema_spec(schema_spec)
+    transformer_schema = StreamingTransformerSchema(streaming_bts, schema_loader)
     transformer = StreamingTransformer(transformer_schema, 'user1')
     store = schema_loader.get_store('test.memstore')
 
@@ -164,13 +164,13 @@ def test_streaming_transformer_schema_missing_attributes_adds_error(schema_loade
     schema_spec[StreamingTransformerSchema.ATTRIBUTE_AGGREGATES][0][
         AggregateSchema.ATTRIBUTE_TYPE] = Type.BLURR_AGGREGATE_VARIABLE
 
-    streaming_dtc = schema_loader.add_schema_spec(schema_spec)
-    schema = StreamingTransformerSchema(streaming_dtc, schema_loader)
+    streaming_bts = schema_loader.add_schema_spec(schema_spec)
+    schema = StreamingTransformerSchema(streaming_bts, schema_loader)
 
     assert len(schema.errors) == 3
-    assert RequiredAttributeError(streaming_dtc, schema_spec,
+    assert RequiredAttributeError(streaming_bts, schema_spec,
                                   StreamingTransformerSchema.ATTRIBUTE_IDENTITY) in schema.errors
-    assert RequiredAttributeError(streaming_dtc, schema_spec,
+    assert RequiredAttributeError(streaming_bts, schema_spec,
                                   StreamingTransformerSchema.ATTRIBUTE_TIME) in schema.errors
-    assert RequiredAttributeError(streaming_dtc, schema_spec,
+    assert RequiredAttributeError(streaming_bts, schema_spec,
                                   StreamingTransformerSchema.ATTRIBUTE_STORES) in schema.errors
