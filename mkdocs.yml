@@ -5,8 +5,8 @@ pages:
 - Playground:
     - 'Streaming BTS Tutorial': 'Streaming BTS Tutorial.md'
     - 'Window BTS Tutorial': 'Window BTS Tutorial.md'
-    - 'Offer AI Example': 'examples/offer-ai/offer-ai-walkthrough.md'
-    - 'Frequently Bought Together Example': 'examples/frequently-bought-together/fbt-walkthrough.md'
+    - 'Offer AI Example': 'https://github.com/productml/blurr-examples/blob/master/offer-ai/offer-ai-walkthrough.md'
+    - 'Frequently Bought Together Example': 'https://github.com/productml/blurr-examples/blob/master/frequently-bought-together/fbt-walkthrough.md'
     - 'Raw Event Formats': 'Raw event formats.md'
 - Blurr Transform Spec (BTS):
     - 'BTS Overview': 'Blurr Transform Spec (BTS).md'
