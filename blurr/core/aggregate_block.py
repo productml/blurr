@@ -3,6 +3,7 @@ from typing import Dict, Any, List
 from blurr.core.aggregate import Aggregate, AggregateSchema
 from blurr.core.evaluation import Expression
 from blurr.core.schema_loader import SchemaLoader
+from blurr.core.store_key import Key, KeyType
 from blurr.core.type import Type
 from blurr.core.validator import ATTRIBUTE_INTERNAL
 
@@ -79,11 +80,12 @@ class BlockAggregate(Aggregate):
         if split_should_be_evaluated and self._schema.split.evaluate(
                 self._evaluation_context) is True:
             # Save the current snapshot with the current timestamp
-            self._persist(self._start_time)
+            self._persist()
             # Reset the state of the contents
             self.__init__(self._schema, self._identity, self._evaluation_context)
 
         super().run_evaluate()
 
-    def _persist(self, timestamp=None) -> None:
-        super()._persist(timestamp if timestamp else self._start_time)
+    @property
+    def _key(self):
+        return Key(KeyType.TIMESTAMP, self._identity, self._name, [], self._start_time)

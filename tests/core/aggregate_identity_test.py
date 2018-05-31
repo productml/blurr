@@ -8,7 +8,7 @@ from blurr.core.evaluation import EvaluationContext
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store import StoreSchema
-from blurr.core.store_key import Key
+from blurr.core.store_key import Key, KeyType
 from blurr.core.type import Type
 
 
@@ -164,21 +164,21 @@ def test_split_by_label_valid(identity_aggregate_schema_spec: Dict[str, Any],
     store_state = identity_aggregate._store.get_all(identity)
     assert len(store_state) == 3
 
-    assert store_state.get(Key('user1', 'label_aggr.a')) == {
+    assert store_state.get(Key(KeyType.DIMENSION, 'user1', 'label_aggr', ['a'])) == {
         '_identity': 'user1',
         'label': 'a',
         'sum': 110,
         'count': 2
     }
 
-    assert store_state.get(Key('user1', 'label_aggr.b')) == {
+    assert store_state.get(Key(KeyType.DIMENSION, 'user1', 'label_aggr', ['b'])) == {
         '_identity': 'user1',
         'label': 'b',
         'sum': 1,
         'count': 1
     }
 
-    assert store_state.get(Key('user1', 'label_aggr.c')) == {
+    assert store_state.get(Key(KeyType.DIMENSION, 'user1', 'label_aggr', ['c'])) == {
         '_identity': 'user1',
         'label': 'c',
         'sum': 11000,
@@ -209,7 +209,7 @@ def test_split_when_label_evaluates_to_none(identity_aggregate_schema_spec: Dict
     store_state = identity_aggregate._store.get_all(identity)
     assert len(store_state) == 1
 
-    assert store_state.get(Key('user1', 'label_aggr.b')) == {
+    assert store_state.get(Key(KeyType.DIMENSION, 'user1', 'label_aggr', ['b'])) == {
         '_identity': 'user1',
         'label': 'b',
         'sum': 1,
@@ -238,7 +238,7 @@ def test_two_key_fields_in_aggregate(
     store_state = identity_aggregate._store.get_all('user1')
     assert len(store_state) == 3
 
-    assert store_state.get(Key('user1', 'label_aggr.a:97')) == {
+    assert store_state.get(Key(KeyType.DIMENSION, 'user1', 'label_aggr', ['a', '97'])) == {
         '_identity': 'user1',
         'label': 'a',
         'label_ascii': 97,
@@ -246,7 +246,7 @@ def test_two_key_fields_in_aggregate(
         'count': 2
     }
 
-    assert store_state.get(Key('user1', 'label_aggr.b:98')) == {
+    assert store_state.get(Key(KeyType.DIMENSION, 'user1', 'label_aggr', ['b', '98'])) == {
         '_identity': 'user1',
         'label': 'b',
         'label_ascii': 98,
@@ -254,7 +254,7 @@ def test_two_key_fields_in_aggregate(
         'count': 1
     }
 
-    assert store_state.get(Key('user1', 'label_aggr.c:99')) == {
+    assert store_state.get(Key(KeyType.DIMENSION, 'user1', 'label_aggr', ['c', '99'])) == {
         '_identity': 'user1',
         'label': 'c',
         'label_ascii': 99,
