@@ -46,5 +46,4 @@ def test_example_bts_output(input_files, output_file, capsys):
         '<raw-json-files>': None,
     }) == 0
     out, err = capsys.readouterr()
-    print(out)
     assert out.splitlines() == get_file_text(output_file).splitlines()

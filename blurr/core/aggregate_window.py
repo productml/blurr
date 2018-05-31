@@ -23,8 +23,10 @@ class WindowAggregateSchema(AggregateSchema):
 
         self.window_value = self._spec.get(self.ATTRIBUTE_WINDOW_VALUE, 0)
         self.window_type = self._spec.get(self.ATTRIBUTE_WINDOW_TYPE, None)
-        self.source: TimeAggregateSchema = self.schema_loader.get_schema_object(
-            self._spec[self.ATTRIBUTE_SOURCE]) if self.ATTRIBUTE_SOURCE in self._spec else None
+
+        self.source: TimeAggregateSchema = self.schema_loader.get_schema_object(self._spec[self.ATTRIBUTE_SOURCE]) if \
+            self.ATTRIBUTE_SOURCE in self._spec and schema_loader.has_schema_spec(self._spec[self.ATTRIBUTE_SOURCE]) \
+            else None
 
     def validate_schema_spec(self) -> None:
         super().validate_schema_spec()
