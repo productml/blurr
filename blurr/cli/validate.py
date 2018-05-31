@@ -9,22 +9,22 @@ from blurr.core.errors import SchemaError, InvalidSpecError
 from blurr.core.schema_loader import SchemaLoader
 
 
-def validate_command(dtc_files: List[str]) -> int:
+def validate_command(bts_files: List[str]) -> int:
     all_files_valid = True
-    if len(dtc_files) == 0:
-        dtc_files = get_yml_files()
-    for dtc_file in dtc_files:
-        if validate_file(dtc_file) == 1:
+    if len(bts_files) == 0:
+        bts_files = get_yml_files()
+    for bts_file in bts_files:
+        if validate_file(bts_file) == 1:
             all_files_valid = False
 
     return 0 if all_files_valid else 1
 
 
-def validate_file(dtc_file: str) -> int:
-    print('Running validation on {}'.format(dtc_file))
+def validate_file(bts_file: str) -> int:
+    print('Running validation on {}'.format(bts_file))
     try:
-        dtc_dict = yaml.safe_load(open(dtc_file, 'r', encoding='utf-8'))
-        validate(dtc_dict)
+        bts_dict = yaml.safe_load(open(bts_file, 'r', encoding='utf-8'))
+        validate(bts_dict)
         print('Document is valid')
         return 0
     except yaml.YAMLError as err:
@@ -43,11 +43,11 @@ def validate_file(dtc_file: str) -> int:
 
 def validate(spec: Dict[str, Any]) -> None:
     schema_loader = SchemaLoader()
-    dtc_name = schema_loader.add_schema_spec(spec)
-    if not dtc_name:
+    bts_name = schema_loader.add_schema_spec(spec)
+    if not bts_name:
         raise InvalidSpecError(spec)
     schema_loader.raise_errors()
-    schema_loader.get_schema_object(dtc_name)
+    schema_loader.get_schema_object(bts_name)
     print(schema_loader.get_errors())
     schema_loader.raise_errors()
 

@@ -2,7 +2,7 @@ import os
 from typing import Any
 from unittest import mock
 
-from blurr.cli.util import get_yml_files, get_stream_window_dtc_files
+from blurr.cli.util import get_yml_files, get_stream_window_bts_files
 
 
 def override_open(filename: str) -> Any:
@@ -46,22 +46,22 @@ def test_get_yml_files():
 
 
 @mock.patch('builtins.open', new=override_open)
-def test_get_stream_window_dtc_files_bad_files():
-    assert get_stream_window_dtc_files([]) == (None, None)
-    assert get_stream_window_dtc_files(['invalid.yml']) == (None, None)
+def test_get_stream_window_bts_files_bad_files():
+    assert get_stream_window_bts_files([]) == (None, None)
+    assert get_stream_window_bts_files(['invalid.yml']) == (None, None)
 
 
 @mock.patch('builtins.open', new=override_open)
-def test_get_stream_window_dtc_files_missing_stream():
-    assert get_stream_window_dtc_files(['invalid.yml', 'stream1.yml']) == ('stream1.yml', None)
+def test_get_stream_window_bts_files_missing_stream():
+    assert get_stream_window_bts_files(['invalid.yml', 'stream1.yml']) == ('stream1.yml', None)
 
 
 @mock.patch('builtins.open', new=override_open)
-def test_get_stream_window_dtc_files_missing_window():
-    assert get_stream_window_dtc_files(['invalid.yml', 'window2.yml']) == (None, 'window2.yml')
+def test_get_stream_window_bts_files_missing_window():
+    assert get_stream_window_bts_files(['invalid.yml', 'window2.yml']) == (None, 'window2.yml')
 
 
 @mock.patch('builtins.open', new=override_open)
-def test_get_stream_window_dtc_files_valid():
-    assert get_stream_window_dtc_files(['stream1.yml', 'stream2.yml',
+def test_get_stream_window_bts_files_valid():
+    assert get_stream_window_bts_files(['stream1.yml', 'stream2.yml',
                                         'window1.yml']) == ('stream1.yml', 'window1.yml')

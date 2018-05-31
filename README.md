@@ -17,9 +17,9 @@
 
 # What is Blurr?
 
-Blurr transforms structured, streaming `raw data` into `features` for model training and prediction using a `high-level expressive YAML-based language` called the Data Transform Configuration (DTC). This merges the schema and the computation model for data transformations.
+Blurr transforms structured, streaming `raw data` into `features` for model training and prediction using a `high-level expressive YAML-based language` called the Blurr Transform Spec (BTS). The BTS merges the schema and computation model for data processing.
 
-The DTC is a __data transform definition__ for structured data. The DTC encapsulates the *business logic* of data transforms and Blurr orchestrates the *execution* of data transforms. Blurr is runner-agnostic, so DTCs can be run by event processors such as Spark, Spark Streaming or Flink.
+The BTS is a __data transform definition__ for structured data. The BTS encapsulates the *business logic* of data transforms and Blurr orchestrates the *execution* of data transforms. Blurr unner-agnostic, so BTSs can be run by event processors such as Spark, Spark Streaming or Flink.
 
 # Is Blurr for you?
 
@@ -37,14 +37,13 @@ Yes, if: you are well on your way on the ML 'curve of enlightenment', and are th
 
 [Read the docs](http://productml-blurr.readthedocs.io/en/latest/)
 
-[Streaming DTC Tutorial](http://productml-blurr.readthedocs.io/en/latest/Streaming%20DTC%20Tutorial/) |
-[Window DTC Tutorial](http://productml-blurr.readthedocs.io/en/latest/Window%20DTC%20Tutorial/)
+[Streaming BTS Tutorial](http://productml-blurr.readthedocs.io/en/latest/Streaming%20BTS%20Tutorial/) |
+[Window BTS Tutorial](http://productml-blurr.readthedocs.io/en/latest/Window%20BTS%20Tutorial/)
 
 Preparing data for specific use cases using Blurr:
 
 * [Dynamic in-game offers (Offer AI)](docs/examples/offer-ai/offer-ai-walkthrough.md)
 * [Frequently Bought Together](docs/examples/frequently-bought-together/fbt-walkthrough.md)
-
 
 # Contribute to Blurr
 
@@ -69,7 +68,7 @@ Inspired by the (old school) [Joel Test](https://www.joelonsoftware.com/2000/08/
 Blurr is currently in Developer Preview. __Stay in touch!__: Star this project or email hello@blurr.ai
 
 - ~~Local transformations only~~
-- ~~Support for custom functions and other python libraries in the DTC~~
+- ~~Support for custom functions and other python libraries in the BTS~~
 - ~~Spark runner~~
 - S3 support for data sink
 - DynamoDB as an Intermediate Store

@@ -11,12 +11,12 @@ def validate(template):
     validate_command([template])
 
 
-def transform(*, log_files, stream_dtc, window_dtc=None, output_file):
-    transform_local(stream_dtc, window_dtc, log_files, output_file)
+def transform(*, log_files, stream_bts, window_bts=None, output_file):
+    transform_local(stream_bts, window_bts, log_files, output_file)
 
 
-def transform_local(stream_dtc_file, window_dtc_file, raw_json_files, output_file) -> int:
-    runner = LocalRunner(stream_dtc_file, window_dtc_file)
+def transform_local(stream_bts_file, window_bts_file, raw_json_files, output_file) -> int:
+    runner = LocalRunner(stream_bts_file, window_bts_file)
     result = runner.execute(
         runner.get_identity_records_from_json_files(raw_json_files, SimpleJsonDataProcessor()))
     runner.write_output_file(output_file, result)

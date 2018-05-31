@@ -33,18 +33,18 @@ def schema_loader():
 
 @fixture
 def stream_transformer(schema_loader, stream_schema_spec):
-    stream_dtc_name = schema_loader.add_schema_spec(stream_schema_spec)
+    stream_bts_name = schema_loader.add_schema_spec(stream_schema_spec)
     stream_transformer = StreamingTransformer(
-        schema_loader.get_schema_object(stream_dtc_name), 'user1')
+        schema_loader.get_schema_object(stream_bts_name), 'user1')
     stream_transformer.run_restore({Key(KeyType.DIMENSION, 'user1', 'state'): {'country': 'US'}})
     return stream_transformer
 
 
 @fixture
 def window_transformer(schema_loader, stream_transformer, window_schema_spec):
-    window_dtc_name = schema_loader.add_schema_spec(window_schema_spec)
+    window_bts_name = schema_loader.add_schema_spec(window_schema_spec)
     return WindowTransformer(
-        schema_loader.get_schema_object(window_dtc_name), 'user1',
+        schema_loader.get_schema_object(window_bts_name), 'user1',
         Context({
             stream_transformer._schema.name: stream_transformer
         }))
@@ -62,8 +62,8 @@ def block_aggregate(stream_transformer):
 
 def test_window_transformer_schema_init(schema_loader, stream_schema_spec, window_schema_spec):
     schema_loader.add_schema_spec(stream_schema_spec)
-    window_dtc_name = schema_loader.add_schema_spec(window_schema_spec)
-    window_transformer_schema = WindowTransformerSchema(window_dtc_name, schema_loader)
+    window_bts_name = schema_loader.add_schema_spec(window_schema_spec)
+    window_transformer_schema = WindowTransformerSchema(window_bts_name, schema_loader)
     anchor_spec = schema_loader.get_schema_spec('ProductMLExample.anchor')
     assert anchor_spec == window_schema_spec['Anchor']
     assert anchor_spec['Name'] == 'anchor'
@@ -157,8 +157,8 @@ def test_window_transformer_schema_missing_attributes_adds_error(schema_loader, 
                                                                  window_schema_spec):
     del window_schema_spec[WindowTransformerSchema.ATTRIBUTE_ANCHOR]
     schema_loader.add_schema_spec(stream_schema_spec)
-    window_dtc_name = schema_loader.add_schema_spec(window_schema_spec)
-    schema = WindowTransformerSchema(window_dtc_name, schema_loader)
+    window_bts_name = schema_loader.add_schema_spec(window_schema_spec)
+    schema = WindowTransformerSchema(window_bts_name, schema_loader)
 
     assert 1 == len(schema.errors)
     assert isinstance(schema.errors[0], RequiredAttributeError)
