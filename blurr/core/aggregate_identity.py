@@ -39,9 +39,6 @@ class IdentityAggregateSchema(AggregateSchema):
                     self.ATTRIBUTE_TYPE,
                     {Type.INTEGER.value, Type.STRING.value}))
 
-    def extend_schema_spec(self):
-        super().extend_schema_spec()
-
 
 class IdentityAggregate(Aggregate):
     def __init__(self, schema: AggregateSchema, identity: str,
