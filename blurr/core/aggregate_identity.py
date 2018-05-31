@@ -34,7 +34,6 @@ class IdentityAggregateSchema(AggregateSchema):
                 validate_enum_attribute(
                     self.schema_loader.get_fully_qualified_name(self.fully_qualified_name,
                                                                 schema_spec[self.ATTRIBUTE_NAME]),
-                    # TODO Find a way to remove hardcoding of the type strings
                     schema_spec,
                     self.ATTRIBUTE_TYPE,
                     {Type.INTEGER.value, Type.STRING.value}))
