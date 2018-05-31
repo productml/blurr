@@ -15,8 +15,7 @@ class TimeAggregateSchema(AggregateSchema, ABC):
 
         if self.ATTRIBUTE_FIELDS in self._spec:
             # Add new fields to the schema spec. Since `_identity` is added by the super, new elements are added after
-            predefined_field = self._build_time_fields_spec(
-                self._spec[self.ATTRIBUTE_NAME])
+            predefined_field = self._build_time_fields_spec(self._spec[self.ATTRIBUTE_NAME])
             self._spec[self.ATTRIBUTE_FIELDS][1:1] = predefined_field
 
             # Add new field schema to the schema loader

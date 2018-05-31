@@ -35,9 +35,7 @@ class IdentityAggregateSchema(AggregateSchema):
                 validate_enum_attribute(
                     self.schema_loader.get_fully_qualified_name(self.fully_qualified_name,
                                                                 schema_spec[self.ATTRIBUTE_NAME]),
-                    schema_spec,
-                    self.ATTRIBUTE_TYPE,
-                    {Type.INTEGER.value, Type.STRING.value}))
+                    schema_spec, self.ATTRIBUTE_TYPE, {Type.INTEGER.value, Type.STRING.value}))
 
 
 class IdentityAggregate(Aggregate):
