@@ -9,7 +9,7 @@ from blurr.core.errors import IdentityError, TimeError, RequiredAttributeError
 from blurr.core.evaluation import Context
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.store_key import Key
+from blurr.core.store_key import Key, KeyType
 from blurr.core.transformer_streaming import StreamingTransformerSchema, StreamingTransformer
 from blurr.core.type import Type
 
@@ -144,11 +144,14 @@ def test_streaming_transformer_finalize(schema_loader: SchemaLoader,
     store = schema_loader.get_store('test.memstore')
 
     transformer.run_finalize()
-    assert store.get(Key('user1', 'test_group')) is None
+    assert store.get(Key(KeyType.DIMENSION, 'user1', 'test_group')) is None
 
     transformer.run_evaluate(Record())
     transformer.run_finalize()
-    assert store.get(Key('user1', 'test_group')) == {'_identity': 'user1', 'events': 1}
+    assert store.get(Key(KeyType.DIMENSION, 'user1', 'test_group')) == {
+        '_identity': 'user1',
+        'events': 1
+    }
 
 
 def test_streaming_transformer_schema_missing_attributes_adds_error(schema_loader: SchemaLoader,

@@ -60,7 +60,7 @@ def test_initialization_with_invalid_source(schema_loader_with_mem_store: Schema
 
     schema = WindowAggregateSchema(name, schema_loader_with_mem_store)
     assert len(schema.errors) == 0
-    assert len(schema_loader_with_mem_store.get_errors()) == 1
+    assert len(schema_loader_with_mem_store.get_errors()) == 0
 
 
 def test_window_aggregate_schema_missing_attributes_adds_error(
@@ -76,6 +76,8 @@ def test_window_aggregate_schema_missing_attributes_adds_error(
     schema = WindowAggregateSchema(name, schema_loader_with_mem_store)
 
     assert 3 == len(schema.errors)
-    assert RequiredAttributeError(name, {}, WindowAggregateSchema.ATTRIBUTE_WINDOW_TYPE) in schema.errors
-    assert RequiredAttributeError(name, {}, WindowAggregateSchema.ATTRIBUTE_WINDOW_VALUE) in schema.errors
+    assert RequiredAttributeError(name, {},
+                                  WindowAggregateSchema.ATTRIBUTE_WINDOW_TYPE) in schema.errors
+    assert RequiredAttributeError(name, {},
+                                  WindowAggregateSchema.ATTRIBUTE_WINDOW_VALUE) in schema.errors
     assert RequiredAttributeError(name, {}, WindowAggregateSchema.ATTRIBUTE_SOURCE) in schema.errors

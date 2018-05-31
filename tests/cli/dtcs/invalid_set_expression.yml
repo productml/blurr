@@ -11,12 +11,13 @@ When: x = 'test'
 
 
 Stores:
- - Type: Blurr:Store:Store
+ - Type: Blurr:Store:Memory
    Name: memory_store
 Aggregates:
- - Type: Blurr:DataGroup:Identity
+ - Type: Blurr:Aggregate:Identity
    Name: user
-   Store: offer_ai_dynamo
+   Store: memory_store
    Fields:
      - Name: user_id
+       Type: string
        Value: source.customer_identifier

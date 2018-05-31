@@ -29,7 +29,7 @@ class BaseSchemaError(Exception, ABC):
     @abstractmethod
     def key(self) -> Tuple:
         """ Returns a tuple that uniquely identifies the object by its values """
-        return (self.fully_qualified_name,)
+        return (self.fully_qualified_name, )
 
     def __hash__(self):
         return hash(self.key)
@@ -54,7 +54,7 @@ class BaseSchemaAttributeError(BaseSchemaError, ABC):
 
     @property
     def key(self):
-        return super().key + (self.attribute,)
+        return super().key + (self.attribute, )
 
 
 class RequiredAttributeError(BaseSchemaAttributeError):
@@ -83,12 +83,19 @@ class InvalidValueError(BaseSchemaAttributeError):
 
     @property
     def key(self):
-        return super().key + (str(self.candidates),)
+        return super().key + (str(self.candidates), )
 
 
 class InvalidNumberError(BaseSchemaAttributeError):
-    def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
-                 value_type: Type, minimum: Any, maximum: Any, *args, **kwargs):
+    def __init__(self,
+                 fully_qualified_name: str,
+                 spec: Dict[str, Any],
+                 attribute: str,
+                 value_type: Type,
+                 minimum: Any = None,
+                 maximum: Any = None,
+                 *args,
+                 **kwargs):
         super().__init__(fully_qualified_name, spec, attribute, *args, **kwargs)
         self.type = value_type
         self.min = minimum
@@ -127,7 +134,7 @@ class InvalidIdentifierError(BaseSchemaAttributeError):
 
     @property
     def key(self):
-        return super().key + (str(self.reason),)
+        return super().key + (str(self.reason), )
 
 
 class InvalidTypeError(BaseSchemaAttributeError):
@@ -187,10 +194,6 @@ class InvalidExpressionError(BaseSchemaAttributeError):
             name=self.fully_qualified_name,
             error=str(self.error))
 
-    @property
-    def key(self):
-        return super().key + (str(self.error),)
-
 
 class SchemaErrorCollection:
     def __init__(self, *args):
@@ -232,7 +235,7 @@ class SchemaErrorCollection:
 
     @property
     def has_errors(self) -> bool:
-        return len(self.log) > 0
+        return len(self.errors) > 0
 
     def raise_errors(self):
         if self.has_errors:
@@ -272,10 +275,23 @@ class SchemaError(Exception):
 
 
 class SpecNotFoundError(BaseSchemaError):
+    @property
+    def key(self):
+        return super().key
+
+
+class InvalidSpecError(BaseSchemaError):
+    def __init__(self, spec: Dict[str, Any], *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fully_qualified_name = '**InvalidSpec**'
+        self.spec = spec
 
     @property
     def key(self):
         return super().key
+
+    def __str__(self):
+        return 'The following spec is invalid: \n{spec}'.format(spec=self.spec)
 
 
 class ExpressionEvaluationError(Exception):

@@ -3,21 +3,20 @@ Version: '2018-03-01'
 Description: Example
 Name: example_name
 Identity: source.user_id
+Time: source.timestamp
 When: source.package_version == '1.0'
 Stores:
- - Type: Blurr:Store:Store
+ - Type: Blurr:Store:Memory
    Name: memory_store
 Aggregates:
  - Type: Blurr:Aggregate:Identity
    Name: user
-   Store: offer_ai_dynamo
+   Store: memory_store
    Fields:
-     - Name: user_id
-
-
-       # SHOULD BE ONE OF DEFINED DATA TYPES
-       Type: foo
-
-
-
+     - Name: _name
+       Type: string
        Value: source.customer_identifier
+     - Name: type
+       Type: string
+       Value: source.country
+       When: last_session == None

@@ -6,12 +6,11 @@ from blurr.core.aggregate_block import BlockAggregate, BlockAggregateSchema
 from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.store_key import Key
+from blurr.core.store_key import Key, KeyType
 from blurr.core.type import Type
 
 
 class WindowAggregateSchema(AggregateSchema):
-
     ATTRIBUTE_WINDOW_VALUE = 'WindowValue'
     ATTRIBUTE_WINDOW_TYPE = 'WindowType'
     ATTRIBUTE_SOURCE = 'Source'
@@ -21,8 +20,10 @@ class WindowAggregateSchema(AggregateSchema):
 
         self.window_value = self._spec.get(self.ATTRIBUTE_WINDOW_VALUE, 0)
         self.window_type = self._spec.get(self.ATTRIBUTE_WINDOW_TYPE, None)
-        self.source: BlockAggregateSchema = self.schema_loader.get_schema_object(
-            self._spec[self.ATTRIBUTE_SOURCE]) if self.ATTRIBUTE_SOURCE in self._spec else None
+
+        self.source: BlockAggregateSchema = self.schema_loader.get_schema_object(self._spec[self.ATTRIBUTE_SOURCE]) if \
+            self.ATTRIBUTE_SOURCE in self._spec and schema_loader.has_schema_spec(self._spec[self.ATTRIBUTE_SOURCE]) \
+            else None
 
     def validate_schema_spec(self) -> None:
         super().validate_schema_spec()
@@ -66,13 +67,15 @@ class WindowAggregate(Aggregate):
                 self._schema.window_type, Type.HOUR):
             block_list = self._load_blocks(
                 store.get_range(
-                    Key(self._identity, self._schema.source.name, start_time),
-                    Key(self._identity, self._schema.source.name, self._get_end_time(start_time))))
+                    Key(KeyType.TIMESTAMP, self._identity, self._schema.source.name, [],
+                        start_time),
+                    Key(KeyType.TIMESTAMP, self._identity, self._schema.source.name, [],
+                        self._get_end_time(start_time))))
         else:
             block_list = self._load_blocks(
                 store.get_range(
-                    Key(self._identity, self._schema.source.name, start_time), None,
-                    self._schema.window_value))
+                    Key(KeyType.TIMESTAMP, self._identity, self._schema.source.name, [],
+                        start_time), None, self._schema.window_value))
 
         self._window_source = _WindowSource(block_list)
         self._validate_view()

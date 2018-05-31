@@ -1,4 +1,4 @@
-from typing import Dict, Any, List, Optional, Union, Set
+from typing import Dict, Any, List, Optional, Union
 
 from blurr.core.errors import BaseSchemaError, InvalidTypeError, TypeLoaderError, SpecNotFoundError
 from blurr.core.errors import SchemaErrorCollection
@@ -68,9 +68,10 @@ class SchemaLoader:
             return self._error_cache.errors
 
         return self._error_cache[fully_qualified_name] + ([
-            error for error in self._error_cache.errors
-            if error.fully_qualified_name.startswith(fully_qualified_name + self.ITEM_SEPARATOR)
-        ] if include_nested else [])
+                                                              error for error in self._error_cache.errors
+                                                              if error.fully_qualified_name.startswith(
+                fully_qualified_name + self.ITEM_SEPARATOR)
+                                                          ] if include_nested else [])
 
     def raise_errors(self) -> None:
         """ Raises errors that have been collected in the error cache """
@@ -162,6 +163,15 @@ class SchemaLoader:
             self.add_errors(SpecNotFoundError(fully_qualified_name, {}))
 
         return self._spec_cache.get(fully_qualified_name, None)
+
+    def has_schema_spec(self, fully_qualified_name: str) -> bool:
+        """
+        Checks if a schema spec exists in the schema loader
+        :param fully_qualified_name: The fully qualified name of the schema needed.
+        :return: True if spec definition exists, False otherwise.
+        """
+
+        return fully_qualified_name in self._spec_cache
 
     def get_schema_specs_of_type(self, *schema_types: Type) -> Dict[str, Dict[str, Any]]:
         """

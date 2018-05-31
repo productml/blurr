@@ -10,11 +10,11 @@ Stores:
 Aggregates:
  - Type: Blurr:Aggregate:Identity
    Name: user
-   Store: offer_ai_dynamo
+   Store: memory_store
    Fields:
      - Name: user_id
+
+       # SHOULD BE ONE OF DEFINED DATA TYPES
+       Type: foo
+
        Value: source.customer_identifier
-       Atomic: true
-     - Name: country
-       Value: source.country
-       When: last_session == None
