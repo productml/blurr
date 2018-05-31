@@ -19,7 +19,7 @@
 
 Blurr transforms structured, streaming `raw data` into `features` for model training and prediction using a `high-level expressive YAML-based language` called the Blurr Transform Spec (BTS). The BTS merges the schema and computation model for data processing.
 
-The BTS is a __data transform definition__ for structured data. The BTS encapsulates the *business logic* of data transforms and Blurr orchestrates the *execution* of data transforms. Blurr unner-agnostic, so BTSs can be run by event processors such as Spark, Spark Streaming or Flink.
+The BTS is a __data transform definition__ for structured data. The BTS encapsulates the *business logic* of data transforms and Blurr orchestrates the *execution* of data transforms. Blurr is runner-agnostic, so BTSs can be run by event processors such as Spark, Spark Streaming or Flink.
 
 # Is Blurr for you?
 
