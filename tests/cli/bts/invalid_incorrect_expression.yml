@@ -2,20 +2,21 @@ Type: Blurr:Transform:Streaming
 Version: '2018-03-01'
 Description: Example
 Name: example_name
+Time: time
 Identity: source.user_id
-Time: source.timestamp
-When: source.package_version == '1.0'
+
+
+# SHOULD BE A CORRECT PYTHON EXPRESSION
+When: x == senor roy
+
 Stores:
  - Type: Blurr:Store:Memory
    Name: memory_store
 Aggregates:
  - Type: Blurr:Aggregate:Identity
    Name: user
-   Store: offer_ai_dynamo
+   Store: memory_store
    Fields:
-     - Name: _name
+     - Name: user_id
+       Type: string
        Value: source.customer_identifier
-       Atomic: true
-     - Name: type
-       Value: source.country
-       When: last_session == None

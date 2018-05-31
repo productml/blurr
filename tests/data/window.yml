@@ -4,8 +4,6 @@ Description: Second Level processing for feature generation
 
 Name: ProductMLExample
 
-SourceDTC: Sessions
-
 Anchor:
   Condition: Sessions.session.events > 0 and Sessions.state.country != ''
   Max: 1
@@ -32,6 +30,6 @@ Aggregates:
     Fields:
      - Name: total_events
        Type: integer
-       # Should be similar to just sum(source.events) as Window DTC is not
+       # Should be similar to just sum(source.events) as Window BTS is not
        # supposed to run with state.
        Value: last_day.total_events + sum(source.events)

@@ -1,9 +1,9 @@
 ####
-# Header block that defines the properties of this DTC
+# Header block that defines the properties of this BTS
 ####
 
-# Type of DTC. Streaming or Window
-# The Window DTC periodically applies windows operations on top of sessionized data
+# Type of BTS. Streaming or Window
+# The Window BTS periodically applies windows operations on top of sessionized data
 Type: Blurr:Transform:Window
 
 Version: '2018-03-01'
@@ -11,8 +11,8 @@ Description: Second Level processing for feature generation
 
 Name: fbt_window
 
-# The DTC used in Step 1
-SourceDTC: fbt_v1
+# The BTS used in Step 1
+SourceBTS: fbt_v1
 
 # Anchor defines the condition used to trigger the decision
 # If the user view a primary product in this session, every session
@@ -21,10 +21,10 @@ SourceDTC: fbt_v1
 Anchor:
 
   Condition:  fbt_v1.item_stats.transaction_value_this_session > 0
-  # Max defines the maximum number of output rows to be generated every time the Window DTC is run
-  # We expect the Window DTC is run periodically (perhaps daily) to generate training data
+  # Max defines the maximum number of output rows to be generated every time the Window BTS is run
+  # We expect the Window BTS is run periodically (perhaps daily) to generate training data
   # By setting max = 1, we're making sure that we are only selecting one transaction for each user
-  # in each period the Window DTC is run. This is to avoid over-sampling more active users
+  # in each period the Window BTS is run. This is to avoid over-sampling more active users
   # We're free to change this the max value to whatever we want, of course
   Max: 1
 

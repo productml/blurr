@@ -13,7 +13,7 @@ from blurr.core.type import Type
 class WindowTransformerSchema(TransformerSchema):
     """
     Represents the schema for processing aggregated data using windows.
-    Handles attributes specific to the window DTC schema
+    Handles attributes specific to the window BTS schema
     """
 
     ATTRIBUTE_ANCHOR = 'Anchor'
@@ -39,7 +39,7 @@ class WindowTransformerSchema(TransformerSchema):
 
 class WindowTransformer(Transformer):
     """
-    The Window DTC transformer that performs window operations on pre-aggregated
+    The Window BTS transformer that performs window operations on pre-aggregated
     block data.
     """
 

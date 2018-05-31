@@ -3,13 +3,13 @@ copyright: Authors of Blurr
 pages:
 - Home: 'index.md'
 - Playground:
-    - 'Streaming DTC Tutorial': 'Streaming DTC Tutorial.md'
-    - 'Window DTC Tutorial': 'Window DTC Tutorial.md'
+    - 'Streaming BTS Tutorial': 'Streaming BTS Tutorial.md'
+    - 'Window BTS Tutorial': 'Window BTS Tutorial.md'
     - 'Offer AI Example': 'examples/offer-ai/offer-ai-walkthrough.md'
     - 'Frequently Bought Together Example': 'examples/frequently-bought-together/fbt-walkthrough.md'
     - 'Raw Event Formats': 'Raw event formats.md'
-- Data Transform Config (DTC):
-    - 'DTC Overview': 'Data Transform Config (DTC).md'
-    - 'DTC Snippets': 'DTC Snippets.md'
+- Blurr Transform Spec (BTS):
+    - 'BTS Overview': 'Blurr Transform Spec (BTS).md'
+    - 'BTS Snippets': 'BTS Snippets.md'
 - Using Blurr:
     - 'CLI': 'Blurr CLI.md'

@@ -68,9 +68,10 @@ class SchemaLoader:
             return self._error_cache.errors
 
         return self._error_cache[fully_qualified_name] + ([
-            error for error in self._error_cache.errors
-            if error.fully_qualified_name.startswith(fully_qualified_name + self.ITEM_SEPARATOR)
-        ] if include_nested else [])
+                                                              error for error in self._error_cache.errors
+                                                              if error.fully_qualified_name.startswith(
+                fully_qualified_name + self.ITEM_SEPARATOR)
+                                                          ] if include_nested else [])
 
     def raise_errors(self) -> None:
         """ Raises errors that have been collected in the error cache """
@@ -163,6 +164,15 @@ class SchemaLoader:
 
         return self._spec_cache.get(fully_qualified_name, None)
 
+    def has_schema_spec(self, fully_qualified_name: str) -> bool:
+        """
+        Checks if a schema spec exists in the schema loader
+        :param fully_qualified_name: The fully qualified name of the schema needed.
+        :return: True if spec definition exists, False otherwise.
+        """
+
+        return fully_qualified_name in self._spec_cache
+
     def get_schema_specs_of_type(self, *schema_types: Type) -> Dict[str, Dict[str, Any]]:
         """
         Returns a list of fully qualified names and schema dictionary tuples for
@@ -180,9 +190,9 @@ class SchemaLoader:
     @staticmethod
     def get_transformer_name(fully_qualified_name: str) -> str:
         """
-        Returns the DTC transformer name based on the given fully_qualified_name
+        Returns the BTS transformer name based on the given fully_qualified_name
         of one of the nested child items.
         :param fully_qualified_name: Fully qualified name of the nested child item.
-        :return: DTC transformer name.
+        :return: BTS transformer name.
         """
         return fully_qualified_name.split(SchemaLoader.ITEM_SEPARATOR, 1)[0]

@@ -6,8 +6,8 @@ from pytest import mark
 from blurr.cli.cli import cli
 
 
-def run_command(stream_dtc_file: Optional[str],
-                window_dtc_file: Optional[str],
+def run_command(stream_bts_file: Optional[str],
+                window_bts_file: Optional[str],
                 source: Optional[str],
                 raw_json_files: Optional[str],
                 runner: Optional[str] = None,
@@ -17,8 +17,8 @@ def run_command(stream_dtc_file: Optional[str],
         'validate': False,
         'package-spark': False,
         '--runner': runner,
-        '--streaming-dtc': stream_dtc_file,
-        '--window-dtc': window_dtc_file,
+        '--streaming-bts': stream_bts_file,
+        '--window-bts': window_bts_file,
         '--data-processor': data_processor,
         '--source': source,
         '<raw-json-files>': raw_json_files,
@@ -35,16 +35,14 @@ def assert_record_in_ouput(record: Any, out_text: str) -> None:
 def test_transform_invalid(capsys) -> None:
     assert run_command(None, None, None, None) == 1
     out, err = capsys.readouterr()
-    assert ('Streaming DTC file not provided and could not be found in '
-            'the current directory.') in err
+    assert ('Streaming BTS not provided and could not be found in the current directory.') in err
 
 
 def test_transform_only_window(capsys) -> None:
     assert run_command(None, 'tests/data/window.yml', None, None) == 1
     out, err = capsys.readouterr()
     assert out == ''
-    assert ('Streaming DTC file not provided and could not be found in '
-            'the current directory.') in err
+    assert ('Streaming BTS not provided and could not be found in the current directory.') in err
 
 
 def test_transform_no_raw_data(capsys) -> None:
@@ -57,8 +55,8 @@ def test_transform_no_raw_data(capsys) -> None:
 @mark.parametrize("runner", ['local', 'spark'])
 def test_transform_only_stream(capsys, runner) -> None:
     assert run_command(
-        stream_dtc_file='tests/data/stream.yml',
-        window_dtc_file=None,
+        stream_bts_file='tests/data/stream.yml',
+        window_bts_file=None,
         source='tests/data/raw.json',
         raw_json_files=None,
         runner=runner) == 0
@@ -95,8 +93,8 @@ def test_transform_only_stream(capsys, runner) -> None:
 @mark.parametrize("runner", ['local', 'spark'])
 def test_transform_valid_raw_with_source(capsys, runner) -> None:
     assert run_command(
-        stream_dtc_file='tests/data/stream.yml',
-        window_dtc_file='tests/data/window.yml',
+        stream_bts_file='tests/data/stream.yml',
+        window_bts_file='tests/data/window.yml',
         source='tests/data/raw.json,tests/data/raw.json',
         raw_json_files=None,
         runner=runner) == 0
@@ -129,8 +127,8 @@ def test_transform_valid_raw_without_source(capsys) -> None:
 
 def test_transform_invalid_runner(capsys) -> None:
     assert run_command(
-        stream_dtc_file='tests/data/stream.yml',
-        window_dtc_file='tests/data/window.yml',
+        stream_bts_file='tests/data/stream.yml',
+        window_bts_file='tests/data/window.yml',
         source=None,
         raw_json_files='tests/data/raw.json,tests/data/raw.json',
         runner='incorrect') == 1
@@ -140,8 +138,8 @@ def test_transform_invalid_runner(capsys) -> None:
 
 def test_transform_invalid_data_processor(capsys) -> None:
     assert run_command(
-        stream_dtc_file='tests/data/stream.yml',
-        window_dtc_file='tests/data/window.yml',
+        stream_bts_file='tests/data/stream.yml',
+        window_bts_file='tests/data/window.yml',
         source=None,
         raw_json_files='tests/data/raw.json,tests/data/raw.json',
         data_processor='incorrect') == 1
