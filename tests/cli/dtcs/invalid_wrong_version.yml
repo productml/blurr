@@ -1,0 +1,21 @@
+Type: Blurr:Transform:Streaming
+
+# WRONG VERSION
+Version: '2088-03-01'
+
+Description: Example
+Name: example_name
+Identity: source.user_id
+Time: source.timestamp
+When: source.package_version == '1.0'
+Stores:
+ - Type: Blurr:Store:Memory
+   Name: memory_store
+Aggregates:
+ - Type: Blurr:Aggregate:Identity
+   Name: user
+   Store: memory_store
+   Fields:
+     - Name: user_id
+       Type: string
+       Value: source.customer_identifier

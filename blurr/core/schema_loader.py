@@ -68,9 +68,10 @@ class SchemaLoader:
             return self._error_cache.errors
 
         return self._error_cache[fully_qualified_name] + ([
-            error for error in self._error_cache.errors
-            if error.fully_qualified_name.startswith(fully_qualified_name + self.ITEM_SEPARATOR)
-        ] if include_nested else [])
+                                                              error for error in self._error_cache.errors
+                                                              if error.fully_qualified_name.startswith(
+                fully_qualified_name + self.ITEM_SEPARATOR)
+                                                          ] if include_nested else [])
 
     def raise_errors(self) -> None:
         """ Raises errors that have been collected in the error cache """

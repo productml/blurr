@@ -9,7 +9,7 @@ from blurr.core.errors import RequiredAttributeError, InvalidNumberError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.store_key import Key
+from blurr.core.store_key import Key, KeyType
 from blurr.core.type import Type
 
 
@@ -100,31 +100,34 @@ def test_aggregate_final_state(activity_aggregate_schema: ActivityAggregateSchem
     store_state = activity_aggregate._store.get_all(identity)
     assert len(store_state) == 3
     assert store_state.get(
-        Key('user1', 'activity_aggr', datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc))) == {
-            '_identity': 'user1',
-            '_start_time': datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc).isoformat(),
-            '_end_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc).isoformat(),
-            'sum': 111,
-            'count': 3
-        }
+        Key(KeyType.TIMESTAMP, 'user1', 'activity_aggr', [],
+            datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc))) == {
+                '_identity': 'user1',
+                '_start_time': datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc).isoformat(),
+                '_end_time': datetime(2018, 1, 1, 1, 2, 1, 0, timezone.utc).isoformat(),
+                'sum': 111,
+                'count': 3
+            }
 
     assert store_state.get(
-        Key('user1', 'activity_aggr', datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc))) == {
-            '_identity': 'user1',
-            '_start_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc).isoformat(),
-            '_end_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc).isoformat(),
-            'sum': 1000,
-            'count': 1
-        }
+        Key(KeyType.TIMESTAMP, 'user1', 'activity_aggr', [],
+            datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc))) == {
+                '_identity': 'user1',
+                '_start_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc).isoformat(),
+                '_end_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc).isoformat(),
+                'sum': 1000,
+                'count': 1
+            }
 
     assert store_state.get(
-        Key('user1', 'activity_aggr', datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc))) == {
-            '_identity': 'user1',
-            '_start_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc).isoformat(),
-            '_end_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc).isoformat(),
-            'sum': 10000,
-            'count': 1
-        }
+        Key(KeyType.TIMESTAMP, 'user1', 'activity_aggr', [],
+            datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc))) == {
+                '_identity': 'user1',
+                '_start_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc).isoformat(),
+                '_end_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc).isoformat(),
+                'sum': 10000,
+                'count': 1
+            }
 
 
 def test_evaluate_no_separation(activity_aggregate_schema: ActivityAggregateSchema,

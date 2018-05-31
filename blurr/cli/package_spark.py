@@ -1,8 +1,8 @@
 import os
 import tempfile
 import zipfile
-
 from distutils.dir_util import copy_tree
+
 from pip._internal import main as pip_main
 
 from blurr.cli.util import eprint

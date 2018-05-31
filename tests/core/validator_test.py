@@ -3,9 +3,11 @@ from typing import Dict, Any
 import yaml
 from pytest import raises, fixture
 
-from blurr.core.errors import RequiredAttributeError, InvalidIdentifierError, EmptyAttributeError, InvalidValueError
+from blurr.core.errors import RequiredAttributeError, InvalidIdentifierError, EmptyAttributeError, \
+    InvalidValueError
 from blurr.core.validator import validate_required_attributes, validate_number_attribute, \
-    validate_python_identifier_attributes, ATTRIBUTE_INTERNAL, validate_empty_attributes, validate_enum_attribute
+    validate_python_identifier_attributes, ATTRIBUTE_INTERNAL, validate_empty_attributes, \
+    validate_enum_attribute
 
 
 @fixture

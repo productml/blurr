@@ -1,0 +1,30 @@
+Type: Blurr:Transform:Streaming
+Version: '2018-03-01'
+Description: Example
+Name: example_name
+Import:
+ - { Module: dateutil, Identifiers: [ parser, tz]}
+ - { Module: dateutil, Identifiers: [ parser ]}
+ - { Module: dateutil}
+Identity: source.user_id
+Time: source.timestamp
+When: source.package_version == '1.0'
+Stores:
+ - Type: Blurr:Store:Memory
+   Name: memory_store
+Aggregates:
+ - Type: Blurr:Aggregate:Identity
+   Name: user
+   Store: memory_store
+   Dimensions:
+     - Name: value
+       Type: map
+       Value: source.value
+   Fields:
+     - Name: user_id
+       Type: string
+       Value: source.customer_identifier
+     - Name: country
+       Type: string
+       Value: source.country
+       When: last_session == None

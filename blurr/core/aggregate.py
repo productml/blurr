@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod, abstractproperty
 from typing import Dict, Type, Any
 
 from blurr.core.base import BaseSchemaCollection, BaseItemCollection, BaseItem
@@ -7,7 +7,7 @@ from blurr.core.evaluation import EvaluationContext
 from blurr.core.loader import TypeLoader
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store import StoreSchema, Store
-from blurr.core.store_key import Key
+from blurr.core.store_key import Key, KeyType
 from blurr.core.type import Type as BtsType
 from blurr.core.validator import ATTRIBUTE_INTERNAL
 
@@ -89,13 +89,16 @@ class Aggregate(BaseItemCollection, ABC):
         """
         self._persist()
 
-    def _persist(self, timestamp=None) -> None:
+    @property
+    def _key(self):
+        return Key(KeyType.DIMENSION, self._identity, self._name)
+
+    def _persist(self) -> None:
         """
         Persists the current data group
-        :param timestamp: Optional timestamp to include in the Key construction
         """
         if self._store:
-            self._store.save(Key(self._identity, self._name, timestamp), self._snapshot)
+            self._store.save(self._key, self._snapshot)
 
     def __getattr__(self, item: str) -> Any:
         """
