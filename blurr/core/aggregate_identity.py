@@ -23,10 +23,14 @@ class IdentityAggregateSchema(AggregateSchema):
                 self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
             for schema_spec in self._spec.get(self.ATTRIBUTE_DIMENSIONS, [])
         }
+        self.key_type = KeyType.DIMENSION
 
     def validate_schema_spec(self) -> None:
         super().validate_schema_spec()
         self.validate_required_attributes(self.ATTRIBUTE_STORE)
+
+    def extend_schema_spec(self):
+        super().extend_schema_spec()
 
 
 class IdentityAggregate(Aggregate):
@@ -91,10 +95,11 @@ class IdentityAggregate(Aggregate):
         return True
 
     @property
-    def _key(self, timestamp: datetime = None):
+    def _key(self):
         """ Generates the Key object based on dimension fields. """
-        return Key(KeyType.DIMENSION, self._identity, self._name,
+        return Key(self._schema.key_type, self._identity, self._name,
                    [str(item.value) for item in self._dimension_fields.values()])
 
     def _persist(self) -> None:
-        self._store.save(self._existing_key, self._snapshot)
+        if self._existing_key:
+            self._store.save(self._existing_key, self._snapshot)

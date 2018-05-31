@@ -2,7 +2,7 @@ from collections import defaultdict
 from datetime import datetime
 from typing import Dict
 
-from blurr.core.aggregate_block import BlockAggregate
+from blurr.core.aggregate_block import BlockAggregate, TimeAggregate
 from blurr.core.base import BaseSchema
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.schema_loader import SchemaLoader
@@ -32,7 +32,7 @@ class Anchor:
         self._condition_met: Dict[datetime, int] = defaultdict(int)
         self.anchor_block = None
 
-    def evaluate_anchor(self, block: BlockAggregate, evaluation_context: EvaluationContext) -> bool:
+    def evaluate_anchor(self, block: TimeAggregate, evaluation_context: EvaluationContext) -> bool:
         self.anchor_block = block
         if self.max_condition_met(block):
             return False
@@ -45,7 +45,7 @@ class Anchor:
     def add_condition_met(self):
         self._condition_met[self.anchor_block._start_time.date()] += 1
 
-    def max_condition_met(self, block: BlockAggregate) -> bool:
+    def max_condition_met(self, block: TimeAggregate) -> bool:
         if self._schema.max is None:
             return False
         return self._condition_met[block._start_time.date()] >= self._schema.max

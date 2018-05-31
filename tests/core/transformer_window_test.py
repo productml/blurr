@@ -4,7 +4,7 @@ import pytest
 import yaml
 from pytest import fixture
 
-from blurr.core.aggregate_block import BlockAggregate
+from blurr.core.aggregate_block import BlockAggregate, TimeAggregate
 from blurr.core.anchor import AnchorSchema
 from blurr.core.errors import PrepareWindowMissingBlocksError, RequiredAttributeError
 from blurr.core.evaluation import Context
@@ -51,10 +51,10 @@ def window_transformer(schema_loader, stream_transformer, window_schema_spec):
 
 
 @fixture
-def block_aggregate(stream_transformer):
+def time_aggregate(stream_transformer):
     block = None
     for aggregate in stream_transformer._nested_items.values():
-        if isinstance(aggregate, BlockAggregate):
+        if isinstance(aggregate, TimeAggregate):
             block = aggregate
 
     return block
@@ -71,8 +71,8 @@ def test_window_transformer_schema_init(schema_loader, stream_schema_spec, windo
     assert isinstance(window_transformer_schema.anchor, AnchorSchema)
 
 
-def test_evaluate_prepare_window_error(window_transformer, block_aggregate):
-    block_aggregate.run_restore({
+def test_evaluate_prepare_window_error(window_transformer, time_aggregate):
+    time_aggregate.run_restore({
         'events': 3,
         '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc).isoformat(),
         '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc).isoformat()
@@ -80,27 +80,27 @@ def test_evaluate_prepare_window_error(window_transformer, block_aggregate):
     with pytest.raises(
             PrepareWindowMissingBlocksError,
             match='last_session WindowAggregate: Expecting 1 but found 0 blocks'):
-        window_transformer.run_evaluate(block_aggregate)
+        window_transformer.run_evaluate(time_aggregate)
 
 
-def test_evaluate_prepare_window(schema_loader, window_transformer, block_aggregate):
+def test_evaluate_prepare_window(schema_loader, window_transformer, time_aggregate):
     init_memory_store(schema_loader.get_store('Sessions.memory'))
-    block_aggregate.run_restore({
+    time_aggregate.run_restore({
         'events': 3,
         '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc).isoformat(),
         '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc).isoformat()
     })
-    assert window_transformer.run_evaluate(block_aggregate) is True
+    assert window_transformer.run_evaluate(time_aggregate) is True
 
 
-def test_evaluate_false(schema_loader, window_transformer, block_aggregate):
+def test_evaluate_false(schema_loader, window_transformer, time_aggregate):
     init_memory_store(schema_loader.get_store('Sessions.memory'))
-    block_aggregate.run_restore({
+    time_aggregate.run_restore({
         'events': 0,
         '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc).isoformat(),
         '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc).isoformat()
     })
-    assert window_transformer.run_evaluate(block_aggregate) is False
+    assert window_transformer.run_evaluate(time_aggregate) is False
 
 
 def test_evaluate_missing_block_error(window_transformer):
@@ -109,16 +109,16 @@ def test_evaluate_missing_block_error(window_transformer):
         window_transformer.run_evaluate()
 
 
-def test_window_transformer(schema_loader, window_transformer, block_aggregate):
+def test_window_transformer(schema_loader, window_transformer, time_aggregate):
     init_memory_store(schema_loader.get_store('Sessions.memory'))
 
-    block_aggregate.run_restore({
+    time_aggregate.run_restore({
         'events': 3,
         '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc).isoformat(),
         '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc).isoformat()
     })
 
-    assert window_transformer.run_evaluate(block_aggregate) is True
+    assert window_transformer.run_evaluate(time_aggregate) is True
 
     snapshot = window_transformer._snapshot
     assert snapshot['last_session'] == {'_identity': 'user1', 'events': 2}
@@ -132,22 +132,22 @@ def test_window_transformer(schema_loader, window_transformer, block_aggregate):
     }
 
 
-def test_window_transformer_internal_reset(schema_loader, window_transformer, block_aggregate):
+def test_window_transformer_internal_reset(schema_loader, window_transformer, time_aggregate):
     init_memory_store(schema_loader.get_store('Sessions.memory'))
     window_transformer._anchor._schema.max = None
 
-    block_aggregate.run_restore({
+    time_aggregate.run_restore({
         'events': 3,
         '_start_time': datetime(2018, 3, 7, 21, 36, 31, 0, timezone.utc).isoformat(),
         '_end_time': datetime(2018, 3, 7, 21, 37, 31, 0, timezone.utc).isoformat()
     })
 
-    assert window_transformer.run_evaluate(block_aggregate) is True
+    assert window_transformer.run_evaluate(time_aggregate) is True
     snapshot = window_transformer._snapshot
     assert snapshot['last_session'] == {'_identity': 'user1', 'events': 2}
     assert snapshot['last_day'] == {'_identity': 'user1', 'total_events': 3}
 
-    assert window_transformer.run_evaluate(block_aggregate) is True
+    assert window_transformer.run_evaluate(time_aggregate) is True
     snapshot = window_transformer._snapshot
     assert snapshot['last_session'] == {'_identity': 'user1', 'events': 2}
     assert snapshot['last_day'] == {'_identity': 'user1', 'total_events': 3}

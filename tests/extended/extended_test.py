@@ -10,7 +10,7 @@ def test_extended_runner():
         local_runner.get_identity_records_from_json_files(['tests/extended/raw.json']))
 
     assert len(local_runner._per_user_data) == 1
-    assert len(local_runner._per_user_data['user-1'][0]) == 5
+    assert len(local_runner._per_user_data['user-1'][0]) == 4
 
     result_state = local_runner._per_user_data['user-1'][0][Key(KeyType.DIMENSION, 'user-1',
                                                                 'state')]
@@ -37,28 +37,27 @@ def test_extended_runner():
 
     assert result_state == expected_state
 
-    result_session = local_runner._per_user_data['user-1'][0][Key(KeyType.TIMESTAMP, 'user-1',
-                                                                  'session', [],
-                                                                  datetime(2016, 2, 13, 0, 0, 58))]
+    result_session = local_runner._per_user_data['user-1'][0][Key(KeyType.DIMENSION, 'user-1',
+                                                                  'session', ['session-3'])]
     expected_session = {
         '_identity': 'user-1',
-        '_start_time': datetime(2016, 2, 13, 0, 0, 58).isoformat(),
+        '_start_time': datetime(2016, 2, 12, 0, 0, 0).isoformat(),
         '_end_time': datetime(2016, 2, 13, 0, 1, 25).isoformat(),
         'session_id': 'session-3',
-        'events': 5,
-        'games_won': 1,
-        'levels_played': [7, 8],
+        'events': 11,
+        'games_won': 2,
+        'levels_played': [6, 6, 7, 8],
         'badges': {
-            'bronze': 1
+            'bronze': 1,
+            'gold': 1
         },
-        'start_score': 51,
+        'start_score': 18,
         'end_score': 71
     }
     assert result_session == expected_session
 
-    result_session_10 = local_runner._per_user_data['user-1'][0][Key(KeyType.TIMESTAMP, 'user-1',
-                                                                     'session', [],
-                                                                     datetime(2016, 2, 10, 0, 0))]
+    result_session_10 = local_runner._per_user_data['user-1'][0][Key(KeyType.DIMENSION, 'user-1',
+                                                                     'session', ['session-1'])]
     expected_session_10 = {
         '_identity': 'user-1',
         '_start_time': datetime(2016, 2, 10, 0, 0).isoformat(),
@@ -76,9 +75,8 @@ def test_extended_runner():
 
     assert result_session_10 == expected_session_10
 
-    result_session_11 = local_runner._per_user_data['user-1'][0][Key(KeyType.TIMESTAMP, 'user-1',
-                                                                     'session', [],
-                                                                     datetime(2016, 2, 11, 0, 0))]
+    result_session_11 = local_runner._per_user_data['user-1'][0][Key(KeyType.DIMENSION, 'user-1',
+                                                                     'session', ['session-2'])]
     expected_session_11 = {
         '_identity': 'user-1',
         '_start_time': datetime(2016, 2, 11, 0, 0).isoformat(),
@@ -95,23 +93,3 @@ def test_extended_runner():
     }
 
     assert result_session_11 == expected_session_11
-
-    result_session_12 = local_runner._per_user_data['user-1'][0][Key(KeyType.TIMESTAMP, 'user-1',
-                                                                     'session', [],
-                                                                     datetime(2016, 2, 12, 0, 0))]
-    expected_session_12 = {
-        '_identity': 'user-1',
-        '_start_time': datetime(2016, 2, 12, 0, 0).isoformat(),
-        '_end_time': datetime(2016, 2, 12, 0, 0, 56).isoformat(),
-        'session_id': 'session-3',
-        'events': 6,
-        'games_won': 1,
-        'levels_played': [6, 6],
-        'badges': {
-            'gold': 1
-        },
-        'start_score': 0,
-        'end_score': 51
-    }
-
-    assert result_session_12 == expected_session_12

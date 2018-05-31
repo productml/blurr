@@ -10,13 +10,38 @@ from blurr.core.schema_loader import SchemaLoader
 from blurr.core.type import Type
 
 
-@fixture
-def window_aggregate_schema(schema_loader_with_mem_store: SchemaLoader, mem_store_name: str,
-                            stream_dtc_name: str) -> WindowAggregateSchema:
+@fixture(params=['activity', 'block'])
+def window_aggregate_schema(request, schema_loader_with_mem_store: SchemaLoader,
+                            mem_store_name: str, stream_dtc_name: str) -> WindowAggregateSchema:
     schema_loader_with_mem_store.add_schema_spec({
-        'Type': Type.BLURR_AGGREGATE_BLOCK,
+        'Type': Type.BLURR_AGGREGATE_ACTIVITY,
         'Name': 'session',
         'Store': mem_store_name,
+        'SeparateByInactiveSeconds': 1800,
+        'Fields': [
+            {
+                'Name': 'events',
+                'Type': Type.INTEGER,
+                'Value': 'session.events + 1',
+            },
+        ],
+    }, stream_dtc_name)
+    schema_loader_with_mem_store.add_schema_spec({
+        'Type': Type.BLURR_AGGREGATE_BLOCK,
+        'Name': 'session_dim',
+        'Store': mem_store_name,
+        'Dimensions:': [
+            {
+                'Name': 'custom_dimension',
+                'Type': Type.STRING,
+                'Value': 'session.dim',
+            },
+            {
+                'Name': 'session_id',
+                'Type': Type.STRING,
+                'Value': 'session.session_id',
+            },
+        ],
         'Fields': [
             {
                 'Name': 'events',
@@ -30,7 +55,7 @@ def window_aggregate_schema(schema_loader_with_mem_store: SchemaLoader, mem_stor
         'Name': 'test_window_name',
         'WindowType': Type.DAY,
         'WindowValue': 1,
-        'Source': stream_dtc_name + '.session',
+        'Source': stream_dtc_name + ('.session' if request.param == 'activity' else '.session_dim'),
         'Fields': [{
             'Name': 'total_events',
             'Type': Type.INTEGER,

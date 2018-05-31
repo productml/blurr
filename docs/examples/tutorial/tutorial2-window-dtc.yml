@@ -29,3 +29,6 @@ Aggregates:
      - Name: avg_games_per_session
        Type: float
        Value: sum(source.games_played) / len(source.session_id)
+
+#python -m blurr transform --debug --streaming-dtc=docs/examples/tutorial/tutorial2-streaming-dtc.yml --window-dtc=docs/examples/tutorial/tutorial2-window-dtc.yml docs/examples/tutorial/tutorial2-data.log
+#python -m blurr transform --debug --streaming-dtc=docs/examples/tutorial/tutorial2-streaming-dtc.yml docs/examples/tutorial/tutorial2-data.log
