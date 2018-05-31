@@ -1,9 +1,9 @@
-# Tutorial 1: Event Aggregation : Streaming DTC
+# Tutorial 1: Event Aggregation : Streaming BTS
 
 In this tutorial we'll learn how Blurr performs basic data aggregation. The following concepts will be introduced:
 
-* The _Data Transform Configuration_ document (DTC)
-* The basic blocks of a DTC: `Header`, `Store`, `Identity` and `Aggregates`
+* The _Blurr Transform Spec_ document (BTS)
+* The basic blocks of a BTS: `Header`, `Store`, `Identity` and `Aggregates`
 * How events are processed and aggregated one by one by a `Block Aggregate`
 * How `Identity` and `Dimensions` are used to create new records.
 
@@ -61,7 +61,7 @@ We will transform the original sequence of events into an series of records cont
 | T8KA        | 09C1       | 1            | 1         |
 
 
-In order to obtain this transformation, Blurr will process the events sequentially one by one using this __Data Transform Configuration (DTC)__ file.
+In order to obtain this transformation, Blurr will process the events sequentially one by one using this __Blurr Transform Spec (BTS)__ file.
 
 ```yaml
 Type: Blurr:Transform:Streaming
@@ -104,7 +104,7 @@ Aggregates:
        Value: session_stats.games_won + 1
 ```
 
-Let's have a quick look at the five main blocks of this DTC: `Header`, `Store`, `Time`, `Identity` and `Aggregates`.
+Let's have a quick look at the five main blocks of this BTS: `Header`, `Store`, `Time`, `Identity` and `Aggregates`.
 
 ### 2.1. Header
 
@@ -114,9 +114,9 @@ Version: '2018-03-07'
 Name : sessions
 ```
 
-`Type` and `Version` identify the capabilities of the DTC.
+`Type` and `Version` identify the capabilities of the BTS.
 
-Further in this series of tutorials we'll introduce different types of DTCs, such as `Window` DTC. We'll also learn how DTCs are combined, the reason why every DTC must have a unique `Name`.
+Further in this series of tutorials we'll introduce different types of BTSs, such as `Window` BTS. We'll also learn how BTSs are combined, the reason why every BTS must have a unique `Name`.
 
 ### 2.2. Store
 
@@ -130,13 +130,13 @@ The output of a transformation is a collection of __records__ persisted in a dat
 
 ### 2.3. Identity
 
-Every DTC has an __Identity__, which is always a property of the events being processed. In our example, the Identity is the property `user_id`:
+Every BTS has an __Identity__, which is always a property of the events being processed. In our example, the Identity is the property `user_id`:
 
 ```yaml
 Identity: source.user_id
 ```
 
-> In a DTC we can access the properties of the event being processed using the `source` keyword, as in `source.user_id` or `source.won`
+> In a BTS we can access the properties of the event being processed using the `source` keyword, as in `source.user_id` or `source.won`
 
 The Identity is the main dimension around which events are aggregated. At this stage, let's just think on the Identity as a mandatory field that is part of both the original events and the output.
 
@@ -266,7 +266,7 @@ A second user starts a new game:
 { "user_id": "B6FA", "session_id": "D043", "country" : "US", "event_id": "game_start" }
 ```
 
-Previously we defined `source.user_id` as the __Identity__ of the DTC:
+Previously we defined `source.user_id` as the __Identity__ of the BTS:
 
 ```yaml
 Identity: source.user_id
@@ -361,7 +361,7 @@ No record is created. The last record for that user is updated instead:
 We can preview the result of the transformation using `blurr transform` command:
 
 ```bash
-$ blurr transform --streaming-dtc tutorial1-streaming-dtc.yml tutorial1-data.log
+$ blurr transform --streaming-bts tutorial1-streaming-bts.yml tutorial1-data.log
 
 ["09C1/session_stats/915D/", {"_identity": "09C1", "_start_time": "2018-03-04T09:01:03", "_end_time": "2018-03-04T09:10:22", "games_played": 2, "games_won": 2, "session_id": "915D"}]
 ["09C1/session_stats/T8KA/", {"_identity": "09C1", "_start_time": "2018-03-04T09:22:13", "_end_time": "2018-03-04T09:25:24", "games_played": 1, "games_won": 1, "session_id": "T8KA"}]

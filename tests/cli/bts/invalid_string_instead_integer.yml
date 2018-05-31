@@ -1,7 +1,7 @@
 Type: Blurr:Transform:Window
 Version: '2018-03-01'
 Description: Example
-SourceDTC: test
+SourceBTS: test
 Name: example_name
 When: source.package_version == '1.0'
 
@@ -12,7 +12,7 @@ Anchor:
 Aggregates:
  - Type: Blurr:Aggregate:Variable
    Name: user
-   Store: offer_ai_dynamo
    Fields:
      - Name: user_id
+       Type: string
        Value: source.customer_identifier

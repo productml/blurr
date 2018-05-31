@@ -10,6 +10,6 @@ Stores:
 Aggregates:
  - Type: Blurr:Aggregate:Identity
    Name: user
-   Store: offer_ai_dynamo
+   Store: memory_store
 
    # Aggregate SHOULD HAVE FIELDS

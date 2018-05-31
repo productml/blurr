@@ -10,7 +10,7 @@ from blurr.core.schema_loader import SchemaLoader
 
 class AnchorSchema(BaseSchema):
     """
-    Represents the schema for the Anchor specified in a window DTC.
+    Represents the schema for the Anchor specified in a window BTS.
     """
 
     ATTRIBUTE_CONDITION = 'Condition'
@@ -23,7 +23,8 @@ class AnchorSchema(BaseSchema):
         self.max = self._spec[self.ATTRIBUTE_MAX] if self.ATTRIBUTE_MAX in self._spec else None
 
     def validate_schema_spec(self) -> None:
-        self.validate_required_attributes(self.ATTRIBUTE_CONDITION, self.ATTRIBUTE_MAX)
+        self.validate_required_attributes(self.ATTRIBUTE_CONDITION)
+        self.validate_number_attribute(self.ATTRIBUTE_MAX, int, 1)
 
 
 class Anchor:

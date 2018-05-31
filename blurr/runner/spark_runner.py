@@ -39,34 +39,34 @@ class SparkRunner(Runner):
     """
     Provides these functionality in a Spark session:
     - Convert events data into Records.
-    - Execute Blurr DTC on Records.
+    - Execute Blurr BTS on Records.
     - Basic output to file and to stdout.
 
     Example usage to process JSON events in files:
     ```
     json_files = [...]
-    runner = SparkRunner(stream_dtc_file, window_dtc_file)
+    runner = SparkRunner(stream_bts_file, window_bts_file)
     # Provide a custom data processor if the json files contain data in a format other than
     # new-line separated JSONs where each JSON object is an event dictionary.
     records_rdd = runner.get_record_rdd_from_json_files(json_files)
     output_rdd = runner.execute(records_rdd)
-    # Output rdd contains data in a Tuple[Identity, Tuple[Streaming DTC State, List of Window DTC
-    # output]] format. These two can then be written out to external storage for passing DTC State
+    # Output rdd contains data in a Tuple[Identity, Tuple[Streaming BTS State, List of Window BTS
+    # output]] format. These two can then be written out to external storage for passing BTS State
     # for the next execution run and as the training data for the model respectively.
     ```
     """
 
-    def __init__(self, stream_dtc_file: str, window_dtc_file: Optional[str] = None):
+    def __init__(self, stream_bts_file: str, window_bts_file: Optional[str] = None):
         """
         Initialize SparkRunner.
 
-        :param stream_dtc_file: Streaming DTC to use. Must be provded.
-        :param window_dtc_file: Window DTC to use. If none is provided only the streaming DTC output
+        :param stream_bts_file: Streaming BTS to use. Must be provded.
+        :param window_bts_file: Window BTS to use. If none is provided only the streaming BTS output
             is generated.
         """
         if _spark_import_err:
             raise _spark_import_err
-        super().__init__(stream_dtc_file, window_dtc_file)
+        super().__init__(stream_bts_file, window_bts_file)
 
     def _execute_per_identity_records(
             self, identity_records_with_state: Tuple[str, Union[List, Tuple[List, Dict]]]):
@@ -79,13 +79,13 @@ class SparkRunner(Runner):
 
     def execute(self, identity_records: 'RDD', old_state_rdd: Optional['RDD'] = None) -> 'RDD':
         """
-        Executes Blurr DTC with the given records. old_state_rdd can be provided to load an older
+        Executes Blurr BTS with the given records. old_state_rdd can be provided to load an older
         state from a previous run.
 
         :param identity_records: RDD of the form Tuple[Identity, List[TimeAndRecord]]
-        :param old_state_rdd: A previous streaming DTC state RDD as Tuple[Identity, Streaming DTC
+        :param old_state_rdd: A previous streaming BTS state RDD as Tuple[Identity, Streaming BTS
             State]
-        :return: RDD[Identity, Tuple[Streaming DTC State, List of Window DTC output]]
+        :return: RDD[Identity, Tuple[Streaming BTS State, List of Window BTS output]]
         """
         identity_records_with_state = identity_records
         if old_state_rdd:
@@ -138,8 +138,8 @@ class SparkRunner(Runner):
         """
         Basic helper function to persist data to disk.
 
-        If window DTC was provided then the window DTC output to written in csv format, otherwise,
-        the streaming DTC output is written in JSON format to the `path` provided
+        If window BTS was provided then the window BTS output to written in csv format, otherwise,
+        the streaming BTS output is written in JSON format to the `path` provided
 
         :param path: Path where the output should be written.
         :param per_identity_data: Output of the `execute()` call.
@@ -148,7 +148,7 @@ class SparkRunner(Runner):
         :return:
         """
         _spark_session_ = get_spark_session(spark_session)
-        if not self._window_dtc:
+        if not self._window_bts:
             per_identity_data.flatMap(
                 lambda x: [json.dumps(data, cls=BlurrJSONEncoder) for data in x[1][0].items()]
             ).saveAsTextFile(path)
@@ -159,14 +159,14 @@ class SparkRunner(Runner):
 
     def print_output(self, per_identity_data: 'RDD') -> None:
         """
-        Basic helper function to write data to stdout. If window DTC was provided then the window
-        DTC output is written, otherwise, the streaming DTC output is written to stdout.
+        Basic helper function to write data to stdout. If window BTS was provided then the window
+        BTS output is written, otherwise, the streaming BTS output is written to stdout.
 
         WARNING - For large datasets this will be extremely slow.
 
         :param per_identity_data: Output of the `execute()` call.
         """
-        if not self._window_dtc:
+        if not self._window_bts:
             data = per_identity_data.flatMap(
                 lambda x: [json.dumps(data, cls=BlurrJSONEncoder) for data in x[1][0].items()])
         else:

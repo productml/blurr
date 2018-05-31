@@ -9,8 +9,8 @@ from blurr.store.memory_store import MemoryStore
 
 
 @fixture
-def memory_store(schema_loader_with_mem_store, stream_dtc_name, mem_store_name) -> MemoryStore:
-    return schema_loader_with_mem_store.get_store(stream_dtc_name + '.' + mem_store_name)
+def memory_store(schema_loader_with_mem_store, stream_bts_name, mem_store_name) -> MemoryStore:
+    return schema_loader_with_mem_store.get_store(stream_bts_name + '.' + mem_store_name)
 
 
 @fixture

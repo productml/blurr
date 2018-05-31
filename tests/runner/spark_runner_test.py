@@ -8,11 +8,11 @@ from blurr.core.store_key import Key, KeyType
 from blurr.runner.spark_runner import SparkRunner, get_spark_session
 
 
-def execute_runner(stream_dtc_file: str,
-                   window_dtc_file: Optional[str],
+def execute_runner(stream_bts_file: str,
+                   window_bts_file: Optional[str],
                    local_json_files: List[str],
                    old_state: Optional[Dict[str, Dict]] = None) -> Tuple[SparkRunner, Any]:
-    runner = SparkRunner(stream_dtc_file, window_dtc_file)
+    runner = SparkRunner(stream_bts_file, window_bts_file)
     if old_state:
         old_state = get_spark_session().sparkContext.parallelize(old_state.items())
     return runner, runner.execute(
@@ -27,7 +27,7 @@ def get_spark_output(out_dir: PosixPath) -> List:
     return output_text
 
 
-def test_only_stream_dtc_provided():
+def test_only_stream_bts_provided():
     runner, data = execute_runner('tests/data/stream.yml', None, ['tests/data/raw.json'])
     block_data = {}
     window_data = {}
@@ -37,7 +37,7 @@ def test_only_stream_dtc_provided():
 
     assert len(block_data) == 3
 
-    # Stream DTC output
+    # Stream BTS output
     assert block_data['userA'][Key(KeyType.TIMESTAMP, 'userA', 'session', [],
                                    datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()))] == {
                                        '_identity': 'userA',
@@ -93,7 +93,7 @@ def test_no_variable_aggreate_data_stored():
     assert Key(KeyType.DIMENSION, 'userA', 'vars') not in block_data['userA']
 
 
-def test_stream_and_window_dtc_provided():
+def test_stream_and_window_bts_provided():
     runner, data = execute_runner('tests/data/stream.yml', 'tests/data/window.yml',
                                   ['tests/data/raw.json'])
     window_data = {}
@@ -109,7 +109,7 @@ def test_stream_and_window_dtc_provided():
     assert window_data['userB'] == []
 
 
-def test_stream_dtc_with_state():
+def test_stream_bts_with_state():
     _, data_combined = execute_runner('tests/data/stream.yml', None,
                                       ['tests/data/raw.json', 'tests/data/raw2.json'], None)
 
@@ -124,7 +124,7 @@ def test_stream_dtc_with_state():
     assert {}.update(data_separate.collect()) == {}.update(data_combined.collect())
 
 
-def test_stream_and_window_dtc_with_state():
+def test_stream_and_window_bts_with_state():
     _, data_combined = execute_runner('tests/data/stream.yml', 'tests/data/window.yml',
                                       ['tests/data/raw.json', 'tests/data/raw2.json'], None)
 
@@ -140,7 +140,7 @@ def test_stream_and_window_dtc_with_state():
     assert {}.update(data_separate.collect()) == {}.update(data_combined.collect())
 
 
-def test_write_output_file_only_source_dtc_provided(tmpdir):
+def test_write_output_file_only_source_bts_provided(tmpdir):
     runner, data = execute_runner('tests/data/stream.yml', None, ['tests/data/raw.json'])
     out_dir = tmpdir.join('out')
     runner.write_output_file(str(out_dir), data)
@@ -155,7 +155,7 @@ def test_write_output_file_only_source_dtc_provided(tmpdir):
             '}]') in output_text
 
 
-def test_write_output_file_with_stream_and_window_dtc_provided(tmpdir):
+def test_write_output_file_with_stream_and_window_bts_provided(tmpdir):
     runner, data = execute_runner('tests/data/stream.yml', 'tests/data/window.yml',
                                   ['tests/data/raw.json'])
     out_dir = tmpdir.join('out')

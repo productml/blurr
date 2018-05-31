@@ -7,6 +7,8 @@ from blurr.core.field import FieldSchema, Field
 from blurr.core.loader import TypeLoader
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key, KeyType
+from blurr.core.type import Type
+from blurr.core.validator import validate_enum_attribute
 
 
 class IdentityAggregateSchema(AggregateSchema):
@@ -28,6 +30,14 @@ class IdentityAggregateSchema(AggregateSchema):
     def validate_schema_spec(self) -> None:
         super().validate_schema_spec()
         self.validate_required_attributes(self.ATTRIBUTE_STORE)
+        for schema_spec in self._spec.get(self.ATTRIBUTE_DIMENSIONS, []):
+            self.add_errors(
+                validate_enum_attribute(
+                    self.schema_loader.get_fully_qualified_name(self.fully_qualified_name,
+                                                                schema_spec[self.ATTRIBUTE_NAME]),
+                    schema_spec,
+                    self.ATTRIBUTE_TYPE,
+                    {Type.INTEGER.value, Type.STRING.value}))
 
     def extend_schema_spec(self):
         super().extend_schema_spec()

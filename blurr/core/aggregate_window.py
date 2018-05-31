@@ -3,6 +3,7 @@ from typing import Any, List, Tuple
 
 from blurr.core.aggregate import Aggregate, AggregateSchema
 from blurr.core.aggregate_block import BlockAggregate, BlockAggregateSchema, TimeAggregate
+from blurr.core.aggregate_time import TimeAggregateSchema
 from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.loader import TypeLoader
@@ -22,7 +23,7 @@ class WindowAggregateSchema(AggregateSchema):
 
         self.window_value = self._spec.get(self.ATTRIBUTE_WINDOW_VALUE, 0)
         self.window_type = self._spec.get(self.ATTRIBUTE_WINDOW_TYPE, None)
-        self.source: AggregateSchema = self.schema_loader.get_schema_object(
+        self.source: TimeAggregateSchema = self.schema_loader.get_schema_object(
             self._spec[self.ATTRIBUTE_SOURCE]) if self.ATTRIBUTE_SOURCE in self._spec else None
 
     def validate_schema_spec(self) -> None:

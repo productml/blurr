@@ -5,40 +5,30 @@ import yaml
 
 from blurr.cli.util import get_yml_files, eprint
 from blurr.core import logging
-from blurr.core.errors import BaseSchemaError, SchemaError
+from blurr.core.errors import SchemaError, InvalidSpecError
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.syntax.schema_validator import is_streaming_dtc, validate as validate_window
 
 
-def validate_command(dtc_files: List[str]) -> int:
+def validate_command(bts_files: List[str]) -> int:
     all_files_valid = True
-    if len(dtc_files) == 0:
-        dtc_files = get_yml_files()
-    for dtc_file in dtc_files:
-        if validate_file(dtc_file) == 1:
+    if len(bts_files) == 0:
+        bts_files = get_yml_files()
+    for bts_file in bts_files:
+        if validate_file(bts_file) == 1:
             all_files_valid = False
 
     return 0 if all_files_valid else 1
 
 
-def validate_file(dtc_file: str) -> int:
-    print('Running validation on {}'.format(dtc_file))
+def validate_file(bts_file: str) -> int:
+    print('Running validation on {}'.format(bts_file))
     try:
-        dtc_dict = yaml.safe_load(open(dtc_file, 'r', encoding='utf-8'))
-        if is_streaming_dtc(dtc_dict):
-            validate(dtc_dict)
-        else:
-            # TODO: Window DTC validation using the new validation technique requires
-            # streaming DTC to be loaded in the schema loader.  Refactoring required.
-            validate_window(dtc_dict)
+        bts_dict = yaml.safe_load(open(bts_file, 'r', encoding='utf-8'))
+        validate(bts_dict)
         print('Document is valid')
         return 0
     except yaml.YAMLError as err:
         eprint('Invalid yaml')
-        eprint(str(err))
-        return 1
-    # TODO Keeping for legacy - to be removed in the future
-    except BaseSchemaError as err:
         eprint(str(err))
         return 1
     except SchemaError as err:
@@ -53,9 +43,12 @@ def validate_file(dtc_file: str) -> int:
 
 def validate(spec: Dict[str, Any]) -> None:
     schema_loader = SchemaLoader()
-    stream_dtc_name = schema_loader.add_schema_spec(spec)
+    bts_name = schema_loader.add_schema_spec(spec)
+    if not bts_name:
+        raise InvalidSpecError(spec)
     schema_loader.raise_errors()
-    schema_loader.get_schema_object(stream_dtc_name)
+    schema_loader.get_schema_object(bts_name)
+    print(schema_loader.get_errors())
     schema_loader.raise_errors()
 
 

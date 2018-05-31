@@ -12,7 +12,7 @@ from blurr.core.type import Type
 
 @fixture(params=['activity', 'block'])
 def window_aggregate_schema(request, schema_loader_with_mem_store: SchemaLoader,
-                            mem_store_name: str, stream_dtc_name: str) -> WindowAggregateSchema:
+                            mem_store_name: str, stream_bts_name: str) -> WindowAggregateSchema:
     schema_loader_with_mem_store.add_schema_spec({
         'Type': Type.BLURR_AGGREGATE_ACTIVITY,
         'Name': 'session',
@@ -25,7 +25,7 @@ def window_aggregate_schema(request, schema_loader_with_mem_store: SchemaLoader,
                 'Value': 'session.events + 1',
             },
         ],
-    }, stream_dtc_name)
+    }, stream_bts_name)
     schema_loader_with_mem_store.add_schema_spec({
         'Type': Type.BLURR_AGGREGATE_BLOCK,
         'Name': 'session_dim',
@@ -49,13 +49,13 @@ def window_aggregate_schema(request, schema_loader_with_mem_store: SchemaLoader,
                 'Value': 'session.events + 1',
             },
         ],
-    }, stream_dtc_name)
+    }, stream_bts_name)
     name = schema_loader_with_mem_store.add_schema_spec({
         'Type': Type.BLURR_AGGREGATE_WINDOW,
         'Name': 'test_window_name',
         'WindowType': Type.DAY,
         'WindowValue': 1,
-        'Source': stream_dtc_name + ('.session' if request.param == 'activity' else '.session_dim'),
+        'Source': stream_bts_name + ('.session' if request.param == 'activity' else '.session_dim'),
         'Fields': [{
             'Name': 'total_events',
             'Type': Type.INTEGER,

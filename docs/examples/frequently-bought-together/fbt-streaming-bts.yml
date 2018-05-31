@@ -1,9 +1,9 @@
 ####
-# Header block that defines the properties of this DTC
+# Header block that defines the properties of this BTS
 ####
 
-# Type of DTC. Streaming or Window
-# The Streaming DTC processes the raw data and converts it into sessions
+# Type of BTS. Streaming or Window
+# The Streaming BTS processes the raw data and converts it into sessions
 
 Type: Blurr:Transform:Streaming
 Version: '2018-03-01'
@@ -13,7 +13,7 @@ Name: fbt_v1
 # The field in the raw data around which data is aggregated. This is usually a unique user id
 
 Identity: source.appInstanceId
-Time: parser.parse(source.start_time) #This tells the DTC that source.start_time is time of the source event
+Time: parser.parse(source.start_time) #This tells the BTS that source.start_time is time of the source event
 
 ##
 # The raw data is converted to sessions and stored in persistent storage such as DynamoDB (a Store)
