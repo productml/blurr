@@ -29,7 +29,7 @@ Yes, if: you are well on your way on the ML 'curve of enlightenment', and are th
 
 # Playground
 
-An end-to-end NYSE price [prediction example using Blurr](https://colab.research.google.com/drive/1XU8G7as4cuPYqcoV5rJAd8yMuXUPXU8Q)
+[Launch playground](https://colab.research.google.com/drive/1XU8G7as4cuPYqcoV5rJAd8yMuXUPXU8Q)
 
 # Tutorial and Docs
 
