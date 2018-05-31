@@ -8,6 +8,8 @@ import json
 from collections import defaultdict
 from typing import List, Optional, Dict, Tuple
 
+from smart_open import smart_open
+
 from blurr.cli.validate import validate
 from blurr.runner.data_processor import DataProcessor, SimpleJsonDataProcessor
 from blurr.runner.json_encoder import BlurrJSONEncoder
@@ -41,12 +43,12 @@ class LocalRunner(Runner):
 
     def get_identity_records_from_json_files(
             self,
-            local_json_files: List[str],
+            json_files: List[str],
             data_processor: DataProcessor = SimpleJsonDataProcessor()
     ) -> Dict[str, List[TimeAndRecord]]:
         identity_records = defaultdict(list)
-        for file in local_json_files:
-            with open(file) as file_stream:
+        for file in json_files:
+            with smart_open(file) as file_stream:
                 for identity, record_with_datetime in self.get_per_identity_records(
                         file_stream, data_processor):
                     identity_records[identity].append(record_with_datetime)
@@ -68,7 +70,7 @@ class LocalRunner(Runner):
 
     def write_output_file(self, output_file: str, per_user_data):
         if not self._window_bts:
-            with open(output_file, 'w') as file:
+            with smart_open(output_file, 'w') as file:
                 for block_data, _ in per_user_data.values():
                     for row in block_data.items():
                         file.write(json.dumps(row, cls=BlurrJSONEncoder))
@@ -80,7 +82,7 @@ class LocalRunner(Runner):
                     header = list(data_row.keys())
                     break
             header.sort()
-            with open(output_file, 'w') as csv_file:
+            with smart_open(output_file, 'w') as csv_file:
                 writer = csv.DictWriter(csv_file, header)
                 writer.writeheader()
                 for _, window_data in per_user_data.values():
