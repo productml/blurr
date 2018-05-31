@@ -31,9 +31,12 @@ class IdentityAggregateSchema(AggregateSchema):
         self.validate_required_attributes(self.ATTRIBUTE_STORE)
         for schema_spec in self._spec.get(self.ATTRIBUTE_DIMENSIONS, []):
             self.add_errors(
-                validate_enum_attribute(self.schema_loader.get_fully_qualified_name(self.fully_qualified_name,
-                                                                                    schema_spec[self.ATTRIBUTE_NAME]),
-                                        schema_spec, self.ATTRIBUTE_TYPE, {Type.INTEGER.value, Type.STRING.value}))
+                validate_enum_attribute(
+                    self.schema_loader.get_fully_qualified_name(self.fully_qualified_name,
+                                                                schema_spec[self.ATTRIBUTE_NAME]),
+                    schema_spec,
+                    self.ATTRIBUTE_TYPE,
+                    {Type.INTEGER.value, Type.STRING.value}))
 
 
 class IdentityAggregate(Aggregate):
