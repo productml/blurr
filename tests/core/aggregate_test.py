@@ -7,7 +7,7 @@ from blurr.core.aggregate import AggregateSchema, Aggregate
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.field import Field
 from blurr.core.schema_loader import SchemaLoader
-from blurr.core.store_key import Key
+from blurr.core.store_key import Key, KeyType
 from blurr.core.type import Type
 
 
@@ -87,10 +87,9 @@ def test_aggregate_persist_with_store(aggregate_schema_with_store):
         schema=aggregate_schema_with_store,
         identity="12345",
         evaluation_context=EvaluationContext())
-    dt = datetime.now()
-    dt.replace(tzinfo=timezone.utc)
-    aggregate._persist(dt)
-    snapshot_aggregate = aggregate._store.get(Key(identity="12345", group="user", timestamp=dt))
+    aggregate._persist()
+    snapshot_aggregate = aggregate._store.get(
+        Key(KeyType.DIMENSION, identity="12345", group="user"))
     assert snapshot_aggregate is not None
     assert snapshot_aggregate == aggregate._snapshot
 
@@ -101,6 +100,7 @@ def test_aggregate_finalize(aggregate_schema_with_store):
         identity="12345",
         evaluation_context=EvaluationContext())
     aggregate.run_finalize()
-    snapshot_aggregate = aggregate._store.get(Key(identity="12345", group="user"))
+    snapshot_aggregate = aggregate._store.get(
+        Key(KeyType.DIMENSION, identity="12345", group="user"))
     assert snapshot_aggregate is not None
     assert snapshot_aggregate == aggregate._snapshot

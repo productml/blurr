@@ -29,7 +29,7 @@ class BaseSchemaError(Exception, ABC):
     @abstractmethod
     def key(self) -> Tuple:
         """ Returns a tuple that uniquely identifies the object by its values """
-        return (self.fully_qualified_name,)
+        return (self.fully_qualified_name, )
 
     def __hash__(self):
         return hash(self.key)
@@ -54,7 +54,7 @@ class BaseSchemaAttributeError(BaseSchemaError, ABC):
 
     @property
     def key(self):
-        return super().key + (self.attribute,)
+        return super().key + (self.attribute, )
 
 
 class RequiredAttributeError(BaseSchemaAttributeError):
@@ -83,7 +83,7 @@ class InvalidValueError(BaseSchemaAttributeError):
 
     @property
     def key(self):
-        return super().key + (str(self.candidates),)
+        return super().key + (str(self.candidates), )
 
 
 class InvalidNumberError(BaseSchemaAttributeError):
@@ -127,7 +127,7 @@ class InvalidIdentifierError(BaseSchemaAttributeError):
 
     @property
     def key(self):
-        return super().key + (str(self.reason),)
+        return super().key + (str(self.reason), )
 
 
 class InvalidTypeError(BaseSchemaAttributeError):
@@ -268,7 +268,6 @@ class SchemaError(Exception):
 
 
 class SpecNotFoundError(BaseSchemaError):
-
     @property
     def key(self):
         return super().key
