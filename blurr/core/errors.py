@@ -87,8 +87,15 @@ class InvalidValueError(BaseSchemaAttributeError):
 
 
 class InvalidNumberError(BaseSchemaAttributeError):
-    def __init__(self, fully_qualified_name: str, spec: Dict[str, Any], attribute: str,
-                 value_type: Type, minimum: Any = None, maximum: Any = None, *args, **kwargs):
+    def __init__(self,
+                 fully_qualified_name: str,
+                 spec: Dict[str, Any],
+                 attribute: str,
+                 value_type: Type,
+                 minimum: Any = None,
+                 maximum: Any = None,
+                 *args,
+                 **kwargs):
         super().__init__(fully_qualified_name, spec, attribute, *args, **kwargs)
         self.type = value_type
         self.min = minimum
@@ -274,7 +281,6 @@ class SpecNotFoundError(BaseSchemaError):
 
 
 class InvalidSpecError(BaseSchemaError):
-
     def __init__(self, spec: Dict[str, Any], *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fully_qualified_name = '**InvalidSpec**'
@@ -285,8 +291,7 @@ class InvalidSpecError(BaseSchemaError):
         return super().key
 
     def __str__(self):
-        return 'The following spec is invalid: \n{spec}'.format(
-            spec=self.spec)
+        return 'The following spec is invalid: \n{spec}'.format(spec=self.spec)
 
 
 class ExpressionEvaluationError(Exception):

@@ -61,10 +61,7 @@ setup(
     author_email="info@productml.com",
     url="https://github.com/productml/blurr",
     packages=find_packages(),
-    data_files=[
-        "blurr/core/syntax/dtc_window_schema.yml", "blurr/core/syntax/dtc_streaming_schema.yml",
-        "blurr/VERSION"
-    ],
+    data_files=["blurr/VERSION"],
     include_package_data=True,
     install_requires=requirements(),
     python_requires='>=3.6',

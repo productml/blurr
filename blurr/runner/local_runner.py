@@ -8,7 +8,7 @@ import json
 from collections import defaultdict
 from typing import List, Optional, Dict, Tuple
 
-from blurr.core.syntax.schema_validator import validate
+from blurr.cli.validate import validate
 from blurr.runner.data_processor import DataProcessor, SimpleJsonDataProcessor
 from blurr.runner.json_encoder import BlurrJSONEncoder
 from blurr.runner.runner import Runner, TimeAndRecord
