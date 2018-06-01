@@ -22,7 +22,6 @@ pipenv = "*"
 twine = "*"
 pytest-cov = "*"
 python-coveralls = "*"
-
 pip = "*"
 
 
