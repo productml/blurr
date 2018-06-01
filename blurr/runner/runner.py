@@ -2,7 +2,9 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import List, Optional, Tuple, Any, Dict, Iterable, Generator
 
+
 import yaml
+from smart_open import smart_open
 
 from blurr.core import logging
 from blurr.core.aggregate_block import BlockAggregate, TimeAggregate
@@ -39,9 +41,9 @@ class Runner(ABC):
     """
 
     def __init__(self, stream_bts_file: str, window_bts_file: Optional[str]):
-        self._stream_bts = yaml.safe_load(open(stream_bts_file))
+        self._stream_bts = yaml.safe_load(smart_open(stream_bts_file))
         self._window_bts = None if window_bts_file is None else yaml.safe_load(
-            open(window_bts_file))
+            smart_open(window_bts_file))
 
         # TODO: Assume validation will be done separately.
         # This causes a problem when running the code on spark

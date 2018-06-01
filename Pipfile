@@ -10,7 +10,8 @@ name = "pypi"
 pyyaml = "*"
 python-dateutil = "*"
 docopt = "*"
-
+boto3 = "*"
+smart_open = "*"
 
 [dev-packages]
 
@@ -21,7 +22,6 @@ pipenv = "*"
 twine = "*"
 pytest-cov = "*"
 python-coveralls = "*"
-"boto3" = "*"
 pip = "*"
 
 
