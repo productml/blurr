@@ -3,9 +3,7 @@ Version: '2018-03-01'
 Description: Example
 Name: example_name
 Import:
- - { Module: dateutil, Identifiers: [ parser, tz]}
- - { Module: dateutil, Identifiers: [ parser ]}
- - { Module: dateutil}
+ - { Module: datetime, Identifiers: [ datetime, timezone]}
 Identity: source.customer_identifier
 Time: source.timestamp
 When: source.package_version == '1.0'

@@ -1,6 +1,6 @@
 from typing import Dict, Any, List
 
-from dateutil import parser
+import ciso8601
 from pytest import fixture
 
 from blurr.core.aggregate_identity import IdentityAggregateSchema, IdentityAggregate
@@ -121,7 +121,7 @@ def test_schema_initialization(identity_aggregate_schema_spec: Dict[str, Any],
 
 def evaluate_event(record: Record, aggregate: IdentityAggregate) -> None:
     aggregate._evaluation_context.global_add('source', record)
-    aggregate._evaluation_context.global_add('time', parser.parse(record.event_time))
+    aggregate._evaluation_context.global_add('time', ciso8601.parse_datetime(record.event_time))
     aggregate.run_evaluate()
 
 

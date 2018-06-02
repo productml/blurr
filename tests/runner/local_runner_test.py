@@ -1,7 +1,5 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Tuple, Any, Optional, Dict
-
-from dateutil.tz import tzutc
 
 from blurr.core.store_key import Key, KeyType
 from blurr.runner.local_runner import LocalRunner
@@ -23,23 +21,23 @@ def test_only_stream_bts_provided():
     # Stream BTS output
     assert data['userA'][0][Key(
         KeyType.TIMESTAMP, 'userA', 'session', [], datetime(2018, 3, 7, 23, 35, 31))] == {
-        '_identity': 'userA',
-        '_start_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()).isoformat(),
-        '_end_time': datetime(2018, 3, 7, 23, 35, 32, tzinfo=tzutc()).isoformat(),
-        'events': 2,
-        'country': 'IN',
-        'continent': 'World'
-    }
+               '_identity': 'userA',
+               '_start_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=timezone.utc).isoformat(),
+               '_end_time': datetime(2018, 3, 7, 23, 35, 32, tzinfo=timezone.utc).isoformat(),
+               'events': 2,
+               'country': 'IN',
+               'continent': 'World'
+           }
 
     assert data['userA'][0][Key(
         KeyType.TIMESTAMP, 'userA', 'session', [], datetime(2018, 3, 7, 22, 35, 31))] == {
-            '_identity': 'userA',
-            '_start_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=tzutc()).isoformat(),
-            '_end_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=tzutc()).isoformat(),
-            'events': 1,
-            'country': 'US',
-            'continent': 'North America'
-        }
+               '_identity': 'userA',
+               '_start_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=timezone.utc).isoformat(),
+               '_end_time': datetime(2018, 3, 7, 22, 35, 31, tzinfo=timezone.utc).isoformat(),
+               'events': 1,
+               'country': 'US',
+               'continent': 'North America'
+           }
 
     assert data['userA'][0][Key(KeyType.DIMENSION, 'userA', 'state')] == {
         '_identity': 'userA',
@@ -49,13 +47,13 @@ def test_only_stream_bts_provided():
 
     assert data['userB'][0][Key(
         KeyType.TIMESTAMP, 'userB', 'session', [], datetime(2018, 3, 7, 23, 35, 31))] == {
-            '_identity': 'userB',
-            '_start_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()).isoformat(),
-            '_end_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()).isoformat(),
-            'events': 1,
-            'country': '',
-            'continent': ''
-        }
+               '_identity': 'userB',
+               '_start_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=timezone.utc).isoformat(),
+               '_end_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=timezone.utc).isoformat(),
+               'events': 1,
+               'country': '',
+               'continent': ''
+           }
 
     for (_, window_data) in runner._per_user_data.values():
         assert window_data == []

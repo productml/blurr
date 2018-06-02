@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Tuple
 
-from dateutil import parser
+import ciso8601
 
 from blurr.core.store import Store, Key, StoreSchema
 
@@ -45,7 +45,7 @@ class MemoryStore(Store):
                 if start < key < end:
                     items_in_range.append((key, item))
                 elif key.timestamp is None:
-                    item_ts = parser.parse(item.get('_start_time', datetime.min.isoformat()))
+                    item_ts = ciso8601.parse_datetime(item.get('_start_time', datetime.min.isoformat()))
                     item_ts = item_ts if item_ts.tzinfo else item_ts.replace(tzinfo=timezone.utc)
                     if start.timestamp < item_ts < end.timestamp:
                         items_in_range.append((key, item))
