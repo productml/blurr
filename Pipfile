@@ -8,9 +8,8 @@ name = "pypi"
 [packages]
 
 pyyaml = "*"
-python-dateutil = "*"
 docopt = "*"
-
+ciso8601 = "*"
 
 [dev-packages]
 
