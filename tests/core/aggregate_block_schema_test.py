@@ -17,7 +17,11 @@ def schema_spec() -> Dict[str, Any]:
         'Name': 'user',
         'Filter': 'source.event_id in ["app_launched", "user_updated"]',
         'Store': 'memstore',
-        'Split': True,
+        'Dimensions': [{
+            'Name': 'label',
+            'Type': Type.STRING,
+            'Value': 'source.label'
+        }],
         'Fields': [{
             'Name': 'event_count',
             'Type': Type.INTEGER,
@@ -62,27 +66,19 @@ def test_block_aggregate_schema_initialization(schema_spec, store_spec):
     name = schema_loader.add_schema_spec(schema_spec)
     schema_loader.add_schema_spec(store_spec, name)
     schema = BlockAggregateSchema(name, schema_loader)
+    assert schema._spec[BlockAggregateSchema.ATTRIBUTE_DIMENSIONS] == [{
+        'Name': 'label',
+        'Type': Type.STRING,
+        'Value': 'source.label'
+    }]
     assert match_fields(schema._spec['Fields'])
 
     loader_spec = schema_loader.get_schema_spec(name)
     assert match_fields(loader_spec['Fields'])
 
 
-def test_block_aggregate_schema_with_split_initialization(schema_spec, store_spec):
-    schema_spec['Split'] = '4 > 2'
-    schema_loader = SchemaLoader()
-    name = schema_loader.add_schema_spec(schema_spec)
-    schema_loader.add_schema_spec(store_spec, name)
-    schema = BlockAggregateSchema(name, schema_loader)
-    assert isinstance(schema.split, Expression)
-    assert match_fields(schema_spec['Fields'])
-
-    loader_spec = schema_loader.get_schema_spec(name)
-    assert match_fields(loader_spec['Fields'])
-
-
-def test_block_aggregate_schema_missing_split_attribute_adds_error(schema_spec, store_spec):
-    del schema_spec[BlockAggregateSchema.ATTRIBUTE_SPLIT]
+def test_block_aggregate_schema_missing_dimensions_attribute_adds_error(schema_spec, store_spec):
+    del schema_spec[BlockAggregateSchema.ATTRIBUTE_DIMENSIONS]
 
     schema_loader = SchemaLoader()
     name = schema_loader.add_schema_spec(schema_spec)
@@ -91,4 +87,4 @@ def test_block_aggregate_schema_missing_split_attribute_adds_error(schema_spec, 
 
     assert 1 == len(schema.errors)
     assert isinstance(schema.errors[0], RequiredAttributeError)
-    assert BlockAggregateSchema.ATTRIBUTE_SPLIT == schema.errors[0].attribute
+    assert BlockAggregateSchema.ATTRIBUTE_DIMENSIONS == schema.errors[0].attribute

@@ -123,6 +123,9 @@ class Field(BaseItem):
     def run_reset(self) -> None:
         self.value = self._schema.default
 
+    def __repr__(self):
+        return str(self._snapshot)
+
 
 class ComplexTypeBase(ABC):
     """

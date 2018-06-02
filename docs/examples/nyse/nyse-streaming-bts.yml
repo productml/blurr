@@ -18,8 +18,11 @@ Aggregates:
   - Type: Blurr:Aggregate:Block
     Name: stats
     Store: memory
-    Split: str(time.date()) != stats.date
     When: source.symbol in ['AAPL', 'MSFT', 'GOOG', 'FB']
+    Dimensions:
+      - Name: date
+        Type: string
+        Value: str(time.date())
     Fields:
       - Name: close
         Type: float
@@ -43,7 +46,3 @@ Aggregates:
       - Name: volume
         Type: float
         Value: stats.volume + source.volume
-
-      - Name: date
-        Type: string
-        Value: str(time.date())

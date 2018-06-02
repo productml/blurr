@@ -5,7 +5,7 @@ In this tutorial we'll learn how Blurr performs basic data aggregation. The foll
 * The _Blurr Transform Spec_ document (BTS)
 * The basic blocks of a BTS: `Header`, `Store`, `Identity` and `Aggregates`
 * How events are processed and aggregated one by one by a `Block Aggregate`
-* How `Identity` and `Split` are used to create new records.
+* How `Identity` and `Dimensions` are used to create new records.
 
 Try the code from this example [launching a Jupyter Notebook](https://mybinder.org/v2/gh/productml/blurr/master?filepath=examples%2Ftutorial).
 
@@ -85,13 +85,14 @@ Aggregates:
    Name: session_stats
    Store: hello_world_store
 
-   Split: source.session_id != session_stats.session_id
-
-   Fields:
+   Dimensions:
+   
      - Name: session_id
        Type: string
        Value: source.session_id
-
+       
+   Fields:
+   
      - Name: games_played
        Type: integer
        When: source.event_id == 'game_start'
@@ -167,13 +168,13 @@ Aggregates:
    Name: session_stats
    Store: hello_world_store
 
-   Split: source.session_id != session_stats.session_id
-
-   Fields:
-
+   Dimensions:
+   
      - Name: session_id
        Type: string
        Value: source.session_id
+       
+   Fields:
 
      - Name: games_played
        Type: integer
@@ -298,25 +299,30 @@ After some time, the user decides to play again. This is considered a new sessio
 { "user_id": "09C1", "session_id": "T8KA", "country" : "UK", "event_id": "game_start" }
 ```
 
-There's an element of the Aggregate we haven't covered yet, `Split`:
+There's an element of the Aggregate we haven't covered yet, `Dimension`:
 
 ```yaml
-Split: source.session_id != session_stats.session_id
+Dimensions:
+   
+     - Name: session_id
+       Type: string
+       Value: source.session_id
 ```
 
-Splitting is a key component of event aggregation. A `Block Aggregate` always contains a `Split` expression, defining __when a new record has to be created__ in the store.
+Dimensions is a key component of event aggregation. A `Block Aggregate` always contains a `Dimensions` section, defining __the record has to be upated with new events__ in the store.
 
-`Split` is evaluated for every event. In all the previous events the result of this evaluation was `False`,  but for this case it evaluates to `True`:
+The dimension fields are evaluated first every event. If the `Block Aggregate` is not already evaluating these dimensions then 
+an existing record from the store is retrieved. If no record is found in the store then a new record is created.
 
 * `source.session_id` is the value of the property `session_id` in the event being processed (`T8KA`).
 * `session_stats.session_id` is the value of `session_id` __in the last record saved for the same Identity__ (i.e. the last session played by the user, `915D`)
 
 ```python
-source.session_id != session_stats.session_id
-"T8KA" != "915D" # True
+source.session_id == session_stats.session_id
+"T8KA" == "915D" # False - New record is created because T8KA doesn't already exist in the store
 ```
 
-As a result of the evaluation of `Split` a new record is created in the store:
+As a result of the evaluation of `Dimensions` a new record is created in the store:
 
 
 | session_id  | user_id    | games_played | games_won |
@@ -334,11 +340,11 @@ The previous user finishes the game:
 { "user_id": "09C1", "session_id": "T8KA", "country" : "US", "event_id": "game_end", "won": 1 }
 ```
 
-`Split` evaluates to `False`, since `session_id` is the same for the last record saved from the same user (created after the previous event):
+Since `session_id` is the same for the last record saved from the same user (created after the previous event):
 
 ```python
-source.session_id != session_stats.session_id
-"T8KA" != "T8KA" # False
+source.session_id == session_stats.session_id
+"T8KA" == "T8KA" # True
 ```
 
 No record is created. The last record for that user is updated instead:
@@ -357,14 +363,14 @@ We can preview the result of the transformation using `blurr transform` command:
 ```bash
 $ blurr transform --streaming-bts tutorial1-streaming-bts.yml tutorial1-data.log
 
-["09C1/session_stats/2018-03-04T09:01:03+00:00", {"_identity": "09C1", "_start_time": "2018-03-04T09:01:03", "_end_time": "2018-03-04T09:10:22", "session_id": "915D", "games_played": 2, "games_won": 2}]
-["09C1/session_stats/2018-03-04T09:22:13+00:00", {"_identity": "09C1", "_start_time": "2018-03-04T09:22:13", "_end_time": "2018-03-04T09:25:24", "session_id": "T8KA", "games_played": 1, "games_won": 1}]
-["B6FA/session_stats/2018-03-04T09:11:03+00:00", {"_identity": "B6FA", "_start_time": "2018-03-04T09:11:03", "_end_time": "2018-03-04T09:21:55", "session_id": "D043", "games_played": 1, "games_won": 1}]
+["09C1/session_stats/915D/", {"_identity": "09C1", "_start_time": "2018-03-04T09:01:03", "_end_time": "2018-03-04T09:10:22", "games_played": 2, "games_won": 2, "session_id": "915D"}]
+["09C1/session_stats/T8KA/", {"_identity": "09C1", "_start_time": "2018-03-04T09:22:13", "_end_time": "2018-03-04T09:25:24", "games_played": 1, "games_won": 1, "session_id": "T8KA"}]
+["B6FA/session_stats/D043/", {"_identity": "B6FA", "_start_time": "2018-03-04T09:11:03", "_end_time": "2018-03-04T09:21:55", "games_played": 1, "games_won": 1, "session_id": "D043"}]
 ```
 
 `transform` prints the result of the transform in JSON format, which is slightly different from the table representation.
 
 Each entry consists of an array with 2 items:
 
-* A `identity/aggregate_name/timestamp` string. The __Identity__ is represented by `user_id` in the tables.
+* A `identity/aggregate_name/session_id/` string. The __Identity__ is represented by `user_id` in the tables.
 * An object with the remaining values of the record.

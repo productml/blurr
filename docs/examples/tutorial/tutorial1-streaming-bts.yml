@@ -19,13 +19,12 @@ Aggregates:
    Name: session_stats
    Store: hello_world_store
 
-   Split: source.session_id != session_stats.session_id
-
-   Fields:
+   Dimensions:
      - Name: session_id
        Type: string
        Value: source.session_id
 
+   Fields:
      - Name: games_played
        Type: integer
        When: source.event_id == 'game_start'
