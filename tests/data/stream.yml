@@ -4,10 +4,10 @@ Description: 'Level 1 trasnformation from streaming Raw Data'
 Name: Sessions
 
 Import:
-  - { Module: dateutil.parser, Identifiers: [ parse ]}
+  - { Module: ciso8601, Identifiers: [ parse_datetime ]}
 
 Identity: source.user_id
-Time: parse(source.event_time)
+Time: parse_datetime(source.event_time)
 Stores:
   -
     Type: 'Blurr:Store:Memory'
