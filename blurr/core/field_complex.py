@@ -95,7 +95,7 @@ class BloomFilter(ComplexTypeBase, ScalableBloomFilter):
     def dump(self) -> str:
         file = BytesIO()
         self.tofile(file)
-        return str(b64encode(file.getvalue()))
+        return b64encode(file.getvalue()).decode("utf-8")
 
     @classmethod
     def load(cls, dump: str) -> 'BloomFilter':

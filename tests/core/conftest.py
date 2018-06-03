@@ -113,13 +113,15 @@ def init_memory_store(store: MemoryStore) -> None:
         })
 
 
-def aggregate_snapshot_equals(left: Dict[str, Any], right: Dict[str, Any]) -> bool:
+def assert_aggregate_snapshot_equals(left: Dict[str, Any], right: Dict[str, Any], verify_identity = False):
     """ Compares two aggregate snapshots for equality after removing the implicitly added fields """
 
     left.pop(AggregateSchema.ATTRIBUTE_FIELD_PROCESSED_TRACKER, None)
     right.pop(AggregateSchema.ATTRIBUTE_FIELD_PROCESSED_TRACKER, None)
 
-    left.pop(AggregateSchema.ATTRIBUTE_FIELD_IDENTITY, None)
-    right.pop(AggregateSchema.ATTRIBUTE_FIELD_IDENTITY, None)
+    if not verify_identity:
+        left.pop(AggregateSchema.ATTRIBUTE_FIELD_IDENTITY, None)
+        right.pop(AggregateSchema.ATTRIBUTE_FIELD_IDENTITY, None)
 
-    return left == right
+    assert len(left) == len(right)
+    assert left == right

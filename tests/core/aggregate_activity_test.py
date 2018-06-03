@@ -11,7 +11,7 @@ from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key, KeyType
 from blurr.core.type import Type
-from tests.core.conftest import aggregate_snapshot_equals
+from tests.core.conftest import assert_aggregate_snapshot_equals
 
 
 @fixture
@@ -100,7 +100,7 @@ def test_aggregate_final_state(activity_aggregate_schema: ActivityAggregateSchem
 
     store_state = activity_aggregate._store.get_all(identity)
     assert len(store_state) == 3
-    assert aggregate_snapshot_equals(store_state.get(
+    assert_aggregate_snapshot_equals(store_state.get(
         Key(KeyType.TIMESTAMP, 'user1', 'activity_aggr', [],
             datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc))), {
                 '_start_time': datetime(2018, 1, 1, 1, 1, 1, 0, timezone.utc).isoformat(),
@@ -109,7 +109,7 @@ def test_aggregate_final_state(activity_aggregate_schema: ActivityAggregateSchem
                 'count': 3
             })
 
-    assert aggregate_snapshot_equals(store_state.get(
+    assert_aggregate_snapshot_equals(store_state.get(
         Key(KeyType.TIMESTAMP, 'user1', 'activity_aggr', [],
             datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc))), {
                 '_start_time': datetime(2018, 1, 1, 3, 1, 1, 0, timezone.utc).isoformat(),
@@ -118,7 +118,7 @@ def test_aggregate_final_state(activity_aggregate_schema: ActivityAggregateSchem
                 'count': 1
             })
 
-    assert aggregate_snapshot_equals(store_state.get(
+    assert_aggregate_snapshot_equals(store_state.get(
         Key(KeyType.TIMESTAMP, 'user1', 'activity_aggr', [],
             datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc))), {
                 '_start_time': datetime(2018, 1, 2, 1, 1, 1, 0, timezone.utc).isoformat(),
