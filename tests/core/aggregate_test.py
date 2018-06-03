@@ -1,4 +1,3 @@
-from datetime import datetime, timezone
 from typing import Dict, Any
 
 from pytest import fixture

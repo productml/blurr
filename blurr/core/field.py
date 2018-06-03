@@ -49,17 +49,17 @@ class FieldSchema(BaseSchema, ABC):
     @property
     @abstractmethod
     def default(self) -> Any:
-        """
-        Returns the default value for this type
-        """
+        """  Returns the default value for this type  """
         raise NotImplementedError('type_object is required')
 
     @staticmethod
     def encoder(value: Any) -> Any:
+        """ Encodes the field value for creating snapshot """
         return value
 
     # TODO: Add unit tests for the casting being done here.
     def decoder(self, value: Any) -> Any:
+        """ Decodes the value of the field from the encoded snapshot """
         return self.type_object(value)
 
 

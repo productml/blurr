@@ -1,9 +1,9 @@
-from abc import ABC, abstractmethod, abstractproperty
-from typing import Dict, Type, Any
+from abc import ABC
+from typing import Dict, Type, Any, List
 
 from blurr.core.base import BaseSchemaCollection, BaseItemCollection, BaseItem
 from blurr.core.errors import MissingAttributeError
-from blurr.core.evaluation import EvaluationContext
+from blurr.core.evaluation import EvaluationContext, Expression
 from blurr.core.loader import TypeLoader
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store import StoreSchema, Store
@@ -21,6 +21,8 @@ class AggregateSchema(BaseSchemaCollection, ABC):
     # Field Name Definitions
     ATTRIBUTE_STORE = 'Store'
     ATTRIBUTE_FIELDS = 'Fields'
+    ATTRIBUTE_FIELD_PROCESSED_TRACKER = '_processed_tracker'
+    ATTRIBUTE_FIELD_IDENTITY = '_identity'
 
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         """
@@ -28,6 +30,8 @@ class AggregateSchema(BaseSchemaCollection, ABC):
         :param spec: Schema specifications for the field
         """
         super().__init__(fully_qualified_name, schema_loader, self.ATTRIBUTE_FIELDS)
+        self.is_processed = Expression('time in {aggregate}.{tracker}'.format(
+            aggregate=self._spec[self.ATTRIBUTE_NAME], tracker=self.ATTRIBUTE_FIELD_PROCESSED_TRACKER))
         store_name = self._spec.get(self.ATTRIBUTE_STORE, None)
         self.store_schema: StoreSchema = None
         if store_name:
@@ -38,16 +42,34 @@ class AggregateSchema(BaseSchemaCollection, ABC):
         """ Injects the identity field """
         super().extend_schema_spec()
 
-        identity_field = {
-            'Name': '_identity',
-            'Type': BtsType.STRING,
-            'Value': 'identity',
-            ATTRIBUTE_INTERNAL: True
-        }
-
         if self.ATTRIBUTE_FIELDS in self._spec:
-            self._spec[self.ATTRIBUTE_FIELDS].insert(0, identity_field)
-            self.schema_loader.add_schema_spec(identity_field, self.fully_qualified_name)
+            predefined_field = self._build_identity_processed_tracker_spec(self._spec[self.ATTRIBUTE_NAME])
+            self._spec[self.ATTRIBUTE_FIELDS][0:0] = predefined_field
+
+            for field_schema in predefined_field:
+                self.schema_loader.add_schema_spec(field_schema, self.fully_qualified_name)
+
+    def _build_identity_processed_tracker_spec(self, name_in_context: str) -> List[Dict[str, Any]]:
+        """
+        Constructs the spec for predefined fields that are to be included in the master spec prior to schema load
+        :param name_in_context: Name of the current object in the context
+        :return:
+        """
+        return [
+            {
+                'Name': '_identity',
+                'Type': BtsType.STRING,
+                'Value': 'identity',
+                ATTRIBUTE_INTERNAL: True
+            },
+            {
+                'Name': self.ATTRIBUTE_FIELD_PROCESSED_TRACKER,
+                'Type': BtsType.BLOOM_FILTER,
+                'Value': '{aggregate}.{tracker}.add(time.isoformat())'.format(
+                    aggregate=name_in_context, tracker=self.ATTRIBUTE_FIELD_PROCESSED_TRACKER),
+                ATTRIBUTE_INTERNAL: True
+            }
+        ]
 
 
 class Aggregate(BaseItemCollection, ABC):
@@ -75,6 +97,12 @@ class Aggregate(BaseItemCollection, ABC):
         if self._schema.store_schema:
             self._store = self._schema.schema_loader.get_store(
                 self._schema.store_schema.fully_qualified_name)
+
+    def run_evaluate(self) -> None:
+        """ Runs the exactly-once check for the current record """
+
+        if not self._schema.is_processed.evaluate(self._evaluation_context):
+            super().run_evaluate()
 
     @property
     def _nested_items(self) -> Dict[str, Type[BaseItem]]:
