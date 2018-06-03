@@ -5,9 +5,12 @@ from pytest import fixture
 from blurr.core.aggregate import AggregateSchema, Aggregate
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.field import Field
+from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key, KeyType
 from blurr.core.type import Type
+
+from ciso8601 import parse_datetime
 
 
 def get_aggregate_schema_spec() -> Dict[str, Any]:
@@ -18,7 +21,7 @@ def get_aggregate_schema_spec() -> Dict[str, Any]:
         'Fields': [{
             'Name': 'event_count',
             'Type': Type.INTEGER,
-            'Value': 5
+            'Value': 'user.event_count + 1'
         }]
     }
 
@@ -66,7 +69,7 @@ def test_aggregate_nested_items(aggregate_schema_with_store):
         identity="12345",
         evaluation_context=EvaluationContext())
     nested_items = aggregate._nested_items
-    assert len(nested_items) == 2
+    assert len(nested_items) == 3
     assert "event_count" in nested_items
     assert isinstance(nested_items["event_count"], Field)
     assert "_identity" in nested_items
@@ -103,3 +106,29 @@ def test_aggregate_finalize(aggregate_schema_with_store):
         Key(KeyType.DIMENSION, identity="12345", group="user"))
     assert snapshot_aggregate is not None
     assert snapshot_aggregate == aggregate._snapshot
+
+
+def test_aggregate_exactly_once(aggregate_schema_with_store):
+    aggregate = MockAggregate(
+        schema=aggregate_schema_with_store,
+        identity="12345",
+        evaluation_context=EvaluationContext())
+
+    record = Record({
+        'id': 'user1',
+        'event_value': 10000,
+        'event_time': '2018-01-02T01:01:01+00:00'
+    })
+
+    aggregate._evaluation_context.global_add('source', record)
+    aggregate._evaluation_context.global_add('identity', record.id)
+    aggregate._evaluation_context.global_add('time', parse_datetime(record.event_time))
+    aggregate._evaluation_context.global_add('user', aggregate)
+    aggregate.run_evaluate()
+
+    assert aggregate.event_count == 1
+    assert parse_datetime(record.event_time).isoformat() in aggregate._processed_tracker
+
+    aggregate.run_evaluate()
+
+    assert aggregate.event_count == 1
