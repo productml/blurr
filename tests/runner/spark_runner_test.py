@@ -6,6 +6,7 @@ from dateutil.tz import tzutc
 
 from blurr.core.store_key import Key, KeyType
 from blurr.runner.spark_runner import SparkRunner, get_spark_session
+from tests.core.conftest import assert_aggregate_snapshot_equals
 
 
 def execute_runner(stream_bts_file: str,
@@ -38,9 +39,8 @@ def test_only_stream_bts_provided():
     assert len(block_data) == 3
 
     # Stream BTS output
-    assert block_data['userA'][Key(KeyType.TIMESTAMP, 'userA', 'session', [],
-                                   datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()))] == {
-                                       '_identity': 'userA',
+    assert_aggregate_snapshot_equals(block_data['userA'][Key(KeyType.TIMESTAMP, 'userA', 'session', [],
+                                   datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()))], {
                                        '_start_time': datetime(
                                            2018, 3, 7, 23, 35, 31, tzinfo=tzutc()).isoformat(),
                                        '_end_time': datetime(
@@ -48,11 +48,10 @@ def test_only_stream_bts_provided():
                                        'events': 2,
                                        'country': 'IN',
                                        'continent': 'World'
-                                   }
+                                   })
 
-    assert block_data['userA'][Key(KeyType.TIMESTAMP, 'userA', 'session', [],
-                                   datetime(2018, 3, 7, 22, 35, 31))] == {
-                                       '_identity': 'userA',
+    assert_aggregate_snapshot_equals(block_data['userA'][Key(KeyType.TIMESTAMP, 'userA', 'session', [],
+                                   datetime(2018, 3, 7, 22, 35, 31))], {
                                        '_start_time': datetime(
                                            2018, 3, 7, 22, 35, 31, tzinfo=tzutc()).isoformat(),
                                        '_end_time': datetime(
@@ -60,17 +59,15 @@ def test_only_stream_bts_provided():
                                        'events': 1,
                                        'country': 'US',
                                        'continent': 'North America'
-                                   }
+                                   })
 
-    assert block_data['userA'][Key(KeyType.DIMENSION, 'userA', 'state')] == {
-        '_identity': 'userA',
+    assert_aggregate_snapshot_equals(block_data['userA'][Key(KeyType.DIMENSION, 'userA', 'state')], {
         'country': 'IN',
         'continent': 'World'
-    }
+    })
 
-    assert block_data['userB'][Key(KeyType.TIMESTAMP, 'userB', 'session', [],
-                                   datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()))] == {
-                                       '_identity': 'userB',
+    assert_aggregate_snapshot_equals(block_data['userB'][Key(KeyType.TIMESTAMP, 'userB', 'session', [],
+                                   datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()))], {
                                        '_start_time': datetime(
                                            2018, 3, 7, 23, 35, 31, tzinfo=tzutc()).isoformat(),
                                        '_end_time': datetime(
@@ -78,7 +75,7 @@ def test_only_stream_bts_provided():
                                        'events': 1,
                                        'country': '',
                                        'continent': ''
-                                   }
+                                   })
 
     assert window_data == {'userA': [], 'userB': [], 'userC': []}
 
@@ -102,9 +99,7 @@ def test_stream_and_window_bts_provided():
 
     assert window_data['userA'] == [{
         'last_session.events': 1,
-        'last_session._identity': 'userA',
         'last_day.total_events': 1,
-        'last_day._identity': 'userA'
     }]
     assert window_data['userB'] == []
 
@@ -146,7 +141,6 @@ def test_write_output_file_only_source_bts_provided(tmpdir):
     runner.write_output_file(str(out_dir), data)
     output_text = get_spark_output(out_dir)
     assert ('["userA/session//2018-03-07T22:35:31+00:00", {'
-            '"_identity": "userA", '
             '"_start_time": "2018-03-07T22:35:31+00:00", '
             '"_end_time": "2018-03-07T22:35:31+00:00", '
             '"events": 1, '
@@ -161,5 +155,5 @@ def test_write_output_file_with_stream_and_window_bts_provided(tmpdir):
     out_dir = tmpdir.join('out')
     runner.write_output_file(str(out_dir), data)
     output_text = get_spark_output(out_dir)
-    assert 'last_day._identity,last_day.total_events,last_session._identity,last_session.events' in output_text
-    assert 'userA,1,userA,1' in output_text
+    assert 'last_day.total_events,last_session.events' in output_text
+    assert '1,1' in output_text
