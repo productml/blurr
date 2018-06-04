@@ -43,10 +43,10 @@ def window_aggregate_schema(schema_loader_with_mem_store: SchemaLoader, mem_stor
 
 @fixture
 def window_aggregate(window_aggregate_schema: WindowAggregateSchema) -> WindowAggregate:
-    return WindowAggregate(window_aggregate_schema, "user1",
-                           EvaluationContext(Context({
-                               'identity': 'user1'
-                           })))
+    context = EvaluationContext(Context({'identity': 'user1'}))
+    aggregate = WindowAggregate(window_aggregate_schema, "user1", context)
+    context.global_add('test_window_name', aggregate)
+    return aggregate
 
 
 def test_window_type_day_positive(window_aggregate: WindowAggregate) -> None:

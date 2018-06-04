@@ -25,12 +25,9 @@ class AggregateSchema(BaseSchemaCollection, ABC):
     ATTRIBUTE_FIELD_IDENTITY = '_identity'
 
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
-        """
-        Initializing the nested field schema that all data groups contain
-        :param spec: Schema specifications for the field
-        """
+        """ Initializes the stores and ing the nested field schema that all data groups contain """
         super().__init__(fully_qualified_name, schema_loader, self.ATTRIBUTE_FIELDS)
-        self.is_processed = Expression('time.isoformat() in {aggregate}.{tracker}'.format(
+        self.is_processed = Expression('\'time\' in globals() or time.isoformat() in {aggregate}.{tracker}'.format(
             aggregate=self._spec[self.ATTRIBUTE_NAME], tracker=self.ATTRIBUTE_FIELD_PROCESSED_TRACKER))
         store_name = self._spec.get(self.ATTRIBUTE_STORE, None)
         self.store_schema: StoreSchema = None
