@@ -10,7 +10,7 @@ from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key, KeyType
 from blurr.core.type import Type
 
-from ciso8601 import parse_datetime
+from dateutil import parser
 
 
 def get_aggregate_schema_spec() -> Dict[str, Any]:
@@ -124,16 +124,16 @@ def test_aggregate_exactly_once_execution_per_record(aggregate_schema_with_store
 
     aggregate._evaluation_context.global_add('source', record)
     aggregate._evaluation_context.global_add('identity', record.id)
-    aggregate._evaluation_context.global_add('time', parse_datetime(record.event_time))
+    aggregate._evaluation_context.global_add('time', parser.parse(record.event_time))
+    aggregate._evaluation_context.global_add('_record_id', record)
     aggregate._evaluation_context.global_add('user', aggregate)
     aggregate.run_evaluate()
 
     assert aggregate.event_count == 1
-    # assert parse_datetime(record.event_time).isoformat() in aggregate._processed_tracker
 
-    # aggregate.run_evaluate()
+    aggregate.run_evaluate()
 
-    # assert aggregate.event_count == 1
+    assert aggregate.event_count == 1
 
     record = Record({
         'id': 'user1',
@@ -142,9 +142,10 @@ def test_aggregate_exactly_once_execution_per_record(aggregate_schema_with_store
     })
 
     aggregate._evaluation_context.global_add('source', record)
-    aggregate._evaluation_context.global_add('time', parse_datetime(record.event_time))
+    aggregate._evaluation_context.global_add('time', parser.parse(record.event_time))
+    aggregate._evaluation_context.global_add('_record_id', record)
 
     aggregate.run_evaluate()
-    # aggregate.run_evaluate()
+    aggregate.run_evaluate()
 
     assert aggregate.event_count == 2
