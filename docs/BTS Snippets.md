@@ -1,21 +1,27 @@
-# Splits
+# Splitting Aggregates
 
-## One block per day
+## One block per day (using Block Aggregate)
 
 ```YAML
-Split: datetime.strptime('source.start_time', "%d %m %Y") != datetime.strptime('start_time', "%d %m %Y")      
+Dimensions:
+  - Name: date
+    Type: string
+    Value: str(time.date())
 ```
 
-## One block per session_id
+## One block per session_id (using Block Aggregate)
 
 ```yaml
-Split: source.session_id != BlockAggregateName.session_id
+Dimensions:
+  - Name: session_id
+    Type: string
+    Value: source.session_id
 ```
 
-## Inactivity based split
+## Inactivity based split (using Activity Aggregate)
 
 ```YAML
-Split: (time - end_time).minutes > 30
+SeparateByInactiveSeconds: 1800
 # Calculates the distance in minutes between event time and the end time (time last event was received) of the current block.  Split happens when the difference is greater than 30 minutes.
 ```
 

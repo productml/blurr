@@ -1,7 +1,8 @@
+from datetime import datetime
 from typing import Any, Dict, List, Tuple
 
 import boto3
-from boto3.dynamodb.conditions import Key as DynamoKey
+from boto3.dynamodb.conditions import Key as DynamoKey, Attr
 
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store import Store, Key, StoreSchema
@@ -11,12 +12,14 @@ class DynamoStoreSchema(StoreSchema):
     ATTRIBUTE_TABLE = 'Table'
     ATTRIBUTE_READ_CAPACITY_UNITS = 'ReadCapacityUnits'
     ATTRIBUTE_WRITE_CAPACITY_UNITS = 'WriteCapacityUnits'
+    QUERY_LIMIT = 1000
 
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
         self.table_name = self._spec.get(self.ATTRIBUTE_TABLE, None)
         self.rcu = self._spec.get(self.ATTRIBUTE_READ_CAPACITY_UNITS, 5)
         self.wcu = self._spec.get(self.ATTRIBUTE_WRITE_CAPACITY_UNITS, 5)
+        self.query_limit = self.QUERY_LIMIT
 
     def validate_schema_spec(self) -> None:
         super().validate_schema_spec()
@@ -94,43 +97,46 @@ class DynamoStore(Store):
 
         return self.clean_for_get(item)
 
-    def get_range(self, start: Key, end: Key = None, count: int = 0) -> List[Tuple[Key, Any]]:
-
-        if end and count:
-            raise ValueError('Only one of `end` or `count` can be set')
-
-        if end is not None and end < start:
-            start, end = end, start
-
-        sort_key_condition = DynamoKey('range_key')
-
-        if end:
-            sort_key_condition = sort_key_condition.between(start.sort_key, end.sort_key)
-        else:
-            sort_key_condition = sort_key_condition.gt(
-                start.sort_key) if count > 0 else sort_key_condition.lt(start.sort_key)
-
+    def _get_range_timestamp_key(self, start: Key, end: Key,
+                                 count: int = 0) -> List[Tuple[Key, Any]]:
+        sort_key_condition = DynamoKey('range_key').between(start.sort_key, end.sort_key)
+        # Limit is set to count+1 because for items where the start key matches exactly
+        # KeyConditionExpression passes and FilterExpression fails.
         response = self._table.query(
-            Limit=abs(count) if count else 1000,
-            KeyConditionExpression=DynamoKey('partition_key').eq(start.identity) &
-            sort_key_condition,
+            Limit=abs(count) + 1 if count else self._schema.query_limit,
+            KeyConditionExpression=DynamoKey('partition_key').eq(
+                start.identity) & sort_key_condition,
+            FilterExpression=Attr('_start_time').gt(start.timestamp.isoformat()) &
+            Attr('_start_time').lt(end.timestamp.isoformat()),
             ScanIndexForward=count >= 0,
         )
+        items = sorted([self.prepare_record(item) for item in response.get('Items', [])])
+        if count:
+            items = self._restrict_items_to_count(items, count)
+        return items
 
-        records = [self.prepare_record(item)
-                   for item in response['Items']] if 'Items' in response else []
-
-        if not records:
-            return records
-
-        # Ignore the starting record because `between` includes the records that match the boundary condition
-        if records[0][0] == start or records[0][0] == end:
-            del records[0]
-
-        if records[-1][0] == start or records[-1][0] == end:
-            del records[-1]
-
-        return records
+    def _get_range_dimension_key(self,
+                                 base_key: Key,
+                                 start_time: datetime,
+                                 end_time: datetime = None,
+                                 count: int = 0) -> List[Tuple[Key, Any]]:
+        # A smaller limit cannot be set when abs(count) > 0 because all items need to be
+        # returned to find the count number of elements in a sorted manner.
+        # TODO: Improve count query performance by using a secondary index.
+        response = self._table.query(
+            Limit=self._schema.query_limit,
+            KeyConditionExpression=DynamoKey('partition_key').eq(
+                base_key.identity) & DynamoKey('range_key').begins_with(base_key.sort_prefix_key),
+            FilterExpression=Attr('_start_time').gt(start_time.isoformat()) &
+            Attr('_start_time').lt(end_time.isoformat()),
+            ScanIndexForward=count >= 0,
+        )
+        items = sorted(
+            [self.prepare_record(item) for item in response.get('Items', [])],
+            key=lambda i: i[1].get('_start_time', datetime.min.isoformat()))
+        if count:
+            items = self._restrict_items_to_count(items, count)
+        return items
 
     def get_all(self, identity: str) -> Dict[Key, Any]:
         response = self._table.query(KeyConditionExpression=DynamoKey('partition_key').eq(identity))

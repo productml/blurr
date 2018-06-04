@@ -2,10 +2,12 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import List, Optional, Tuple, Any, Dict, Iterable, Generator
 
+
 import yaml
+from smart_open import smart_open
 
 from blurr.core import logging
-from blurr.core.aggregate_block import BlockAggregate
+from blurr.core.aggregate_block import BlockAggregate, TimeAggregate
 from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import Context
 from blurr.core.record import Record
@@ -39,9 +41,9 @@ class Runner(ABC):
     """
 
     def __init__(self, stream_bts_file: str, window_bts_file: Optional[str]):
-        self._stream_bts = yaml.safe_load(open(stream_bts_file))
+        self._stream_bts = yaml.safe_load(smart_open(stream_bts_file))
         self._window_bts = None if window_bts_file is None else yaml.safe_load(
-            open(window_bts_file))
+            smart_open(window_bts_file))
 
         # TODO: Assume validation will be done separately.
         # This causes a problem when running the code on spark
@@ -143,7 +145,7 @@ class Runner(ABC):
 
         block_obj = None
         for aggregate in stream_transformer._nested_items.values():
-            if not isinstance(aggregate, BlockAggregate):
+            if not isinstance(aggregate, TimeAggregate):
                 continue
             if block_obj is not None:
                 raise Exception(('Window operation is supported against Streaming ',

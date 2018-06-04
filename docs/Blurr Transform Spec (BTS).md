@@ -42,7 +42,7 @@ When | Boolean expression that defines which raw data should be processed | Any 
 
 ## Store
 
-At the end of a transform, data is persisted in the store. The Blurr Transform Library (DTL) works with an abstraction of storage which isolates the actual storage tier from how it works with the DTL.
+At the end of a transform, data is persisted in the store. The Blurr Transform Library works with an abstraction of storage which isolates the actual storage tier from how it works with the DTL.
 
 ```YAML
 Stores:
@@ -171,14 +171,20 @@ Aggregates:
 
 ### Block Aggregate
 
-`Blurr:Aggregate:Block`. Fields in the Block Aggregates are in a one-to-many relationship with the identity.  These fields are aggregated together in blocks based on the split condition specified.
+`Blurr:Aggregate:Block`. Fields in the Block Aggregates are in a one-to-many relationship with the identity.  These fields are aggregated together in blocks based on the `Dimensions` fields specified.
+`Blurr:Aggregate:Block` is similar to `Blurr:Aggregate:Identity` with the difference being that in the case of Block aggregates Blurr internally
+keeps track on the time-range of the block and `Blurr:Aggregate:Block` aggregates are expected to be spread across time.
 
 ```YAML
 
 - Type: Blurr:Aggregate:Block
   Name: session
   When: source.app_version > '3.7'
-  Split: source.session_id != session.id
+  
+  Dimensions:
+    - Name: session_id
+      Type: string
+      Value: source.session_id
 
   Fields:
     - Name: presents_wrapped
@@ -193,10 +199,9 @@ Key |  Description | Allowed values | Required
 Type | Type of Aggregate | `Blurr:Aggregate:Identity`, `Blurr:Aggregate:Block`, `Blurr:Aggregate:Variable` | Required
 Name | Name of the Aggregate | Any `string` that does not start with `_` or `run_`. , unique within the BTS | Required
 When | Boolean expression that defines which raw events to process | Any `boolean` expression | Optional
-Split | Boolean expression that defines when a new block should be created | Any `boolean` expression | Required
 
 ### Activity Aggregate
-`Blurr:Aggregate:Activity`.Activity Aggregate is a specialization of the Block Aggregate where the inactivity based `Split` condition is 
+`Blurr:Aggregate:Activity`.Activity Aggregate is a specialization of the Block Aggregate where the inactivity based aggregate splitting condition is 
 specified by  `SeparateByInactiveSeconds`.
 
 ### Variable
@@ -324,7 +329,7 @@ Type | Type of Aggregate | `Blurr:Aggregate:Window`, `Blurr:Aggregate:Variable` 
 Name | Name of the Aggregate | Any `string`, unique within the BTS | Required
 WindowType | The type of window to use around the anchor block | `day`, `hour`, `count` | Optional. A Window Aggregate can be defined without a Window
 WindowValue | The number of days, hours or blocks to window around the anchor block | Integer | Optional. A Window Aggregate can be defined without a Window
-Source | The Block Aggregate (defined in the Streaming BTS) on which the window operations should be performed | Valid Block Aggregate | Required
+Source | The Block Aggregate or Activity Aggregate (defined in the Streaming BTS) on which the window operations should be performed | Valid Block of Activity Aggregate | Required
 
 All functions defined on windows work on a list of values. For e.g. if a session contains a `games_played` field and a `last_week` window is defined on it, then `last_week.games_played` represents the list of values from last week's sessions.
 
