@@ -42,8 +42,8 @@ Yes, if: you are well on your way on the ML 'curve of enlightenment', and are th
 
 Preparing data for specific use cases using Blurr:
 
-* [Dynamic in-game offers (Offer AI)](docs/examples/offer-ai/offer-ai-walkthrough.md)
-* [Frequently Bought Together](docs/examples/frequently-bought-together/fbt-walkthrough.md)
+* [Dynamic in-game offers (Offer AI)](https://github.com/productml/blurr-examples/blob/master/offer-ai/offer-ai-walkthrough.md)
+* [Frequently Bought Together](https://github.com/productml/blurr-examples/blob/master/frequently-bought-together/fbt-walkthrough.md)
 
 # Contribute to Blurr
 
