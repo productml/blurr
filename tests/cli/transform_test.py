@@ -111,8 +111,8 @@ def test_transform_valid_raw_without_source(capsys) -> None:
     out, err = capsys.readouterr()
     assert_record_in_ouput([
         'userA', [{
-            'last_session.events': 2,
-            'last_day.total_events': 2
+            'last_session.events': 1,
+            'last_day.total_events': 1
         }]
     ], out)
     assert err == ''

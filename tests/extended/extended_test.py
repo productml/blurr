@@ -41,7 +41,6 @@ def test_extended_runner():
     result_session = local_runner._per_user_data['user-1'][0][Key(KeyType.DIMENSION, 'user-1',
                                                                   'session', ['session-3'])]
     expected_session = {
-        '_identity': 'user-1',
         '_start_time': datetime(2016, 2, 12, 0, 0, 0).isoformat(),
         '_end_time': datetime(2016, 2, 13, 0, 1, 25).isoformat(),
         'session_id': 'session-3',
