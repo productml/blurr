@@ -87,8 +87,8 @@ class WindowAggregate(Aggregate):
                 Type.COUNT) and len(self._window_source.view) != abs(self._schema.window_value):
             raise PrepareWindowMissingBlocksError(
                 '{} WindowAggregate: Expecting {} but found {} blocks'.format(
-                    self._schema.name, abs(self._schema.window_value), len(
-                        self._window_source.view)))
+                    self._schema.name, abs(self._schema.window_value),
+                    len(self._window_source.view)))
 
         if len(self._window_source.view) == 0:
             raise PrepareWindowMissingBlocksError(

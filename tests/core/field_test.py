@@ -21,6 +21,13 @@ class MockFieldSchema(FieldSchema):
     def default(self) -> Any:
         return int(0)
 
+    @staticmethod
+    def sanitize_object(instance: Any) -> Any:
+        if isinstance(instance, int):
+            if instance == 100:
+                return -100
+        return instance
+
 
 @fixture
 def test_field_schema() -> MockFieldSchema:
@@ -175,3 +182,22 @@ def test_set_field_snapshot_decoding():
     assert field._snapshot
     assert isinstance(field._snapshot, list)
     assert set(field._snapshot) == field.value
+
+
+def test_set_field_sanitize():
+    schema_loader = SchemaLoader()
+    name = schema_loader.add_schema_spec({'Name': 'test', 'Type': 'integer', 'Value': 'test+1'})
+    field_schema = MockFieldSchema(name, schema_loader)
+    field = Field(field_schema, EvaluationContext())
+    field._evaluation_context.global_add('test', 98)
+
+    field.run_evaluate()
+    assert field.value == 99
+    field._evaluation_context.global_add('test', field.value)
+
+    field.run_evaluate()
+    assert field.value == -100
+    field._evaluation_context.global_add('test', field.value)
+
+    field.run_evaluate()
+    assert field.value == -99

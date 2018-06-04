@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from blurr.core.store_key import Key, KeyType
 from blurr.runner.local_runner import LocalRunner
@@ -41,8 +41,8 @@ def test_extended_runner():
                                                                   'session', ['session-3'])]
     expected_session = {
         '_identity': 'user-1',
-        '_start_time': datetime(2016, 2, 12, 0, 0, 0).isoformat(),
-        '_end_time': datetime(2016, 2, 13, 0, 1, 25).isoformat(),
+        '_start_time': datetime(2016, 2, 12, 0, 0, 0, tzinfo=timezone.utc).isoformat(),
+        '_end_time': datetime(2016, 2, 13, 0, 1, 25, tzinfo=timezone.utc).isoformat(),
         'session_id': 'session-3',
         'events': 11,
         'games_won': 2,
@@ -60,8 +60,8 @@ def test_extended_runner():
                                                                      'session', ['session-1'])]
     expected_session_10 = {
         '_identity': 'user-1',
-        '_start_time': datetime(2016, 2, 10, 0, 0).isoformat(),
-        '_end_time': datetime(2016, 2, 10, 0, 1, 47).isoformat(),
+        '_start_time': datetime(2016, 2, 10, 0, 0, tzinfo=timezone.utc).isoformat(),
+        '_end_time': datetime(2016, 2, 10, 0, 1, 47, tzinfo=timezone.utc).isoformat(),
         'session_id': 'session-1',
         'events': 4,
         'games_won': 1,
@@ -79,8 +79,8 @@ def test_extended_runner():
                                                                      'session', ['session-2'])]
     expected_session_11 = {
         '_identity': 'user-1',
-        '_start_time': datetime(2016, 2, 11, 0, 0).isoformat(),
-        '_end_time': datetime(2016, 2, 11, 0, 0, 28).isoformat(),
+        '_start_time': datetime(2016, 2, 11, 0, 0, tzinfo=timezone.utc).isoformat(),
+        '_end_time': datetime(2016, 2, 11, 0, 0, 28, tzinfo=timezone.utc).isoformat(),
         'session_id': 'session-2',
         'events': 7,
         'games_won': 1,

@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import List, Optional, Tuple, Any, Dict, Iterable, Generator
 
-
 import yaml
 from smart_open import smart_open
 

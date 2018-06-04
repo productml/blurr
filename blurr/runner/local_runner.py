@@ -42,9 +42,7 @@ class LocalRunner(Runner):
                 self._per_user_data[identity] = (old_state[identity], [])
 
     def get_identity_records_from_json_files(
-            self,
-            json_files: List[str],
-            data_processor: DataProcessor = SimpleJsonDataProcessor()
+            self, json_files: List[str], data_processor: DataProcessor = SimpleJsonDataProcessor()
     ) -> Dict[str, List[TimeAndRecord]]:
         identity_records = defaultdict(list)
         for file in json_files:

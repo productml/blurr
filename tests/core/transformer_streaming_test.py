@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any
 
 import pytest
@@ -84,7 +84,7 @@ def test_streaming_transformer_schema_get_time_constant(schema_loader: SchemaLoa
                                                         schema_spec: Dict[str, Any]) -> None:
     streaming_bts = schema_loader.add_schema_spec(schema_spec)
     transformer_schema = StreamingTransformerSchema(streaming_bts, schema_loader)
-    assert transformer_schema.get_time(Record()) == datetime(2016, 10, 10)
+    assert transformer_schema.get_time(Record()) == datetime(2016, 10, 10, tzinfo=timezone.utc)
 
 
 def test_streaming_transformer_schema_get_time_datetime_not_defined(

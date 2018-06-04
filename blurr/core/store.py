@@ -133,7 +133,6 @@ class Store(ABC):
     @staticmethod
     def _add_timezone_if_required(time: datetime) -> datetime:
         if time.tzinfo is None or time.tzinfo.utcoffset(time) is None:
-            return time.replace(tzinfo=timezone.utc)
+            time = time.replace(tzinfo=timezone.utc)
 
         return time
-

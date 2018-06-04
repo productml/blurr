@@ -21,17 +21,20 @@ def test_example_bts_valid(input_bts):
 
 
 def get_file_text(file_path) -> str:
-    with open(file_path, "r") as f:
+    with open(file_path, 'r') as f:
         return f.read()
 
 
 @pytest.mark.parametrize(
     'input_files, output_file',
     [(('docs/examples/tutorial/tutorial1-streaming-bts.yml', None,
-       'docs/examples/tutorial/tutorial1-data.log'), "docs/examples/tutorial/tutorial1-output.log"),
+       'docs/examples/tutorial/tutorial1-data.log'), 'docs/examples/tutorial/tutorial1-output.log'),
      (('docs/examples/tutorial/tutorial2-streaming-bts.yml',
        'docs/examples/tutorial/tutorial2-window-bts.yml',
-       'docs/examples/tutorial/tutorial2-data.log'), "docs/examples/tutorial/tutorial2-output.log")]
+       'docs/examples/tutorial/tutorial2-data.log'), 'docs/examples/tutorial/tutorial2-output.log'),
+     (('docs/examples/nyse/nyse-streaming-bts.yml', 'docs/examples/nyse/nyse-window-bts.yml',
+       'docs/examples/nyse/nyse-input-data-test.json'),
+      'docs/examples/nyse/nyse-input-data-test-out.log')],
 )
 def test_example_bts_output(input_files, output_file, capsys):
     stream_bts_file, window_bts_file, raw_json_file = input_files
