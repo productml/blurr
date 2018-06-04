@@ -21,17 +21,16 @@ Time: parser.parse(source.start_time) #This tells the BTS that source.start_time
 ##
 
 Stores:
-   - Type: Blurr:Store:Memory
-     Name: fbt
+  - Type: Blurr:Store:Memory
+    Name: fbt
 
 Aggregates:
+  - Type: Blurr:Aggregate:Identity
+    Name: user
+    Store: fbt
+    When: source.event_name == 'session_start'
 
- - Type: Blurr:Aggregate:Identity
-   Name: user
-   Store: fbt
-   When: source.event_name == 'session_start'
-
-   Fields:
+    Fields:
      - Name: appInstanceId
        Type: string
        Value: source.appInstanceId
@@ -61,30 +60,29 @@ Aggregates:
        Type: string
        Value: (time - user.time).days
 
-##
-# Session aggregates definition
-##
+  ##
+  # Session aggregates definition
+  ##
+  - Type: Blurr:Aggregate:Block
+    Name: item_stats
+    Store: fbt
+    Dimensions:
+      - { Name: session_id, Type: string, Value: source.session_id }
 
- - Type: Blurr:Aggregate:Block
-   Name: item_stats
-   Store: fbt
-   Split: source.session_id != item_stats.session_id
+    Fields:
+      - Name: product_primary
+        Type: list
+        Value: item_stats.product_primary.append(source.item_id)
+        When: source.event_name == 'view_item'
 
-   Fields:
+      - Name: transaction_value_this_session
+        Type: float
+        Value: sum([float(val.strip()) for val in source.value.split(',')])
+        #This also sums all the values in the list if multiple items were bought in one transaction
+        When: source.event_name == 'ecommerce_purchase' and source.currency == 'usd'
 
-     - Name: product_primary
-       Type: list
-       Value: item_stats.product_primary.append(source.item_id)
-       When: source.event_name == 'view_item'
-
-     - Name: transaction_value_this_session
-       Type: float
-       Value: sum([float(val.strip()) for val in source.value.split(',')])
-       #This also sums all the values in the list if multiple items were bought in one transaction
-       When: source.event_name == 'ecommerce_purchase' and source.currency == 'usd'
-
-     - Name: products_bought
-       Type: list
-       Value: item_stats.products_bought.extend(list(zip([val.strip() for val in source.item_id.split(',')], [float(val.strip()) for val in source.value.split(',')])))
-       # This creates a list of tuples [(item_id1, value1), (item_id2, value2)...]
-       When: source.event_name == 'ecommerce_purchase' and source.currency == 'usd'
+      - Name: products_bought
+        Type: list
+        Value: item_stats.products_bought.extend(list(zip([val.strip() for val in source.item_id.split(',')], [float(val.strip()) for val in source.value.split(',')])))
+        # This creates a list of tuples [(item_id1, value1), (item_id2, value2)...]
+        When: source.event_name == 'ecommerce_purchase' and source.currency == 'usd'

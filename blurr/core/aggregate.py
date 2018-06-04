@@ -4,6 +4,7 @@ from typing import Dict, Type, Any, List
 from blurr.core.base import BaseSchemaCollection, BaseItemCollection, BaseItem
 from blurr.core.errors import MissingAttributeError
 from blurr.core.evaluation import EvaluationContext, Expression
+from blurr.core.field import Field
 from blurr.core.loader import TypeLoader
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store import StoreSchema, Store
@@ -27,8 +28,8 @@ class AggregateSchema(BaseSchemaCollection, ABC):
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         """ Initializes the stores and ing the nested field schema that all data groups contain """
         super().__init__(fully_qualified_name, schema_loader, self.ATTRIBUTE_FIELDS)
-        self.is_processed = Expression('\'time\' in globals() or time.isoformat() in {aggregate}.{tracker}'.format(
-            aggregate=self._spec[self.ATTRIBUTE_NAME], tracker=self.ATTRIBUTE_FIELD_PROCESSED_TRACKER))
+        # self.is_processed = Expression('\'time\' in globals() or time.isoformat() in {aggregate}.{tracker}'.format(
+        #     aggregate=self._spec[self.ATTRIBUTE_NAME], tracker=self.ATTRIBUTE_FIELD_PROCESSED_TRACKER))
         store_name = self._spec.get(self.ATTRIBUTE_STORE, None)
         self.store_schema: StoreSchema = None
         if store_name:
@@ -59,13 +60,13 @@ class AggregateSchema(BaseSchemaCollection, ABC):
                 'Value': 'identity',
                 ATTRIBUTE_INTERNAL: True
             },
-            {
-                'Name': self.ATTRIBUTE_FIELD_PROCESSED_TRACKER,
-                'Type': BtsType.BLOOM_FILTER,
-                'Value': '{aggregate}.{tracker}.add(time.isoformat())'.format(
-                    aggregate=name_in_context, tracker=self.ATTRIBUTE_FIELD_PROCESSED_TRACKER),
-                ATTRIBUTE_INTERNAL: True
-            }
+            # {
+            #     'Name': self.ATTRIBUTE_FIELD_PROCESSED_TRACKER,
+            #     'Type': BtsType.BLOOM_FILTER,
+            #     'Value': '{aggregate}.{tracker}.add(time.isoformat())'.format(
+            #         aggregate=name_in_context, tracker=self.ATTRIBUTE_FIELD_PROCESSED_TRACKER),
+            #     ATTRIBUTE_INTERNAL: True
+            # }
         ]
 
 
@@ -95,14 +96,14 @@ class Aggregate(BaseItemCollection, ABC):
             self._store = self._schema.schema_loader.get_store(
                 self._schema.store_schema.fully_qualified_name)
 
-    def run_evaluate(self) -> None:
-        """ Runs the exactly-once check for the current record """
-
-        if not self._schema.is_processed.evaluate(self._evaluation_context):
-            super().run_evaluate()
+    # def run_evaluate(self) -> None:
+    #     """ Runs the exactly-once check for the current record """
+    #
+    #     if not self._schema.is_processed.evaluate(self._evaluation_context):
+    #         super().run_evaluate()
 
     @property
-    def _nested_items(self) -> Dict[str, Type[BaseItem]]:
+    def _nested_items(self) -> Dict[str, Field]:
         """
         Returns the dictionary of fields the Aggregate contains
         """

@@ -50,14 +50,13 @@ Aggregates:
    Name: game_stats
    # We defined this store earlier
    Store: offer_ai
-   # Split defines when a new session is created when the boolean expression is TRUE
-   Split: source.session_id != game_stats.session_id
 
-   Fields:
+   Dimensions:
      - Name: session_id
        Type: string # String is the default type and is used if type is not defined
        Value: source.session_id
 
+   Fields:
      - Name: games_played
        Type: integer # String is the default type and is used if type is not defined
        Value: game_stats.games_played + 1

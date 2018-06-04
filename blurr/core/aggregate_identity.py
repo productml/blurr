@@ -25,6 +25,7 @@ class IdentityAggregateSchema(AggregateSchema):
                 self.fully_qualified_name, schema_spec[self.ATTRIBUTE_NAME])
             for schema_spec in self._spec.get(self.ATTRIBUTE_DIMENSIONS, [])
         }
+        self.key_type = KeyType.DIMENSION
 
     def validate_schema_spec(self) -> None:
         super().validate_schema_spec()
@@ -34,9 +35,7 @@ class IdentityAggregateSchema(AggregateSchema):
                 validate_enum_attribute(
                     self.schema_loader.get_fully_qualified_name(self.fully_qualified_name,
                                                                 schema_spec[self.ATTRIBUTE_NAME]),
-                    schema_spec,
-                    self.ATTRIBUTE_TYPE,
-                    {Type.INTEGER.value, Type.STRING.value}))
+                    schema_spec, self.ATTRIBUTE_TYPE, {Type.INTEGER.value, Type.STRING.value}))
 
 
 class IdentityAggregate(Aggregate):
@@ -101,10 +100,11 @@ class IdentityAggregate(Aggregate):
         return True
 
     @property
-    def _key(self, timestamp: datetime = None):
+    def _key(self):
         """ Generates the Key object based on dimension fields. """
-        return Key(KeyType.DIMENSION, self._identity, self._name,
+        return Key(self._schema.key_type, self._identity, self._name,
                    [str(item.value) for item in self._dimension_fields.values()])
 
     def _persist(self) -> None:
-        self._store.save(self._existing_key, self._snapshot)
+        if self._existing_key:
+            self._store.save(self._existing_key, self._snapshot)

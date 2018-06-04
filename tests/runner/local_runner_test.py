@@ -23,13 +23,13 @@ def test_only_stream_bts_provided():
     # Stream BTS output
     assert data['userA'][0][Key(
         KeyType.TIMESTAMP, 'userA', 'session', [], datetime(2018, 3, 7, 23, 35, 31))] == {
-        '_identity': 'userA',
-        '_start_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()).isoformat(),
-        '_end_time': datetime(2018, 3, 7, 23, 35, 32, tzinfo=tzutc()).isoformat(),
-        'events': 2,
-        'country': 'IN',
-        'continent': 'World'
-    }
+            '_identity': 'userA',
+            '_start_time': datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()).isoformat(),
+            '_end_time': datetime(2018, 3, 7, 23, 35, 32, tzinfo=tzutc()).isoformat(),
+            'events': 2,
+            'country': 'IN',
+            'continent': 'World'
+        }
 
     assert data['userA'][0][Key(
         KeyType.TIMESTAMP, 'userA', 'session', [], datetime(2018, 3, 7, 22, 35, 31))] == {

@@ -2,15 +2,18 @@ from datetime import datetime, timedelta
 from typing import Any, List, Tuple
 
 from blurr.core.aggregate import Aggregate, AggregateSchema
-from blurr.core.aggregate_block import BlockAggregate, BlockAggregateSchema
+from blurr.core.aggregate_block import BlockAggregate, BlockAggregateSchema, TimeAggregate
+from blurr.core.aggregate_time import TimeAggregateSchema
 from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import EvaluationContext
+from blurr.core.loader import TypeLoader
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key, KeyType
 from blurr.core.type import Type
 
 
 class WindowAggregateSchema(AggregateSchema):
+
     ATTRIBUTE_WINDOW_VALUE = 'WindowValue'
     ATTRIBUTE_WINDOW_TYPE = 'WindowType'
     ATTRIBUTE_SOURCE = 'Source'
@@ -21,7 +24,7 @@ class WindowAggregateSchema(AggregateSchema):
         self.window_value = self._spec.get(self.ATTRIBUTE_WINDOW_VALUE, 0)
         self.window_type = self._spec.get(self.ATTRIBUTE_WINDOW_TYPE, None)
 
-        self.source: BlockAggregateSchema = self.schema_loader.get_schema_object(self._spec[self.ATTRIBUTE_SOURCE]) if \
+        self.source: TimeAggregateSchema = self.schema_loader.get_schema_object(self._spec[self.ATTRIBUTE_SOURCE]) if \
             self.ATTRIBUTE_SOURCE in self._spec and schema_loader.has_schema_spec(self._spec[self.ATTRIBUTE_SOURCE]) \
             else None
 
@@ -37,8 +40,8 @@ class _WindowSource:
     Represents a window on the pre-aggregated source data.
     """
 
-    def __init__(self, block_list: List[BlockAggregate]):
-        self.view: List[BlockAggregate] = block_list
+    def __init__(self, block_list: List[TimeAggregate]):
+        self.view: List[TimeAggregate] = block_list
 
     def __getattr__(self, item: str) -> List[Any]:
         return [getattr(block, item) for block in self.view]
@@ -67,13 +70,13 @@ class WindowAggregate(Aggregate):
                 self._schema.window_type, Type.HOUR):
             block_list = self._load_blocks(
                 store.get_range(
-                    Key(KeyType.TIMESTAMP, self._identity, self._schema.source.name), start_time,
-                    self._get_end_time(start_time)))
+                    Key(self._schema.source.key_type, self._identity, self._schema.source.name),
+                    start_time, self._get_end_time(start_time)))
         else:
             block_list = self._load_blocks(
                 store.get_range(
-                    Key(KeyType.TIMESTAMP, self._identity, self._schema.source.name), start_time,
-                    None, self._schema.window_value))
+                    Key(self._schema.source.key_type, self._identity, self._schema.source.name),
+                    start_time, None, self._schema.window_value))
 
         self._window_source = _WindowSource(block_list)
         self._validate_view()
@@ -106,15 +109,16 @@ class WindowAggregate(Aggregate):
         elif Type.is_type_equal(self._schema.window_type, Type.HOUR):
             return start_time + timedelta(hours=self._schema.window_value)
 
-    def _load_blocks(self, blocks: List[Tuple[Key, Any]]) -> List[BlockAggregate]:
+    def _load_blocks(self, blocks: List[Tuple[Key, Any]]) -> List[TimeAggregate]:
         """
         Converts [(Key, block)] to [BlockAggregate]
         :param blocks: List of (Key, block) blocks.
         :return: List of BlockAggregate
         """
         return [
-            BlockAggregate(self._schema.source, self._identity,
-                           EvaluationContext()).run_restore(block) for (_, block) in blocks
+            TypeLoader.load_item(self._schema.source.type)(self._schema.source, self._identity,
+                                                           EvaluationContext()).run_restore(block)
+            for (_, block) in blocks
         ]
 
     def run_evaluate(self) -> None:

@@ -28,11 +28,11 @@ def match_fields(fields):
         'Value': 'identity',
         ATTRIBUTE_INTERNAL: True
     }, {
-        'Name': '_processed_tracker',
-        'Type': Type.BLOOM_FILTER,
-        'Value': 'user._processed_tracker.add(time.isoformat())',
-        ATTRIBUTE_INTERNAL: True
-    }, {
+    #     'Name': '_processed_tracker',
+    #     'Type': Type.BLOOM_FILTER,
+    #     'Value': 'user._processed_tracker.add(time.isoformat())',
+    #     ATTRIBUTE_INTERNAL: True
+    # }, {
         'Name': 'event_count',
         'Type': Type.INTEGER,
         'Value': 5

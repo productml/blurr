@@ -66,6 +66,12 @@ class Store(ABC):
         """
         raise NotImplementedError()
 
+    def get_time_range(self, identity, group, start_time, end_time) -> List[Tuple[Key, Any]]:
+        raise NotImplementedError()
+
+    def get_count_range(self, identity, group, time, count):
+        raise NotImplementedError()
+
     @abstractmethod
     def _get_range_dimension_key(self,
                                  base_key: Key,
