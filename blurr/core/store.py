@@ -46,6 +46,9 @@ class Store(ABC):
             end_time = datetime.min.replace(
                 tzinfo=timezone.utc) if count < 0 else datetime.max.replace(tzinfo=timezone.utc)
 
+        end_time = self._add_timezone_if_required(end_time)
+        start_time = self._add_timezone_if_required(start_time)
+
         if end_time < start_time:
             start_time, end_time = end_time, start_time
 
@@ -126,3 +129,11 @@ class Store(ABC):
     @staticmethod
     def _sign(x: int) -> int:
         return (1, -1)[x < 0]
+
+    @staticmethod
+    def _add_timezone_if_required(time: datetime) -> datetime:
+        if time.tzinfo is None or time.tzinfo.utcoffset(time) is None:
+            return time.replace(tzinfo=timezone.utc)
+
+        return time
+
