@@ -35,9 +35,9 @@ def test_aggregate_schema_contains_identity_field(aggregate_schema_spec):
     name = schema_loader.add_schema_spec(aggregate_schema_spec)
 
     aggregate_schema = MockAggregateSchema(name, schema_loader)
-    assert len(aggregate_schema.nested_schema) == 2
+    assert len(aggregate_schema.nested_schema) == 3
     assert '_identity' in aggregate_schema.nested_schema
-    # assert '_processed_tracker' in aggregate_schema.nested_schema
+    assert '_processed_tracker' in aggregate_schema.nested_schema
 
 
 def test_aggregate_schema_initialization_with_store(aggregate_schema_spec, store_spec):

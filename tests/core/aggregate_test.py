@@ -69,13 +69,13 @@ def test_aggregate_nested_items(aggregate_schema_with_store):
         identity='12345',
         evaluation_context=EvaluationContext())
     nested_items = aggregate._nested_items
-    assert len(nested_items) == 2
+    assert len(nested_items) == 3
     assert 'event_count' in nested_items
     assert isinstance(nested_items['event_count'], Field)
     assert '_identity' in nested_items
     assert isinstance(nested_items['_identity'], Field)
-    # assert '_processed_tracker' in nested_items
-    # assert isinstance(nested_items['_processed_tracker'], Field)
+    assert '_processed_tracker' in nested_items
+    assert isinstance(nested_items['_processed_tracker'], Field)
 
 
 def test_aggregate_persist_without_store(aggregate_schema_without_store):

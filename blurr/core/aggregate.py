@@ -22,23 +22,28 @@ class AggregateSchema(BaseSchemaCollection, ABC):
     # Field Name Definitions
     ATTRIBUTE_STORE = 'Store'
     ATTRIBUTE_FIELDS = 'Fields'
-    ATTRIBUTE_FIELD_PROCESSED_TRACKER = '_processed_tracker'
+    ATTRIBUTE_IS_PROCESSED = '_IsProcessed'
     ATTRIBUTE_FIELD_IDENTITY = '_identity'
+    ATTRIBUTE_FIELD_PROCESSED_TRACKER = '_processed_tracker'
 
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         """ Initializes the stores and ing the nested field schema that all data groups contain """
         super().__init__(fully_qualified_name, schema_loader, self.ATTRIBUTE_FIELDS)
-        # self.is_processed = Expression('\'time\' in globals() or time.isoformat() in {aggregate}.{tracker}'.format(
-        #     aggregate=self._spec[self.ATTRIBUTE_NAME], tracker=self.ATTRIBUTE_FIELD_PROCESSED_TRACKER))
+
         store_name = self._spec.get(self.ATTRIBUTE_STORE, None)
         self.store_schema: StoreSchema = None
         if store_name:
             self.store_schema = self.schema_loader.get_nested_schema_object(
                 self.schema_loader.get_transformer_name(self.fully_qualified_name), store_name)
 
+        self.is_processed = self.build_expression(self.ATTRIBUTE_IS_PROCESSED)
+
     def extend_schema_spec(self) -> None:
         """ Injects the identity field """
         super().extend_schema_spec()
+
+        self._spec[self.ATTRIBUTE_IS_PROCESSED] = '_record_id in {aggregate}.{tracker} if "_record_id" in globals() or "_record_id" in locals() else False'.format(
+            aggregate=self._spec[self.ATTRIBUTE_NAME], tracker=self.ATTRIBUTE_FIELD_PROCESSED_TRACKER)
 
         if self.ATTRIBUTE_FIELDS in self._spec:
             predefined_field = self._build_identity_processed_tracker_spec(self._spec[self.ATTRIBUTE_NAME])
@@ -60,13 +65,14 @@ class AggregateSchema(BaseSchemaCollection, ABC):
                 'Value': 'identity',
                 ATTRIBUTE_INTERNAL: True
             },
-            # {
-            #     'Name': self.ATTRIBUTE_FIELD_PROCESSED_TRACKER,
-            #     'Type': BtsType.BLOOM_FILTER,
-            #     'Value': '{aggregate}.{tracker}.add(time.isoformat())'.format(
-            #         aggregate=name_in_context, tracker=self.ATTRIBUTE_FIELD_PROCESSED_TRACKER),
-            #     ATTRIBUTE_INTERNAL: True
-            # }
+            {
+                'Name': self.ATTRIBUTE_FIELD_PROCESSED_TRACKER,
+                'Type': BtsType.BLOOM_FILTER,
+                'Value': '{aggregate}.{tracker}.add(_record_id)'.format(
+                    aggregate=name_in_context, tracker=self.ATTRIBUTE_FIELD_PROCESSED_TRACKER),
+                'When': '"_record_id" in globals() or "_record_id" in locals()',
+                ATTRIBUTE_INTERNAL: True
+            }
         ]
 
 
@@ -87,7 +93,7 @@ class Aggregate(BaseItemCollection, ABC):
         super().__init__(schema, evaluation_context)
         self._identity = identity
 
-        self._fields: Dict[str, Type[BaseItem]] = {
+        self._fields: Dict[str, Field] = {
             name: TypeLoader.load_item(item_schema.type)(item_schema, self._evaluation_context)
             for name, item_schema in self._schema.nested_schema.items()
         }
@@ -96,11 +102,11 @@ class Aggregate(BaseItemCollection, ABC):
             self._store = self._schema.schema_loader.get_store(
                 self._schema.store_schema.fully_qualified_name)
 
-    # def run_evaluate(self) -> None:
-    #     """ Runs the exactly-once check for the current record """
-    #
-    #     if not self._schema.is_processed.evaluate(self._evaluation_context):
-    #         super().run_evaluate()
+    def run_evaluate(self) -> None:
+        """ Runs the exactly-once check for the current record """
+
+        if not self._schema.is_processed.evaluate(self._evaluation_context):
+            super().run_evaluate()
 
     @property
     def _nested_items(self) -> Dict[str, Field]:
