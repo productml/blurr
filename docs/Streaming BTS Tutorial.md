@@ -75,9 +75,9 @@ Stores:
 Identity: source.user_id
 
 Import:
-  - { Module: dateutil.parser, Identifiers: [ parse ]}
+  - { Module: ciso8601, Identifiers: [ parse_datetime ] }
 
-Time: parse(source.timestamp)
+Time: parse_datetime(source.timestamp)
 
 Aggregates:
 

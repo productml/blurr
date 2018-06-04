@@ -1,10 +1,7 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any, Dict, List, Tuple
 
-from dateutil import parser
-
 from blurr.core.store import Store, Key, StoreSchema
-from blurr.core.store_key import KeyType
 
 
 class MemoryStoreSchema(StoreSchema):

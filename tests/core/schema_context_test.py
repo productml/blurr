@@ -12,65 +12,65 @@ def test_import_empty():
 
 
 def test_import_just_module():
-    spec = [{'Module': 'dateutil'}]
+    spec = [{'Module': 'datetime'}]
     schema_context = SchemaContext(spec)
     context = schema_context.context
 
     assert not context.local_context
     assert context.global_context
 
-    import dateutil
-    assert context.global_context['dateutil'] == dateutil
+    import datetime
+    assert context.global_context['datetime'] == datetime
 
 
 def test_import_module_and_identifier():
-    spec = [{'Module': 'dateutil', 'Identifiers': ['parser']}]
+    spec = [{'Module': 'datetime', 'Identifiers': ['datetime']}]
     schema_context = SchemaContext(spec)
     context = schema_context.context
 
     assert not context.local_context
     assert context.global_context
 
-    from dateutil import parser
-    assert context.global_context['parser'] == parser
+    from datetime import datetime
+    assert context.global_context['datetime'] == datetime
 
 
 def test_import_module_and_multiple_identifiers():
-    spec = [{'Module': 'dateutil', 'Identifiers': ['parser', 'tz']}]
+    spec = [{'Module': 'datetime', 'Identifiers': ['datetime', 'timezone']}]
     schema_context = SchemaContext(spec)
     context = schema_context.context
 
     assert not context.local_context
     assert context.global_context
 
-    from dateutil import parser
-    from dateutil import tz
-    assert context.global_context['parser'] == parser
-    assert context.global_context['tz'] == tz
+    from datetime import datetime
+    from datetime import timezone
+    assert context.global_context['datetime'] == datetime
+    assert context.global_context['timezone'] == timezone
 
 
 def test_import_just_module_with_alias():
-    spec = [{'Module': 'dateutil as my_mod'}]
+    spec = [{'Module': 'datetime as my_mod'}]
     schema_context = SchemaContext(spec)
     context = schema_context.context
 
     assert not context.local_context
     assert context.global_context
 
-    import dateutil
-    assert context.global_context['my_mod'] == dateutil
+    import datetime
+    assert context.global_context['my_mod'] == datetime
 
 
 def test_import_module_and_identifier_with_alias():
-    spec = [{'Module': 'dateutil', 'Identifiers': ['parser as my_func']}]
+    spec = [{'Module': 'datetime', 'Identifiers': ['datetime as my_func']}]
     schema_context = SchemaContext(spec)
     context = schema_context.context
 
     assert not context.local_context
     assert context.global_context
 
-    from dateutil import parser
-    assert context.global_context['my_func'] == parser
+    from datetime import datetime
+    assert context.global_context['my_func'] == datetime
 
 
 def test_import_just_module_error():
@@ -81,7 +81,7 @@ def test_import_just_module_error():
 
 
 def test_import_module_and_identifier_error():
-    spec = [{'Module': 'dateutil', 'Identifiers': ['unknown_func']}]
+    spec = [{'Module': 'datetime', 'Identifiers': ['unknown_func']}]
     schema_context = SchemaContext(spec)
     with pytest.raises(ImportError, match='cannot import name \'unknown_func\''):
         assert schema_context.context

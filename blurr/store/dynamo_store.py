@@ -3,11 +3,9 @@ from typing import Any, Dict, List, Tuple
 
 import boto3
 from boto3.dynamodb.conditions import Key as DynamoKey, Attr
-from dateutil import parser
 
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store import Store, Key, StoreSchema
-from blurr.core.store_key import KeyType
 
 
 class DynamoStoreSchema(StoreSchema):

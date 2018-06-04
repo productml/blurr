@@ -2,8 +2,7 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import List, Any
 
-from dateutil import parser
-
+import ciso8601
 
 class KeyType(Enum):
     DIMENSION = 1
@@ -67,7 +66,7 @@ class Key:
             key_type = KeyType.TIMESTAMP
         return Key(key_type, parts[0], parts[1], parts[2].split(Key.DIMENSION_PARTITION)
                    if parts[2] else [],
-                   parser.parse(parts[3]) if parts[3] else None)
+                   ciso8601.parse_datetime(parts[3]) if parts[3] else None)
 
     @staticmethod
     def parse_sort_key(identity: str, sort_key_string: str) -> 'Key':
@@ -78,7 +77,7 @@ class Key:
             key_type = KeyType.TIMESTAMP
         return Key(key_type, identity, parts[0], parts[1].split(Key.DIMENSION_PARTITION)
                    if parts[1] else [],
-                   parser.parse(parts[2]) if parts[2] else None)
+                   ciso8601.parse_datetime(parts[2]) if parts[2] else None)
 
     def __str__(self):
         """ Returns the string representation of the key"""

@@ -38,7 +38,7 @@ Time: datetime.fromtimestamp(source.timestamp, timezone.utc)
 ## Parsing ISO datetime string
 ```YAML
 Import:
-  - { Module: dateutil.parser, Identifiers: [ parse ]}
+  - { Module: ciso8601, Identifiers: [ parse_datetime as parse ]}
 
 Time: parse(source.event_time)
 ```

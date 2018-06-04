@@ -2,10 +2,6 @@ Type: Blurr:Transform:Streaming
 Version: '2018-03-01'
 Description: Example
 Name: example_name
-Import:
- - { Module: dateutil, Identifiers: [ parser, tz]}
- - { Module: dateutil, Identifiers: [ parser ]}
- - { Module: dateutil}
 Identity: source.user_id
 Time: source.timestamp
 When: source.package_version == '1.0'

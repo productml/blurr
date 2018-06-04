@@ -1,8 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import PosixPath
 from typing import List, Tuple, Any, Optional, Dict
-
-from dateutil.tz import tzutc
 
 from blurr.core.store_key import Key, KeyType
 from blurr.runner.spark_runner import SparkRunner, get_spark_session
@@ -39,12 +37,12 @@ def test_only_stream_bts_provided():
 
     # Stream BTS output
     assert block_data['userA'][Key(KeyType.TIMESTAMP, 'userA', 'session', [],
-                                   datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()))] == {
+                                   datetime(2018, 3, 7, 23, 35, 31, tzinfo=timezone.utc))] == {
                                        '_identity': 'userA',
                                        '_start_time': datetime(
-                                           2018, 3, 7, 23, 35, 31, tzinfo=tzutc()).isoformat(),
+                                           2018, 3, 7, 23, 35, 31, tzinfo=timezone.utc).isoformat(),
                                        '_end_time': datetime(
-                                           2018, 3, 7, 23, 35, 32, tzinfo=tzutc()).isoformat(),
+                                           2018, 3, 7, 23, 35, 32, tzinfo=timezone.utc).isoformat(),
                                        'events': 2,
                                        'country': 'IN',
                                        'continent': 'World'
@@ -54,9 +52,9 @@ def test_only_stream_bts_provided():
                                    datetime(2018, 3, 7, 22, 35, 31))] == {
                                        '_identity': 'userA',
                                        '_start_time': datetime(
-                                           2018, 3, 7, 22, 35, 31, tzinfo=tzutc()).isoformat(),
+                                           2018, 3, 7, 22, 35, 31, tzinfo=timezone.utc).isoformat(),
                                        '_end_time': datetime(
-                                           2018, 3, 7, 22, 35, 31, tzinfo=tzutc()).isoformat(),
+                                           2018, 3, 7, 22, 35, 31, tzinfo=timezone.utc).isoformat(),
                                        'events': 1,
                                        'country': 'US',
                                        'continent': 'North America'
@@ -69,12 +67,12 @@ def test_only_stream_bts_provided():
     }
 
     assert block_data['userB'][Key(KeyType.TIMESTAMP, 'userB', 'session', [],
-                                   datetime(2018, 3, 7, 23, 35, 31, tzinfo=tzutc()))] == {
+                                   datetime(2018, 3, 7, 23, 35, 31, tzinfo=timezone.utc))] == {
                                        '_identity': 'userB',
                                        '_start_time': datetime(
-                                           2018, 3, 7, 23, 35, 31, tzinfo=tzutc()).isoformat(),
+                                           2018, 3, 7, 23, 35, 31, tzinfo=timezone.utc).isoformat(),
                                        '_end_time': datetime(
-                                           2018, 3, 7, 23, 35, 31, tzinfo=tzutc()).isoformat(),
+                                           2018, 3, 7, 23, 35, 31, tzinfo=timezone.utc).isoformat(),
                                        'events': 1,
                                        'country': '',
                                        'continent': ''

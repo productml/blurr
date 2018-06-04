@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from typing import Dict, Any, List
 
-from dateutil import parser
+import ciso8601
 from pytest import fixture
 
 from blurr.core.aggregate_activity import ActivityAggregate, ActivityAggregateSchema
@@ -79,7 +79,7 @@ def activity_events() -> List[Record]:
 
 def evaluate_event(record: Record, aggregate: ActivityAggregate) -> None:
     aggregate._evaluation_context.global_add('source', record)
-    aggregate._evaluation_context.global_add('time', parser.parse(record.event_time))
+    aggregate._evaluation_context.global_add('time', ciso8601.parse_datetime(record.event_time))
     aggregate.run_evaluate()
 
 

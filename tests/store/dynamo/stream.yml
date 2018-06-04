@@ -3,9 +3,9 @@ Version: '2018-03-01'
 Name: Sessions
 Description: Streaming Extended Test
 Import:
-  - { Module: dateutil, Identifiers: [ parser ]}
+  - { Module: ciso8601, Identifiers: [ parse_datetime ]}
 Identity: source.user_id
-Time: parser.parse(source.time)
+Time: parse_datetime(source.time)
 Stores: 
   -
     Type: Blurr:Store:Dynamo

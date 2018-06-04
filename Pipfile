@@ -8,7 +8,7 @@ name = "pypi"
 [packages]
 
 pyyaml = "*"
-python-dateutil = "*"
+ciso8601 = "*"
 docopt = "*"
 boto3 = "*"
 smart_open = "*"
