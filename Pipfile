@@ -12,6 +12,7 @@ python-dateutil = "*"
 docopt = "*"
 boto3 = "*"
 smart_open = "*"
+pybloom-live = "*"
 
 [dev-packages]
 

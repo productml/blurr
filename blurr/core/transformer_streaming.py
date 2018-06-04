@@ -13,17 +13,27 @@ class StreamingTransformerSchema(TransformerSchema):
 
     ATTRIBUTE_IDENTITY = 'Identity'
     ATTRIBUTE_TIME = 'Time'
+    ATTRIBUTE_RECORD_IDENTIFIER = 'RecordIdentifier'
 
     def __init__(self, fully_qualified_name: str, schema_loader: SchemaLoader) -> None:
         super().__init__(fully_qualified_name, schema_loader)
 
         self.identity = self.build_expression(self.ATTRIBUTE_IDENTITY)
         self.time = self.build_expression(self.ATTRIBUTE_TIME)
+        self.record_id = self.build_expression(self.ATTRIBUTE_RECORD_IDENTIFIER
+                                               ) if self.ATTRIBUTE_RECORD_IDENTIFIER in self._spec else None
 
     def validate_schema_spec(self) -> None:
         super().validate_schema_spec()
         self.validate_required_attributes(self.ATTRIBUTE_IDENTITY, self.ATTRIBUTE_TIME,
                                           self.ATTRIBUTE_STORES)
+
+    def extend_schema_spec(self) -> None:
+        super().extend_schema_spec()
+
+        # If record identifier is not declared, use the whole record object is used
+        if self.ATTRIBUTE_RECORD_IDENTIFIER not in self._spec:
+            self._spec[self.ATTRIBUTE_RECORD_IDENTIFIER] = 'source'
 
     def get_identity(self, record: Record) -> str:
         """
@@ -75,8 +85,11 @@ class StreamingTransformer(Transformer):
         self._evaluation_context.add_record(record)
         self._evaluation_context.global_add('time',
                                             self._schema.time.evaluate(self._evaluation_context))
+        self._evaluation_context.global_add('_record_id',
+                                            self._schema.record_id.evaluate(self._evaluation_context))
         super().run_evaluate()
 
         # Cleanup source and time form the context
         self._evaluation_context.remove_record()
         self._evaluation_context.global_remove('time')
+        self._evaluation_context.global_remove('_record_id')

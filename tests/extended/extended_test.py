@@ -1,7 +1,9 @@
 from datetime import datetime
+from decimal import Decimal
 
 from blurr.core.store_key import Key, KeyType
 from blurr.runner.local_runner import LocalRunner
+from tests.core.conftest import assert_aggregate_snapshot_equals
 
 
 def test_extended_runner():
@@ -15,7 +17,6 @@ def test_extended_runner():
     result_state = local_runner._per_user_data['user-1'][0][Key(KeyType.DIMENSION, 'user-1',
                                                                 'state')]
     expected_state = {
-        '_identity': 'user-1',
         'country': 'US',
         'build': 245,
         'is_paid': True,
@@ -25,7 +26,7 @@ def test_extended_runner():
         'offers_purchased': {
             'offer1': 1
         },
-        'badges': {'silver', 'bronze', 'gold'},
+        'badges': {'silver', 'gold', 'bronze'},
         'signin_method': 'other'
     }
     # Assert the badges is a list and then convert to set for unordered comparison.
@@ -35,12 +36,11 @@ def test_extended_runner():
     assert isinstance(result_state['badges'], list)
     result_state['badges'] = set(result_state['badges'])
 
-    assert result_state == expected_state
+    assert_aggregate_snapshot_equals(result_state, expected_state)
 
     result_session = local_runner._per_user_data['user-1'][0][Key(KeyType.DIMENSION, 'user-1',
                                                                   'session', ['session-3'])]
     expected_session = {
-        '_identity': 'user-1',
         '_start_time': datetime(2016, 2, 12, 0, 0, 0).isoformat(),
         '_end_time': datetime(2016, 2, 13, 0, 1, 25).isoformat(),
         'session_id': 'session-3',
@@ -54,12 +54,12 @@ def test_extended_runner():
         'start_score': 18,
         'end_score': 71
     }
-    assert result_session == expected_session
+
+    assert_aggregate_snapshot_equals(result_session, expected_session)
 
     result_session_10 = local_runner._per_user_data['user-1'][0][Key(KeyType.DIMENSION, 'user-1',
                                                                      'session', ['session-1'])]
     expected_session_10 = {
-        '_identity': 'user-1',
         '_start_time': datetime(2016, 2, 10, 0, 0).isoformat(),
         '_end_time': datetime(2016, 2, 10, 0, 1, 47).isoformat(),
         'session_id': 'session-1',
@@ -73,12 +73,11 @@ def test_extended_runner():
         'end_score': 57
     }
 
-    assert result_session_10 == expected_session_10
+    assert_aggregate_snapshot_equals(result_session_10, expected_session_10)
 
     result_session_11 = local_runner._per_user_data['user-1'][0][Key(KeyType.DIMENSION, 'user-1',
                                                                      'session', ['session-2'])]
     expected_session_11 = {
-        '_identity': 'user-1',
         '_start_time': datetime(2016, 2, 11, 0, 0).isoformat(),
         '_end_time': datetime(2016, 2, 11, 0, 0, 28).isoformat(),
         'session_id': 'session-2',
@@ -92,4 +91,4 @@ def test_extended_runner():
         'end_score': 18
     }
 
-    assert result_session_11 == expected_session_11
+    assert_aggregate_snapshot_equals(result_session_11, expected_session_11)

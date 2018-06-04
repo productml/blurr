@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 from typing import Any
 from unittest import mock
 
@@ -7,6 +8,7 @@ from botocore.exceptions import ClientError
 
 from blurr.core.store_key import Key, KeyType
 from blurr.runner.local_runner import LocalRunner
+from tests.core.conftest import assert_aggregate_snapshot_equals
 from tests.store.dynamo.utils import DYNAMODB_KWARGS
 
 
@@ -43,9 +45,9 @@ def test_extended_runner():
         'is_paid': True,
         'os_name': 'ios',
         'os_version': '7.1.1',
-        'max_level_completed': 7,
+        'max_level_completed': Decimal(7),
         'offers_purchased': {
-            'offer1': 1
+            'offer1': Decimal(1)
         },
         'badges': {'silver', 'bronze', 'gold'},
         'signin_method': 'other'
@@ -57,7 +59,7 @@ def test_extended_runner():
     assert isinstance(result_state['badges'], list)
     result_state['badges'] = set(result_state['badges'])
 
-    assert result_state == expected_state
+    assert_aggregate_snapshot_equals(result_state, expected_state)
 
     result_session = local_runner._per_user_data['user-1'][0][Key(KeyType.DIMENSION, 'user-1',
                                                                   'session', ['session-3'])]
@@ -76,7 +78,7 @@ def test_extended_runner():
         'start_score': 18,
         'end_score': 71
     }
-    assert result_session == expected_session
+    assert_aggregate_snapshot_equals(result_session, expected_session)
 
     result_session_10 = local_runner._per_user_data['user-1'][0][Key(KeyType.DIMENSION, 'user-1',
                                                                      'session', ['session-1'])]
@@ -94,7 +96,7 @@ def test_extended_runner():
         'end_score': 57
     }
 
-    assert result_session_10 == expected_session_10
+    assert_aggregate_snapshot_equals(result_session_10, expected_session_10)
 
     result_session_11 = local_runner._per_user_data['user-1'][0][Key(KeyType.DIMENSION, 'user-1',
                                                                      'session', ['session-2'])]
@@ -112,4 +114,4 @@ def test_extended_runner():
         'end_score': 18
     }
 
-    assert result_session_11 == expected_session_11
+    assert_aggregate_snapshot_equals(result_session_11, expected_session_11)

@@ -13,7 +13,7 @@ from blurr.core.store_key import Key, KeyType
 from blurr.core.transformer_streaming import StreamingTransformer
 from blurr.core.transformer_window import WindowTransformer, WindowTransformerSchema
 from blurr.core.type import Type
-from tests.core.conftest import init_memory_store
+from tests.core.conftest import init_memory_store, assert_aggregate_snapshot_equals
 
 
 @fixture
@@ -121,14 +121,18 @@ def test_window_transformer(schema_loader, window_transformer, time_aggregate):
     assert window_transformer.run_evaluate(time_aggregate) is True
 
     snapshot = window_transformer._snapshot
-    assert snapshot['last_session'] == {'_identity': 'user1', 'events': 2}
-    assert snapshot['last_day'] == {'_identity': 'user1', 'total_events': 3}
+    assert_aggregate_snapshot_equals(snapshot['last_session'], {'events': 2})
+    assert_aggregate_snapshot_equals(snapshot['last_day'], {'total_events': 3})
 
-    assert window_transformer.run_flattened_snapshot == {
+    flattened_snapshot = window_transformer.run_flattened_snapshot
+    del flattened_snapshot['last_session._identity']
+    del flattened_snapshot['last_session._processed_tracker']
+    del flattened_snapshot['last_day._identity']
+    del flattened_snapshot['last_day._processed_tracker']
+
+    assert flattened_snapshot == {
         'last_session.events': 2,
-        'last_session._identity': 'user1',
         'last_day.total_events': 3,
-        'last_day._identity': 'user1'
     }
 
 
@@ -144,13 +148,15 @@ def test_window_transformer_internal_reset(schema_loader, window_transformer, ti
 
     assert window_transformer.run_evaluate(time_aggregate) is True
     snapshot = window_transformer._snapshot
-    assert snapshot['last_session'] == {'_identity': 'user1', 'events': 2}
-    assert snapshot['last_day'] == {'_identity': 'user1', 'total_events': 3}
+    assert_aggregate_snapshot_equals(snapshot['last_session'], {'events': 2})
+    # Total Events was 2 prior to exaclty once semantics.  I have tranced the execution and it seems correct.
+    # TODO Validate this particular case
+    assert_aggregate_snapshot_equals(snapshot['last_day'], {'total_events': 3})
 
     assert window_transformer.run_evaluate(time_aggregate) is True
     snapshot = window_transformer._snapshot
-    assert snapshot['last_session'] == {'_identity': 'user1', 'events': 2}
-    assert snapshot['last_day'] == {'_identity': 'user1', 'total_events': 3}
+    assert_aggregate_snapshot_equals(snapshot['last_session'], {'events': 2})
+    assert_aggregate_snapshot_equals(snapshot['last_day'], {'total_events': 3})
 
 
 def test_window_transformer_schema_missing_attributes_adds_error(schema_loader, stream_schema_spec,

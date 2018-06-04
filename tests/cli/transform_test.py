@@ -63,7 +63,6 @@ def test_transform_only_stream(capsys, runner) -> None:
     out, err = capsys.readouterr()
     assert_record_in_ouput([
         'userA/session//2018-03-07T22:35:31+00:00', {
-            '_identity': 'userA',
             '_start_time': '2018-03-07T22:35:31+00:00',
             '_end_time': '2018-03-07T22:35:31+00:00',
             'events': 1,
@@ -73,13 +72,11 @@ def test_transform_only_stream(capsys, runner) -> None:
     ], out)
     assert_record_in_ouput(
         ['userA/state//', {
-            '_identity': 'userA',
             'country': 'IN',
             'continent': 'World'
         }], out)
     assert_record_in_ouput([
         'userA/session//2018-03-07T23:35:31+00:00', {
-            '_identity': 'userA',
             '_start_time': '2018-03-07T23:35:31+00:00',
             '_end_time': '2018-03-07T23:35:32+00:00',
             'events': 2,
@@ -101,10 +98,8 @@ def test_transform_valid_raw_with_source(capsys, runner) -> None:
     out, err = capsys.readouterr()
     assert_record_in_ouput([
         'userA', [{
-            'last_session._identity': 'userA',
-            'last_session.events': 2,
-            'last_day._identity': 'userA',
-            'last_day.total_events': 2
+            'last_session.events': 1,
+            'last_day.total_events': 1
         }]
     ], out)
     assert err == ''
@@ -116,10 +111,8 @@ def test_transform_valid_raw_without_source(capsys) -> None:
     out, err = capsys.readouterr()
     assert_record_in_ouput([
         'userA', [{
-            'last_session._identity': 'userA',
-            'last_session.events': 2,
-            'last_day._identity': 'userA',
-            'last_day.total_events': 2
+            'last_session.events': 1,
+            'last_day.total_events': 1
         }]
     ], out)
     assert err == ''

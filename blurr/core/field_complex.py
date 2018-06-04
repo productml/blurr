@@ -1,4 +1,8 @@
+from base64 import b64encode, b64decode
+from io import BytesIO
 from typing import Any
+
+from pybloom_live import ScalableBloomFilter
 
 from blurr.core.field import FieldSchema, ComplexTypeBase
 
@@ -82,3 +86,37 @@ class SetFieldSchema(FieldSchema):
     @staticmethod
     def decoder(value: Any) -> Set:
         return Set(value)
+
+
+class BloomFilter(ComplexTypeBase, ScalableBloomFilter):
+    def __init__(self):
+        super().__init__(mode=ScalableBloomFilter.LARGE_SET_GROWTH)
+
+    def dump(self) -> str:
+        file = BytesIO()
+        self.tofile(file)
+        return b64encode(file.getvalue()).decode("utf-8")
+
+    @classmethod
+    def load(cls, dump: str) -> 'BloomFilter':
+        file = BytesIO(b64decode(dump))
+        bf = cls.fromfile(file)
+        bf.__class__ = cls
+        return bf
+
+
+class BloomFilterFieldSchema(FieldSchema):
+    @property
+    def type_object(self) -> Any:
+        return BloomFilter
+
+    @property
+    def default(self) -> Any:
+        return BloomFilter()
+
+    @staticmethod
+    def encoder(value: BloomFilter) -> str:
+        return value.dump()
+
+    def decoder(self, value: Any) -> Any:
+        return self.type_object.load(value)

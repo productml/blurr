@@ -12,6 +12,7 @@ from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key, KeyType
 from blurr.core.transformer_streaming import StreamingTransformerSchema, StreamingTransformer
 from blurr.core.type import Type
+from tests.core.conftest import assert_aggregate_snapshot_equals
 
 
 @fixture
@@ -133,7 +134,7 @@ def test_streaming_transformer_evaluate(schema_loader: SchemaLoader,
     transformer = StreamingTransformer(transformer_schema, 'user1')
     transformer.run_evaluate(Record())
 
-    assert transformer._snapshot == {'test_group': {'_identity': 'user1', 'events': 1}}
+    assert_aggregate_snapshot_equals(transformer._snapshot['test_group'], {'events': 1})
 
 
 def test_streaming_transformer_finalize(schema_loader: SchemaLoader,
@@ -148,10 +149,7 @@ def test_streaming_transformer_finalize(schema_loader: SchemaLoader,
 
     transformer.run_evaluate(Record())
     transformer.run_finalize()
-    assert store.get(Key(KeyType.DIMENSION, 'user1', 'test_group')) == {
-        '_identity': 'user1',
-        'events': 1
-    }
+    assert_aggregate_snapshot_equals(store.get(Key(KeyType.DIMENSION, 'user1', 'test_group')), {'events': 1})
 
 
 def test_streaming_transformer_schema_missing_attributes_adds_error(schema_loader: SchemaLoader,

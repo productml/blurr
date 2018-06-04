@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import List, Optional, Tuple, Any, Dict, Iterable, Generator
-
+from typing import List, Optional, Tuple, Any, Dict, Iterable, Generator, Union
 
 import yaml
 from smart_open import smart_open
 
 from blurr.core import logging
-from blurr.core.aggregate_block import BlockAggregate, TimeAggregate
+from blurr.core.aggregate import AggregateSchema
+from blurr.core.aggregate_block import TimeAggregate
 from blurr.core.errors import PrepareWindowMissingBlocksError
 from blurr.core.evaluation import Context
 from blurr.core.record import Record
@@ -128,7 +128,8 @@ class Runner(ABC):
                 stream_transformer.run_evaluate(event)
             stream_transformer.run_finalize()
 
-        return self._get_store(schema_loader).get_all(identity)
+        # Clean hidden fields added for internal use
+        return {k: self._remove_hidden_fields(aggr) for k, aggr in self._get_store(schema_loader).get_all(identity).items()}
 
     def _execute_window_bts(self, identity: str, schema_loader: SchemaLoader) -> List[Dict]:
         if self._window_bts is None:
@@ -180,7 +181,7 @@ class Runner(ABC):
             logging.debug('No anchors found for identity {} out of {} blocks'.format(
                 identity, blocks))
 
-        return window_data
+        return [self._remove_hidden_fields(aggr) for aggr in window_data]
 
     @staticmethod
     def _get_store(schema_loader: SchemaLoader) -> Store:
@@ -209,3 +210,8 @@ class Runner(ABC):
     @abstractmethod
     def print_output(self, *args, **kwargs):
         NotImplemented('execute must be implemented')
+
+    @staticmethod
+    def _remove_hidden_fields(item: Dict[str, Any]) -> Dict[str, Any]:
+        fields_to_remove = [AggregateSchema.ATTRIBUTE_FIELD_IDENTITY, AggregateSchema.ATTRIBUTE_FIELD_PROCESSED_TRACKER]
+        return {k: v for k, v in item.items() if not any(x for x in fields_to_remove if k == x or k.endswith('.' + x))}

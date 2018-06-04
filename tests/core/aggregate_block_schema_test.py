@@ -42,6 +42,12 @@ def match_fields(fields):
         'Value': 'identity',
         ATTRIBUTE_INTERNAL: True
     }, {
+        'Name': '_processed_tracker',
+        'Type': Type.BLOOM_FILTER,
+        'Value': 'user._processed_tracker.add(_record_id)',
+        'When': '"_record_id" in globals() or "_record_id" in locals()',
+        ATTRIBUTE_INTERNAL: True
+    }, {
         'Name': '_start_time',
         'Type': Type.DATETIME,
         'Value': 'time if user._start_time is None else time if time < '

@@ -25,6 +25,7 @@ ITEM_MAP = {
     Type.MAP: 'blurr.core.field.Field',
     Type.LIST: 'blurr.core.field.Field',
     Type.SET: 'blurr.core.field.Field',
+    Type.BLOOM_FILTER: 'blurr.core.field.Field'
 }
 
 SCHEMA_MAP = {
@@ -48,7 +49,8 @@ SCHEMA_MAP = {
     Type.FLOAT: 'blurr.core.field_simple.FloatFieldSchema',
     Type.MAP: 'blurr.core.field_complex.MapFieldSchema',
     Type.LIST: 'blurr.core.field_complex.ListFieldSchema',
-    Type.SET: 'blurr.core.field_complex.SetFieldSchema'
+    Type.SET: 'blurr.core.field_complex.SetFieldSchema',
+    Type.BLOOM_FILTER: 'blurr.core.field_complex.BloomFilterFieldSchema'
 }
 
 # TODO Build dynamic type loader from a central configuration rather than reading a static dictionary

@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from typing import Dict, Any
 
 from pytest import fixture
 
@@ -6,6 +7,7 @@ from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key, KeyType
 from blurr.core.type import Type
 from blurr.store.memory_store import MemoryStore
+from blurr.core.aggregate import AggregateSchema
 
 
 @fixture
@@ -109,3 +111,17 @@ def init_memory_store(store: MemoryStore) -> None:
             'events': 6,
             '_start_time': date.isoformat()
         })
+
+
+def assert_aggregate_snapshot_equals(left: Dict[str, Any], right: Dict[str, Any], verify_identity = False):
+    """ Compares two aggregate snapshots for equality after removing the implicitly added fields """
+
+    left.pop(AggregateSchema.ATTRIBUTE_FIELD_PROCESSED_TRACKER, None)
+    right.pop(AggregateSchema.ATTRIBUTE_FIELD_PROCESSED_TRACKER, None)
+
+    if not verify_identity:
+        left.pop(AggregateSchema.ATTRIBUTE_FIELD_IDENTITY, None)
+        right.pop(AggregateSchema.ATTRIBUTE_FIELD_IDENTITY, None)
+
+    assert len(left) == len(right)
+    assert left == right
