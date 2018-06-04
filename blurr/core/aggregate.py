@@ -4,6 +4,7 @@ from typing import Dict, Type, Any
 from blurr.core.base import BaseSchemaCollection, BaseItemCollection, BaseItem
 from blurr.core.errors import MissingAttributeError
 from blurr.core.evaluation import EvaluationContext
+from blurr.core.field import Field
 from blurr.core.loader import TypeLoader
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store import StoreSchema, Store
@@ -77,7 +78,7 @@ class Aggregate(BaseItemCollection, ABC):
                 self._schema.store_schema.fully_qualified_name)
 
     @property
-    def _nested_items(self) -> Dict[str, Type[BaseItem]]:
+    def _nested_items(self) -> Dict[str, Field]:
         """
         Returns the dictionary of fields the Aggregate contains
         """

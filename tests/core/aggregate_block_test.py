@@ -7,6 +7,7 @@ from blurr.core.aggregate_block import BlockAggregateSchema, \
     BlockAggregate
 from blurr.core.evaluation import EvaluationContext
 from blurr.core.field import Field
+from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.store_key import Key, KeyType
 from blurr.core.type import Type
@@ -81,46 +82,55 @@ def test_block_aggregate_schema_evaluate_without_split(block_aggregate_schema_sp
 
     # aggregate snapshot should not exist in store
     assert block_aggregate._store.get(
-        Key(key_type=KeyType.TIMESTAMP,
+        Key(key_type=KeyType.DIMENSION,
             identity=block_aggregate._identity,
-            group=block_aggregate._name,
-            timestamp=block_aggregate._start_time)) is None
+            group=block_aggregate._name)) is None
 
 
-def test_block_aggregate_schema_evaluate_with_split(block_aggregate_schema_spec, schema_loader):
-    block_aggregate_schema_spec['Split'] = 'user.event_count == 2'
+def test_block_aggregate_schema_evaluate_with_dimensions(block_aggregate_schema_spec,
+                                                         schema_loader):
+    block_aggregate_schema_spec['Dimensions'] = [{
+        'Name': 'label',
+        'Type': Type.STRING,
+        'Value': 'source.label'
+    }]
     name = schema_loader.add_schema_spec(block_aggregate_schema_spec)
     block_aggregate_schema = BlockAggregateSchema(name, schema_loader)
 
     identity = 'userA'
     time = datetime(2018, 3, 7, 19, 35, 31, 0, timezone.utc)
     block_aggregate = create_block_aggregate(block_aggregate_schema, time, identity)
+    block_aggregate._evaluation_context.global_add('source', Record({'label': 'label1'}))
     block_aggregate.run_evaluate()
     block_aggregate.run_evaluate()
 
     # Check eval results of various fields before split
-    assert check_fields(block_aggregate._nested_items, {
-        '_identity': identity,
-        'event_count': 2,
-        '_start_time': time,
-        '_end_time': time
-    })
+    assert check_fields(
+        block_aggregate._nested_items, {
+            '_identity': identity,
+            'event_count': 2,
+            '_start_time': time,
+            '_end_time': time,
+            'label': 'label1',
+        })
 
     current_snapshot = block_aggregate._snapshot
+    block_aggregate._evaluation_context.global_add('source', Record({'label': 'label2'}))
     block_aggregate.run_evaluate()
 
     # Check eval results of various fields
-    assert check_fields(block_aggregate._nested_items, {
-        '_identity': identity,
-        'event_count': 1,
-        '_start_time': time,
-        '_end_time': time
-    })
+    assert check_fields(
+        block_aggregate._nested_items, {
+            '_identity': identity,
+            'event_count': 1,
+            '_start_time': time,
+            '_end_time': time,
+            'label': 'label2',
+        })
 
     # Check aggregate snapshot present in store
     assert block_aggregate._store.get(
-        Key(key_type=KeyType.TIMESTAMP,
+        Key(key_type=KeyType.DIMENSION,
             identity=block_aggregate._identity,
             group=block_aggregate._name,
-            dimensions=[],
-            timestamp=time)) == current_snapshot
+            dimensions=['label1'])) == current_snapshot

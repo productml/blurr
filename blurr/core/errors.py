@@ -370,3 +370,10 @@ class MissingAttributeError(Exception):
     Raised when the name of the item being retrieved does not exist in the nested items.
     """
     pass
+
+
+class KeyError(Exception):
+    """
+    Raised when an issues happens with respect to the store Key.
+    """
+    pass

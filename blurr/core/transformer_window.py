@@ -1,6 +1,6 @@
 from typing import Dict, Optional
 
-from blurr.core.aggregate_block import BlockAggregate
+from blurr.core.aggregate_block import BlockAggregate, TimeAggregate
 from blurr.core.aggregate_window import WindowAggregate
 from blurr.core.anchor import Anchor
 from blurr.core.errors import AnchorBlockNotDefinedError
@@ -48,7 +48,7 @@ class WindowTransformer(Transformer):
         self._evaluation_context.merge(EvaluationContext(context))
         self._anchor = Anchor(schema.anchor)
 
-    def run_evaluate(self, block: BlockAggregate) -> bool:
+    def run_evaluate(self, block: TimeAggregate) -> bool:
         """
         Evaluates the anchor condition against the specified block.
         :param block: Block to run the anchor condition against.

@@ -9,7 +9,7 @@
 {"event_id": "purchase_completed", "time": "2016-02-11T00:00:22", "user_id": "user-1", "session_id": "session-2", "offer_key": "offer1"}
 {"event_id": "game_start", "time": "2016-02-11T00:00:24", "user_id": "user-1", "session_id": "session-2", "level": 6, "score": 8}
 {"event_id": "game_end", "time": "2016-02-11T00:00:28", "user_id": "user-1", "session_id": "session-2", "level": 6, "score": 18, "badge": "bronze", "won": false}
-{"event_id": "app_launched", "time": "2016-02-12T00:00:00", "user_id": "user-1", "session_id": "session-3", "build": 245, "signin_method": "https://www.instagram.com/something", "os-version": "ios"}
+{"event_id": "app_launched", "time": "2016-02-12T00:00:00", "user_id": "user-1", "session_id": "session-3", "build": 245, "signin_method": "https://www.instagram.com/something", "os-version": "ios", "score": 18}
 {"event_id": "game_start", "time": "2016-02-12T00:00:32", "user_id": "user-1", "session_id": "session-3", "level": 6, "score": 18}
 {"event_id": "game_end", "time": "2016-02-12T00:00:39", "user_id": "user-1", "session_id": "session-3", "level": 6, "score": 38, "badge": "bronze", "won": false}
 {"event_id": "game_start", "time": "2016-02-12T00:00:46", "user_id": "user-1", "session_id": "session-3", "level": 6, "score": 38}
