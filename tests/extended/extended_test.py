@@ -16,7 +16,6 @@ def test_extended_runner():
     result_state = local_runner._per_user_data['user-1'][0][Key(KeyType.DIMENSION, 'user-1',
                                                                 'state')]
     expected_state = {
-        '_identity': 'user-1',
         'country': 'US',
         'build': 245,
         'is_paid': True,
@@ -60,7 +59,6 @@ def test_extended_runner():
     result_session_10 = local_runner._per_user_data['user-1'][0][Key(KeyType.DIMENSION, 'user-1',
                                                                      'session', ['session-1'])]
     expected_session_10 = {
-        '_identity': 'user-1',
         '_start_time': datetime(2016, 2, 10, 0, 0).isoformat(),
         '_end_time': datetime(2016, 2, 10, 0, 1, 47).isoformat(),
         'session_id': 'session-1',
@@ -79,7 +77,6 @@ def test_extended_runner():
     result_session_11 = local_runner._per_user_data['user-1'][0][Key(KeyType.DIMENSION, 'user-1',
                                                                      'session', ['session-2'])]
     expected_session_11 = {
-        '_identity': 'user-1',
         '_start_time': datetime(2016, 2, 11, 0, 0).isoformat(),
         '_end_time': datetime(2016, 2, 11, 0, 0, 28).isoformat(),
         'session_id': 'session-2',
