@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 
 from blurr.core.store_key import Key, KeyType
 from blurr.runner.local_runner import LocalRunner
@@ -21,11 +22,11 @@ def test_extended_runner():
         'is_paid': True,
         'os_name': 'ios',
         'os_version': '7.1.1',
-        'max_level_completed': 7,
+        'max_level_completed': Decimal(7),
         'offers_purchased': {
-            'offer1': 1
+            'offer1': Decimal(1)
         },
-        'badges': {'silver', 'bronze', 'gold'},
+        'badges': {'silver', 'gold', 'bronze'},
         'signin_method': 'other'
     }
     # Assert the badges is a list and then convert to set for unordered comparison.
