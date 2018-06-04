@@ -67,7 +67,7 @@ class FieldSchema(BaseSchema, ABC):
 
     # TODO: Add unit tests for the casting being done here.
     def decoder(self, value: Any) -> Any:
-        return self.type_object(value)
+        return self.sanitize_object(self.type_object(value))
 
 
 class Field(BaseItem):

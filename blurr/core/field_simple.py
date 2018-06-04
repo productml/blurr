@@ -66,6 +66,5 @@ class DateTimeFieldSchema(FieldSchema):
     def encoder(value: Any) -> str:
         return value.isoformat() if value else None
 
-    @staticmethod
-    def decoder(value: Any) -> datetime:
-        return parser.parse(value) if value else None
+    def decoder(self, value: Any) -> datetime:
+        return self.sanitize_object(parser.parse(value)) if value else None
