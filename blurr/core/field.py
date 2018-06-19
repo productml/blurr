@@ -38,6 +38,13 @@ class FieldSchema(BaseSchema, ABC):
         """
         raise NotImplementedError('type_object is required')
 
+    @staticmethod
+    def sanitize_object(instance: Any) -> Any:
+        """
+        Sanitize object after evaluation if needed
+        """
+        return instance
+
     def is_type_of(self, instance: Any) -> bool:
         """
         Checks if instance is of the type
@@ -60,7 +67,7 @@ class FieldSchema(BaseSchema, ABC):
 
     # TODO: Add unit tests for the casting being done here.
     def decoder(self, value: Any) -> Any:
-        return self.type_object(value)
+        return self.sanitize_object(self.type_object(value))
 
 
 class Field(BaseItem):
@@ -104,6 +111,15 @@ class Field(BaseItem):
                     self._schema.fully_qualified_name, err))
                 self.eval_error = True
                 return
+
+        try:
+            result = self._schema.sanitize_object(result)
+        except Exception as err:
+            logging.debug('{} in sanitizing {} of type {} for field {}. Error: {}'.format(
+                type(err).__name__, result, self._schema.type, self._schema.fully_qualified_name,
+                err))
+            self.eval_error = True
+            return
 
         self.value = result
 

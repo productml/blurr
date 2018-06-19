@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from dateutil import parser
@@ -56,9 +56,15 @@ class DateTimeFieldSchema(FieldSchema):
         return None
 
     @staticmethod
+    def sanitize_object(instance: datetime) -> datetime:
+        if instance.tzinfo is None or instance.tzinfo.utcoffset(instance) is None:
+            instance = instance.replace(tzinfo=timezone.utc)
+
+        return instance
+
+    @staticmethod
     def encoder(value: Any) -> str:
         return value.isoformat() if value else None
 
-    @staticmethod
-    def decoder(value: Any) -> datetime:
-        return parser.parse(value) if value else None
+    def decoder(self, value: Any) -> datetime:
+        return self.sanitize_object(parser.parse(value)) if value else None

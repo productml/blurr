@@ -1,6 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from blurr.core.errors import IdentityError, TimeError
+from blurr.core.field_simple import DateTimeFieldSchema
 from blurr.core.record import Record
 from blurr.core.schema_loader import SchemaLoader
 from blurr.core.transformer import Transformer, TransformerSchema
@@ -49,6 +50,9 @@ class StreamingTransformerSchema(TransformerSchema):
         if not time or not isinstance(time, datetime):
             raise TimeError('Could not determine time using {}.  Record is {}'.format(
                 self.time.code_string, record))
+
+        time = DateTimeFieldSchema.sanitize_object(time)
+
         context.remove_record()
         return time
 
@@ -73,8 +77,10 @@ class StreamingTransformer(Transformer):
 
         # Add source record and time to the global context
         self._evaluation_context.add_record(record)
-        self._evaluation_context.global_add('time',
-                                            self._schema.time.evaluate(self._evaluation_context))
+        self._evaluation_context.global_add(
+            'time',
+            DateTimeFieldSchema.sanitize_object(
+                self._schema.time.evaluate(self._evaluation_context)))
         super().run_evaluate()
 
         # Cleanup source and time form the context

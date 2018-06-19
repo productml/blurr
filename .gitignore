@@ -116,14 +116,8 @@ ENV/
 blurr/VERSION
 examples/tutorial/Raw data generation template.xlsx
 
-# examples output data
-docs/examples/tutorial/.ipynb_checkpoints
-docs/examples/tutorial/session_data*.log
-docs/examples/tutorial/session_data*.log
-
 # include tutorial output and input logs
-
-!docs/examples/tutorial/tutorial*.log
+!docs/examples/*/*.log
 
 # scripts temporal Pipfiles
 scripts/Pipfile*

@@ -31,8 +31,8 @@ def transform(runner: Optional[str], stream_bts_file: Optional[str], window_bts_
         data_processor = 'simple'
 
     if runner not in RUNNER_CLASS:
-        eprint('Unknown runner: \'{}\'. Possible values: {}'.format(runner, list(
-            RUNNER_CLASS.keys())))
+        eprint('Unknown runner: \'{}\'. Possible values: {}'.format(runner,
+                                                                    list(RUNNER_CLASS.keys())))
         return 1
 
     if data_processor not in DATA_PROCESSOR_CLASS:

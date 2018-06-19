@@ -78,7 +78,3 @@ class SetFieldSchema(FieldSchema):
     @staticmethod
     def encoder(value: Any) -> Set:
         return list(value)
-
-    @staticmethod
-    def decoder(value: Any) -> Set:
-        return Set(value)
